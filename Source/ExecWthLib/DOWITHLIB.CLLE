@@ -1,0 +1,22 @@
+             PGM        PARM(&LIB &PCMD)
+
+             DCL        VAR(&LIB) TYPE(*CHAR) LEN(10)
+             DCL        VAR(&PCMD) TYPE(*CHAR) LEN(5002)
+             DCL        VAR(&CMDLEN_INT) TYPE(*UINT) STG(*DEFINED) LEN(2) DEFVAR(&PCMD)
+             DCL        VAR(&CMD) TYPE(*CHAR) STG(*DEFINED) LEN(5000) DEFVAR(&PCMD 3)
+             DCL        VAR(&CMDLEN) TYPE(*DEC) LEN(15 5)
+
+             CHGVAR     VAR(&CMDLEN) VALUE(&CMDLEN_INT)
+
+             /* Add library to library list. It's ok if it is already there. */
+             ADDLIBLE   LIB(&LIB) POSITION(*FIRST)
+             MONMSG     MSGID(CPF2103) EXEC(DO)
+                RCVMSG     MSGTYPE(*LAST) RMV(*YES)
+             ENDDO
+
+             /* Call command, don't trap errors so `system` will pick up success or failure. */
+             CALL       PGM(QSYS/QCMDEXC) PARM(&CMD &CMDLEN)
+             MONMSG     MSGID(CZM0000 CZS0000 CPF0000 RNS0000) EXEC(DO)
+                CALL       PGM(QMHRSNEM) PARM('    ' X'0000000800000000')
+               /*NDPGMMSG  MSGID(CPF0212) MSGF(QCPFMSG) MSGTYPE(*ESCAPE)*/
+             ENDDO
