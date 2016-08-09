@@ -132,17 +132,16 @@ VPATH := $(OBJPATH):$(SRCPATH)
 	@echo "\n\n***"
 	@echo "*** Creating module [$*]"
 	@echo "***"
-	@echo ""
 	$(eval crtcmd := crtcmod module($(OBJLIB)/$*) srcstmf('$<') $(CRTCMODFLAGS))
-	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))"  > $(LOGPATH)/$(notdir $<).log
-	$(POSTCCOMPILE)
+	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log
+	@$(POSTCCOMPILE)
 	
 %.MODULE: %.RPGLE
 	@echo "\n\n***"
 	@echo "*** Creating module [$*]"
 	@echo "***"
 	$(eval crtcmd := crtrpgmod module($(OBJLIB)/$*) srcstmf('$<') $(CRTRPGMODFLAGS))
-	system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log
+	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log
 
 
 %.MODULE: %.SQLRPGLE
@@ -150,7 +149,7 @@ VPATH := $(OBJPATH):$(SRCPATH)
 	@echo "*** Creating SQLRPGLE module [$*]"
 	@echo "***"
 	$(eval crtcmd := crtsqlrpgi obj($(OBJLIB)/$*) srcstmf('$<') $(CRTSQLRPGIFLAGS))
-	system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log
+	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log
 
 %.FILE: %.PF
 	@echo "\n\n***"
@@ -196,7 +195,7 @@ VPATH := $(OBJPATH):$(SRCPATH)
 	@echo "*** Creating program [$*] from modules [$^]"
 	@echo "***"
 	$(eval crtcmd := crtpgm pgm($(OBJLIB)/$*) module($(basename $^)) $(CRTPGMFLAGS))
-	system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$@.log
+	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$@.log
 
 $(DEPDIR)/%.d: ;
 .PRECIOUS: $(DEPDIR)/%.d
@@ -215,7 +214,7 @@ make_post:
 	@echo "\n\n***"
 	@echo "*** Source directory:\t$(SRCPATH)"
 	@echo "*** Target library:\t$(OBJLIB)"
-	@echo "*** Compile outputs:\t$(LOGPATH)"
+	@echo "*** Compile listings:\t$(LOGPATH)"
 	@echo "***"
 	@echo "***           * * * * *   B u i l d   S u c c e s s f u l !   * * * * *"
 
