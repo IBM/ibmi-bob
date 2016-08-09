@@ -15,7 +15,7 @@
 #   o ADDLIBLE <object_lib>
 #   o CALL QP2TERM
 #   o cd /some/path/that's/not/QSYS.LIB
-#   o make all OBJPATH:='/QSYS.LIB/<object_lib>.LIB -f <location of makefile>
+#   o make all INCLUDEMAKEFILES:='/path/to/project-specific/makefile.mak' OBJPATH:='/QSYS.LIB/<object_lib>.LIB' -f /location/of/Makefile
 #
 
 # Define some Makefile variables for the compiler.
@@ -85,10 +85,11 @@ CRTSRVPGMFLAGS2 =
 CRTPGMFLAGS2 =
 
 # Miscellaneous variables
+INCLUDEMAKEFILES :=
 SRCPATH := /home/jberman/Source/xp303make
 OBJPATH := $(CURDIR)
 OBJLIB := $(basename $(notdir $(OBJPATH)))
-SDEPATH := /home/jberman/SDE
+SDEPATH := /home/jberman/Source/SDE
 SDELIB := SDE
 runDate := $(shell date +"%F_%H.%M.%S-%a")
 LOGPATH := $(SRCPATH)/Logs/$(runDate)
@@ -97,8 +98,8 @@ DEPDIR := $(SRCPATH)/.deps
 $(shell mkdir -p $(DEPDIR) >/dev/null)
 
 # cleanCDeps removes from the CRTCMOD-generated dependency file any header files located in /QIBM/, plus the
-# original .C file that is included for some reason.
-cleanCDeps = awk '$$2 !~ /^\/QIBM\// && $$2 !~ /$(notdir $<)$$/ { sub("^.*/","",$$2); print $$1 " " $$2 }'
+# original .C file that is included for some reason, and adds the correct suffix to the target (SO1001 -> SO1001.MODULE).
+cleanCDeps = awk '$$2 !~ /^\/QIBM\// && $$2 !~ /$(notdir $<)$$/ { sub("^.*/","",$$2); sub("^$*","$@",$$1); print $$1 " " toupper($$2) }'
 
 # This defines the steps taken after a C compile to massage the auto-generated dependencies into a useable form.
 # See http://make.mad-scientist.net/papers/advanced-auto-dependency-generation/#tldr
@@ -121,9 +122,6 @@ CRTFRMSTMFLIB = CRTFRMSTMF
 
 VPATH := $(OBJPATH):$(SRCPATH)
 
-.PHONY: all
-all: FLDREF.FILE SO1SCP.FILE SYSOPT.FILE SO1001D.FILE JSB067.MODULE SO1001.PGM make_post
-
 ### Implicit rules
 %.MODULE: private TGTRLS = $(moduleTGTRLS)
 %.MODULE: private AUT = $(moduleAUT)
@@ -137,7 +135,7 @@ all: FLDREF.FILE SO1SCP.FILE SYSOPT.FILE SO1001D.FILE JSB067.MODULE SO1001.PGM m
 	@echo ""
 	$(eval crtcmd := crtcmod module($(OBJLIB)/$*) srcstmf('$<') $(CRTCMODFLAGS))
 	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))"  > $(LOGPATH)/$(notdir $<).log
-	@$(POSTCCOMPILE)
+	$(POSTCCOMPILE)
 	
 %.MODULE: %.RPGLE
 	@echo "\n\n***"
@@ -204,21 +202,7 @@ $(DEPDIR)/%.d: ;
 .PRECIOUS: $(DEPDIR)/%.d
 
 ### Rules
-FLDREF.FILE: FLDREF.PF 
-PGMSTS.FILE: PGMSTS.PF
-
-SO1SCP.FILE: SO1SCP.PF FLDREF.FILE
-SYSOPT.FILE: SYSOPT.PF FLDREF.FILE
-
-SO1001D.FILE: SO1001D.DSPF FLDREF.FILE  # Eventually add message file here.
-
-SO1001.MODULE: SO1001.RPGLE SO1001D.FILE SYSOPT.FILE SO1SCP.FILE PGMOPT.FILE PGMSTS.FILE
-JSB067.MODULE: JSB067.C
-
-SO1001.PGM: SO1001.MODULE
-#SO1001.PGM: CRTPGMFLAGS = $(call setFlags(CRTPGMFLAGS, TGTRLS(V7R1M0), ACTGRP(*NEW))
-
-#RPG1.SRVPGM: RPG1.MODULE RPG2.MODULE
+include $(INCLUDEMAKEFILES)
 
 
 #.PHONY: make_pre
@@ -242,9 +226,15 @@ version: ; @echo "Make version: $(MAKE_VERSION)"
 
 .PHONY: test
 test:
-	@echo "SHELL:		$(SHELL)"; \
-	echo ".SHELLFLAGS:	$(.SHELLFLAGS)"; \
-	echo "CURDIR:		$(CURDIR)"; \
-	echo "OBJPATH:	$(OBJPATH)"; \
-	echo "OBJLIB:		$(OBJLIB)";
+	@echo "SHELL:			$(SHELL)"; \
+	echo ".SHELLFLAGS:		$(.SHELLFLAGS)"; \
+	echo "CURDIR:			$(CURDIR)"; \
+	echo "SRCPATH:		$(SRCPATH)"; \
+	echo "DEPDIR:			$(DEPDIR)"; \
+	echo "OBJPATH:		$(OBJPATH)"; \
+	echo "OBJLIB:			$(OBJLIB)"; \
+	echo "INCLUDEMAKEFILES:	$(INCLUDEMAKEFILES)";
 
+# Include all auto-generated source dependency files. Since we don't have a list of source files,
+# we have to grab everything in the `$DEPDIR` directory.
+-include $(wildcard $(DEPDIR)/*.d)
