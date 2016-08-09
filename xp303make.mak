@@ -2,8 +2,22 @@
 ### Included by the QSYSmake generic Makefile.
 
 .PHONY: all
-all: FLDREF.FILE SO1SCP.FILE SYSOPT.FILE SO1001D.FILE JSB067.MODULE SO1001.PGM make_post
+all: PFs LFs DSPFs MODULEs SRVPGMs PGMs make_post
 
+### Group objects by type so they're compiled in the correct order.
+PFs: FLDREF.FILE SO1SCP.FILE SYSOPT.FILE
+
+LFs:
+
+DSPFs: SO1001D.FILE
+
+MODULEs: JSB067.MODULE
+
+SRVPGMs:
+
+PGMs: SO1001.PGM
+
+### Rules
 FLDREF.FILE: FLDREF.PF 
 PGMSTS.FILE: PGMSTS.PF
 
