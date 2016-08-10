@@ -104,9 +104,10 @@ cleanCDeps = awk '$$2 !~ /^\/QIBM\// && $$2 !~ /$(notdir $<)$$/ { sub("^.*/","",
 # This defines the steps taken after a C compile to massage the auto-generated dependencies into a useable form.
 # See http://make.mad-scientist.net/papers/advanced-auto-dependency-generation/#tldr
 define POSTCCOMPILE =
-iconv -f IBM-037 -t ISO8859-1 $(DEPDIR)/$*.Td | tr -d '\r' > $(DEPDIR)/$*.du
-$(cleanCDeps) <$(DEPDIR)/$*.du >$(DEPDIR)/$*.d
-rm $(DEPDIR)/$*.Td $(DEPDIR)/$*.du
+iconv -f IBM-037 -t ISO8859-1 $(DEPDIR)/$*.Td | tr -d '\r' > $(DEPDIR)/$*.T2d
+$(cleanCDeps) <$(DEPDIR)/$*.T2d >$(DEPDIR)/$*.d
+touch -cr $(OBJPATH)/$@ $(DEPDIR)/$*.d
+rm $(DEPDIR)/$*.Td $(DEPDIR)/$*.T2d
 endef
 
 # Example of setting pattern-specific variable when multiple source patterns exist (like with files).
