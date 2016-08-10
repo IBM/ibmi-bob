@@ -1,0 +1,19 @@
+# Scan through current directory of BLDOPT files and extract commands and parameters.
+
+# Default values
+DFT1='AUT(\*EXCLUDE)'
+DFT2='TGTRLS(V5R1M0)'
+DFT3='DBGVIEW(\*LIST)'
+
+files=( "*" )
+for file in $files; do
+	base=$(basename $file .CLP)
+#if [[ $file = 'CRTBNDRPG.CLP' ]]; then
+	sed -e 's/\/\*.*\*\///g' -e 's/ *$//' -e 's/\s*+$//' -e '/^$/d' -e 's/^ *//' -e 's/ *) */) /g' \
+        -e 's/&O\///' -e 's/\&ZE/'$base'/g' -e 's/SRCMBR(&.*) *//' -e 's/SRCFILE(&.*) *//' \
+		-e 's/REPLACE(\*YES) *//' -e 's/DBGVIEW(.*) *//' -e 's/'$DFT1' *//' -e 's/'$DFT2' *//' -e 's/'$DFT3' *//' \
+	$file | tr -d '\n' | \
+	sed -e 's/ *\/\*.*\*\/ *//g'
+	echo
+#fi
+done
