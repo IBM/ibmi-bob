@@ -187,6 +187,8 @@ VPATH := $(OBJPATH):$(SRCPATH)
 	$(eval crtcmd := crtsrvpgm srvpgm($(OBJLIB)/$*) module($(basename $^)) $(CRTSRVPGMFLAGS))
 	system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$@.log
 
+# I think need to modify `module` parameter to only include dependencies that end in '.MODULE'.
+# Also add `srvpgm` parameter, with contents calculated the same way, but with '.SRVPGM'.
 %.PGM: private TGTRLS = $(PGM_TGTRLS)
 %.PGM: private ACTGRP = $(PGM_ACTGRP)
 %.PGM: private AUT = $(PGM_AUT)
