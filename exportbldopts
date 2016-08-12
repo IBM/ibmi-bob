@@ -1,3 +1,5 @@
+#!/usr/bin/bash
+
 # Scan through current directory of BLDOPT files and extract commands and parameters.
 #
 # Processing
@@ -9,10 +11,10 @@
 # o Output object dependencies based on 'SRCMBR', 'MODULE' and 'BNDSRVPGM' parameters, like "SEGDES.1.PGM: SEGDES.1.MODULE SEGDEF_S.SRVPGM SEGACT_S.SRVPGM"
 #   Don't forget binder source, too.
 
-# Default values
-DFT1='AUT(\*EXCLUDE)'
-DFT2='TGTRLS(V5R1M0)'
-DFT3='DBGVIEW(\*LIST)'
+# Global default values
+DFT_AUT='AUT(\*EXCLUDE)'
+DFT_TGTRLS='TGTRLS(V5R1M0)'
+DFT_USRPRF='USRPRF(\*USER)'
 
 files=( "*" )
 for file in $files; do
@@ -20,7 +22,7 @@ for file in $files; do
 #if [[ $file = 'CRTBNDRPG.CLP' ]]; then
 	sed -e 's/\/\*.*\*\///g' -e 's/ *$//' -e :a -e '/+ *$/N; s/ *+ *\n */ /; ta' -e '/^$/d' -e 's/^ *//' -e 's/ *) */) /g' -e 's/^/'$base': /' \
         -e 's/&O\///' -e 's/\&ZE/'$base'/g' -e 's/SRCMBR(&[^)]*) *//' -e 's/SRCFILE(&[^)]*) *//' \
-		-e 's/REPLACE(\*YES) *//' -e 's/DBGVIEW([^)]*) *//' -e 's/'$DFT1' *//' -e 's/'$DFT2' *//' -e 's/'$DFT3' *//' \
+		-e 's/REPLACE(\*YES) *//' -e 's/DBGVIEW([^)]*) *//' -e 's/'$DFT_AUT' *//' -e 's/'$DFT_TGTRLS' *//' -e 's/'$DFT_USRPRF' *//' \
 	$file | \
 	sed -e 's/ *\/\*.*\*\/ *//g'
 #fi

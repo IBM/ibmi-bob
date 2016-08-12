@@ -1,0 +1,9 @@
+#!/usr/bin/bash
+
+echo 'This is one big fat test
+And this is another' | \
+{
+while IFS='' read -r line line2; do
+	echo ${line}
+done
+}

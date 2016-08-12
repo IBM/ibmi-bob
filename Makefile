@@ -31,6 +31,7 @@
 # tl;dr: If you want to customize a compile setting for an object, change these variables
 # in your TARGET (not here).
 TGTRLS := V6R1M0
+DFTACTGRP := *NO
 ACTGRP := E_PRODUCT
 AUT := *EXCLUDE
 DETAIL := *EXTENDED
@@ -39,14 +40,23 @@ COMMIT := *NONE
 DBGVIEW := *ALL
 TEXT := TEST
 RSTDSP := *YES
+VLDCKR := *NONE
+PMTFILE := COMANDM
 
 # Object-type-specific defaults.  Not used directly, but copied to the standard ones above and then
-# inserted into the compile commands.  Change these to alter compile defaults for an entire type of
+# inserted into the compile commands.  Each variable here should also precede its corresponding pattern
+# rule as a pattern-specific variable. Change these to alter compile defaults for an entire type of
 # objects.
 PGM_TGTRLS := $(TGTRLS)
-PGM_ACTGRP := E_PRODUCT
+PGM_ACTGRP := $(ACTGRP)
 PGM_AUT := $(AUT)
 PGM_DETAIL := $(DETAIL)
+
+BNDCL_DFTACTGRP := $(DFTACTGRP)
+BNDCL_ACTGRP := $(ACTGRP)
+
+BNDRPG_DFTACTGRP := $(DFTACTGRP)
+BNDRPG_ACTGRP := $(ACTGRP)
 
 SRVPGM_TGTRLS := $(TGTRLS)
 SRVPGM_ACTGRP := *CALLER
@@ -57,6 +67,10 @@ RPGMOD_TGTRLS := $(TGTRLS)
 RPGMOD_AUT := $(AUT)
 RPGMOD_OPTION := $(OPTION)
 
+CLMOD_TGTRLS := $(TGTRLS)
+CLMOD_AUT := $(AUT)
+CLMOD_OPTION := $(OPTION)
+
 CMOD_TGTRLS := $(TGTRLS)
 CMOD_AUT := $(AUT)
 CMOD_OPTION := *EVENTF *SHOWUSR *XREF *AGR
@@ -65,6 +79,7 @@ DSPF_AUT := $(AUT)
 DSPF_OPTION := *EVENTF *SRC *LIST
 
 # Creation command parameters with variables (the ones listed at the top) for the most common ones.
+CRTBNDCLFLAGS = AUT($(AUT)) DBGVIEW($(DBGVIEW)) TGTRLS($(TGTRLS)) DFTACTGRP($(DFTACTGRP)) ACTGRP($(ACTGRP))
 CRTPFFLAGS = AUT($(AUT)) OPTION(*EVENTF *SRC *LIST) SIZE(*NOMAX) TEXT($(TEXT))
 CRTLFFLAGS = AUT($(AUT)) OPTION(*EVENTF *SRC *LIST)
 CRTDSPFFLAGS = ENHDSP(*YES) RSTDSP($(RSTDSP)) DFRWRT(*YES) AUT($(AUT)) OPTION($(OPTION)) TEXT($(TEXT))
@@ -119,6 +134,8 @@ moduleTGTRLS = $(if $(filter %.C,$<),$(CMOD_TGTRLS),$(if $(filter %.RPGLE,$<),$(
 moduleAUT = $(if $(filter %.C,$<),$(CMOD_AUT),$(if $(filter %.RPGLE,$<),$(RPGMOD_AUT),UNKNOWN_FILE_TYPE))
 moduleOPTION = $(if $(filter %.C,$<),$(CMOD_OPTION),$(if $(filter %.RPGLE,$<),$(RPGMOD_OPTION),UNKNOWN_FILE_TYPE))
 
+programTGTRLS = $(if $(filter %.C,$<),$(BNDC_TGTRLS),$(if $(filter %.CLLE,$<),$(BNDCL_TGTRLS),$(if $(filter %.RPGLE,$<),$(BNDRPG_TGTRLS),UNKNOWN_FILE_TYPE)))
+
 CRTFRMSTMFLIB = CRTFRMSTMF
 
 VPATH := $(OBJPATH):$(SRCPATH)
@@ -150,6 +167,14 @@ VPATH := $(OBJPATH):$(SRCPATH)
 	@echo "*** Creating SQLRPGLE module [$*]"
 	@echo "***"
 	$(eval crtcmd := crtsqlrpgi obj($(OBJLIB)/$*) srcstmf('$<') $(CRTSQLRPGIFLAGS))
+	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log
+
+
+%.PGM: %.CLLE
+	@echo "\n\n***"
+	@echo "*** Creating bound CL program [$*]"
+	@echo "***"
+	$(eval crtcmd := crtrpgmod module($(OBJLIB)/$*) srcstmf('$<') $(CRTRPGMODFLAGS))
 	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log
 
 %.FILE: %.PF
