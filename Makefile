@@ -134,8 +134,6 @@ moduleTGTRLS = $(if $(filter %.C,$<),$(CMOD_TGTRLS),$(if $(filter %.RPGLE,$<),$(
 moduleAUT = $(if $(filter %.C,$<),$(CMOD_AUT),$(if $(filter %.RPGLE,$<),$(RPGMOD_AUT),UNKNOWN_FILE_TYPE))
 moduleOPTION = $(if $(filter %.C,$<),$(CMOD_OPTION),$(if $(filter %.RPGLE,$<),$(RPGMOD_OPTION),UNKNOWN_FILE_TYPE))
 
-programTGTRLS = $(if $(filter %.C,$<),$(BNDC_TGTRLS),$(if $(filter %.CLLE,$<),$(BNDCL_TGTRLS),$(if $(filter %.RPGLE,$<),$(BNDRPG_TGTRLS),UNKNOWN_FILE_TYPE)))
-
 CRTFRMSTMFLIB = CRTFRMSTMF
 
 VPATH := $(OBJPATH):$(SRCPATH)
@@ -209,7 +207,7 @@ VPATH := $(OBJPATH):$(SRCPATH)
 	@echo "\n\n***"
 	@echo "*** Creating service program [$*] from modules [$^]"
 	@echo "***"
-	$(eval crtcmd := crtsrvpgm srvpgm($(OBJLIB)/$*) module($(basename $^)) $(CRTSRVPGMFLAGS))
+	$(eval crtcmd := crtsrvpgm srvpgm($(OBJLIB)/$*) module($(notdir $(basename $^))) $(CRTSRVPGMFLAGS))
 	system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$@.log
 
 # I think need to modify `module` parameter to only include dependencies that end in '.MODULE'.
@@ -222,8 +220,8 @@ VPATH := $(OBJPATH):$(SRCPATH)
 	@echo "\n\n***"
 	@echo "*** Creating program [$*] from modules [$^]"
 	@echo "***"
-	$(eval crtcmd := crtpgm pgm($(OBJLIB)/$*) module($(basename $^)) $(CRTPGMFLAGS))
-	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$@.log
+	$(eval crtcmd := crtpgm pgm($(OBJLIB)/$*) module($(basename $(filter %.MODULE,$(notdir $^)))) bndsrvpgm($(basename $(filter %.SRVPGM,$(notdir $^)))) $(CRTPGMFLAGS))
+	system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$@.log
 
 $(DEPDIR)/%.d: ;
 .PRECIOUS: $(DEPDIR)/%.d
