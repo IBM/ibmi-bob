@@ -17,12 +17,12 @@ DFT_TGTRLS='TGTRLS(V5R1M0)'
 DFT_USRPRF='USRPRF(\*USER)'
 
 # Default values for each object type
-CMD_DFT=( 'VLDCKR(\*NONE)' 'PMTFILE(\*NONE)' 'CMD(CHKIDX)' )
+CMD_DFT=( 'VLDCKR(\*NONE)' 'PMTFILE(\*NONE)' )
 CMOD_DFT=( 'TERASPACE(\*YES \*NOTSIFC)' 'STGMDL(\*INHERIT)' 'SYSIFCOPT(\*IFSIO)' 'OPTION(\*SYSINCPATH \*EVENTF \*SHOWUSR \*XREF \*AGR \*STRUCREF)' )
 RPGMOD_DFT=()
-SQLRPGI_DFT=()
+SQLRPGI_DFT=( 'COMMIT(\*NONE)' )
 BNDCL_DFT=( 'DFTACTGRP(\*NO)' 'ACTGRP(E_PRODUCT)' )
-SRVPGM_DFT=()
+SRVPGM_DFT=( 'ACTGRP(\*CALLER)' 'STGMDL(\*SNGLVL)' )
 PGM_DFT=( 'ACTGRP(E_PRODUCT)' )
 
 
@@ -35,38 +35,121 @@ trim() {
     echo -n "$var"
 }
 
-# The `process_XXX` functions remove any compile parameters that match our defaults for that object type and
-# then output the remainder to a file.
+# The `process_parms` function removes any compile parameters that match our defaults for that object type and
+# then outputs the remainder to stdout.
 # $1 = object name
 # $2 = compile parameters
+# $3 = an array containing all our default parameters for that object type
 process_parms() {
 	local object=$1
 	shift
-	local command=$1
+	local parms=$1
 	shift
-	local defaults=($@)
+	local defaults=("$@")
 	
-	commandSave=$command
-	echo "Command: x${command}x"
+#	parmsSave=$parms
+	parms=" $parms "
+
 	for parm in "${defaults[@]}"
 	do
-		command=${command/$parm/}
+#		echo "parms=$parms" >&2
+#		echo "parm =$parm" >&2
+		parms=${parms/ $parm / }
 	done
 	
-	echo $object
-	echo "**Original command: $commandSave"
-	echo "**New      command: $command"
+	parms=$(trim $parms)
+	
+#	echo $object >&2
+#	echo "**Original parms: $object: $parmsSave" >&2
+#	echo "**     New parms: $object: $parms" >&2
 
-	# http://stackoverflow.com/questions/38986668/can-bash-substring-replacement-use-regexs.
+	echo -n "$parms"
 }
 
-echo "SQLRPGI_DFT=${#SQLRPGI_DFT}"
+cleanup_cmd_parms() {
+	local object=$1
+	local parms=$2
+	parms=" $parms "
+	
+	# If CMD() value equals the object name, remove the parameter.
+	parms=${parms/ CMD($object) / }
+	
+	# If PGM() value equals the object name, remove the parameter.
+	parms=${parms/ PGM($object) / }
+
+	parms=$(trim $parms)
+	echo -n "$parms"
+}
+
+cleanup_module_parms() {
+	local object=$1
+	local parms=$2
+	parms=" $parms "
+	
+	# If MODULE() value equals the object name, remove the parameter.
+	parms=${parms/ MODULE($object) / }
+	
+	parms=$(trim $parms)
+	echo -n "$parms"
+}
+
+cleanup_module_parms() {
+	local object=$1
+	local parms=$2
+	parms=" $parms "
+	
+	# If MODULE() value equals the object name, remove the parameter.
+	parms=${parms/ MODULE($object) / }
+	
+	parms=$(trim $parms)
+	echo -n "$parms"
+}
+
+cleanup_sqli_parms() {
+	local object=$1
+	local parms=$2
+	parms=" $parms "
+	
+	# If OBJ() value equals the object name, remove the parameter.
+	parms=${parms/ OBJ($object) / }
+	
+	parms=$(trim $parms)
+	echo -n "$parms"
+}
+
+cleanup_pgm_parms() {
+	local object=$1
+	local parms=$2
+	parms=" $parms "
+	
+	# If PGM() value equals the object name, remove the parameter.
+	parms=${parms/ PGM($object) / }
+	
+	parms=$(trim $parms)
+	echo -n "$parms"
+}
+
+cleanup_srvpgm_parms() {
+	local object=$1
+	local parms=$2
+	parms=" $parms "
+	
+	# If SRVPGM() value equals the object name, remove the parameter.
+	parms=${parms/ SRVPGM($object) / }
+	
+	parms=$(trim $parms)
+	echo -n "$parms"
+}
+
+
+#echo "SQLRPGI_DFT=${#SQLRPGI_DFT}"
 files=( "*" )
 for file in $files; do
 	base=$(basename $file .CLP)
 	sed -e 's/\/\*.*\*\///g' -e 's/ *$//' -e :a -e '/+ *$/N; s/ *+ *\n */ /; ta' -e '/^$/d' -e 's/^ *//' -e 's/ *) */) /g' -e 's/^/'$base': /' \
-        -e 's/&O\///' -e 's/\&ZE/'$base'/g' -e 's/SRCMBR(&[^)]*) *//' -e 's/SRCFILE(&[^)]*) *//' \
-		-e 's/REPLACE(\*YES) *//' -e 's/DBGVIEW([^)]*) *//' -e 's/OUTPUT(\*LIST) *//' -e 's/'$DFT_AUT' *//' -e 's/'$DFT_TGTRLS' *//' -e 's/'$DFT_USRPRF' *//' \
+        -e 's/&O\///' -e 's/\&ZE/'$base'/g' -e 's/SRCMBR(&[^)]*) *//I' -e 's/SRCFILE(&[^)]*) *//I' -e 's/\*LIBL\///I g' \
+		-e 's/REPLACE(\*YES) *//I' -e 's/DBGVIEW([^)]*) *//I' -e 's/OUTPUT(\*PRINT) *//I' -e 's/DETAIL([^)]*) *//I' \
+		-e 's/'$DFT_AUT' *//I' -e 's/'$DFT_TGTRLS' *//I' -e 's/'$DFT_USRPRF' *//I' \
 	$file | \
 	sed -e 's/ *\/\*.*\*\/ *//g' | \
 	{
@@ -76,24 +159,52 @@ for file in $files; do
 		command=$(trim ${temp/ */})
 		parms=$(trim ${temp/$command/})
 
+		# Remove parameters that match our defaults.
 		case "$command" in
-		CRTCMD)		process_parms $object "$parms" ${CMD_DFT[@]}
+		CRTCMD)		parms=$(process_parms $object "$parms" "${CMD_DFT[@]}")
 					;;
-		CRTCMOD)	process_parms $object "$parms" ${CMOD_DFT[@]}
+		CRTCMOD)	parms=$(process_parms $object "$parms" "${CMOD_DFT[@]}")
 					;;
-		CRTRPGMOD)	process_parms $object "$parms" ${RPGMOD_DFT[@]}
+		CRTRPGMOD)	parms=$(process_parms $object "$parms" "${RPGMOD_DFT[@]}")
 					;;
-		CRTSQLRPGI)	process_parms $object "$parms" ${SQLRPGI_DFT[@]}
+		CRTSQLRPGI)	parms=$(process_parms $object "$parms" "${SQLRPGI_DFT[@]}")
 					;;
-		CRTBNDCL)	process_parms $object "$parms" ${BNDCL_DFT[@]}
+		CRTBNDCL)	parms=$(process_parms $object "$parms" "${BNDCL_DFT[@]}")
 					;;
-		CRTSRVPGM)	process_parms $object "$parms" ${SRVPGM_DFT[@]}
+		CRTSRVPGM)	parms=$(process_parms $object "$parms" "${SRVPGM_DFT[@]}")
 					;;
-		CRTPGM)		process_parms $object "$parms" ${PGM_DFT[@]}
+		CRTPGM)		parms=$(process_parms $object "$parms" "${PGM_DFT[@]}")
 					;;
 		*)			echo "*** Unknown command $command found for object $object"
 					;;
 		esac
+		
+		# Extra clean-up
+		case "$command" in
+		CRTCMD)		parms=$(cleanup_cmd_parms $object "$parms")
+					;;
+		CRTCMOD	| CRTRPGMOD | CRTCLMOD) 
+					parms=$(cleanup_module_parms $object "$parms")
+					;;
+		CRTSQLRPGI | CRTSQLCI)
+					parms=$(cleanup_sqli_parms $object "$parms")
+					;;
+		CRTBNDRPG | CRTBNDCL | CRTPGM)
+					parms=$(cleanup_pgm_parms $object "$parms")
+					;;
+		CRTSRVPGM)	parms=$(cleanup_srvpgm_parms $object "$parms")
+					;;
+		esac
+		
+		# Gather object dependencies by culling from various parameters
+		
+		# Get source depencencies for source-based objects (srvpgms can use binder source) (also peer inside RPGs?)
+		
+		## Output in makefile format
+		# Write object: variable = parameter (or :=?)
+		# Write object: source
+		
+#		if [[ -z ${parms// } ]] # tests for empty string
 	done
 	}
 done
