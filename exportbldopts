@@ -16,6 +16,18 @@ DFT_AUT='AUT(\*EXCLUDE)'
 DFT_TGTRLS='TGTRLS(V5R1M0)'
 DFT_USRPRF='USRPRF(\*USER)'
 
+# Default values for each object type
+CMD_DFT=( 'VLDCKR(\*NONE)' 'PMTFILE(\*NONE)' )
+CMOD_DFT=( 'TERASPACE(\*YES \*NOTSIFC)' 'STGMDL(\*INHERIT)' 'SYSIFCOPT(\*IFSIO)' 'OPTION(\*SYSINCPATH \*EVENTF \*SHOWUSR \*XREF \*AGR \*STRUCREF)' )
+RPGMOD_DFT=()
+SQLRPGI_DFT=()
+BNDCL_DFT=( 'DFTACTGRP(\*NO)' 'ACTGRP(E_PRODUCT)' )
+SRVPGM_DFT=()
+PGM_DFT=( 'ACTGRP(E_PRODUCT)' )
+
+
+
+
 trim() {
     local var="$*"
     var="${var#"${var%%[![:space:]]*}"}"   # remove leading whitespace characters
@@ -27,28 +39,36 @@ trim() {
 # then output the remainder to a file.
 # $1 = object name
 # $2 = compile parameters
-process_CRTCMD() {
-	local dft1="VLDCKR(\*NONE)"
-	local dft2="PMTFILE(\*NONE)"
+process_parms() {
 	local object=$1
-	local command=$2
-	echo "CRTCMD: command=$2"
+	shift
+	local command=$1
+	shift
+	local defaults=($@)
 	
-	command=${command/ $dft1/}
-	command=${command/ $dft2/}
+	commandSave=$command
+	
+	if [[ ${#defaults[@]} -gt 0 ]]; then
+		for parm in "${defaults[@]}"
+		do
+			command=${command/ $parm/}
+		done
+	fi
+	
 	echo $object
-	echo "**Original command: $2"
-	echo "**New command: $command"
+	echo "**Original command: $commandSave"
+	echo "**New      command: $command"
 
 	# remove these dft strings from $2 and output >> to file.
 }
 
+echo "SQLRPGI_DFT=${#SQLRPGI_DFT}"
 files=( "*" )
 for file in $files; do
 	base=$(basename $file .CLP)
 	sed -e 's/\/\*.*\*\///g' -e 's/ *$//' -e :a -e '/+ *$/N; s/ *+ *\n */ /; ta' -e '/^$/d' -e 's/^ *//' -e 's/ *) */) /g' -e 's/^/'$base': /' \
         -e 's/&O\///' -e 's/\&ZE/'$base'/g' -e 's/SRCMBR(&[^)]*) *//' -e 's/SRCFILE(&[^)]*) *//' \
-		-e 's/REPLACE(\*YES) *//' -e 's/DBGVIEW([^)]*) *//' -e 's/'$DFT_AUT' *//' -e 's/'$DFT_TGTRLS' *//' -e 's/'$DFT_USRPRF' *//' \
+		-e 's/REPLACE(\*YES) *//' -e 's/DBGVIEW([^)]*) *//' -e 's/OUTPUT(\*LIST) *//' -e 's/'$DFT_AUT' *//' -e 's/'$DFT_TGTRLS' *//' -e 's/'$DFT_USRPRF' *//' \
 	$file | \
 	sed -e 's/ *\/\*.*\*\/ *//g' | \
 	{
@@ -59,19 +79,19 @@ for file in $files; do
 		parms=$(trim ${temp/$command/})
 
 		case "$command" in
-		CRTCMD)		process_CRTCMD $object "$parms"
+		CRTCMD)		process_parms $object "$parms" ${CMD_DFT[@]}
 					;;
-		CRTCMOD)	process_CRTCMOD $object $parms
+		CRTCMOD)	process_parms $object "$parms" ${CMOD_DFT[@]}
 					;;
-		CRTRPGMOD)	process_CRTRPGMOD $object $parms
+		CRTRPGMOD)	process_parms $object "$parms" ${RPGMOD_DFT[@]}
 					;;
-		CRTSQLRPGI)	process_CRTSQLRPGI $object $parms
+		CRTSQLRPGI)	process_parms $object "$parms" ${SQLRPGI_DFT[@]}
 					;;
-		CRTBNDCL)	process_CRTBNDCL $object $parms
+		CRTBNDCL)	process_parms $object "$parms" ${BNDCL_DFT[@]}
 					;;
-		CRTSRVPGM)	process_CRTSRVPGM $object $parms
+		CRTSRVPGM)	process_parms $object "$parms" ${SRVPGM_DFT[@]}
 					;;
-		CRTPGM)		process_CRTPGM $object $parms
+		CRTPGM)		process_parms $object "$parms" ${PGM_DFT[@]}
 					;;
 		*)			echo "*** Unknown command $command found for object $object"
 					;;
