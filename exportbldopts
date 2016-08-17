@@ -17,7 +17,7 @@ DFT_TGTRLS='TGTRLS(V5R1M0)'
 DFT_USRPRF='USRPRF(\*USER)'
 
 # Default values for each object type
-CMD_DFT=( 'VLDCKR(\*NONE)' 'PMTFILE(\*NONE)' )
+CMD_DFT=( 'VLDCKR(\*NONE)' 'PMTFILE(\*NONE)' 'CMD(CHKIDX)' )
 CMOD_DFT=( 'TERASPACE(\*YES \*NOTSIFC)' 'STGMDL(\*INHERIT)' 'SYSIFCOPT(\*IFSIO)' 'OPTION(\*SYSINCPATH \*EVENTF \*SHOWUSR \*XREF \*AGR \*STRUCREF)' )
 RPGMOD_DFT=()
 SQLRPGI_DFT=()
@@ -47,19 +47,17 @@ process_parms() {
 	local defaults=($@)
 	
 	commandSave=$command
-	
-	if [[ ${#defaults[@]} -gt 0 ]]; then
-		for parm in "${defaults[@]}"
-		do
-			command=${command/ $parm/}
-		done
-	fi
+	echo "Command: x${command}x"
+	for parm in "${defaults[@]}"
+	do
+		command=${command/$parm/}
+	done
 	
 	echo $object
 	echo "**Original command: $commandSave"
 	echo "**New      command: $command"
 
-	# remove these dft strings from $2 and output >> to file.
+	# http://stackoverflow.com/questions/38986668/can-bash-substring-replacement-use-regexs.
 }
 
 echo "SQLRPGI_DFT=${#SQLRPGI_DFT}"
