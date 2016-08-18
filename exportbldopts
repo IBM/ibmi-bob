@@ -141,6 +141,39 @@ cleanup_srvpgm_parms() {
 	echo -n "$parms"
 }
 
+# Gather object dependencies by extracting them from compile parameters
+get_object_deps() {
+	local object=$1
+	local command=$2
+	local parms=$3
+	local deps=
+	
+	case "$command" in
+		CRTCMD)
+			if [[ $parms =~ CMD\(([^\)]*)\) ]]; then
+				deps=${BASH_REMATCH[1]}
+			else
+				deps=$object
+			fi
+			;;
+		CRTCMOD)
+			
+			;;
+		CRTRPGMOD)	
+					;;
+		CRTSQLRPGI)	
+					;;
+		CRTBNDCL)	
+					;;
+		CRTSRVPGM)	
+					;;
+		CRTPGM)		
+					;;
+		*)			echo "*** Unknown command $command found for object $object"
+					;;
+		esac
+}
+
 
 #echo "SQLRPGI_DFT=${#SQLRPGI_DFT}"
 files=( "*" )
@@ -179,6 +212,11 @@ for file in $files; do
 					;;
 		esac
 		
+		echo "$object: $command $parms"
+		
+		# Gather object dependencies by extracting from various parameters
+		objectDeps=$(get_object_deps $object $command "$parms")
+				
 		# Extra clean-up
 		case "$command" in
 		CRTCMD)		parms=$(cleanup_cmd_parms $object "$parms")
@@ -196,13 +234,12 @@ for file in $files; do
 					;;
 		esac
 		
-		# Gather object dependencies by culling from various parameters
 		
-		# Get source depencencies for source-based objects (srvpgms can use binder source) (also peer inside RPGs?)
+		# Get source dependencies for source-based objects (srvpgms can use binder source) (also peer inside RPGs?)
 		
 		## Output in makefile format
 		# Write object: variable = parameter (or :=?)
-		# Write object: source
+		# Write object: sourcedep objectdeps
 		
 #		if [[ -z ${parms// } ]] # tests for empty string
 	done
