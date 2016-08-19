@@ -10,6 +10,9 @@
 # o If any non-default compile parameters remain, output them one at a time to the output file, like "SO1001.PGM: private TGTRLS = $target_release"
 # o Output object dependencies based on 'SRCMBR', 'MODULE' and 'BNDSRVPGM' parameters, like "SEGDES.1.PGM: SEGDES.1.MODULE SEGDEF_S.SRVPGM SEGACT_S.SRVPGM"
 #   Don't forget binder source, too.
+#
+# Notes:
+# o All source must be in the same directory (including bldopt files (ending in .BLDOPT) and binder source (ending in .BND).
 
 # Global default values
 DFT_AUT='AUT(\*EXCLUDE)'
@@ -25,7 +28,8 @@ BNDCL_DFT=( 'DFTACTGRP(\*NO)' 'ACTGRP(E_PRODUCT)' )
 SRVPGM_DFT=( 'ACTGRP(\*CALLER)' 'STGMDL(\*SNGLVL)' )
 PGM_DFT=( 'ACTGRP(E_PRODUCT)' )
 
-
+sourceDeps=
+objectDeps=
 
 
 trim() {
@@ -50,6 +54,58 @@ add_suffix() {
 	
 	output=${output# }
 	echo -n $output
+}
+
+# Returns the IFS suffix appropriate for a given compile command's output object. e.g., $(suffix_for_command "CRTRPGMOD") -> "MODULE"
+# $1 = the standard i compile command for a given object
+# Returns: the filename suffix the object would have when viewed through the IFS (.MODULE, .FILE, etc.)
+obj_suffix_for_cmd() {
+	local command=$1
+	local suffix=
+	
+	case "$command" in
+		CRTBNDCL)	suffix="PGM";;
+		CRTCMD)		suffix="CMD";;
+		CRTCMOD)	suffix="MODULE";;
+		CRTDSPF)	suffix="FILE";;
+		CRTLF)		suffix="FILE";;
+		CRTPF)		suffix="FILE";;
+		CRTPNLGRP)	suffix="PNLGRP";;
+		CRTPGM)		suffix="PGM";;
+		CRTRPGMOD)	suffix="MODULE";;
+		CRTSQLCI)	suffix="MODULE";;
+		CRTSQLRPGI)	suffix="MODULE";;
+		CRTSRVPGM)	suffix="SRVPGM";;
+		*)			echo "*** Unknown command type in obj_suffix_for_cmd: $command" >&2;;
+	esac
+
+	echo -n "$suffix"
+}
+
+# Returns the IFS suffix appropriate for a given compile command's source file. e.g., $(suffix_for_command "CRTRPGMOD") -> ".RPGLE"
+# $1 = the standard i compile command for a given object
+# Returns: the filename suffix the source file would have when viewed through the IFS (.RPGLE, .PF, etc.)
+src_suffix_for_cmd() {
+	local command=$1
+	local suffix=
+	
+	case "$command" in
+		CRTBNDCL)	suffix="CLLE";;
+		CRTCMD)		suffix="CMD";;
+		CRTCMOD)	suffix="C";;
+		CRTDSPF)	suffix="DSPF";;
+		CRTLF)		suffix="LF";;
+		CRTPF)		suffix="PF";;
+		CRTPNLGRP)	suffix="PNLGRP";;
+		CRTPGM)		;;
+		CRTRPGMOD)	suffix="RPGLE";;
+		CRTSQLCI)	suffix="SQLC";;
+		CRTSQLRPGI)	suffix="SQLRPGLE";;
+		CRTSRVPGM)	suffix="BND";;
+		*)			echo "*** Unknown command type in src_suffix_for_cmd: $command" >&2;;
+	esac
+
+	echo -n "$suffix"
 }
 
 # The `process_parms` function removes any compile parameters that match our defaults for that object type and
@@ -190,7 +246,7 @@ get_object_deps() {
 			# Other service programs linked to this service program.
 			if [[ $parms =~ BNDSRVPGM\(([^\)]*)\) ]]; then
 				deps="${BASH_REMATCH[1]}"
-				output=$(add_suffix "$deps" SRVPGM)
+				output="$output $(add_suffix $deps SRVPGM)"
 			fi
 			;;
 		CRTPGM)			
@@ -202,55 +258,57 @@ get_object_deps() {
 			# Service programs linked to this program.
 			if [[ $parms =~ BNDSRVPGM\(([^\)]*)\) ]]; then
 				deps="${BASH_REMATCH[1]}"
-				output=$(add_suffix "$deps" SRVPGM)
+				output="$output $(add_suffix $deps SRVPGM)"
 			fi
 			;;
 		CRTLF)
 			# PFILE or JFILE values
 			if [[ -f ${object}.LF ]]; then
 				deps=$(system "sed -n -e 's/.*PFILE(\([^)]*\).*/\1/p' -e 's/.*JFILE(\([^)]*\).*/\1/p' ${object}.LF | xargs -n 1 | sort -u | xargs")
-				output=$deps
-		*)	echo "*** Unknown command $command found for object $object"
+				output=$(add_suffix "$deps" FILE)
+			fi
+			;;
+		*)	echo "*** Unknown command $command found for object $object in get_object_deps" >&2
 			;;
 		esac
 		
-		echo -n "$output"
+		echo -n "$(trim $output)"
 }
 
 # Gather source dependencies by extracting them from compile parameters
+# Note: Header or include files are gathered at compile time, so don't include those here.
 get_source_deps() {
 	local object=$1
 	local command=$2
 	local parms=$3
 	local deps=
+	local output=
 	
 	case "$command" in
-		CRTCMD)
+		CRTCMD|CRTCMOD|CRTDSPF|CRTPNLGRP|CRTRPGMOD|CRTSQLCI|CRTSQLRPGI|CRTBNDCL|CRTPF|CRTLF)
 			if [[ $parms =~ SRCMBR\(([^\)]*)\) ]]; then
 				deps=${BASH_REMATCH[1]}
 			else
 				deps=$object
 			fi
 			;;
-		CRTCMOD)
-			
-			;;
-		CRTRPGMOD)	
-					;;
-		CRTSQLRPGI)	
-					;;
-		CRTBNDCL)	
-					;;
 		CRTSRVPGM)
 			if [[ -f ${object}.BND ]]; then
-				deps=${object}.BND
+				deps=${object}
 			fi
-					;;
-		CRTPGM)		
-					;;
-		*)			echo "*** Unknown command $command found for object $object"
-					;;
-		esac
+			;;
+		CRTPGM)
+			# No source dependencies for programs.
+			;;
+		*)
+			echo "*** Unknown command $command found for object $object in get_source_deps" >&2
+			;;
+	esac
+	
+	local suffix=$(src_suffix_for_cmd "$command")
+	output=$(add_suffix "$deps" $suffix)
+	
+	echo -n "$output"
 }
 
 # Assume that bldopt filename is the same name as all &ZN and &ZE substitution variables.  If this turns out to not
@@ -260,7 +318,7 @@ get_source_deps() {
 #echo "SQLRPGI_DFT=${#SQLRPGI_DFT}"
 files=( "*.BLDOPT" )
 for file in $files; do
-	base=$(basename $file .CLP)
+	base=$(basename $file .BLDOPT)
 	sed -e 's/\/\*.*\*\///g' -e 's/ *$//' -e :a -e '/+ *$/N; s/ *+ *\n */ /; ta' -e '/^$/d' -e 's/^ *//' -e 's/ *) */) /g' -e 's/^/'$base': /' \
         -e 's/&O\///' -e 's/\&ZE/'$base'/g' -e 's/SRCMBR(&[^)]*) *//I' -e 's/SRCFILE(&[^)]*) *//I' -e 's/\*LIBL\///I g' \
 		-e 's/REPLACE(\*YES) *//I' -e 's/DBGVIEW([^)]*) *//I' -e 's/OUTPUT(\*PRINT) *//I' -e 's/DETAIL([^)]*) *//I' \
@@ -294,7 +352,7 @@ for file in $files; do
 					;;
 		esac
 		
-		echo "$object: $command $parms"
+#		echo "$object: $command $parms"
 		
 		# Gather object dependencies by extracting from various parameters
 		objectDeps=$(get_object_deps $object $command "$parms")
@@ -320,9 +378,11 @@ for file in $files; do
 		# Get source dependencies for source-based objects (srvpgms can use binder source) (also peer inside RPGs?)
 		sourceDeps=$(get_source_deps $object $command "$parms")
 		
+		echo "$object.$(obj_suffix_for_cmd $command) ($command): $sourceDeps | $objectDeps"
+		
 		## Output in makefile format
 		# Write object: variable = parameter (or :=?)
-		# Write object: sourcedep objectdeps
+		# Write object: sourcedeps objectdeps
 		
 #		if [[ -z ${parms// } ]] # tests for empty string
 	done
