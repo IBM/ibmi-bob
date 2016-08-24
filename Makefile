@@ -40,8 +40,12 @@ COMMIT := *NONE
 DBGVIEW := *ALL
 TEXT := TEST
 RSTDSP := *YES
+PGM :=
 VLDCKR := *NONE
-PMTFILE := COMANDM
+PMTFILE := *NONE
+HLPPNLGRP = $*
+HLPID = $*
+OBJTYPE := *MODULE
 
 # Object-type-specific defaults.  Not used directly, but copied to the standard ones above and then
 # inserted into the compile commands.  Each variable here should also precede its corresponding pattern
@@ -80,15 +84,16 @@ DSPF_OPTION := *EVENTF *SRC *LIST
 
 # Creation command parameters with variables (the ones listed at the top) for the most common ones.
 CRTBNDCLFLAGS = AUT($(AUT)) DBGVIEW($(DBGVIEW)) TGTRLS($(TGTRLS)) DFTACTGRP($(DFTACTGRP)) ACTGRP($(ACTGRP))
-CRTPFFLAGS = AUT($(AUT)) OPTION(*EVENTF *SRC *LIST) SIZE(*NOMAX) TEXT($(TEXT))
-CRTLFFLAGS = AUT($(AUT)) OPTION(*EVENTF *SRC *LIST)
-CRTDSPFFLAGS = ENHDSP(*YES) RSTDSP($(RSTDSP)) DFRWRT(*YES) AUT($(AUT)) OPTION($(OPTION)) TEXT($(TEXT))
+CRTCMDFLAGS = PGM($(PGM)) VLDCKR($(VLDCKR)) PMTFILE($(PMTFILE)) HLPPNLGRP($(HLPPNLGRP)) HLPID($(HLPID)) AUT($(AUT))
 CRTCMODFLAGS = TERASPACE(*YES *NOTSIFC) STGMDL(*INHERIT) OUTPUT(*PRINT) OPTION($(OPTION)) DBGVIEW($(DBGVIEW)) \
                SYSIFCOPT(*IFSIO) AUT($(AUT)) TGTRLS($(TGTRLS)) MAKEDEP('$(DEPDIR)/$*.Td')
-CRTRPGMODFLAGS = DBGVIEW($(DBGVIEW)) TGTRLS($(TGTRLS)) OUTPUT(*PRINT) AUT($(AUT)) OPTION($(OPTION))
-CRTSQLRPGIFLAGS = COMMIT($(COMMIT)) OBJTYPE(*MODULE) OUTPUT(*PRINT) TGTRLS($(TGTRLS)) OPTION($(OPTION))
-CRTSRVPGMFLAGS = EXPORT(*ALL) ACTGRP($(ACTGRP)) TGTRLS($(TGTRLS)) AUT($(AUT)) DETAIL($(DETAIL))
+CRTDSPFFLAGS = ENHDSP(*YES) RSTDSP($(RSTDSP)) DFRWRT(*YES) AUT($(AUT)) OPTION($(OPTION)) TEXT($(TEXT))
+CRTLFFLAGS = AUT($(AUT)) OPTION(*EVENTF *SRC *LIST)
+CRTPFFLAGS = AUT($(AUT)) OPTION(*EVENTF *SRC *LIST) SIZE(*NOMAX) TEXT($(TEXT))
 CRTPGMFLAGS = ACTGRP($(ACTGRP)) USRPRF(*USER) TGTRLS($(TGTRLS)) AUT($(AUT)) DETAIL($(DETAIL))
+CRTRPGMODFLAGS = DBGVIEW($(DBGVIEW)) TGTRLS($(TGTRLS)) OUTPUT(*PRINT) AUT($(AUT)) OPTION($(OPTION))
+CRTSQLRPGIFLAGS = COMMIT($(COMMIT)) OBJTYPE($(OBJTYPE)) OUTPUT(*PRINT) TGTRLS($(TGTRLS)) OPTION($(OPTION))
+CRTSRVPGMFLAGS = EXPORT(*ALL) ACTGRP($(ACTGRP)) TGTRLS($(TGTRLS)) AUT($(AUT)) DETAIL($(DETAIL))
 
 # Extra command strings for adhoc addition of extra parameters to the creation commands.
 CRTBNDCLFLAGS =
@@ -140,6 +145,13 @@ CRTFRMSTMFLIB = CRTFRMSTMF
 VPATH := $(OBJPATH):$(SRCPATH)
 
 ### Implicit rules
+%.CMD: %.CMD
+	@echo "\n\n***"
+	@echo "*** Creating command [$*]"
+	@echo "***"
+	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTCMD) stmf('$<') parms('$(CRTCMDFLAGS)'))
+	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log
+
 %.MODULE: private TGTRLS = $(moduleTGTRLS)
 %.MODULE: private AUT = $(moduleAUT)
 %.MODULE: private OPTION = $(moduleOPTION)
@@ -215,7 +227,7 @@ VPATH := $(OBJPATH):$(SRCPATH)
 	@echo "\n\n***"
 	@echo "*** Creating service program [$*] from modules [$^]"
 	@echo "***"
-	$(eval crtcmd := crtsrvpgm srvpgm($(OBJLIB)/$*) module($(notdir $(basename $^))) $(CRTSRVPGMFLAGS))
+	$(eval crtcmd := crtsrvpgm srvpgm($(OBJLIB)/$*) module($(basename $(filter %.MODULE,$(notdir $^))))  bndsrvpgm($(basename $(filter %.SRVPGM,$(notdir $^)))) $(CRTSRVPGMFLAGS))
 	system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$@.log
 
 # I think need to modify `module` parameter to only include dependencies that end in '.MODULE'.

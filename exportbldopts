@@ -76,7 +76,9 @@ obj_suffix_for_cmd() {
 		CRTSQLCI)	suffix="MODULE";;
 		CRTSQLRPGI)	suffix="MODULE";;
 		CRTSRVPGM)	suffix="SRVPGM";;
-		*)			echo "*** Unknown command type in obj_suffix_for_cmd: $command" >&2;;
+		*)			suffix="UNKNOWN"
+					echo "*** Unknown command type in obj_suffix_for_cmd: $command" >&2
+					;;
 	esac
 
 	echo -n "$suffix"
@@ -148,19 +150,13 @@ cleanup_cmd_parms() {
 	
 	# If PGM() value equals the object name, remove the parameter.
 	parms=${parms/ PGM($object) / }
-
-	parms=$(trim $parms)
-	echo -n "$parms"
-}
-
-cleanup_module_parms() {
-	local object=$1
-	local parms=$2
-	parms=" $parms "
 	
-	# If MODULE() value equals the object name, remove the parameter.
-	parms=${parms/ MODULE($object) / }
+	# If HLPPNLGRP() value equals the object name, remove the parameter.
+	parms=${parms/ HLPPNLGRP($object) / }
 	
+	# If HLPID() value equals the object name, remove the parameter.
+	parms=${parms/ HLPID($object) / }
+
 	parms=$(trim $parms)
 	echo -n "$parms"
 }
@@ -246,7 +242,8 @@ get_object_deps() {
 			# Other service programs linked to this service program.
 			if [[ $parms =~ BNDSRVPGM\(([^\)]*)\) ]]; then
 				deps="${BASH_REMATCH[1]}"
-				output="$output $(add_suffix $deps SRVPGM)"
+				deps=$(add_suffix "$deps" SRVPGM)
+				output="$output $deps"
 			fi
 			;;
 		CRTPGM)			
@@ -258,7 +255,8 @@ get_object_deps() {
 			# Service programs linked to this program.
 			if [[ $parms =~ BNDSRVPGM\(([^\)]*)\) ]]; then
 				deps="${BASH_REMATCH[1]}"
-				output="$output $(add_suffix $deps SRVPGM)"
+				deps=$(add_suffix "$deps" SRVPGM)
+				output="$output $deps"
 			fi
 			;;
 		CRTLF)
@@ -311,6 +309,23 @@ get_source_deps() {
 	echo -n "$output"
 }
 
+print_parms() {
+	local fullObject=$1
+	local parms=$2
+	re='^([^\)]*\))'
+	
+	while [[ "${parms}" =~ ${re} ]]; do
+		parm="${BASH_REMATCH[1]}"
+		parms=${parms:${#BASH_REMATCH[1]}}
+		parms=${parms# }
+		#echo "parm: |$parm|"
+		
+		if [[ $parm =~ ^([^\(]*)\(([^\)]*)\) ]]; then
+			echo "$fullObject: private ${BASH_REMATCH[1]} = ${BASH_REMATCH[2]}"
+		fi
+	done
+}
+
 # Assume that bldopt filename is the same name as all &ZN and &ZE substitution variables.  If this turns out to not
 # be the case, remove the sed -e below that inserts $base: at the beginning of the line, and add a function that determines
 # object name for each object type based on its object parameter (CMD() for commands, MODULE() for modules, etc.).
@@ -331,6 +346,7 @@ for file in $files; do
 		temp=$(trim ${line/${object}:/})
 		command=$(trim ${temp/ */})
 		parms=$(trim ${temp/$command/})
+		fullObject="$object.$(obj_suffix_for_cmd $command)"
 
 		# Remove parameters that match our defaults.
 		case "$command" in
@@ -378,10 +394,14 @@ for file in $files; do
 		# Get source dependencies for source-based objects (srvpgms can use binder source) (also peer inside RPGs?)
 		sourceDeps=$(get_source_deps $object $command "$parms")
 		
-		echo "$object.$(obj_suffix_for_cmd $command) ($command): $sourceDeps | $objectDeps"
+		# Blank line before each object's entries
+		echo
 		
-		## Output in makefile format
-		# Write object: variable = parameter (or :=?)
+		## Output parameters in makefile format
+		print_parms $fullObject "$parms"
+		
+		echo "$fullObject ($command): $sourceDeps | $objectDeps"
+		
 		# Write object: sourcedeps objectdeps
 		
 #		if [[ -z ${parms// } ]] # tests for empty string
