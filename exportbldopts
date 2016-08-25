@@ -309,6 +309,9 @@ get_source_deps() {
 	echo -n "$output"
 }
 
+# Prints out to stdout compile parameters in makefile variable format for one object (e.g., TGTRLS = V7R1M0)
+# $1 = object name, including suffix ("JSB100.PGM")
+# $2 = compile parameters
 print_parms() {
 	local fullObject=$1
 	local parms=$2
@@ -320,6 +323,7 @@ print_parms() {
 		parms=${parms# }
 		#echo "parm: |$parm|"
 		
+		# Split apart 'ABC(XYZ)' into 'ABC' and 'XYZ'
 		if [[ $parm =~ ^([^\(]*)\(([^\)]*)\) ]]; then
 			echo "$fullObject: private ${BASH_REMATCH[1]} = ${BASH_REMATCH[2]}"
 		fi
@@ -338,6 +342,7 @@ for file in $files; do
         -e 's/&O\///' -e 's/\&ZE/'$base'/g' -e 's/SRCMBR(&[^)]*) *//I' -e 's/SRCFILE(&[^)]*) *//I' -e 's/\*LIBL\///I g' \
 		-e 's/REPLACE(\*YES) *//I' -e 's/DBGVIEW([^)]*) *//I' -e 's/OUTPUT(\*PRINT) *//I' -e 's/DETAIL([^)]*) *//I' \
 		-e 's/'$DFT_AUT' *//I' -e 's/'$DFT_TGTRLS' *//I' -e 's/'$DFT_USRPRF' *//I' \
+		-e 's/\(OPTION([^)]*\)\*GEN *\([^)]*)\)/\1\2/I' -e 's/ *[^ ]\+( *)//Ig' \
 	$file | \
 	sed -e 's/ *\/\*.*\*\/ *//g' | \
 	{
@@ -397,10 +402,13 @@ for file in $files; do
 		# Blank line before each object's entries
 		echo
 		
+		# Add a comment showing object metadata for debug purposes
+		echo "# $fullObject -- $command"
+		
 		## Output parameters in makefile format
 		print_parms $fullObject "$parms"
 		
-		echo "$fullObject ($command): $sourceDeps | $objectDeps"
+		echo "$fullObject: $sourceDeps | $objectDeps"
 		
 		# Write object: sourcedeps objectdeps
 		
