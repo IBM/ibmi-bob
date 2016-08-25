@@ -45,7 +45,7 @@ VLDCKR := *NONE
 PMTFILE := *NONE
 HLPPNLGRP = $*
 HLPID = $*
-OBJTYPE := *MODULE
+OBJTYPE :=
 
 # Object-type-specific defaults.  Not used directly, but copied to the standard ones above and then
 # inserted into the compile commands.  Each variable here should also precede its corresponding pattern
@@ -70,10 +70,18 @@ SRVPGM_DETAIL := $(DETAIL)
 RPGMOD_TGTRLS := $(TGTRLS)
 RPGMOD_AUT := $(AUT)
 RPGMOD_OPTION := $(OPTION)
+RPGMOD_DBGVIEW := $(DBGVIEW)
+
+SQLRPGIMOD_TGTRLS := $(TGTRLS)
+SQLRPGIMOD_AUT :=
+SQLRPGIMOD_OPTION := $(OPTION)
+SQLRPGIMOD_DBGVIEW := *SOURCE
+SQLRPGIMOD_OBJTYPE := *MODULE
 
 CLMOD_TGTRLS := $(TGTRLS)
 CLMOD_AUT := $(AUT)
 CLMOD_OPTION := $(OPTION)
+CMOD_DBGVIEW := $(DBGVIEW)
 
 CMOD_TGTRLS := $(TGTRLS)
 CMOD_AUT := $(AUT)
@@ -92,7 +100,7 @@ CRTLFFLAGS = AUT($(AUT)) OPTION(*EVENTF *SRC *LIST)
 CRTPFFLAGS = AUT($(AUT)) OPTION(*EVENTF *SRC *LIST) SIZE(*NOMAX) TEXT($(TEXT))
 CRTPGMFLAGS = ACTGRP($(ACTGRP)) USRPRF(*USER) TGTRLS($(TGTRLS)) AUT($(AUT)) DETAIL($(DETAIL))
 CRTRPGMODFLAGS = DBGVIEW($(DBGVIEW)) TGTRLS($(TGTRLS)) OUTPUT(*PRINT) AUT($(AUT)) OPTION($(OPTION))
-CRTSQLRPGIFLAGS = COMMIT($(COMMIT)) OBJTYPE($(OBJTYPE)) OUTPUT(*PRINT) TGTRLS($(TGTRLS)) OPTION($(OPTION))
+CRTSQLRPGIFLAGS = COMMIT($(COMMIT)) OBJTYPE($(OBJTYPE)) OUTPUT(*PRINT) TGTRLS($(TGTRLS)) OPTION($(OPTION)) DBGVIEW($(DBGVIEW))
 CRTSRVPGMFLAGS = EXPORT(*ALL) ACTGRP($(ACTGRP)) TGTRLS($(TGTRLS)) AUT($(AUT)) DETAIL($(DETAIL))
 
 # Extra command strings for adhoc addition of extra parameters to the creation commands.
@@ -131,17 +139,70 @@ touch -cr $(OBJPATH)/$@ $(DEPDIR)/$*.d
 rm $(DEPDIR)/$*.Td $(DEPDIR)/$*.T2d
 endef
 
-# Example of setting pattern-specific variable when multiple source patterns exist (like with files).
-# The pattern-specific variable would set itself to the variable below, which will then be evaluated
+# These variables allow pattern-specific variables to be used when multiple source patterns exist for one object pattern (like with *FILEs).
+# The pattern-specific variable will set itself to a variable below, which will then be evaluated
 # from the context of that pattern-matched rule. This can be used to set specific compile parameters
-# for each type of file object (PF, LF, DSPF, etc.).
-#fileParm = $(if $(filter %.PF,$<),PF_value,$(if $(filter %.LF,$<),LF-value,$(if $(filter %.DSPF,$<),DSPF-value,UNKNOWN_FILE_TYPE)))
-moduleTGTRLS = $(if $(filter %.C,$<),$(CMOD_TGTRLS),$(if $(filter %.RPGLE,$<),$(RPGMOD_TGTRLS),UNKNOWN_FILE_TYPE))
-moduleAUT = $(if $(filter %.C,$<),$(CMOD_AUT),$(if $(filter %.RPGLE,$<),$(RPGMOD_AUT),UNKNOWN_FILE_TYPE))
-moduleOPTION = $(if $(filter %.C,$<),$(CMOD_OPTION),$(if $(filter %.RPGLE,$<),$(RPGMOD_OPTION),UNKNOWN_FILE_TYPE))
+# for each type of, for example, file object (PF, LF, DSPF, etc.).
+# The advantage of this approach over simply hard-coding values in the recipe is that individual targets (compiled objects)
+# will be able to override these values with their own, thereby overriding these defaults.
+# This elaborate construct is to work around a limitation in Make (`%.object: %.source variable=value` does not work).
+#
+# Determine default settings for the various source types that can make a module ojbect.
+moduleAUT = $(strip \
+	$(if $(filter %.C,$<),$(CMOD_AUT), \
+	$(if $(filter %.RPGLE,$<),$(RPGMOD_AUT), \
+	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIMOD_AUT), \
+	UNKNOWN_FILE_TYPE))))
+moduleDBGVIEW = $(strip \
+	$(if $(filter %.C,$<),$(CMOD_DBGVIEW), \
+	$(if $(filter %.RPGLE,$<),$(RPGMOD_DBGVIEW), \
+	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIMOD_DBGVIEW), \
+	UNKNOWN_FILE_TYPE))))
+moduleOBJTYPE = $(strip \
+	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIMOD_OBJTYPE), \
+	UNKNOWN_FILE_TYPE))
+moduleOPTION = $(strip \
+	$(if $(filter %.C,$<),$(CMOD_OPTION), \
+	$(if $(filter %.RPGLE,$<),$(RPGMOD_OPTION), \
+	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIMOD_OPTION), \
+	UNKNOWN_FILE_TYPE))))
+moduleTGTRLS = $(strip \
+	$(if $(filter %.C,$<),$(CMOD_TGTRLS), \
+	$(if $(filter %.RPGLE,$<),$(RPGMOD_TGTRLS), \
+	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIMOD_TGTRLS), \
+	UNKNOWN_FILE_TYPE))))
 
-CRTFRMSTMFLIB = CRTFRMSTMF
+# Determine default settings for the various source types that can make a program ojbect.
+programAUT = $(strip \
+	$(if $(filter %.CLLE,$<),$(BNDCL_AUT), \
+	$(if $(filter %.SQLC,$<),$(SQLCIPGM_AUT), \
+	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIPGM_AUT), \
+	$(if $(filter %.MODULE,$<),$(PGM_AUT), \
+	UNKNOWN_FILE_TYPE)))))
+programACTGRP = $(strip \
+	$(if $(filter %.CLLE,$<),$(BNDCL_ACTGRP), \
+	$(if $(filter %.SQLC,$<),$(SQLCIPGM_ACTGRP), \
+	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIPGM_ACTGRP), \
+	$(if $(filter %.MODULE,$<),$(PGM_ACTGRP), \
+	UNKNOWN_FILE_TYPE)))))
+programOBJTYPE = $(strip \
+	$(if $(filter %.SQLC,$<),$(SQLCIPGM_OBJTYPE), \
+	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIPGM_OBJTYPE), \
+	UNKNOWN_FILE_TYPE)))
+programOPTION = $(strip \
+	$(if $(filter %.CLLE,$<),$(BNDCL_OPTION), \
+	$(if $(filter %.SQLC,$<),$(SQLCIPGM_OPTION), \
+	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIPGM_OPTION), \
+	$(if $(filter %.MODULE,$<),$(PGM_OPTION), \
+	UNKNOWN_FILE_TYPE)))))
+programTGTRLS = $(strip \
+	$(if $(filter %.CLLE,$<),$(BNDCL_TGTRLS), \
+	$(if $(filter %.SQLC,$<),$(SQLCIPGM_TGTRLS), \
+	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIPGM_TGTRLS), \
+	$(if $(filter %.MODULE,$<),$(PGM_TGTRLS), \
+	UNKNOWN_FILE_TYPE)))))
 
+CRTFRMSTMFLIB := CRTFRMSTMF
 VPATH := $(OBJPATH):$(SRCPATH)
 
 ### Implicit rules
@@ -152,47 +213,19 @@ VPATH := $(OBJPATH):$(SRCPATH)
 	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTCMD) stmf('$<') parms('$(CRTCMDFLAGS)'))
 	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log
 
-%.MODULE: private TGTRLS = $(moduleTGTRLS)
-%.MODULE: private AUT = $(moduleAUT)
-%.MODULE: private OPTION = $(moduleOPTION)
 
-%.MODULE: %.C
-%.MODULE: %.C $(DEPDIR)/%.d
+%.FILE: %.DSPF
 	@echo "\n\n***"
-	@echo "*** Creating module [$*]"
+	@echo "*** Creating DSPF [$*]"
 	@echo "***"
-	$(eval crtcmd := crtcmod module($(OBJLIB)/$*) srcstmf('$<') $(CRTCMODFLAGS))
-	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log
-	@$(POSTCCOMPILE)
-	
-%.MODULE: %.RPGLE
-	@echo "\n\n***"
-	@echo "*** Creating module [$*]"
-	@echo "***"
-	$(eval crtcmd := crtrpgmod module($(OBJLIB)/$*) srcstmf('$<') $(CRTRPGMODFLAGS))
+	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTDSPF) stmf('$<') parms('$(CRTDSPFFLAGS)'))
 	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log
 
-
-%.MODULE: %.SQLRPGLE
+%.FILE: %.LF
 	@echo "\n\n***"
-	@echo "*** Creating SQLRPGLE module [$*]"
+	@echo "*** Creating LF [$*]"
 	@echo "***"
-	$(eval crtcmd := crtsqlrpgi obj($(OBJLIB)/$*) srcstmf('$<') $(CRTSQLRPGIFLAGS))
-	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log
-
-
-%.PGM: %.CLLE
-	@echo "\n\n***"
-	@echo "*** Creating bound CL program [$*]"
-	@echo "***"
-	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTBNDCL) stmf('$<') parms('$(CRTBNDCLFLAGS)'))
-	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$@.log
-
-%.MODULE: %.CLLE
-	@echo "\n\n***"
-	@echo "*** Creating CL module [$*]"
-	@echo "***"
-	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTCLMOD) stmf('$<'))
+	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTLF) stmf('$<') parms('$(CRTLFFLAGS)'))
 	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log
 
 %.FILE: %.PF
@@ -204,20 +237,76 @@ VPATH := $(OBJPATH):$(SRCPATH)
 	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log
 
 
-%.FILE: %.LF
+%.MODULE: private AUT = $(moduleAUT)
+%.MODULE: private DBGVIEW = $(moduleDBGVIEW)
+%.MODULE: private OBJTYPE = $(moduleOBJTYPE)
+%.MODULE: private OPTION = $(moduleOPTION)
+%.MODULE: private TGTRLS = $(moduleTGTRLS)
+
+%.MODULE: %.C $(DEPDIR)/%.d
 	@echo "\n\n***"
-	@echo "*** Creating LF [$*]"
+	@echo "*** Creating module [$*]"
 	@echo "***"
-	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTLF) stmf('$<') parms('$(CRTLFFLAGS)'))
+	$(eval crtcmd := crtcmod module($(OBJLIB)/$*) srcstmf('$<') $(CRTCMODFLAGS))
+	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log
+	@$(POSTCCOMPILE)
+
+%.MODULE: %.CLLE
+	@echo "\n\n***"
+	@echo "*** Creating CL module [$*]"
+	@echo "***"
+	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTCLMOD) stmf('$<'))
+	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log
+
+%.MODULE: %.RPGLE
+	@echo "\n\n***"
+	@echo "*** Creating module [$*]"
+	@echo "***"
+	$(eval crtcmd := crtrpgmod module($(OBJLIB)/$*) srcstmf('$<') $(CRTRPGMODFLAGS))
+	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log
+
+%.MODULE: %.SQLRPGLE
+	@echo "\n\n***"
+	@echo "*** Creating SQLRPGLE module [$*]"
+	@echo "***"
+	$(eval crtcmd := crtsqlrpgi obj($(OBJLIB)/$*) srcstmf('$<') $(CRTSQLRPGIFLAGS))
 	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log
 
 
-%.FILE: %.DSPF
+%.PGM: private ACTGRP = $(programACTGRP)
+%.PGM: private AUT = $(programAUT)
+%.PGM: private DETAIL = $(programDETAIL)
+%.PGM: private OBJTYPE = $(programOBJTYPE)
+%.PGM: private TGTRLS = $(programTGTRLS)
+
+%.PGM: %.CLLE
 	@echo "\n\n***"
-	@echo "*** Creating DSPF [$*]"
+	@echo "*** Creating bound CL program [$*]"
 	@echo "***"
-	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTDSPF) stmf('$<') parms('$(CRTDSPFFLAGS)'))
+	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTBNDCL) stmf('$<') parms('$(CRTBNDCLFLAGS)'))
+	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$@.log
+
+%.PGM: %.SQLC
+	@echo "\n\n***"
+	@echo "*** Creating bound SQLC program [$*]"
+	@echo "***"
+	$(eval crtcmd := crtsqlci obj($(OBJLIB)/$*) srcstmf('$<') $(CRTSQLCIFLAGS))
 	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log
+
+%.PGM: %.SQLRPGLE
+	@echo "\n\n***"
+	@echo "*** Creating bound SQLRPGLE program [$*]"
+	@echo "***"
+	$(eval crtcmd := crtsqlrpgi obj($(OBJLIB)/$*) srcstmf('$<') $(CRTSQLRPGIFLAGS))
+	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log
+
+%.PGM: $^
+	@echo "\n\n***"
+	@echo "*** Creating program [$*] from modules [$^]"
+	@echo "***"
+	$(eval crtcmd := crtpgm pgm($(OBJLIB)/$*) module($(basename $(filter %.MODULE,$(notdir $^)))) bndsrvpgm($(basename $(filter %.SRVPGM,$(notdir $^)))) $(CRTPGMFLAGS))
+	system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$@.log
+
 
 %.SRVPGM: private TGTRLS = $(SRVPGM_TGTRLS)
 %.SRVPGM: private ACTGRP = $(SRVPGM_ACTGRP)
@@ -228,19 +317,6 @@ VPATH := $(OBJPATH):$(SRCPATH)
 	@echo "*** Creating service program [$*] from modules [$^]"
 	@echo "***"
 	$(eval crtcmd := crtsrvpgm srvpgm($(OBJLIB)/$*) module($(basename $(filter %.MODULE,$(notdir $^))))  bndsrvpgm($(basename $(filter %.SRVPGM,$(notdir $^)))) $(CRTSRVPGMFLAGS))
-	system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$@.log
-
-# I think need to modify `module` parameter to only include dependencies that end in '.MODULE'.
-# Also add `srvpgm` parameter, with contents calculated the same way, but with '.SRVPGM'.
-%.PGM: private TGTRLS = $(PGM_TGTRLS)
-%.PGM: private ACTGRP = $(PGM_ACTGRP)
-%.PGM: private AUT = $(PGM_AUT)
-%.PGM: private DETAIL = $(PGM_DETAIL)
-%.PGM: $^
-	@echo "\n\n***"
-	@echo "*** Creating program [$*] from modules [$^]"
-	@echo "***"
-	$(eval crtcmd := crtpgm pgm($(OBJLIB)/$*) module($(basename $(filter %.MODULE,$(notdir $^)))) bndsrvpgm($(basename $(filter %.SRVPGM,$(notdir $^)))) $(CRTPGMFLAGS))
 	system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$@.log
 
 $(DEPDIR)/%.d: ;

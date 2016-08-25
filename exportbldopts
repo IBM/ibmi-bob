@@ -193,6 +193,14 @@ cleanup_pgm_parms() {
 	# If PGM() value equals the object name, remove the parameter.
 	parms=${parms/ PGM($object) / }
 	
+	# Remove MODULE() and BNDSRVPGM() parameters, as they've already been harvested in get_object_deps().
+	if [[ "$parms" =~ (MODULE\([^\)]*\)) ]]; then
+		parms=${parms/ ${BASH_REMATCH[1]} / }
+	fi
+	if [[ "$parms" =~ (BNDSRVPGM\([^\)]*\)) ]]; then
+		parms=${parms/ ${BASH_REMATCH[1]} / }
+	fi
+	
 	parms=$(trim $parms)
 	echo -n "$parms"
 }
@@ -204,6 +212,14 @@ cleanup_srvpgm_parms() {
 	
 	# If SRVPGM() value equals the object name, remove the parameter.
 	parms=${parms/ SRVPGM($object) / }
+	
+	# Remove MODULE() and BNDSRVPGM() parameters, as they've already been harvested in get_object_deps().
+	if [[ "$parms" =~ (MODULE\([^\)]*\)) ]]; then
+		parms=${parms/ ${BASH_REMATCH[1]} / }
+	fi
+	if [[ "$parms" =~ (BNDSRVPGM\([^\)]*\)) ]]; then
+		parms=${parms/ ${BASH_REMATCH[1]} / }
+	fi
 	
 	parms=$(trim $parms)
 	echo -n "$parms"
