@@ -23,6 +23,7 @@ DFT_USRPRF='USRPRF(\*USER)'
 CMD_DFT=( 'VLDCKR(\*NONE)' 'PMTFILE(\*NONE)' )
 CMOD_DFT=( 'TERASPACE(\*YES \*NOTSIFC)' 'STGMDL(\*INHERIT)' 'SYSIFCOPT(\*IFSIO)' 'OPTION(\*SYSINCPATH \*EVENTF \*SHOWUSR \*XREF \*AGR \*STRUCREF)' )
 RPGMOD_DFT=()
+SQLCI_DFT=( 'COMMIT(\*NONE)' )
 SQLRPGI_DFT=( 'COMMIT(\*NONE)' )
 BNDCL_DFT=( 'DFTACTGRP(\*NO)' 'ACTGRP(E_PRODUCT)' )
 SRVPGM_DFT=( 'ACTGRP(\*CALLER)' 'STGMDL(\*SNGLVL)' )
@@ -73,8 +74,18 @@ obj_suffix_for_cmd() {
 		CRTPNLGRP)	suffix="PNLGRP";;
 		CRTPGM)		suffix="PGM";;
 		CRTRPGMOD)	suffix="MODULE";;
-		CRTSQLCI)	suffix="MODULE";;
-		CRTSQLRPGI)	suffix="MODULE";;
+		CRTSQLCI | CRTSQLRPGI)
+			if [[ "${parms}" =~ OBJTYPE\(([^\)]*)\) ]]; then
+				case "${BASH_REMATCH[1]}" in
+					\*MODULE)	suffix="MODULE";;
+					\*PGM)		suffix="PGM";;
+					\*SRVPGM)	suffix="SRVPGM";;
+					*)			suffix="UNKNOWN";;
+				esac
+			else
+				suffix="UNKNOWN"
+			fi
+			;;
 		CRTSRVPGM)	suffix="SRVPGM";;
 		*)			suffix="UNKNOWN"
 					echo "*** Unknown command type in obj_suffix_for_cmd: $command" >&2
@@ -371,19 +382,21 @@ for file in $files; do
 
 		# Remove parameters that match our defaults.
 		case "$command" in
+		CRTBNDCL)	parms=$(process_parms $object "$parms" "${BNDCL_DFT[@]}")
+					;;
 		CRTCMD)		parms=$(process_parms $object "$parms" "${CMD_DFT[@]}")
 					;;
 		CRTCMOD)	parms=$(process_parms $object "$parms" "${CMOD_DFT[@]}")
 					;;
+		CRTPGM)		parms=$(process_parms $object "$parms" "${PGM_DFT[@]}")
+					;;
 		CRTRPGMOD)	parms=$(process_parms $object "$parms" "${RPGMOD_DFT[@]}")
+					;;
+		CRTSQLCI)	parms=$(process_parms $object "$parms" "${SQLCI_DFT[@]}")
 					;;
 		CRTSQLRPGI)	parms=$(process_parms $object "$parms" "${SQLRPGI_DFT[@]}")
 					;;
-		CRTBNDCL)	parms=$(process_parms $object "$parms" "${BNDCL_DFT[@]}")
-					;;
 		CRTSRVPGM)	parms=$(process_parms $object "$parms" "${SRVPGM_DFT[@]}")
-					;;
-		CRTPGM)		parms=$(process_parms $object "$parms" "${PGM_DFT[@]}")
 					;;
 		*)			echo "*** Unknown command $command found for object $object"
 					;;
