@@ -51,21 +51,28 @@ OBJTYPE :=
 # inserted into the compile commands.  Each variable here should also precede its corresponding pattern
 # rule as a pattern-specific variable. Change these to alter compile defaults for an entire type of
 # objects.
-PGM_TGTRLS := $(TGTRLS)
-PGM_ACTGRP := $(ACTGRP)
-PGM_AUT := $(AUT)
-PGM_DETAIL := $(DETAIL)
-
 BNDCL_DFTACTGRP := $(DFTACTGRP)
 BNDCL_ACTGRP := $(ACTGRP)
 
 BNDRPG_DFTACTGRP := $(DFTACTGRP)
 BNDRPG_ACTGRP := $(ACTGRP)
 
-SRVPGM_TGTRLS := $(TGTRLS)
-SRVPGM_ACTGRP := *CALLER
-SRVPGM_AUT := $(AUT)
-SRVPGM_DETAIL := $(DETAIL)
+CMOD_TGTRLS := $(TGTRLS)
+CMOD_AUT := $(AUT)
+CMOD_OPTION := *EVENTF *SHOWUSR *XREF *AGR
+
+CLMOD_TGTRLS := $(TGTRLS)
+CLMOD_AUT := $(AUT)
+CLMOD_OPTION := $(OPTION)
+CMOD_DBGVIEW := $(DBGVIEW)
+
+DSPF_AUT := $(AUT)
+DSPF_OPTION := *EVENTF *SRC *LIST
+
+PGM_TGTRLS := $(TGTRLS)
+PGM_ACTGRP := $(ACTGRP)
+PGM_AUT := $(AUT)
+PGM_DETAIL := $(DETAIL)
 
 RPGMOD_TGTRLS := $(TGTRLS)
 RPGMOD_AUT := $(AUT)
@@ -78,17 +85,10 @@ SQLRPGIMOD_OPTION := $(OPTION)
 SQLRPGIMOD_DBGVIEW := *SOURCE
 SQLRPGIMOD_OBJTYPE := *MODULE
 
-CLMOD_TGTRLS := $(TGTRLS)
-CLMOD_AUT := $(AUT)
-CLMOD_OPTION := $(OPTION)
-CMOD_DBGVIEW := $(DBGVIEW)
-
-CMOD_TGTRLS := $(TGTRLS)
-CMOD_AUT := $(AUT)
-CMOD_OPTION := *EVENTF *SHOWUSR *XREF *AGR
-
-DSPF_AUT := $(AUT)
-DSPF_OPTION := *EVENTF *SRC *LIST
+SRVPGM_TGTRLS := $(TGTRLS)
+SRVPGM_ACTGRP := *CALLER
+SRVPGM_AUT := $(AUT)
+SRVPGM_DETAIL := $(DETAIL)
 
 # Creation command parameters with variables (the ones listed at the top) for the most common ones.
 CRTBNDCLFLAGS = AUT($(AUT)) DBGVIEW($(DBGVIEW)) TGTRLS($(TGTRLS)) DFTACTGRP($(DFTACTGRP)) ACTGRP($(ACTGRP))
@@ -100,6 +100,7 @@ CRTLFFLAGS = AUT($(AUT)) OPTION(*EVENTF *SRC *LIST)
 CRTPFFLAGS = AUT($(AUT)) OPTION(*EVENTF *SRC *LIST) SIZE(*NOMAX) TEXT($(TEXT))
 CRTPGMFLAGS = ACTGRP($(ACTGRP)) USRPRF(*USER) TGTRLS($(TGTRLS)) AUT($(AUT)) DETAIL($(DETAIL))
 CRTRPGMODFLAGS = DBGVIEW($(DBGVIEW)) TGTRLS($(TGTRLS)) OUTPUT(*PRINT) AUT($(AUT)) OPTION($(OPTION))
+CRTSQLCIFLAGS
 CRTSQLRPGIFLAGS = COMMIT($(COMMIT)) OBJTYPE($(OBJTYPE)) OUTPUT(*PRINT) TGTRLS($(TGTRLS)) OPTION($(OPTION)) DBGVIEW($(DBGVIEW))
 CRTSRVPGMFLAGS = EXPORT(*ALL) ACTGRP($(ACTGRP)) TGTRLS($(TGTRLS)) AUT($(AUT)) DETAIL($(DETAIL))
 
@@ -150,51 +151,51 @@ endef
 # Determine default settings for the various source types that can make a module ojbect.
 moduleAUT = $(strip \
 	$(if $(filter %.C,$<),$(CMOD_AUT), \
+	$(if $(filter %.CLLE,$<),$(CLMOD_AUT), \
 	$(if $(filter %.RPGLE,$<),$(RPGMOD_AUT), \
-	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIMOD_AUT), \
-	UNKNOWN_FILE_TYPE))))
+	UNKNOWN_FILE_TYPE)))
 moduleDBGVIEW = $(strip \
 	$(if $(filter %.C,$<),$(CMOD_DBGVIEW), \
+	$(if $(filter %.CLLE,$<),$(CLMOD_DBGVIEW), \
 	$(if $(filter %.RPGLE,$<),$(RPGMOD_DBGVIEW), \
+	$(if $(filter %.SQLC,$<),$(SQLCIMOD_DBGVIEW), \
 	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIMOD_DBGVIEW), \
-	UNKNOWN_FILE_TYPE))))
+	UNKNOWN_FILE_TYPE))))))
 moduleOBJTYPE = $(strip \
+	$(if $(filter %.SQLC,$<),$(SQLCIMOD_OBJTYPE), \
 	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIMOD_OBJTYPE), \
-	UNKNOWN_FILE_TYPE))
+	UNKNOWN_FILE_TYPE)))
 moduleOPTION = $(strip \
 	$(if $(filter %.C,$<),$(CMOD_OPTION), \
+	$(if $(filter %.CLLE,$<),$(CLMOD_OPTION), \
 	$(if $(filter %.RPGLE,$<),$(RPGMOD_OPTION), \
+	$(if $(filter %.SQLC,$<),$(SQLCIMOD_OPTION), \
 	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIMOD_OPTION), \
-	UNKNOWN_FILE_TYPE))))
+	UNKNOWN_FILE_TYPE))))))
 moduleTGTRLS = $(strip \
 	$(if $(filter %.C,$<),$(CMOD_TGTRLS), \
+	$(if $(filter %.CLLE,$<),$(CLMOD_TGTRLS), \
 	$(if $(filter %.RPGLE,$<),$(RPGMOD_TGTRLS), \
+	$(if $(filter %.SQLC,$<),$(SQLCIMOD_TGTRLS), \
 	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIMOD_TGTRLS), \
-	UNKNOWN_FILE_TYPE))))
+	UNKNOWN_FILE_TYPE))))))
 
 # Determine default settings for the various source types that can make a program ojbect.
 programAUT = $(strip \
 	$(if $(filter %.CLLE,$<),$(BNDCL_AUT), \
-	$(if $(filter %.SQLC,$<),$(SQLCIPGM_AUT), \
-	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIPGM_AUT), \
 	$(if $(filter %.MODULE,$<),$(PGM_AUT), \
-	UNKNOWN_FILE_TYPE)))))
+	UNKNOWN_FILE_TYPE)))
 programACTGRP = $(strip \
 	$(if $(filter %.CLLE,$<),$(BNDCL_ACTGRP), \
-	$(if $(filter %.SQLC,$<),$(SQLCIPGM_ACTGRP), \
-	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIPGM_ACTGRP), \
 	$(if $(filter %.MODULE,$<),$(PGM_ACTGRP), \
-	UNKNOWN_FILE_TYPE)))))
+	UNKNOWN_FILE_TYPE)))
 programOBJTYPE = $(strip \
 	$(if $(filter %.SQLC,$<),$(SQLCIPGM_OBJTYPE), \
 	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIPGM_OBJTYPE), \
 	UNKNOWN_FILE_TYPE)))
-programOPTION = $(strip \
-	$(if $(filter %.CLLE,$<),$(BNDCL_OPTION), \
-	$(if $(filter %.SQLC,$<),$(SQLCIPGM_OPTION), \
-	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIPGM_OPTION), \
-	$(if $(filter %.MODULE,$<),$(PGM_OPTION), \
-	UNKNOWN_FILE_TYPE)))))
+programDETAIL = $(strip \
+	$(if $(filter %.MODULE,$<),$(PGM_DETAIL), \
+	UNKNOWN_FILE_TYPE))
 programTGTRLS = $(strip \
 	$(if $(filter %.CLLE,$<),$(BNDCL_TGTRLS), \
 	$(if $(filter %.SQLC,$<),$(SQLCIPGM_TGTRLS), \
