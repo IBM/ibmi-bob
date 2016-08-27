@@ -15,7 +15,8 @@
 #   o ADDLIBLE <object_lib>
 #   o CALL QP2TERM
 #   o cd /some/path/that's/not/QSYS.LIB
-#   o make all INCLUDEMAKEFILES:='/path/to/project-specific/makefile.mak' OBJPATH:='/QSYS.LIB/<object_lib>.LIB' -f /location/of/Makefile
+#   o make all INCLUDEMAKEFILES:='/path/to/project-specific/makefile.mak' OBJPATH:='/QSYS.LIB/<object_lib>.LIB' -f /location/of/this/Makefile
+#   o Use `--warn-undefined-variables` while testing to see if any variables have been used without being set.
 #
 
 # Define some Makefile variables for the compiler.
@@ -38,7 +39,7 @@ DETAIL := *EXTENDED
 OPTION := *EVENTF
 COMMIT := *NONE
 DBGVIEW := *ALL
-TEXT := TEST
+TEXT :=
 RSTDSP := *YES
 PGM :=
 VLDCKR := *NONE
@@ -46,63 +47,93 @@ PMTFILE := *NONE
 HLPPNLGRP = $*
 HLPID = $*
 OBJTYPE :=
+TERASPACE :=
+STGMDL := *SNGLVL
 
 # Object-type-specific defaults.  Not used directly, but copied to the standard ones above and then
 # inserted into the compile commands.  Each variable here should also precede its corresponding pattern
 # rule as a pattern-specific variable. Change these to alter compile defaults for an entire type of
-# objects.
-BNDCL_DFTACTGRP := $(DFTACTGRP)
+# object.
 BNDCL_ACTGRP := $(ACTGRP)
+BNDCL_AUT := $(AUT)
+BNDCL_DBGVIEW := $(DBGVIEW)
+BNDCL_DFTACTGRP := $(DFTACTGRP)
+BNDCL_OPTION := $(OPTION)
+BNDCL_TGTRLS := $(TGTRLS)
 
-BNDRPG_DFTACTGRP := $(DFTACTGRP)
 BNDRPG_ACTGRP := $(ACTGRP)
+BNDRPG_DBGVIEW := $(DBGVIEW)
+BNDRPG_DFTACTGRP := $(DFTACTGRP)
+BNDRPG_OPTION := $(OPTION)
 
-CMOD_TGTRLS := $(TGTRLS)
+CMD_AUT := $(AUT)
+
 CMOD_AUT := $(AUT)
-CMOD_OPTION := *EVENTF *SHOWUSR *XREF *AGR
-
-CLMOD_TGTRLS := $(TGTRLS)
-CLMOD_AUT := $(AUT)
-CLMOD_OPTION := $(OPTION)
 CMOD_DBGVIEW := $(DBGVIEW)
+CMOD_OPTION := *EVENTF *SHOWUSR *XREF *AGR
+CMOD_TGTRLS := $(TGTRLS)
+CMOD_TERASPACE := *YES *NOTSIFC
+CMOD_STGMDL := *INHERIT
+
+CLMOD_AUT := $(AUT)
+CLMOD_DBGVIEW := $(DBGVIEW)
+CLMOD_OPTION := $(OPTION)
+CLMOD_TGTRLS := $(TGTRLS)
 
 DSPF_AUT := $(AUT)
 DSPF_OPTION := *EVENTF *SRC *LIST
 
-PGM_TGTRLS := $(TGTRLS)
 PGM_ACTGRP := $(ACTGRP)
 PGM_AUT := $(AUT)
 PGM_DETAIL := $(DETAIL)
+PGM_OPTION := $(OPTION)
+PGM_STGMDL := *SNGLVL
+PGM_TGTRLS := $(TGTRLS)
 
-RPGMOD_TGTRLS := $(TGTRLS)
 RPGMOD_AUT := $(AUT)
-RPGMOD_OPTION := $(OPTION)
 RPGMOD_DBGVIEW := $(DBGVIEW)
+RPGMOD_OPTION := $(OPTION)
+RPGMOD_TGTRLS := $(TGTRLS)
 
-SQLRPGIMOD_TGTRLS := $(TGTRLS)
-SQLRPGIMOD_AUT :=
-SQLRPGIMOD_OPTION := $(OPTION)
+SQLCIMOD_DBGVIEW := *SOURCE
+SQLCIMOD_OBJTYPE := *MODULE
+SQLCIMOD_OPTION := $(OPTION)
+SQLCIMOD_TGTRLS := $(TGTRLS)
+
+SQLCIPGM_DBGVIEW := *SOURCE
+SQLCIPGM_OBJTYPE := *PGM
+SQLCIPGM_OPTION := $(OPTION)
+SQLCIPGM_TGTRLS := $(TGTRLS)
+
 SQLRPGIMOD_DBGVIEW := *SOURCE
 SQLRPGIMOD_OBJTYPE := *MODULE
+SQLRPGIMOD_OPTION := $(OPTION)
+SQLRPGIMOD_TGTRLS := $(TGTRLS)
 
-SRVPGM_TGTRLS := $(TGTRLS)
+SQLRPGIPGM_DBGVIEW := *SOURCE
+SQLRPGIPGM_OBJTYPE := *PGM
+SQLRPGIPGM_OPTION := $(OPTION)
+SQLRPGIPGM_TGTRLS := $(TGTRLS)
+
 SRVPGM_ACTGRP := *CALLER
 SRVPGM_AUT := $(AUT)
 SRVPGM_DETAIL := $(DETAIL)
+SRVPGM_STGMDL := $(STGMDL)
+SRVPGM_TGTRLS := $(TGTRLS)
 
 # Creation command parameters with variables (the ones listed at the top) for the most common ones.
-CRTBNDCLFLAGS = AUT($(AUT)) DBGVIEW($(DBGVIEW)) TGTRLS($(TGTRLS)) DFTACTGRP($(DFTACTGRP)) ACTGRP($(ACTGRP))
+CRTBNDCLFLAGS = AUT($(AUT)) DBGVIEW($(DBGVIEW)) TGTRLS($(TGTRLS)) DFTACTGRP($(DFTACTGRP)) ACTGRP($(ACTGRP)) OPTION($(OPTION))
 CRTCMDFLAGS = PGM($(PGM)) VLDCKR($(VLDCKR)) PMTFILE($(PMTFILE)) HLPPNLGRP($(HLPPNLGRP)) HLPID($(HLPID)) AUT($(AUT))
-CRTCMODFLAGS = TERASPACE(*YES *NOTSIFC) STGMDL(*INHERIT) OUTPUT(*PRINT) OPTION($(OPTION)) DBGVIEW($(DBGVIEW)) \
+CRTCMODFLAGS = TERASPACE($(TERASPACE)) STGMDL($(STGMDL)) OUTPUT(*PRINT) OPTION($(OPTION)) DBGVIEW($(DBGVIEW)) \
                SYSIFCOPT(*IFSIO) AUT($(AUT)) TGTRLS($(TGTRLS)) MAKEDEP('$(DEPDIR)/$*.Td')
 CRTDSPFFLAGS = ENHDSP(*YES) RSTDSP($(RSTDSP)) DFRWRT(*YES) AUT($(AUT)) OPTION($(OPTION)) TEXT($(TEXT))
 CRTLFFLAGS = AUT($(AUT)) OPTION(*EVENTF *SRC *LIST)
 CRTPFFLAGS = AUT($(AUT)) OPTION(*EVENTF *SRC *LIST) SIZE(*NOMAX) TEXT($(TEXT))
-CRTPGMFLAGS = ACTGRP($(ACTGRP)) USRPRF(*USER) TGTRLS($(TGTRLS)) AUT($(AUT)) DETAIL($(DETAIL))
+CRTPGMFLAGS = ACTGRP($(ACTGRP)) USRPRF(*USER) TGTRLS($(TGTRLS)) AUT($(AUT)) DETAIL($(DETAIL)) OPTION($(OPTION)) STGMDL($(STGMDL))
 CRTRPGMODFLAGS = DBGVIEW($(DBGVIEW)) TGTRLS($(TGTRLS)) OUTPUT(*PRINT) AUT($(AUT)) OPTION($(OPTION))
-CRTSQLCIFLAGS
+CRTSQLCIFLAGS =
 CRTSQLRPGIFLAGS = COMMIT($(COMMIT)) OBJTYPE($(OBJTYPE)) OUTPUT(*PRINT) TGTRLS($(TGTRLS)) OPTION($(OPTION)) DBGVIEW($(DBGVIEW))
-CRTSRVPGMFLAGS = EXPORT(*ALL) ACTGRP($(ACTGRP)) TGTRLS($(TGTRLS)) AUT($(AUT)) DETAIL($(DETAIL))
+CRTSRVPGMFLAGS = EXPORT(*ALL) ACTGRP($(ACTGRP)) TGTRLS($(TGTRLS)) AUT($(AUT)) DETAIL($(DETAIL)) STGMDL($(STGMDL))
 
 # Extra command strings for adhoc addition of extra parameters to the creation commands.
 CRTBNDCLFLAGS =
@@ -153,7 +184,7 @@ moduleAUT = $(strip \
 	$(if $(filter %.C,$<),$(CMOD_AUT), \
 	$(if $(filter %.CLLE,$<),$(CLMOD_AUT), \
 	$(if $(filter %.RPGLE,$<),$(RPGMOD_AUT), \
-	UNKNOWN_FILE_TYPE)))
+	UNKNOWN_FILE_TYPE))))
 moduleDBGVIEW = $(strip \
 	$(if $(filter %.C,$<),$(CMOD_DBGVIEW), \
 	$(if $(filter %.CLLE,$<),$(CLMOD_DBGVIEW), \
@@ -172,6 +203,9 @@ moduleOPTION = $(strip \
 	$(if $(filter %.SQLC,$<),$(SQLCIMOD_OPTION), \
 	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIMOD_OPTION), \
 	UNKNOWN_FILE_TYPE))))))
+moduleSTGMDL = $(strip \
+	$(if $(filter %.C,$<),$(CMOD_STGMDL), \
+	UNKNOWN_FILE_TYPE))
 moduleTGTRLS = $(strip \
 	$(if $(filter %.C,$<),$(CMOD_TGTRLS), \
 	$(if $(filter %.CLLE,$<),$(CLMOD_TGTRLS), \
@@ -181,21 +215,41 @@ moduleTGTRLS = $(strip \
 	UNKNOWN_FILE_TYPE))))))
 
 # Determine default settings for the various source types that can make a program ojbect.
+programACTGRP = $(strip \
+	$(if $(filter %.CLLE,$<),$(BNDCL_ACTGRP), \
+	$(if $(filter %.MODULE,$<),$(PGM_ACTGRP), \
+	UNKNOWN_FILE_TYPE)))
 programAUT = $(strip \
 	$(if $(filter %.CLLE,$<),$(BNDCL_AUT), \
 	$(if $(filter %.MODULE,$<),$(PGM_AUT), \
 	UNKNOWN_FILE_TYPE)))
-programACTGRP = $(strip \
-	$(if $(filter %.CLLE,$<),$(BNDCL_ACTGRP), \
-	$(if $(filter %.MODULE,$<),$(PGM_ACTGRP), \
+programDBGVIEW = $(strip \
+	$(if $(filter %.CLLE,$<),$(BNDCL_DBGVIEW), \
+	$(if $(filter %.RPGLE,$<),$(BNDRPG_DBGVIEW), \
+	$(if $(filter %.SQLC,$<),$(SQLCIPGM_DBGVIEW), \
+	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIPGM_DBGVIEW), \
+	UNKNOWN_FILE_TYPE)))))
+programDETAIL = $(strip \
+	$(if $(filter %.MODULE,$<),$(PGM_DETAIL), \
+	UNKNOWN_FILE_TYPE))
+programDFTACTGRP = $(strip \
+	$(if $(filter %.CLLE,$<),$(BNDCL_DFTACTGRP), \
+	$(if $(filter %.RPGLE,$<),$(BNDRPG_DFTACTGRP), \
 	UNKNOWN_FILE_TYPE)))
 programOBJTYPE = $(strip \
 	$(if $(filter %.SQLC,$<),$(SQLCIPGM_OBJTYPE), \
 	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIPGM_OBJTYPE), \
 	UNKNOWN_FILE_TYPE)))
-programDETAIL = $(strip \
-	$(if $(filter %.MODULE,$<),$(PGM_DETAIL), \
-	UNKNOWN_FILE_TYPE))
+programOPTION = $(strip \
+	$(if $(filter %.CLLE,$<),$(BNDCL_OPTION), \
+	$(if $(filter %.RPGLE,$<),$(BNDRPG_OPTION), \
+	$(if $(filter %.SQLC,$<),$(SQLCIPGM_OPTION), \
+	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIPGM_OPTION), \
+	$(if $(filter %.MODULE,$<),$(PGM_OPTION), \
+	UNKNOWN_FILE_TYPE))))))
+programSTGMDL = $(strip \
+	$(if $(filter %.MODULE,$<),$(PGM_STGMDL), \
+	UNKNOWN_FILE_TYPE))))))
 programTGTRLS = $(strip \
 	$(if $(filter %.CLLE,$<),$(BNDCL_TGTRLS), \
 	$(if $(filter %.SQLC,$<),$(SQLCIPGM_TGTRLS), \
@@ -207,6 +261,7 @@ CRTFRMSTMFLIB := CRTFRMSTMF
 VPATH := $(OBJPATH):$(SRCPATH)
 
 ### Implicit rules
+%.CMD: private AUT = $(CMD_AUT)
 %.CMD: %.CMD
 	@echo "\n\n***"
 	@echo "*** Creating command [$*]"
@@ -242,6 +297,7 @@ VPATH := $(OBJPATH):$(SRCPATH)
 %.MODULE: private DBGVIEW = $(moduleDBGVIEW)
 %.MODULE: private OBJTYPE = $(moduleOBJTYPE)
 %.MODULE: private OPTION = $(moduleOPTION)
+%.MODULE: private STGMDL = $(moduleSTGMDL)
 %.MODULE: private TGTRLS = $(moduleTGTRLS)
 
 %.MODULE: %.C $(DEPDIR)/%.d
@@ -276,8 +332,12 @@ VPATH := $(OBJPATH):$(SRCPATH)
 
 %.PGM: private ACTGRP = $(programACTGRP)
 %.PGM: private AUT = $(programAUT)
+%.PGM: private DBGVIEW = $(programDBGVIEW)
 %.PGM: private DETAIL = $(programDETAIL)
+%.PGM: private DFTACTGRP = $(programDFTACTGRP)
 %.PGM: private OBJTYPE = $(programOBJTYPE)
+%.PGM: private OPTION = $(programOPTION)
+%.PGM: private STGMDL = $(programSTGMDL)
 %.PGM: private TGTRLS = $(programTGTRLS)
 
 %.PGM: %.CLLE
@@ -309,10 +369,11 @@ VPATH := $(OBJPATH):$(SRCPATH)
 	system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$@.log
 
 
-%.SRVPGM: private TGTRLS = $(SRVPGM_TGTRLS)
 %.SRVPGM: private ACTGRP = $(SRVPGM_ACTGRP)
 %.SRVPGM: private AUT = $(SRVPGM_AUT)
 %.SRVPGM: private DETAIL = $(SRVPGM_DETAIL)
+%.SRVPGM: private STGMDL = $(SRVPGM_STGMDL)
+%.SRVPGM: private TGTRLS = $(SRVPGM_TGTRLS)
 %.SRVPGM: $^
 	@echo "\n\n***"
 	@echo "*** Creating service program [$*] from modules [$^]"
