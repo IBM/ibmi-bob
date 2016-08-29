@@ -434,12 +434,18 @@ for file in $files; do
 		# Add a comment showing object metadata for debug purposes
 		echo "# $fullObject -- $command"
 		
-		## Output parameters in makefile format
+		## Output custom compile parameters in makefile format
 		print_parms $fullObject "$parms"
 		
-		echo "$fullObject: $sourceDeps | $objectDeps"
+		# Write object: sourcedeps objectdeps		
+		output="$fullObject: $sourceDeps"
+		output="${output% } $objectDeps"
 		
-		# Write object: sourcedeps objectdeps
+		if [[ ${#output} -ge 110 ]]; then
+			echo "$output" | fold -s -w 100 | sed -e '$ ! s/$/\\/'
+		else
+			echo "$output"
+		fi
 		
 #		if [[ -z ${parms// } ]] # tests for empty string
 	done
