@@ -2,6 +2,10 @@
 
 # Scan through current directory of BLDOPT files and extract commands and parameters.
 #
+# To invoke:
+# o cd source_directory
+# o path/to/exportbldopts output_file
+#
 # Processing
 # o Read through each ADM BLDOPT file
 # o Remove comments
@@ -34,6 +38,8 @@ PGM_DFT=( 'ACTGRP(E_PRODUCT)' )
 
 sourceDeps=
 objectDeps=
+metadataDir=".metadata"
+outputFile=$1
 
 
 trim() {
@@ -417,14 +423,47 @@ print_parms() {
 			echo "$fullObject: private ${BASH_REMATCH[1]} = ${BASH_REMATCH[2]}"
 		fi
 	done
+	
+	# Write object to the metadata log file for this object type, as a record of this object existing.
+	echo "${fullObject}" >> "$metadataDir/${fullObject##*.}.log"
 }
+
+# Prints a summary report (redirected to stderr)
+print_summary() {
+	(( totalCount = 0 ))
+	echo; echo
+	echo "*** EXPORT COMPLETE! ***"
+	echo
+	echo "Objects exported:"
+	echo
+	
+	for logFile in $metadataDir/*.log; do
+		(( count=$(wc -l <$logFile) ))
+		(( totalCount += count ))
+		printf "\t$(basename ${logFile%.*}):\t%u\n" $count
+	done
+	
+	echo
+	echo "Total objects exported: $totalCount"
+	echo "Output file: ${metadataDir}/$outputFile"
+}
+
+############################
+# Beginning of main script #
+############################
+
+# Clear/create metadata subdirectory for logging imported objects.
+if [ ! -d "$metadataDir" ]; then
+	mkdir "$metadataDir"
+fi
+[ "$(ls -A $metadataDir)" ] && rm -r $metadataDir/*
+echo "This directory contains info about the items in the parent directory." > "$metadataDir/Readme.txt"
 
 # Assume that bldopt filename is the same name as all &ZN and &ZE substitution variables.  If this turns out to not
 # be the case, remove the sed -e below that inserts $base: at the beginning of the line, and add a function that determines
 # object name for each object type based on its object parameter (CMD() for commands, MODULE() for modules, etc.).
 
-#echo "SQLRPGI_DFT=${#SQLRPGI_DFT}"
-files=( "*.BLDOPT" )
+files=( "B*.BLDOPT" )
 # echo ${files[@]}
 for file in $files; do
 	base=$(basename $file .BLDOPT)
@@ -527,5 +566,7 @@ for file in $files; do
 				echo "$output"
 #			fi
 		done
-	}
+	} >>$metadataDir/$outputFile
 done
+
+print_summary >&2
