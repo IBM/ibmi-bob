@@ -38,7 +38,7 @@ PGM_DFT=( 'ACTGRP(E_PRODUCT)' )
 
 sourceDeps=
 objectDeps=
-metadataDir=".metadata"
+metadataDir=".exportbldopts"
 outputFile=$1
 
 
@@ -463,7 +463,7 @@ echo "This directory contains info about the items in the parent directory." > "
 # be the case, remove the sed -e below that inserts $base: at the beginning of the line, and add a function that determines
 # object name for each object type based on its object parameter (CMD() for commands, MODULE() for modules, etc.).
 
-files=( "B*.BLDOPT" )
+files=( "*.BLDOPT" )
 # echo ${files[@]}
 for file in $files; do
 	base=$(basename $file .BLDOPT)
