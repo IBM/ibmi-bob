@@ -16,7 +16,7 @@
 
 # Global default values
 DFT_AUT='AUT(\*EXCLUDE)'
-DFT_TGTRLS='TGTRLS(V5R1M0)'
+DFT_TGTRLS='TGTRLS([^)]*)'
 DFT_USRPRF='USRPRF(\*USER)'
 
 # Default values for each object type
@@ -29,7 +29,7 @@ RPGMOD_DFT=()
 SQLCI_DFT=( 'COMMIT(\*NONE)' )
 SQLRPGI_DFT=( 'COMMIT(\*NONE)' )
 BNDCL_DFT=( 'DFTACTGRP(\*NO)' 'ACTGRP(E_PRODUCT)' )
-SRVPGM_DFT=( 'ACTGRP(\*CALLER)' 'STGMDL(\*SNGLVL)' )
+SRVPGM_DFT=( 'ACTGRP(\*CALLER)' 'STGMDL(\*SNGLVL)' 'BNDDIR(\*NONE)' )
 PGM_DFT=( 'ACTGRP(E_PRODUCT)' )
 
 sourceDeps=
@@ -429,7 +429,7 @@ files=( "*.BLDOPT" )
 for file in $files; do
 	base=$(basename $file .BLDOPT)
 	sed -e 's/\/\*.*\*\///g' -e 's/ *$//' -e :a -e '/+ *$/N; s/ *+ *\n */ /; ta' -e 's/\/\*.*\*\///g' -e 's/^ *//' -e '/^$/d' -e 's/ *) */) /g' -e 's/^/'$base': /' \
-        -e 's/&O\///' -e 's/\&ZE/'$base'/g' -e 's/SRCMBR(&[^)]*) *//I' -e 's/SRCFILE(&[^)]*) *//I' -e 's/\*LIBL\///I g' \
+        -e 's/&O\/\|&L\///g' -e 's/&ZE\|&ZN/'$base'/g' -e 's/SRCMBR('$base') *//I' -e 's/\*LIBL\///I g' -e 's/ SRCFILE([^)]*) */ /I' \
 		-e 's/(  */(/g' -e 's/  *)/)/g' \
 		-e 's/REPLACE(\*YES) *//I' -e 's/DBGVIEW([^)]*) *//I' -e 's/OUTPUT(\*PRINT) *//I' -e 's/DETAIL([^)]*) *//I' \
 		-e 's/'$DFT_AUT' *//I' -e 's/'$DFT_TGTRLS' *//I' -e 's/'$DFT_USRPRF' *//I' \

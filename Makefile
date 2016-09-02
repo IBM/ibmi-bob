@@ -49,6 +49,7 @@ HLPID = $*
 OBJTYPE :=
 TERASPACE :=
 STGMDL := *SNGLVL
+BNDDIR :=
 
 # Object-type-specific defaults.  Not used directly, but copied to the standard ones above and then
 # inserted into the compile commands.  Each variable here should also precede its corresponding pattern
@@ -117,6 +118,7 @@ SQLRPGIPGM_TGTRLS := $(TGTRLS)
 
 SRVPGM_ACTGRP := *CALLER
 SRVPGM_AUT := $(AUT)
+SRVPGM_BNDDIR := *NONE
 SRVPGM_DETAIL := $(DETAIL)
 SRVPGM_STGMDL := $(STGMDL)
 SRVPGM_TGTRLS := $(TGTRLS)
