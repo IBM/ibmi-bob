@@ -448,25 +448,14 @@ print_summary() {
 	echo "Output file: ${metadataDir}/$outputFile"
 }
 
-############################
-# Beginning of main script #
-############################
-
-# Clear/create metadata subdirectory for logging imported objects.
-if [ ! -d "$metadataDir" ]; then
-	mkdir "$metadataDir"
-fi
-[ "$(ls -A $metadataDir)" ] && rm -r $metadataDir/*
-echo "This directory contains info about the items in the parent directory." > "$metadataDir/Readme.txt"
-
+# Main processing for the contents of a .BLDOPT file.
+#
 # Assume that bldopt filename is the same name as all &ZN and &ZE substitution variables.  If this turns out to not
 # be the case, remove the sed -e below that inserts $base: at the beginning of the line, and add a function that determines
 # object name for each object type based on its object parameter (CMD() for commands, MODULE() for modules, etc.).
-
-files=( "*.BLDOPT" )
-# echo ${files[@]}
-for file in $files; do
+process_bldopt() {
 	base=$(basename $file .BLDOPT)
+
 	sed -e 's/\/\*.*\*\///g' -e 's/ *$//' -e :a -e '/+ *$/N; s/ *+ *\n */ /; ta' -e 's/\/\*.*\*\///g' -e 's/^ *//' -e '/^$/d' -e 's/ *) */) /g' -e 's/^/'$base': /' \
         -e 's/&O\/\|&L\///g' -e 's/&ZE\|&ZN/'$base'/g' -e 's/SRCMBR('$base') *//I' -e 's/\*LIBL\///I g' -e 's/ SRCFILE([^)]*) */ /I' \
 		-e 's/(  */(/g' -e 's/  *)/)/g' \
@@ -474,7 +463,6 @@ for file in $files; do
 		-e 's/'$DFT_AUT' *//I' -e 's/'$DFT_TGTRLS' *//I' -e 's/'$DFT_USRPRF' *//I' \
 		-e 's/\(OPTION([^)]*\)\*GEN *\([^)]*)\)/\1\2/I' -e 's/ *[^ ]\+( *)//Ig' \
 	$file | \
-#	sed -e 's/ *\/\*.*\*\/ *//g' | \
 	{
 		while IFS='' read -r line || [[ -n "$line" ]]; do
 			object=$(trim ${line/:*/})
@@ -566,7 +554,29 @@ for file in $files; do
 				echo "$output"
 #			fi
 		done
-	} >>$metadataDir/$outputFile
+	}
+}
+
+############################
+# Beginning of main script #
+############################
+
+# Clear/create metadata subdirectory for logging imported objects.
+if [ ! -d "$metadataDir" ]; then
+	mkdir "$metadataDir"
+fi
+[ "$(ls -A $metadataDir)" ] && rm -r $metadataDir/*
+echo "This directory contains info about the items in the parent directory." > "$metadataDir/Readme.txt"
+
+files=( "*.*" )
+# echo ${files[@]}
+for file in $files; do
+	fileSuffix=${file##*.}
+
+	if [[ $fileSuffix == "BLDOPT" ]]; then
+		process_bldopt >> $metadataDir/$outputFile
+	fi
+	
 done
 
 print_summary >&2
