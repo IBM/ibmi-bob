@@ -560,6 +560,11 @@ process_standalone_source_file() {
 		echo "*** Binder source $filename.$fileType found without a matching BLDOPT!" >&2
 	fi
 	
+	# This is kind of a hack to get obj_suffix_for_cmd() working for non-BLDOPT files.  If a
+	# standalone SQLxyz source file is encountered, set a variable to trick obj_suffix_for_cmd()
+	# into treating it as a CRTSQLxyzI *PGM object.
+	local parms="OBJTYPE(*PGM)"
+	
 	# If we got this far, the source file likely isn't created by commands in a BLDOPT file, so create a makefile
 	# definition for it now.
 	local sourceDeps=$(get_source_deps $filename $commandSolo "")
