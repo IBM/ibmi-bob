@@ -399,9 +399,9 @@ get_object_deps() {
 		CRTPRTF)
 			# Scan through source and look for REF() and MSGCON() and add them as object dependencies. Any other keywords?
 			if [[ -f ${object}.PRTF ]]; then
-				deps=$(sed -n -e 's/.*REF(\([^)]*\).*/\1/p' ${object}.DSPF | sed -e '/\// s/.*\///')
+				deps=$(sed -n -e 's/.*REF(\([^)]*\).*/\1/p' ${object}.PRTF | sed -e '/\// s/.*\///')
 				output=$(add_suffix "$deps" FILE)
-				deps=$(sed -n -e 's/.*MSGCON(.* \(.*\)).*/\1/p' ${object}.DSPF | sed -e '/\// s/.*\///' | sort -u | xargs)
+				deps=$(sed -n -e 's/.*MSGCON(.* \(.*\)).*/\1/p' ${object}.PRTF | sed -e '/\// s/.*\///' | sort -u | xargs)
 				deps=$(add_suffix "$deps" MSGF)
 				output="$output $deps"
 			fi
