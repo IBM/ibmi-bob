@@ -397,7 +397,14 @@ get_object_deps() {
 			# No object dependencies on panel groups
 			;;
 		CRTPRTF)
-			# No object dependencies on printer file.
+			# Scan through source and look for REF() and MSGCON() and add them as object dependencies. Any other keywords?
+			if [[ -f ${object}.PRTF ]]; then
+				deps=$(sed -n -e 's/.*REF(\([^)]*\).*/\1/p' ${object}.DSPF | sed -e '/\// s/.*\///')
+				output=$(add_suffix "$deps" FILE)
+				deps=$(sed -n -e 's/.*MSGCON(.* \(.*\)).*/\1/p' ${object}.DSPF | sed -e '/\// s/.*\///' | sort -u | xargs)
+				deps=$(add_suffix "$deps" MSGF)
+				output="$output $deps"
+			fi
 			;;
 		CRTRPGMOD|CRTBNDRPG)
 			# Call script to parse F-specs for files and data areas
@@ -707,7 +714,7 @@ if [ ! -d "$metadataDir" ]; then
 	mkdir "$metadataDir"
 fi
 [ "$(ls -A $metadataDir)" ] && rm -r $metadataDir/*
-echo "This directory contains info about the items in the parent directory." > "$metadataDir/Readme.txt"
+echo "This directory contains info about the items exported into the parent directory." > "$metadataDir/Readme.txt"
 
 files=( "*.*" )
 # echo ${files[@]}
