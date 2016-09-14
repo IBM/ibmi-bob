@@ -409,7 +409,7 @@ get_object_deps() {
 		CRTRPGMOD|CRTBNDRPG)
 			# Scan through source, look for files (externally-described data structures, too), and add them as object dependencies.
 			if [[ -f ${object}.RPGLE ]]; then
-				deps=$(sed -n -r -e 's/^.{5}[Ff](.{10}).{19}(DISK|WORKSTN|PRINTER).*/\1/I p' -e 's/^.{5}[Dd].*EXTNAME\(([^\)]*).*/\1/I p' ${object}.RPGLE | sort -u | xargs | tr "[:lower:]" "[:upper:]")
+				deps=$(sed -n -r -e '/^.{6}[^*]/ s/^.{5}[Ff]([^ ]{,9}).*(DISK|WORKSTN|PRINTER).*/\1/I p' -e '/^.{6}[^*]/ s/^.{5}[Dd].*EXTNAME\(([^ \)]*).*/\1/I p' ${object}.RPGLE | tr "[:lower:]" "[:upper:]" | sort -u | xargs)
 				output=$(add_suffix "$deps" FILE)
 			fi
 			;;
@@ -419,7 +419,7 @@ get_object_deps() {
 		CRTSQLRPGI)
 			# Scan through source, look for files (externally-described data structures, too), and add them as object dependencies.
 			if [[ -f ${object}.SQLRPGLE ]]; then
-				deps=$(sed -n -r -e 's/^.{5}[Ff](.{10}).{19}(DISK|WORKSTN|PRINTER).*/\1/I p' -e 's/^.{5}[Dd].*EXTNAME\(([^\)]*).*/\1/I p' ${object}.SQLRPGLE | sort -u | xargs | tr "[:lower:]" "[:upper:]")
+				deps=$(sed -n -r -e '/^.{6}[^*]/ s/^.{5}[Ff]([^ ]{,9}).*(DISK|WORKSTN|PRINTER).*/\1/I p' -e '/^.{6}[^*]/ s/^.{5}[Dd].*EXTNAME\(([^ \)]*).*/\1/I p' ${object}.SQLRPGLE | tr "[:lower:]" "[:upper:]" | sort -u | xargs)
 				output=$(add_suffix "$deps" FILE)
 			fi
 			# Try to detect files accessed by SQL?
