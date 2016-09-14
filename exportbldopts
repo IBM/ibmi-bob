@@ -407,13 +407,22 @@ get_object_deps() {
 			fi
 			;;
 		CRTRPGMOD|CRTBNDRPG)
-			# Call script to parse F-specs for files and data areas
+			# Scan through source, look for files (externally-described data structures, too), and add them as object dependencies.
+			if [[ -f ${object}.RPGLE ]]; then
+				deps=$(sed -n -r -e 's/^.{5}[Ff](.{10}).{19}(DISK|WORKSTN|PRINTER).*/\1/I p' -e 's/^.{5}[Dd].*EXTNAME\(([^\)]*).*/\1/I p' ${object}.RPGLE | sort -u | xargs | tr "[:lower:]" "[:upper:]")
+				output=$(add_suffix "$deps" FILE)
+			fi
 			;;
-		CRTSQLCI)			
+		CRTSQLCI)
 			# Is there any way to extract files out of SQLC code?
 			;;
-		CRTSQLRPGI)			
-			# Call script to parse F-specs for files and data areas. And files accessed by SQL?
+		CRTSQLRPGI)
+			# Scan through source, look for files (externally-described data structures, too), and add them as object dependencies.
+			if [[ -f ${object}.SQLRPGLE ]]; then
+				deps=$(sed -n -r -e 's/^.{5}[Ff](.{10}).{19}(DISK|WORKSTN|PRINTER).*/\1/I p' -e 's/^.{5}[Dd].*EXTNAME\(([^\)]*).*/\1/I p' ${object}.SQLRPGLE | sort -u | xargs | tr "[:lower:]" "[:upper:]")
+				output=$(add_suffix "$deps" FILE)
+			fi
+			# Try to detect files accessed by SQL?
 			;;
 		CRTPGM)			
 			# Modules bound into the program
@@ -422,7 +431,7 @@ get_object_deps() {
 				output=$(add_suffix "$deps" MODULE)
 			fi
 			# Service programs linked to this program.
-			if [[ $parms =~ BNDSRVPGM\(([^\)]*)\) ]]; then
+			if [[ $parms =~ BNDSRVPGM\(([^\)]*)\) ]] && [[ ${BASH_REMATCH[1]} != '*NONE' ]]; then
 				deps="${BASH_REMATCH[1]}"
 				deps=$(add_suffix "$deps" SRVPGM)
 				output="$output $deps"
@@ -435,7 +444,7 @@ get_object_deps() {
 				output=$(add_suffix "$deps" MODULE)
 			fi
 			# Other service programs linked to this service program.
-			if [[ $parms =~ BNDSRVPGM\(([^\)]*)\) ]]; then
+			if [[ $parms =~ BNDSRVPGM\(([^\)]*)\) ]] && [[ ${BASH_REMATCH[1]} != '*NONE' ]]; then
 				deps="${BASH_REMATCH[1]}"
 				deps=$(add_suffix "$deps" SRVPGM)
 				output="$output $deps"
@@ -587,6 +596,7 @@ process_standalone_source_file() {
 	# Write object: sourcedeps objectdeps		
 	local output="$fullObject: $sourceDeps"
 	output="${output% } $objectDeps"
+	output="${output% }"
 	echo "$output"
 	
 	# Write object to metadata log file
@@ -641,7 +651,7 @@ process_bldopt() {
 						;;
 			CRTSRVPGM)	parms=$(process_parms $object "$parms" "${SRVPGM_DFT[@]}")
 						;;
-			*)			echo "*** Unknown command $command found for object $object"
+			*)			echo "*** Unknown command $command found for object $object" >&2
 						;;
 			esac
 			
@@ -692,6 +702,7 @@ process_bldopt() {
 			# Write object: sourcedeps objectdeps		
 			local output="$fullObject: $sourceDeps"
 			output="${output% } $objectDeps"
+			output="${output% }"
 			
 #			if [[ ${#output} -ge 110 ]]; then
 #				echo "$output" | fold -s -w 100 | sed -e '$ ! s/$/\\/'
