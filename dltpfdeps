@@ -56,8 +56,8 @@ if [ $# -ne 2 ]; then
 	exit 1
 fi
 
-PF=$1
-lib=$2
+PF=$(print_upper $1)
+lib=$(print_upper $2)
 path=/qsys.lib/$lib.lib
 error=0
 
@@ -75,12 +75,14 @@ files=$(system "dspdbr ${lib}/${PF}" | sed -n '/Dependent File/,$p' | tail -n +2
 ### Loop through list of LFs and try to delete each one.
 for f in $files; do
 	[ "$debug" == "true" ] && echo "dltpfdeps: attempting to delete LF $path/${f}.FILE."
-	rm -R $path/${f}.FILE
-	printf "*** $(script_name): Logical file [$(print_upper $f)] for physical file $(print_upper $PF) "
-	if [ -d ${f}.FILE ]; then
-		printf "NOT "
+	if [ -d $path/${f}.FILE ]; then
+		rm -R $path/${f}.FILE
+		printf "*** $(script_name): Logical file [$(print_upper $f)] for physical file $(print_upper $PF) "
+		if [ -d $path/${f}.FILE ]; then
+			printf "NOT "
+		fi
+		echo "deleted."
 	fi
-	echo "deleted."
 done
 
 ### Try to delete PF.  This may fail if LFs located in other libraries are attached to it.

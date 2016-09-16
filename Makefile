@@ -39,7 +39,7 @@ OBJTYPE :=
 OPTION := *EVENTF
 PGM :=
 PMTFILE := *NONE
-RSTDSP := *YES
+RSTDSP :=
 SIZE :=
 STGMDL := *SNGLVL
 TERASPACE :=
@@ -79,6 +79,7 @@ CLMOD_TGTRLS := $(TGTRLS)
 
 DSPF_AUT := $(AUT)
 DSPF_OPTION := *EVENTF *SRC *LIST
+DSPF_RSTDSP := *YES
 
 LF_AUT := $(AUT)
 LF_OPTION := *EVENTF *SRC *LIST
@@ -235,6 +236,9 @@ fileOPTION = $(strip \
 	$(if $(filter %.PF,$<),$(PF_OPTION), \
 	$(if $(filter %.PRTF,$<),$(PRTF_OPTION), \
 	UNKNOWN_FILE_TYPE)))))
+fileRSTDSP = $(strip \
+	$(if $(filter %.DSPF,$<),$(DSPF_RSTDSP), \
+	UNKNOWN_FILE_TYPE))
 fileSIZE = $(strip \
 	$(if $(filter %.PF,$<),$(PF_SIZE), \
 	UNKNOWN_FILE_TYPE))
@@ -297,6 +301,7 @@ VPATH := $(OBJPATH):$(SRCPATH)
 
 %.FILE: private AUT = $(fileAUT)
 %.FILE: private OPTION = $(fileOPTION)
+%.FILE: private RSTDSP = $(fileRSTDSP)
 %.FILE: private SIZE = $(fileSIZE)
 
 %.FILE: %.DSPF
