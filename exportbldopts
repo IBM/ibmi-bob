@@ -367,9 +367,9 @@ get_object_deps() {
 			# Is there any way to get a definitive list of files used in C?
 			;;
 		CRTDSPF)
-			# Scan through source and look for REF() and MSGCON() and add them as object dependencies. Any other keywords?
+			# Scan through source and look for REF(), REFFLD(), and MSGCON() and add them as object dependencies. Any other keywords?
 			if [[ -f ${object}.DSPF ]]; then
-				deps=$(sed -n -e 's/.*REF(\([^)]*\).*/\1/p' ${object}.DSPF | sed -e '/\// s/.*\///')
+				deps=$(sed -n -r -e 's/.*REF\((.*\/)?([^)]*).*/\2/p' -e 's/.*REFFLD\([^ )]* (.*\/)?([^\*)]+).*/\2/p' ${object}.DSPF | sort -u | xargs)
 				output=$(add_suffix "$deps" FILE)
 				deps=$(sed -n -e 's/.*MSGCON(.* \(.*\)).*/\1/p' ${object}.DSPF | sed -e '/\// s/.*\///' | sort -u | xargs)
 				deps=$(add_suffix "$deps" MSGF)
@@ -387,9 +387,9 @@ get_object_deps() {
 			# Any object dependencies for a MENU object?
 			;;
 		CRTPF)
-			# Scan through source and look for REF() and add those items as object dependencies.
+			# Scan through source and look for REF() and REFFLD() and add those items as object dependencies.
 			if [[ -f ${object}.PF ]]; then
-				deps=$(sed -n -e 's/.*REF(\([^)]*\).*/\1/p' ${object}.PF | sed -e '/\// s/.*\///')
+				deps=$(sed -n -r -e 's/.*REF\((.*\/)?([^)]*).*/\2/p' -e 's/.*REFFLD\([^ )]* (.*\/)?([^\*)]+).*/\2/p' ${object}.PF | sort -u | xargs)
 				output=$(add_suffix "$deps" FILE)
 			fi
 			;;
@@ -725,7 +725,7 @@ if [ ! -d "$metadataDir" ]; then
 	mkdir "$metadataDir"
 fi
 [ "$(ls -A $metadataDir)" ] && rm -r $metadataDir/*
-echo "This directory contains info about the items exported into the parent directory." > "$metadataDir/Readme.txt"
+echo "This directory contains info about the items exported into the parent directory.  It is cleared every time a build occurs." > "$metadataDir/Readme.txt"
 
 files=( "*.*" )
 # echo ${files[@]}

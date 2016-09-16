@@ -31,25 +31,26 @@
 # at the top.)
 # tl;dr: If you want to customize a compile setting for an object, change these variables
 # in your TARGET (not here).
-TGTRLS := V6R1M0
-DFTACTGRP := *NO
 ACTGRP := E_PRODUCT
 AUT := *EXCLUDE
-DETAIL := *EXTENDED
-OPTION := *EVENTF
+BNDDIR :=
 COMMIT := *NONE
 DBGVIEW := *ALL
-TEXT :=
-RSTDSP := *YES
-PGM :=
-VLDCKR := *NONE
-PMTFILE := *NONE
-HLPPNLGRP = $*
+DETAIL := *EXTENDED
+DFTACTGRP := *NO
 HLPID = $*
+HLPPNLGRP = $*
 OBJTYPE :=
-TERASPACE :=
+OPTION := *EVENTF
+PGM :=
+PMTFILE := *NONE
+RSTDSP := *YES
+SIZE :=
 STGMDL := *SNGLVL
-BNDDIR :=
+TERASPACE :=
+TEXT :=
+TGTRLS := V6R1M0
+VLDCKR := *NONE
 
 # Object-type-specific defaults.  Not used directly, but copied to the standard ones above and then
 # inserted into the compile commands.  Each variable here should also precede its corresponding pattern
@@ -83,6 +84,13 @@ CLMOD_TGTRLS := $(TGTRLS)
 
 DSPF_AUT := $(AUT)
 DSPF_OPTION := *EVENTF *SRC *LIST
+
+LF_AUT := $(AUT)
+LF_OPTION := *EVENTF *SRC *LIST
+
+PF_AUT := $(AUT)
+PF_OPTION := *EVENTF *SRC *LIST
+PF_SIZE := *NOMAX
 
 PGM_ACTGRP := $(ACTGRP)
 PGM_AUT := $(AUT)
@@ -129,8 +137,8 @@ CRTCMDFLAGS = PGM($(PGM)) VLDCKR($(VLDCKR)) PMTFILE($(PMTFILE)) HLPPNLGRP($(HLPP
 CRTCMODFLAGS = TERASPACE($(TERASPACE)) STGMDL($(STGMDL)) OUTPUT(*PRINT) OPTION($(OPTION)) DBGVIEW($(DBGVIEW)) \
                SYSIFCOPT(*IFSIO) AUT($(AUT)) TGTRLS($(TGTRLS)) MAKEDEP('$(DEPDIR)/$*.Td')
 CRTDSPFFLAGS = ENHDSP(*YES) RSTDSP($(RSTDSP)) DFRWRT(*YES) AUT($(AUT)) OPTION($(OPTION)) TEXT($(TEXT))
-CRTLFFLAGS = AUT($(AUT)) OPTION(*EVENTF *SRC *LIST)
-CRTPFFLAGS = AUT($(AUT)) OPTION(*EVENTF *SRC *LIST) SIZE(*NOMAX) TEXT($(TEXT))
+CRTLFFLAGS = AUT($(AUT)) OPTION($(OPTION))
+CRTPFFLAGS = AUT($(AUT)) OPTION($(OPTION)) SIZE($(SIZE)) TEXT($(TEXT))
 CRTPGMFLAGS = ACTGRP($(ACTGRP)) USRPRF(*USER) TGTRLS($(TGTRLS)) AUT($(AUT)) DETAIL($(DETAIL)) OPTION($(OPTION)) STGMDL($(STGMDL))
 CRTRPGMODFLAGS = DBGVIEW($(DBGVIEW)) TGTRLS($(TGTRLS)) OUTPUT(*PRINT) AUT($(AUT)) OPTION($(OPTION))
 CRTSQLCIFLAGS =
@@ -149,7 +157,7 @@ CRTPGMFLAGS2 =
 
 # Miscellaneous variables
 INCLUDEMAKEFILES :=
-SRCPATH := /home/jberman/Source/xp303make
+SRCPATH := /home/jberman/Source/xp33make
 OBJPATH := $(CURDIR)
 OBJLIB := $(basename $(notdir $(OBJPATH)))
 SDEPATH := /home/jberman/Source/SDE
@@ -216,7 +224,25 @@ moduleTGTRLS = $(strip \
 	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIMOD_TGTRLS), \
 	UNKNOWN_FILE_TYPE))))))
 
-# Determine default settings for the various source types that can make a program ojbect.
+#
+# Determine default settings for the various source types that can make a file ojbect.
+fileAUT = $(strip \
+	$(if $(filter %.DSPF,$<),$(DSPF_AUT), \
+	$(if $(filter %.LF,$<),$(LF_AUT), \
+	$(if $(filter %.PF,$<),$(PF_AUT), \
+	$(if $(filter %.PRTF,$<),$(PRTF_AUT), \
+	UNKNOWN_FILE_TYPE)))))
+fileOPTION = $(strip \
+	$(if $(filter %.DSPF,$<),$(DSPF_OPTION), \
+	$(if $(filter %.LF,$<),$(LF_OPTION), \
+	$(if $(filter %.PF,$<),$(PF_OPTION), \
+	$(if $(filter %.PRTF,$<),$(PRTF_OPTION), \
+	UNKNOWN_FILE_TYPE)))))
+fileSIZE = $(strip \
+	$(if $(filter %.PF,$<),$(PF_SIZE), \
+	UNKNOWN_FILE_TYPE))
+
+# Determine default settings for the various source types that can make a program object.
 programACTGRP = $(strip \
 	$(if $(filter %.CLLE,$<),$(BNDCL_ACTGRP), \
 	$(if $(filter %.MODULE,$<),$(PGM_ACTGRP), \
@@ -272,6 +298,10 @@ VPATH := $(OBJPATH):$(SRCPATH)
 	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log
 
 
+%.FILE: private AUT = $(fileAUT)
+%.FILE: private OPTION = $(fileOPTION)
+%.FILE: private SIZE = $(fileSIZE)
+
 %.FILE: %.DSPF
 	@echo "\n\n***"
 	@echo "*** Creating DSPF [$*]"
@@ -283,6 +313,7 @@ VPATH := $(OBJPATH):$(SRCPATH)
 	@echo "\n\n***"
 	@echo "*** Creating LF [$*]"
 	@echo "***"
+	[ -d $(OBJPATH)/$@ ] && rm -r $(OBJPATH)/$@
 	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTLF) stmf('$<') parms('$(CRTLFFLAGS)'))
 	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log
 
