@@ -8,12 +8,14 @@
 print_help() {
 	echo "dltpfdeps -- delete physical file dependencies\n"
 	echo "Deletes all logical files attached to a given physical file.  Only logical files in the specified library will be deleted.\n"
-	echo "usage: dltpfdeps [-p] [-d] file library\n"
+	echo "Usage: dltpfdeps [-p] [-d] file library\n"
+	echo "\t-d\tDebug mode. Enables extra logging."
+	echo "\t-p\tDelete the physical file as well as any logical files attached to it.\n"
 	echo "EXAMPLES"
-	echo "Delete all logical files in library MYLIB that are attached to physical file MYPF.\n"
-	echo "\tdltpfdeps MYPF MYLIB\n"
-	echo "Delete all logical files in library MYLIB that are attached to physical file MYPF, and also delete the physical file.\n"
-	echo "\tdltpfdeps -p MYPF MYLIB"
+	echo "     Delete all logical files in library MYLIB that are attached to physical file MYPF."
+	echo "     \tdltpfdeps MYPF MYLIB\n"
+	echo "     Delete all logical files in library MYLIB that are attached to physical file MYPF, and also delete the physical file."
+	echo "     \tdltpfdeps -p MYPF MYLIB"
 	
 	
 	exit 0
@@ -21,7 +23,7 @@ print_help() {
 
 ### Print a string in upper case
 print_upper() {
-	local string=$(echo "$1" | tr '[a-z]' '[A-Z]')
+	local string=$(echo "$1" | tr '[:lower:]' '[:upper:]')
 	echo $string
 }
 

@@ -1,6 +1,5 @@
 #
-# This is a test Makefile to build objects in XP303MAKE from source in ~/home/jberman/Source/xp303make.
-# Invoke by typing `make`.
+# This is a Makefile to build IBM i objects in XP303MAKE from source in ~/home/jberman/Source/xp303make.
 #
 # Note: When using the IFS, path case sensitivity needs to match the actual item
 # in the file system or things will break.
@@ -17,10 +16,6 @@
 #   o cd /some/path/that's/not/QSYS.LIB
 #   o make all INCLUDEMAKEFILES:='/path/to/project-specific/makefile.mak' OBJPATH:='/QSYS.LIB/<object_lib>.LIB' -f /location/of/this/Makefile
 #   o Use `--warn-undefined-variables` while testing to see if any variables have been used without being set.
-#
-
-# Define some Makefile variables for the compiler.
-# To use variables later in the Makefile, reference $(variable_name)
 #
 
 # These variables are swapped into the compile commands.  They can be overridden on a
@@ -159,6 +154,7 @@ CRTPGMFLAGS2 =
 INCLUDEMAKEFILES :=
 SRCPATH := /home/jberman/Source/xp33make
 OBJPATH := $(CURDIR)
+override OBJPATH := $(shell echo "$(OBJPATH)" | tr '[:lower:]' '[:upper:]')
 OBJLIB := $(basename $(notdir $(OBJPATH)))
 SDEPATH := /home/jberman/Source/SDE
 SDELIB := SDE
@@ -181,13 +177,14 @@ touch -cr $(OBJPATH)/$@ $(DEPDIR)/$*.d
 rm $(DEPDIR)/$*.Td $(DEPDIR)/$*.T2d
 endef
 
-# These variables allow pattern-specific variables to be used when multiple source patterns exist for one object pattern (like with *FILEs).
+# These variables allow pattern-specific variables to be used when multiple source patterns exist for one object pattern (like with *FILEs, which can be PFs, LFs, DSPFs, etc.).
 # The pattern-specific variable will set itself to a variable below, which will then be evaluated
 # from the context of that pattern-matched rule. This can be used to set specific compile parameters
 # for each type of, for example, file object (PF, LF, DSPF, etc.).
 # The advantage of this approach over simply hard-coding values in the recipe is that individual targets (compiled objects)
 # will be able to override these values with their own, thereby overriding these defaults.
-# This elaborate construct is to work around a limitation in Make (`%.object: %.source variable=value` does not work).
+# This elaborate construct is to work around a limitation in Make (`%.object: %.source variable=value` does not work; it
+# effectively resolves to `%.object: variable=value`).
 #
 # Determine default settings for the various source types that can make a module ojbect.
 moduleAUT = $(strip \
@@ -313,7 +310,7 @@ VPATH := $(OBJPATH):$(SRCPATH)
 	@echo "\n\n***"
 	@echo "*** Creating LF [$*]"
 	@echo "***"
-	[ -d $(OBJPATH)/$@ ] && rm -r $(OBJPATH)/$@
+	@if [ -d $(OBJPATH)/$@ ]; then rm -r $(OBJPATH)/$@; fi
 	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTLF) stmf('$<') parms('$(CRTLFFLAGS)'))
 	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log
 
