@@ -188,14 +188,10 @@ rm $(DEPDIR)/$*.Td $(DEPDIR)/$*.T2d
 endef
 
 # Commands to generate typedef structure for *FILE objects (for use by C code)
-define TYPEDEF1 =
-system -v "GENCSRC OBJ('$(OBJPATH)/$@') SRCSTMF('$(SRCPATH)/$@.TH') SLTFLD(*BOTH *KEY) TYPEDEFPFX('$(basename $@)')"
-iconv -f IBM-037 -t ISO8859-1 $(SRCPATH)/$@.TH | tr -d '\r' > $(SRCPATH)/$@.H
-rm $(SRCPATH)/$@.TH
-endef
-define TYPEDEF =
-echo hello1
-echo hello2
+define TYPEDEF_SCRIPT =
+system -v "GENCSRC OBJ('$(OBJPATH)/$@') SRCSTMF('$<.TH') SLTFLD(*BOTH *KEY) TYPEDEFPFX('$(basename $@)')"
+iconv -f IBM-037 -t ISO8859-1 $<.TH | tr -d '\r' > $<.H
+rm $<.TH
 endef
 
 # These variables allow pattern-specific variables to be used when multiple source patterns exist for one object pattern (like with *FILEs, which can be PFs, LFs, DSPFs, etc.).
@@ -332,6 +328,7 @@ VPATH := $(OBJPATH):$(SRCPATH)
 %.FILE: private PAGESIZE = $(filePAGESIZE)
 %.FILE: private RSTDSP = $(fileRSTDSP)
 %.FILE: private SIZE = $(fileSIZE)
+%.FILE: private TYPEDEF = $(if $(filter YES,$(CREATE_TYPEDEF)),$(TYPEDEF_SCRIPT),)
 
 %.FILE: %.DSPF
 	@echo "\n\n***"
@@ -347,12 +344,7 @@ VPATH := $(OBJPATH):$(SRCPATH)
 	@if [ -d $(OBJPATH)/$@ ]; then rm -r $(OBJPATH)/$@; fi
 	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTLF) stmf('$<') parms('$(CRTLFFLAGS)'))
 	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log
-	$(eval CREATE_TYPEDEF := $(echo "$(CREATE_TYPE_DEF)" | tr '[:lower:]' '[:upper:]'))
-	if [ "$(CREATE_TYPEDEF)" == "YES" ]; then \
-	system -v "GENCSRC OBJ('$(OBJPATH)/$@') SRCSTMF('$<.TH') SLTFLD(*BOTH *KEY) TYPEDEFPFX('$(basename $@)')"; \
-	iconv -f IBM-037 -t ISO8859-1 $<.TH | tr -d '\r' > $<.H; \
-	rm $<.TH; \
-	fi
+	$(TYPEDEF)
 
 %.FILE: %.PF
 	@echo "\n\n***"
@@ -361,9 +353,7 @@ VPATH := $(OBJPATH):$(SRCPATH)
 	@$(SDEPATH)/dltpfdeps -p $* $(OBJLIB)
 	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTPF) stmf('$<') parms('$(CRTPFFLAGS)'))
 	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log
-#ifeq ($(echo "$(CREATE_TYPEDEF)" | tr '[:lower:]' '[:upper:]'),YES)
-#	$(TYPEDEF)
-#endif
+	$(TYPEDEF)
 
 
 %.FILE: %.PRTF
