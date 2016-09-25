@@ -37,11 +37,13 @@ HLPID = $*
 HLPPNLGRP = $*
 OBJTYPE :=
 OPTION := *EVENTF
+PAGESIZE :=
 PGM :=
 PMTFILE := *NONE
 RSTDSP :=
 SIZE :=
 STGMDL := *SNGLVL
+SYSIFCOPT :=
 TERASPACE :=
 TEXT :=
 TGTRLS := V6R1M0
@@ -68,9 +70,10 @@ CMD_AUT := $(AUT)
 CMOD_AUT := $(AUT)
 CMOD_DBGVIEW := $(DBGVIEW)
 CMOD_OPTION := *EVENTF *SHOWUSR *XREF *AGR
-CMOD_TGTRLS := $(TGTRLS)
-CMOD_TERASPACE := *YES *NOTSIFC
 CMOD_STGMDL := *INHERIT
+CMOD_SYSIFCOPT := *IFSIO
+CMOD_TERASPACE := *YES *NOTSIFC
+CMOD_TGTRLS := $(TGTRLS)
 
 CLMOD_AUT := $(AUT)
 CLMOD_DBGVIEW := $(DBGVIEW)
@@ -94,6 +97,10 @@ PGM_DETAIL := $(DETAIL)
 PGM_OPTION := $(OPTION)
 PGM_STGMDL := *SNGLVL
 PGM_TGTRLS := $(TGTRLS)
+
+PRTF_AUT := $(AUT)
+PRTF_OPTION := *EVENTF *SRC *LIST
+PRTF_PAGESIZE := 66 132
 
 RPGMOD_AUT := $(AUT)
 RPGMOD_DBGVIEW := $(DBGVIEW)
@@ -129,6 +136,7 @@ SRVPGM_TGTRLS := $(TGTRLS)
 
 # Creation command parameters with variables (the ones listed at the top) for the most common ones.
 CRTBNDCLFLAGS = AUT($(AUT)) DBGVIEW($(DBGVIEW)) TGTRLS($(TGTRLS)) DFTACTGRP($(DFTACTGRP)) ACTGRP($(ACTGRP)) OPTION($(OPTION))
+CRTCLMODFLAGS = AUT($(AUT)) DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) STGMDL($(STGMDL)) SYSIFCOPT($(SYSIFCOPT)) TERASPACE($(TERASPACE)) TGTRLS($(TGTRLS))
 CRTCMDFLAGS = PGM($(PGM)) VLDCKR($(VLDCKR)) PMTFILE($(PMTFILE)) HLPPNLGRP($(HLPPNLGRP)) HLPID($(HLPID)) AUT($(AUT))
 CRTCMODFLAGS = TERASPACE($(TERASPACE)) STGMDL($(STGMDL)) OUTPUT(*PRINT) OPTION($(OPTION)) DBGVIEW($(DBGVIEW)) \
                SYSIFCOPT(*IFSIO) AUT($(AUT)) TGTRLS($(TGTRLS)) MAKEDEP('$(DEPDIR)/$*.Td')
@@ -136,7 +144,8 @@ CRTDSPFFLAGS = ENHDSP(*YES) RSTDSP($(RSTDSP)) DFRWRT(*YES) AUT($(AUT)) OPTION($(
 CRTLFFLAGS = AUT($(AUT)) OPTION($(OPTION))
 CRTPFFLAGS = AUT($(AUT)) OPTION($(OPTION)) SIZE($(SIZE)) TEXT($(TEXT))
 CRTPGMFLAGS = ACTGRP($(ACTGRP)) USRPRF(*USER) TGTRLS($(TGTRLS)) AUT($(AUT)) DETAIL($(DETAIL)) OPTION($(OPTION)) STGMDL($(STGMDL))
-CRTRPGMODFLAGS = DBGVIEW($(DBGVIEW)) TGTRLS($(TGTRLS)) OUTPUT(*PRINT) AUT($(AUT)) OPTION($(OPTION))
+CRTPRTFFLAGS = AUT($(AUT)) OPTION($(OPTION)) PAGESIZE($(PAGESIZE))
+CRTRPGMODFLAGS = AUT($(AUT)) DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) OUTPUT(*PRINT) TGTRLS($(TGTRLS))
 CRTSQLCIFLAGS =
 CRTSQLRPGIFLAGS = COMMIT($(COMMIT)) OBJTYPE($(OBJTYPE)) OUTPUT(*PRINT) TGTRLS($(TGTRLS)) OPTION($(OPTION)) DBGVIEW($(DBGVIEW))
 CRTSRVPGMFLAGS = EXPORT(*ALL) ACTGRP($(ACTGRP)) TGTRLS($(TGTRLS)) AUT($(AUT)) DETAIL($(DETAIL)) STGMDL($(STGMDL))
@@ -178,6 +187,17 @@ touch -cr $(OBJPATH)/$@ $(DEPDIR)/$*.d
 rm $(DEPDIR)/$*.Td $(DEPDIR)/$*.T2d
 endef
 
+# Commands to generate typedef structure for *FILE objects (for use by C code)
+define TYPEDEF1 =
+system -v "GENCSRC OBJ('$(OBJPATH)/$@') SRCSTMF('$(SRCPATH)/$@.TH') SLTFLD(*BOTH *KEY) TYPEDEFPFX('$(basename $@)')"
+iconv -f IBM-037 -t ISO8859-1 $(SRCPATH)/$@.TH | tr -d '\r' > $(SRCPATH)/$@.H
+rm $(SRCPATH)/$@.TH
+endef
+define TYPEDEF =
+echo hello1
+echo hello2
+endef
+
 # These variables allow pattern-specific variables to be used when multiple source patterns exist for one object pattern (like with *FILEs, which can be PFs, LFs, DSPFs, etc.).
 # The pattern-specific variable will set itself to a variable below, which will then be evaluated
 # from the context of that pattern-matched rule. This can be used to set specific compile parameters
@@ -214,6 +234,12 @@ moduleOPTION = $(strip \
 moduleSTGMDL = $(strip \
 	$(if $(filter %.C,$<),$(CMOD_STGMDL), \
 	UNKNOWN_FILE_TYPE))
+moduleSYSIFCOPT = $(strip \
+	$(if $(filter %.C,$<),$(CMOD_SYSIFCOPT), \
+	UNKNOWN_FILE_TYPE))
+moduleTERASPACE = $(strip \
+	$(if $(filter %.C,$<),$(CMOD_TERASPACE), \
+	UNKNOWN_FILE_TYPE))
 moduleTGTRLS = $(strip \
 	$(if $(filter %.C,$<),$(CMOD_TGTRLS), \
 	$(if $(filter %.CLLE,$<),$(CLMOD_TGTRLS), \
@@ -222,7 +248,6 @@ moduleTGTRLS = $(strip \
 	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIMOD_TGTRLS), \
 	UNKNOWN_FILE_TYPE))))))
 
-#
 # Determine default settings for the various source types that can make a file ojbect.
 fileAUT = $(strip \
 	$(if $(filter %.DSPF,$<),$(DSPF_AUT), \
@@ -236,6 +261,9 @@ fileOPTION = $(strip \
 	$(if $(filter %.PF,$<),$(PF_OPTION), \
 	$(if $(filter %.PRTF,$<),$(PRTF_OPTION), \
 	UNKNOWN_FILE_TYPE)))))
+filePAGESIZE = $(strip \
+	$(if $(filter %.PRTF,$<),$(PRTF_PAGESIZE), \
+	UNKNOWN_FILE_TYPE))
 fileRSTDSP = $(strip \
 	$(if $(filter %.DSPF,$<),$(DSPF_RSTDSP), \
 	UNKNOWN_FILE_TYPE))
@@ -301,6 +329,7 @@ VPATH := $(OBJPATH):$(SRCPATH)
 
 %.FILE: private AUT = $(fileAUT)
 %.FILE: private OPTION = $(fileOPTION)
+%.FILE: private PAGESIZE = $(filePAGESIZE)
 %.FILE: private RSTDSP = $(fileRSTDSP)
 %.FILE: private SIZE = $(fileSIZE)
 
@@ -318,6 +347,12 @@ VPATH := $(OBJPATH):$(SRCPATH)
 	@if [ -d $(OBJPATH)/$@ ]; then rm -r $(OBJPATH)/$@; fi
 	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTLF) stmf('$<') parms('$(CRTLFFLAGS)'))
 	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log
+	$(eval CREATE_TYPEDEF := $(echo "$(CREATE_TYPE_DEF)" | tr '[:lower:]' '[:upper:]'))
+	if [ "$(CREATE_TYPEDEF)" == "YES" ]; then \
+	system -v "GENCSRC OBJ('$(OBJPATH)/$@') SRCSTMF('$<.TH') SLTFLD(*BOTH *KEY) TYPEDEFPFX('$(basename $@)')"; \
+	iconv -f IBM-037 -t ISO8859-1 $<.TH | tr -d '\r' > $<.H; \
+	rm $<.TH; \
+	fi
 
 %.FILE: %.PF
 	@echo "\n\n***"
@@ -326,6 +361,17 @@ VPATH := $(OBJPATH):$(SRCPATH)
 	@$(SDEPATH)/dltpfdeps -p $* $(OBJLIB)
 	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTPF) stmf('$<') parms('$(CRTPFFLAGS)'))
 	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log
+#ifeq ($(echo "$(CREATE_TYPEDEF)" | tr '[:lower:]' '[:upper:]'),YES)
+#	$(TYPEDEF)
+#endif
+
+
+%.FILE: %.PRTF
+	@echo "\n\n***"
+	@echo "*** Creating PRTF [$*]"
+	@echo "***"
+	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTPRTF) stmf('$<') parms('$(CRTPRTFFLAGS)'))
+	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log
 
 
 %.MODULE: private AUT = $(moduleAUT)
@@ -333,6 +379,8 @@ VPATH := $(OBJPATH):$(SRCPATH)
 %.MODULE: private OBJTYPE = $(moduleOBJTYPE)
 %.MODULE: private OPTION = $(moduleOPTION)
 %.MODULE: private STGMDL = $(moduleSTGMDL)
+%.MODULE: private SYSIFCOPT = $(moduleSYSIFCOPT)
+%.MODULE: private TERASPACE = $(moduleTERASPACE)
 %.MODULE: private TGTRLS = $(moduleTGTRLS)
 
 %.MODULE: %.C $(DEPDIR)/%.d
