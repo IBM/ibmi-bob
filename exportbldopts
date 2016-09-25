@@ -407,9 +407,9 @@ get_object_deps() {
 			fi
 			;;
 		CRTRPGMOD|CRTBNDRPG)
-			# Scan through source, look for files (externally-described data structures, too), and add them as object dependencies.
+			# Scan through source, look for files (externally-described data structures, too), and add them as object dependencies.  Filter out program-described files.
 			if [[ -f ${object}.RPGLE ]]; then
-				deps=$(sed -n -r -e '/^.{6}[^*]/ s/^.{5}[Ff]([^ ]{,9}).*(DISK|WORKSTN|PRINTER).*/\1/I p' -e '/^.{6}[^*]/ s/^.{5}[Dd].*EXTNAME\(([^ \)]*).*/\1/I p' ${object}.RPGLE | tr "[:lower:]" "[:upper:]" | sort -u | xargs)
+				deps=$(sed -n -r -e '/^.{6}[^*].{14}[^Ff]/ s/^.{5}[Ff]([^ ]{,10}).*(DISK|WORKSTN|PRINTER).*/\1/I p' -e '/^.{6}[^*]/ s/^.{5}[Dd].*EXTNAME\(([^ \)]*).*/\1/I p' ${object}.RPGLE | tr "[:lower:]" "[:upper:]" | sort -u | xargs)
 				output=$(add_suffix "$deps" FILE)
 			fi
 			;;
@@ -417,9 +417,9 @@ get_object_deps() {
 			# Is there any way to extract files out of SQLC code?
 			;;
 		CRTSQLRPGI)
-			# Scan through source, look for files (externally-described data structures, too), and add them as object dependencies.
+			# Scan through source, look for files (externally-described data structures, too), and add them as object dependencies.  Filter out program-described files.
 			if [[ -f ${object}.SQLRPGLE ]]; then
-				deps=$(sed -n -r -e '/^.{6}[^*]/ s/^.{5}[Ff]([^ ]{,9}).*(DISK|WORKSTN|PRINTER).*/\1/I p' -e '/^.{6}[^*]/ s/^.{5}[Dd].*EXTNAME\(([^ \)]*).*/\1/I p' ${object}.SQLRPGLE | tr "[:lower:]" "[:upper:]" | sort -u | xargs)
+				deps=$(sed -n -r -e '/^.{6}[^*].{14}[^Ff]/ s/^.{5}[Ff]([^ ]{,10}).*(DISK|WORKSTN|PRINTER).*/\1/I p' -e '/^.{6}[^*]/ s/^.{5}[Dd].*EXTNAME\(([^ \)]*).*/\1/I p' ${object}.SQLRPGLE | tr "[:lower:]" "[:upper:]" | sort -u | xargs)
 				output=$(add_suffix "$deps" FILE)
 			fi
 			# Try to detect files accessed by SQL?
