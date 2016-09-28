@@ -71,7 +71,7 @@ CMOD_AUT := $(AUT)
 CMOD_DBGVIEW := $(DBGVIEW)
 CMOD_OPTION := *EVENTF *SHOWUSR *XREF *AGR
 CMOD_STGMDL := *INHERIT
-CMOD_SYSIFCOPT := *IFSIO
+CMOD_SYSIFCOPT := *IFS64IO
 CMOD_TERASPACE := *YES *NOTSIFC
 CMOD_TGTRLS := $(TGTRLS)
 
@@ -139,7 +139,7 @@ CRTBNDCLFLAGS = AUT($(AUT)) DBGVIEW($(DBGVIEW)) TGTRLS($(TGTRLS)) DFTACTGRP($(DF
 CRTCLMODFLAGS = AUT($(AUT)) DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) STGMDL($(STGMDL)) SYSIFCOPT($(SYSIFCOPT)) TERASPACE($(TERASPACE)) TGTRLS($(TGTRLS))
 CRTCMDFLAGS = PGM($(PGM)) VLDCKR($(VLDCKR)) PMTFILE($(PMTFILE)) HLPPNLGRP($(HLPPNLGRP)) HLPID($(HLPID)) AUT($(AUT))
 CRTCMODFLAGS = TERASPACE($(TERASPACE)) STGMDL($(STGMDL)) OUTPUT(*PRINT) OPTION($(OPTION)) DBGVIEW($(DBGVIEW)) \
-               SYSIFCOPT(*IFSIO) AUT($(AUT)) TGTRLS($(TGTRLS)) MAKEDEP('$(DEPDIR)/$*.Td')
+               SYSIFCOPT($(SYSIFCOPT)) AUT($(AUT)) TGTRLS($(TGTRLS)) MAKEDEP('$(DEPDIR)/$*.Td')
 CRTDSPFFLAGS = ENHDSP(*YES) RSTDSP($(RSTDSP)) DFRWRT(*YES) AUT($(AUT)) OPTION($(OPTION)) TEXT($(TEXT))
 CRTLFFLAGS = AUT($(AUT)) OPTION($(OPTION))
 CRTPFFLAGS = AUT($(AUT)) OPTION($(OPTION)) SIZE($(SIZE)) TEXT($(TEXT))
@@ -162,7 +162,7 @@ CRTPGMFLAGS2 =
 
 # Miscellaneous variables
 INCLUDEMAKEFILES :=
-SRCPATH := /home/jberman/Source/xp33make
+SRCPATH := /home/JBERMAN/Source/xp33make
 OBJPATH := $(CURDIR)
 override OBJPATH := $(shell echo "$(OBJPATH)" | tr '[:lower:]' '[:upper:]')
 OBJLIB := $(basename $(notdir $(OBJPATH)))
@@ -182,16 +182,17 @@ cleanCDeps = awk '$$2 !~ /^\/QIBM\// && $$2 !~ /$(notdir $<)$$/ { sub("^.*/","",
 # See http://make.mad-scientist.net/papers/advanced-auto-dependency-generation/#tldr
 define POSTCCOMPILE =
 iconv -f IBM-037 -t ISO8859-1 $(DEPDIR)/$*.Td | tr -d '\r' > $(DEPDIR)/$*.T2d
-$(cleanCDeps) <$(DEPDIR)/$*.T2d >$(DEPDIR)/$*.d
+$(cleanCDeps) <$(DEPDIR)/$*.T2d | sort -u >$(DEPDIR)/$*.d
 touch -cr $(OBJPATH)/$@ $(DEPDIR)/$*.d
 rm $(DEPDIR)/$*.Td $(DEPDIR)/$*.T2d
 endef
 
 # Commands to generate typedef structure for *FILE objects (for use by C code)
 define TYPEDEF_SCRIPT =
-system -v "GENCSRC OBJ('$(OBJPATH)/$@') SRCSTMF('$<.TH') SLTFLD(*BOTH *KEY) TYPEDEFPFX('$(basename $@)')"
-iconv -f IBM-037 -t ISO8859-1 $<.TH | tr -d '\r' > $<.H
+if [ "$(suffix $<)" = '.PRTF' ]; then SLTFLD='*OUTPUT'; else SLTFLD='*BOTH *KEY'; fi; system -v "GENCSRC OBJ('$(OBJPATH)/$@') SRCSTMF('$<.TH') SLTFLD($$SLTFLD) TYPEDEFPFX('$(basename $@)')" > /dev/null
+(file=$(subst .,_,$(notdir $<))_H; echo "#ifndef $${file}"; echo "   #define $${file}"; iconv -f IBM-037 -t ISO8859-1 $<.TH | tr -d '\r'; echo "#endif  /* $${file} */") > $<.H
 rm $<.TH
+echo "*** Created typedef file $<.H for file [$*]"
 endef
 
 # These variables allow pattern-specific variables to be used when multiple source patterns exist for one object pattern (like with *FILEs, which can be PFs, LFs, DSPFs, etc.).
@@ -344,7 +345,7 @@ VPATH := $(OBJPATH):$(SRCPATH)
 	@if [ -d $(OBJPATH)/$@ ]; then rm -r $(OBJPATH)/$@; fi
 	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTLF) stmf('$<') parms('$(CRTLFFLAGS)'))
 	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log
-	$(TYPEDEF)
+	@$(TYPEDEF)
 
 %.FILE: %.PF
 	@echo "\n\n***"
@@ -353,7 +354,7 @@ VPATH := $(OBJPATH):$(SRCPATH)
 	@$(SDEPATH)/dltpfdeps -p $* $(OBJLIB)
 	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTPF) stmf('$<') parms('$(CRTPFFLAGS)'))
 	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log
-	$(TYPEDEF)
+	@$(TYPEDEF)
 
 
 %.FILE: %.PRTF
@@ -362,6 +363,7 @@ VPATH := $(OBJPATH):$(SRCPATH)
 	@echo "***"
 	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTPRTF) stmf('$<') parms('$(CRTPRTFFLAGS)'))
 	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log
+	@$(TYPEDEF)
 
 
 %.MODULE: private AUT = $(moduleAUT)
@@ -378,7 +380,7 @@ VPATH := $(OBJPATH):$(SRCPATH)
 	@echo "*** Creating module [$*]"
 	@echo "***"
 	$(eval crtcmd := crtcmod module($(OBJLIB)/$*) srcstmf('$<') $(CRTCMODFLAGS))
-	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log
+	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" >$(LOGPATH)/$(notdir $<).log 2>&1
 	@$(POSTCCOMPILE)
 
 %.MODULE: %.CLLE
