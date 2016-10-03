@@ -150,15 +150,8 @@ CRTSQLCIFLAGS =
 CRTSQLRPGIFLAGS = COMMIT($(COMMIT)) OBJTYPE($(OBJTYPE)) OUTPUT(*PRINT) TGTRLS($(TGTRLS)) OPTION($(OPTION)) DBGVIEW($(DBGVIEW))
 CRTSRVPGMFLAGS = EXPORT(*ALL) ACTGRP($(ACTGRP)) TGTRLS($(TGTRLS)) AUT($(AUT)) DETAIL($(DETAIL)) STGMDL($(STGMDL))
 
-# Extra command strings for adhoc addition of extra parameters to the creation commands.
-CRTBNDCLFLAGS =
-CRTPFFLAGS2 =
-CRTLFFLAGS2 =
-CRTDSPFFLAGS2 =
-CRTRPGMODFLAGS2 =
-CRTSQLRPGIFLAGS2 =
-CRTSRVPGMFLAGS2 =
-CRTPGMFLAGS2 =
+# Extra command string for adhoc addition of extra parameters to a creation command.
+ADHOCCRTFLAGS =
 
 # Miscellaneous variables
 INCLUDEMAKEFILES :=
@@ -379,8 +372,8 @@ VPATH := $(OBJPATH):$(SRCPATH)
 	@echo "\n\n***"
 	@echo "*** Creating module [$*]"
 	@echo "***"
-	$(eval crtcmd := crtcmod module($(OBJLIB)/$*) srcstmf('$<') $(CRTCMODFLAGS))
-	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" >$(LOGPATH)/$(notdir $<).log 2>&1
+	$(eval crtcmd := crtcmod module($(OBJLIB)/$*) srcstmf('$<') $(CRTCMODFLAGS) $(ADHOCCRTFLAGS))
+	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" >$(LOGPATH)/$(notdir $<).log 2>&1 || (ret=$$?; rm $(DEPDIR)/$*.Td 2>/dev/null; exit $$ret)
 	@$(POSTCCOMPILE)
 
 %.MODULE: %.CLLE
@@ -412,6 +405,7 @@ VPATH := $(OBJPATH):$(SRCPATH)
 %.PGM: private DFTACTGRP = $(programDFTACTGRP)
 %.PGM: private OBJTYPE = $(programOBJTYPE)
 %.PGM: private OPTION = $(programOPTION)
+###%.PGM: private PGM = $*
 %.PGM: private STGMDL = $(programSTGMDL)
 %.PGM: private TGTRLS = $(programTGTRLS)
 
@@ -451,10 +445,10 @@ VPATH := $(OBJPATH):$(SRCPATH)
 %.SRVPGM: private TGTRLS = $(SRVPGM_TGTRLS)
 %.SRVPGM: $^
 	@echo "\n\n***"
-	@echo "*** Creating service program [$*] from modules [$^]"
+	@echo "*** Creating service program [$*] from modules [$(basename $(filter %.MODULE,$(notdir $^)))] and service programs [$(basename $(filter %.SRVPGM,$(notdir $^)))]"
 	@echo "***"
-	$(eval crtcmd := crtsrvpgm srvpgm($(OBJLIB)/$*) module($(basename $(filter %.MODULE,$(notdir $^))))  bndsrvpgm($(basename $(filter %.SRVPGM,$(notdir $^)))) $(CRTSRVPGMFLAGS))
-	system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$@.log
+	$(eval crtcmd := crtsrvpgm srvpgm($(OBJLIB)/$*) module($(basename $(filter %.MODULE,$(notdir $^)))) bndsrvpgm($(basename $(filter %.SRVPGM,$(notdir $^)))) $(CRTSRVPGMFLAGS))
+	system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$@.log 2>&1
 
 $(DEPDIR)/%.d: ;
 .PRECIOUS: $(DEPDIR)/%.d
