@@ -5,15 +5,15 @@
 ### Written by Jeff Berman, 2016-10-04
 
 print_help() {
-	echo "typedef -- generate typedef for externally-described files\n"
+	(echo "typedef -- generate typedef for externally-described files\n"
 	echo "Generates typedefs for an externally-described file to stdout.  This is a wrapper around GENCSRC, and converts its output to ASCII with Unix-style line endings.\n"
 	echo "Usage: typedef [-d] file library\n"
 	echo "EXAMPLE"
 	echo "     Generate typedef for file MYLIB/MYFILE."
-	echo "     \ttypedef MYFILE MYLIB\n"
+	echo "     \ttypedef MYFILE MYLIB\n") | fold -s
 		
 	exit 0
-}
+} >&2
 
 ### Print a string in upper case
 print_upper() {
@@ -53,7 +53,7 @@ path=/QSYS.LIB/$lib.LIB
 
 ### First check if file even exists; if not, we're all done.
 if [ ! -e $path/${file}.FILE ]; then
-	echo "typedef: File $path/${file}.FILE doesn't exist; exiting."
+	echo "typedef: File $path/${file}.FILE doesn't exist; exiting." >&2
 	exit 0
 fi
 
@@ -76,12 +76,12 @@ if [ "$debug" == "true" ]; then
 	echo "typedef: SLTFLD =\t$SLTFLD"
 	echo "typedef: tempfile =\t/tmp/$tempfile"
 	echo
-fi
+fi >&2
 
 system -v "GENCSRC OBJ('$path/${file}.FILE') SRCSTMF('/tmp/${tempfile}') SLTFLD($SLTFLD) TYPEDEFPFX('$file')" > /dev/null
 
 if [ $? -ne 0 ]; then
-	echo "typefef: Error occurred calling GENCSRC."
+	echo "typefef: Error occurred calling GENCSRC." >&2
 	exit 1
 fi
 
