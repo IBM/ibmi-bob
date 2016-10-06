@@ -49,7 +49,12 @@ fi
 
 file=$(print_upper $1)
 lib=$(print_upper $2)
-path=/QSYS.LIB/$lib.LIB
+
+if [[ "$lib" == "QSYS" ]]; then
+	path="/QSYS.LIB"
+else
+	path=/QSYS.LIB/${lib}.LIB
+fi
 
 ### First check if file even exists; if not, we're all done.
 if [ ! -e $path/${file}.FILE ]; then
