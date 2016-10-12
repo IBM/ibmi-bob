@@ -42,7 +42,6 @@ PGM :=
 PMTFILE := *NONE
 RSTDSP :=
 SIZE :=
-SQLOPTION := *EVENTF *XREF
 STGMDL := *SNGLVL
 SYSIFCOPT :=
 TERASPACE :=
@@ -111,7 +110,6 @@ RPGMOD_TGTRLS := $(TGTRLS)
 SQLCIMOD_DBGVIEW := *SOURCE
 SQLCIMOD_OBJTYPE := *MODULE
 SQLCIMOD_OPTION := $(CMOD_OPTION)
-SQLCIMOD_SQLOPTION := $(SQLOPTION)
 SQLCIMOD_STGMDL := $(CMOD_STGMDL)
 SQLCIMOD_SYSIFCOPT := $(CMOD_SYSIFCOPT)
 SQLCIMOD_TERASPACE := *YES *TSIFC
@@ -125,7 +123,6 @@ SQLCIPGM_TGTRLS := $(TGTRLS)
 SQLRPGIMOD_DBGVIEW := *SOURCE
 SQLRPGIMOD_OBJTYPE := *MODULE
 SQLRPGIMOD_OPTION := $(RPGMOD_OPTION)
-SQLRPGIMOD_SQLOPTION := $(SQLOPTION)
 SQLRPGIMOD_TGTRLS := $(TGTRLS)
 
 SQLRPGIPGM_DBGVIEW := *SOURCE
@@ -153,10 +150,10 @@ CRTPFFLAGS = AUT($(AUT)) OPTION($(OPTION)) SIZE($(SIZE)) TEXT($(TEXT))
 CRTPGMFLAGS = ACTGRP($(ACTGRP)) USRPRF(*USER) TGTRLS($(TGTRLS)) AUT($(AUT)) DETAIL($(DETAIL)) OPTION($(OPTION)) STGMDL($(STGMDL))
 CRTPRTFFLAGS = AUT($(AUT)) OPTION($(OPTION)) PAGESIZE($(PAGESIZE))
 CRTRPGMODFLAGS = AUT($(AUT)) DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) OUTPUT(*PRINT) TGTRLS($(TGTRLS))
-CRTSQLCIFLAGS = COMMIT($(COMMIT)) OBJTYPE($(OBJTYPE)) OUTPUT(*PRINT) TGTRLS($(TGTRLS)) OPTION($(SQLOPTION)) DBGVIEW($(DBGVIEW)) \
+CRTSQLCIFLAGS = COMMIT($(COMMIT)) OBJTYPE($(OBJTYPE)) OUTPUT(*PRINT) TGTRLS($(TGTRLS)) DBGVIEW($(DBGVIEW)) \
 				COMPILEOPT('INCDIR(''$(SRCPATH)'') OPTION($(OPTION)) STGMDL($(STGMDL)) SYSIFCOPT($(SYSIFCOPT)) \
 							TERASPACE($(TERASPACE)) MAKEDEP(''$(DEPDIR)/$*.Td'')')
-CRTSQLRPGIFLAGS = COMMIT($(COMMIT)) OBJTYPE($(OBJTYPE)) OUTPUT(*PRINT) TGTRLS($(TGTRLS)) OPTION($(SQLOPTION)) DBGVIEW($(DBGVIEW))
+CRTSQLRPGIFLAGS = COMMIT($(COMMIT)) OBJTYPE($(OBJTYPE)) OUTPUT(*PRINT) TGTRLS($(TGTRLS)) DBGVIEW($(DBGVIEW))
 CRTSRVPGMFLAGS = EXPORT(*ALL) ACTGRP($(ACTGRP)) TGTRLS($(TGTRLS)) AUT($(AUT)) DETAIL($(DETAIL)) STGMDL($(STGMDL))
 
 # Extra command string for adhoc addition of extra parameters to a creation command.
@@ -178,7 +175,7 @@ $(shell mkdir -p $(DEPDIR) >/dev/null)
 
 # cleanCDeps removes from the CRTCMOD-generated dependency file any header files located in /QIBM/, plus the
 # original .C file that is included for some reason, and adds the correct suffix to the target (SO1001 -> SO1001.MODULE).
-cleanCDeps = awk '$$2 !~ /^\/QIBM\// && $$2 !~ /$(notdir $<)$$/ { sub("^.*/","",$$2); sub("^$*","$@",$$1); print $$1 " " toupper($$2) }'
+cleanCDeps = awk '$$2 !~ /^\/QIBM\// && $$2 !~ /$(notdir $<)$$/ && $$2 !~ /$(basename $(notdir $<)).MBR$$/ { sub("^.*/","",$$2); sub("^$*","$@",$$1); print $$1 " " toupper($$2) }'
 
 # This defines the steps taken after a C compile to massage the auto-generated dependencies into a useable form.
 # See http://make.mad-scientist.net/papers/advanced-auto-dependency-generation/#tldr
@@ -230,10 +227,6 @@ moduleOPTION = $(strip \
 	$(if $(filter %.SQLC,$<),$(SQLCIMOD_OPTION), \
 	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIMOD_OPTION), \
 	UNKNOWN_FILE_TYPE))))))
-moduleSQLOPTION = $(strip \
-	$(if $(filter %.SQLC,$<),$(SQLCIMOD_SQLOPTION), \
-	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIMOD_SQLOPTION), \
-	UNKNOWN_FILE_TYPE)))
 moduleSTGMDL = $(strip \
 	$(if $(filter %.C,$<),$(CMOD_STGMDL), \
 	$(if $(filter %.SQLC,$<),$(SQLCIMOD_STGMDL), \
@@ -379,7 +372,6 @@ VPATH := $(OBJPATH):$(SRCPATH)
 %.MODULE: private DBGVIEW = $(moduleDBGVIEW)
 %.MODULE: private OBJTYPE = $(moduleOBJTYPE)
 %.MODULE: private OPTION = $(moduleOPTION)
-%.MODULE: private SQLOPTION = $(moduleSQLOPTION)
 %.MODULE: private STGMDL = $(moduleSTGMDL)
 %.MODULE: private SYSIFCOPT = $(moduleSYSIFCOPT)
 %.MODULE: private TERASPACE = $(moduleTERASPACE)
@@ -412,7 +404,7 @@ VPATH := $(OBJPATH):$(SRCPATH)
 	@echo "*** Creating SQLC module [$*]"
 	@echo "***"
 	$(eval crtcmd := crtsqlci obj($(OBJLIB)/$*) srcstmf('$<') $(CRTSQLCIFLAGS))
-	system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" >$(LOGPATH)/$(notdir $<).log 2>&1 || (ret=$$?; rm $(DEPDIR)/$*.Td 2>/dev/null; exit $$ret)
+	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" >$(LOGPATH)/$(notdir $<).log 2>&1 || (ret=$$?; rm $(DEPDIR)/$*.Td 2>/dev/null; exit $$ret)
 	@$(POSTCCOMPILE)
 
 %.MODULE: %.SQLRPGLE
