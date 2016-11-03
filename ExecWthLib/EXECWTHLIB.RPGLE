@@ -26,6 +26,22 @@ dcl-pr resendEscapeMessage extpgm('QMHRSNEM');
    fromCallStackCounter int(10) const;
 end-pr;
 
+dcl-pr moveProgramMessages extpgm('QMHMOVPM');
+   messageKey         char(4) const;
+   messageTypes       char(40) const;
+   messageTypesCount  int(10) const;
+   toCallStackEntry   char(10) const;
+   toCallStackCounter int(10) const;
+   error              char(1) options(*varsize) const;
+
+   toCallStackEntryLen    int(10) const;
+   toCallStackEntryQual   char(20) const;
+
+   toCallStackEntryType   char(10) const;
+   fromCallStackEntryAddr char(16) const;
+   fromCallStackCounter   int(10) const;
+end-pr;
+
 dcl-pr receiveProgramMessage extpgm('QMHRCVPM');
    messageInfo char(1) options(*varsize) const;
    messageInfoLen int(10) const;
@@ -114,11 +130,33 @@ cmdLen = %len(%trim(cmd));
 callp(e) QCmdExc(cmd: cmdLen);
 
 if %error;
+   forwardNonEscapeMsgs();
    forwardEscape();
 endif;
 
 *inlr = *on;
 return;
+
+// Forward non-escape messages to caller
+dcl-proc forwardNonEscapeMsgs;
+   error.avail = 0;
+   callp(e) moveProgramMessages (
+             ' ':
+             '*COMP     *DIAG     *INFO':
+             3:
+             '*PGMBDY':
+             1:
+             error:
+             10:
+             '*NONE     *NONE':
+             '*CHAR':
+             '*':
+             1);
+
+   if %error ;   // Temp for testing
+      *inlr = *on;
+   endif;
+end-proc;
 
 // Forward escape message to caller
 dcl-proc forwardEscape;

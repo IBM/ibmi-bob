@@ -42,6 +42,15 @@
            ErrorCode     CHAR(32767) OPTIONS(*VARSIZE);
        END-PR;
 
+       dcl-pr moveProgramMessages extpgm('QMHMOVPM');
+         messageKey char(4) const;
+         messageTypes char(40) const;
+         messageTypesCount int(10) const;
+         toCallStackEntry char(10) const;
+         toCallStackCounter int(10) const;
+         error char(1) options(*varsize) const;
+       end-pr;
+
        DCL-DS OptCtlBlk QUALIFIED;
            Type   INT(10) INZ(0);
            DBCS   CHAR(1) INZ('0');
@@ -52,7 +61,7 @@
        END-DS;
 
        DCL-DS APIError QUALIFIED;
-           Provided INT(10) INZ(272);
+           Provided INT(10) INZ(%size(APIError));
            Avail    INT(10) INZ(0);
            MsgID    CHAR(7);
            Rsvd     CHAR(1);
@@ -176,6 +185,17 @@
 
        // If an error occurred then fail the command
        IF APIError.Avail > 0;
+           // Forward messages to caller
+           APIError.Avail = 0;
+           callp(e) moveProgramMessages(
+              ' ':
+              '*COMP     *DIAG     *INFO     *ESCAPE':
+              4:
+              '*PGMBDY':
+              1:
+              APIError);
+
+           // Send escape message
            ErrorText = %TRIMR(Cmd) + ' failed with message id '
               + APIError.MsgID;
            SendProgramMessage('CPF9898'
