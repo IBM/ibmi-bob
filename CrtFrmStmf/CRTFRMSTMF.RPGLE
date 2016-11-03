@@ -42,14 +42,14 @@
            ErrorCode     CHAR(32767) OPTIONS(*VARSIZE);
        END-PR;
 
-       dcl-pr moveProgramMessages extpgm('QMHMOVPM');
-         messageKey char(4) const;
-         messageTypes char(40) const;
-         messageTypesCount int(10) const;
-         toCallStackEntry char(10) const;
+       DCL-PR moveProgramMessages extpgm('QMHMOVPM');
+         messageKey         char(4) const;
+         messageTypes       char(40) const;
+         messageTypesCount  int(10) const;
+         toCallStackEntry   char(10) const;
          toCallStackCounter int(10) const;
-         error char(1) options(*varsize) const;
-       end-pr;
+         error              char(1) options(*varsize) const;
+       END-PR;
 
        DCL-DS OptCtlBlk QUALIFIED;
            Type   INT(10) INZ(0);
