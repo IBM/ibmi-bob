@@ -1,5 +1,8 @@
 #
-# This is a Makefile to build IBM i objects in XP303MAKE from source in ~/home/jberman/Source/xp303make.
+# This is a generic Makefile to build IBM i objects in XP303MAKE from source in an IFS directory.
+# It should be included near the top of a project-specific makefile via the `include` directive, e.g.
+#    IBMIMAKE := /Source/SDE/Makefile
+#    include $(IBMIMAKE)
 #
 # Note: When using the IFS, path case sensitivity needs to match the actual item
 # in the file system or things will break.
@@ -8,15 +11,19 @@
 #   o ADDLIBLE <object_lib>
 #   o CALL QP2TERM
 #   o cd /qsys.lib/<object_lib>.lib
-#   o make all -f <location of makefile>
+#   o make all -f <location of project-specific makefile>
 #
 # Work around for C compiler bug:
 #   o ADDLIBLE <object_lib>
 #   o CALL QP2TERM
-#   o cd /some/path/that's/not/QSYS.LIB
-#   o make all INCLUDEMAKEFILES:='/path/to/project-specific/makefile.mak' OBJPATH:='/QSYS.LIB/<object_lib>.LIB' -f /location/of/this/Makefile
+#   o cd /some/path/that's/not/in/QSYS.LIB
+#   o make all OBJPATH:='/QSYS.LIB/<object_lib>.LIB' -f /path/to/project-specific/makefile.mak
 #   o Use `--warn-undefined-variables` while testing to see if any variables have been used without being set.
 #
+# To invoke from a shell:
+#   o cd /some/path/that's/not/in/QSYS.LIB
+#   o make all OBJPATH:='/QSYS.LIB/<object_lib>.LIB' -f /path/to/project-specific/makefile.mak
+
 
 # These variables are swapped into the compile commands.  They can be overridden on a
 # per-object basis by setting target-specific variables, e.g. `SO1001: TGTRLS = V7R1M0`.
@@ -33,13 +40,14 @@ COMMIT := *NONE
 DBGVIEW := *ALL
 DETAIL := *EXTENDED
 DFTACTGRP := *NO
-HLPID = $*
-HLPPNLGRP = $*
+HLPID =
+HLPPNLGRP =
 OBJTYPE :=
 OPTION := *EVENTF
 PAGESIZE :=
 PGM :=
-PMTFILE := *NONE
+PMTFILE :=
+RPGPPOPT :=
 RSTDSP :=
 SIZE :=
 STGMDL := *SNGLVL
@@ -47,7 +55,7 @@ SYSIFCOPT :=
 TERASPACE :=
 TEXT :=
 TGTRLS := V6R1M0
-VLDCKR := *NONE
+VLDCKR :=
 
 # Object-type-specific defaults.  Not used directly, but copied to the standard ones above and then
 # inserted into the compile commands.  Each variable here should also precede its corresponding pattern
@@ -66,6 +74,11 @@ BNDRPG_DFTACTGRP := $(DFTACTGRP)
 BNDRPG_OPTION := $(OPTION)
 
 CMD_AUT := $(AUT)
+CMD_HLPID = $*
+CMD_HLPPNLGRP = $*
+CMD_PGM = $*
+CMD_PMTFILE := *NONE
+CMD_VLDCKR := *NONE
 
 CMOD_AUT := $(AUT)
 CMOD_DBGVIEW := $(DBGVIEW)
@@ -123,24 +136,25 @@ SQLCIPGM_TGTRLS := $(TGTRLS)
 SQLRPGIMOD_DBGVIEW := *SOURCE
 SQLRPGIMOD_OBJTYPE := *MODULE
 SQLRPGIMOD_OPTION := $(RPGMOD_OPTION)
+SQLRPGIMOD_RPGPPOPT := *LVL2
 SQLRPGIMOD_TGTRLS := $(TGTRLS)
 
 SQLRPGIPGM_DBGVIEW := *SOURCE
 SQLRPGIPGM_OBJTYPE := *PGM
 SQLRPGIPGM_OPTION := $(OPTION)
+SQLRPGIPGM_RPGPPOPT := *LVL2
 SQLRPGIPGM_TGTRLS := $(TGTRLS)
 
 SRVPGM_ACTGRP := *CALLER
 SRVPGM_AUT := $(AUT)
 SRVPGM_BNDDIR := *NONE
-SRVPGM_DETAIL := $(DETAIL)
+SRVPGM_DETAIL := *BASIC
 SRVPGM_STGMDL := $(STGMDL)
 SRVPGM_TGTRLS := $(TGTRLS)
 
 # Creation command parameters with variables (the ones listed at the top) for the most common ones.
 CRTBNDCLFLAGS = AUT($(AUT)) DBGVIEW($(DBGVIEW)) TGTRLS($(TGTRLS)) DFTACTGRP($(DFTACTGRP)) ACTGRP($(ACTGRP)) OPTION($(OPTION))
-CRTCLMODFLAGS = AUT($(AUT)) DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) STGMDL($(STGMDL)) SYSIFCOPT($(SYSIFCOPT)) \
-				TERASPACE($(TERASPACE)) TGTRLS($(TGTRLS))
+CRTCLMODFLAGS = AUT($(AUT)) DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) TGTRLS($(TGTRLS))
 CRTCMDFLAGS = PGM($(PGM)) VLDCKR($(VLDCKR)) PMTFILE($(PMTFILE)) HLPPNLGRP($(HLPPNLGRP)) HLPID($(HLPID)) AUT($(AUT))
 CRTCMODFLAGS = TERASPACE($(TERASPACE)) STGMDL($(STGMDL)) OUTPUT(*PRINT) OPTION($(OPTION)) DBGVIEW($(DBGVIEW)) \
                SYSIFCOPT($(SYSIFCOPT)) AUT($(AUT)) TGTRLS($(TGTRLS)) MAKEDEP('$(DEPDIR)/$*.Td')
@@ -153,8 +167,8 @@ CRTRPGMODFLAGS = AUT($(AUT)) DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) OUTPUT(*PRINT
 CRTSQLCIFLAGS = COMMIT($(COMMIT)) OBJTYPE($(OBJTYPE)) OUTPUT(*PRINT) TGTRLS($(TGTRLS)) DBGVIEW($(DBGVIEW)) \
 				COMPILEOPT('INCDIR(''$(SRCPATH)'') OPTION($(OPTION)) STGMDL($(STGMDL)) SYSIFCOPT($(SYSIFCOPT)) \
 							TERASPACE($(TERASPACE)) MAKEDEP(''$(DEPDIR)/$*.Td'')')
-CRTSQLRPGIFLAGS = COMMIT($(COMMIT)) OBJTYPE($(OBJTYPE)) OUTPUT(*PRINT) TGTRLS($(TGTRLS)) DBGVIEW($(DBGVIEW))
-CRTSRVPGMFLAGS = EXPORT(*ALL) ACTGRP($(ACTGRP)) TGTRLS($(TGTRLS)) AUT($(AUT)) DETAIL($(DETAIL)) STGMDL($(STGMDL))
+CRTSQLRPGIFLAGS = COMMIT($(COMMIT)) OBJTYPE($(OBJTYPE)) OUTPUT(*PRINT) TGTRLS($(TGTRLS)) DBGVIEW($(DBGVIEW)) RPGPPOPT($(RPGPPOPT))
+CRTSRVPGMFLAGS = ACTGRP($(ACTGRP)) TGTRLS($(TGTRLS)) AUT($(AUT)) DETAIL($(DETAIL)) STGMDL($(STGMDL))
 
 # Extra command string for adhoc addition of extra parameters to a creation command.
 ADHOCCRTFLAGS =
@@ -203,7 +217,30 @@ endef
 # This elaborate construct is to work around a limitation in Make (`%.object: %.source variable=value` does not work; it
 # effectively resolves to `%.object: variable=value`).
 #
-# Determine default settings for the various source types that can make a module ojbect.
+# Determine default settings for the various source types that can make a file object.
+fileAUT = $(strip \
+	$(if $(filter %.DSPF,$<),$(DSPF_AUT), \
+	$(if $(filter %.LF,$<),$(LF_AUT), \
+	$(if $(filter %.PF,$<),$(PF_AUT), \
+	$(if $(filter %.PRTF,$<),$(PRTF_AUT), \
+	UNKNOWN_FILE_TYPE)))))
+fileOPTION = $(strip \
+	$(if $(filter %.DSPF,$<),$(DSPF_OPTION), \
+	$(if $(filter %.LF,$<),$(LF_OPTION), \
+	$(if $(filter %.PF,$<),$(PF_OPTION), \
+	$(if $(filter %.PRTF,$<),$(PRTF_OPTION), \
+	UNKNOWN_FILE_TYPE)))))
+filePAGESIZE = $(strip \
+	$(if $(filter %.PRTF,$<),$(PRTF_PAGESIZE), \
+	UNKNOWN_FILE_TYPE))
+fileRSTDSP = $(strip \
+	$(if $(filter %.DSPF,$<),$(DSPF_RSTDSP), \
+	UNKNOWN_FILE_TYPE))
+fileSIZE = $(strip \
+	$(if $(filter %.PF,$<),$(PF_SIZE), \
+	UNKNOWN_FILE_TYPE))
+
+# Determine default settings for the various source types that can make a module object.
 moduleAUT = $(strip \
 	$(if $(filter %.C,$<),$(CMOD_AUT), \
 	$(if $(filter %.CLLE,$<),$(CLMOD_AUT), \
@@ -227,6 +264,9 @@ moduleOPTION = $(strip \
 	$(if $(filter %.SQLC,$<),$(SQLCIMOD_OPTION), \
 	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIMOD_OPTION), \
 	UNKNOWN_FILE_TYPE))))))
+moduleRPGPPOPT = $(strip \
+	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIMOD_RPGPPOPT), \
+	UNKNOWN_FILE_TYPE))
 moduleSTGMDL = $(strip \
 	$(if $(filter %.C,$<),$(CMOD_STGMDL), \
 	$(if $(filter %.SQLC,$<),$(SQLCIMOD_STGMDL), \
@@ -246,29 +286,6 @@ moduleTGTRLS = $(strip \
 	$(if $(filter %.SQLC,$<),$(SQLCIMOD_TGTRLS), \
 	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIMOD_TGTRLS), \
 	UNKNOWN_FILE_TYPE))))))
-
-# Determine default settings for the various source types that can make a file ojbect.
-fileAUT = $(strip \
-	$(if $(filter %.DSPF,$<),$(DSPF_AUT), \
-	$(if $(filter %.LF,$<),$(LF_AUT), \
-	$(if $(filter %.PF,$<),$(PF_AUT), \
-	$(if $(filter %.PRTF,$<),$(PRTF_AUT), \
-	UNKNOWN_FILE_TYPE)))))
-fileOPTION = $(strip \
-	$(if $(filter %.DSPF,$<),$(DSPF_OPTION), \
-	$(if $(filter %.LF,$<),$(LF_OPTION), \
-	$(if $(filter %.PF,$<),$(PF_OPTION), \
-	$(if $(filter %.PRTF,$<),$(PRTF_OPTION), \
-	UNKNOWN_FILE_TYPE)))))
-filePAGESIZE = $(strip \
-	$(if $(filter %.PRTF,$<),$(PRTF_PAGESIZE), \
-	UNKNOWN_FILE_TYPE))
-fileRSTDSP = $(strip \
-	$(if $(filter %.DSPF,$<),$(DSPF_RSTDSP), \
-	UNKNOWN_FILE_TYPE))
-fileSIZE = $(strip \
-	$(if $(filter %.PF,$<),$(PF_SIZE), \
-	UNKNOWN_FILE_TYPE))
 
 # Determine default settings for the various source types that can make a program object.
 programACTGRP = $(strip \
@@ -303,6 +320,9 @@ programOPTION = $(strip \
 	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIPGM_OPTION), \
 	$(if $(filter %.MODULE,$<),$(PGM_OPTION), \
 	UNKNOWN_FILE_TYPE))))))
+programRPGPPOPT = $(strip \
+	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIPGM_RPGPPOPT), \
+	UNKNOWN_FILE_TYPE))
 programSTGMDL = $(strip \
 	$(if $(filter %.MODULE,$<),$(PGM_STGMDL), \
 	UNKNOWN_FILE_TYPE))))))
@@ -318,12 +338,17 @@ VPATH := $(OBJPATH):$(SRCPATH)
 
 ### Implicit rules
 %.CMD: private AUT = $(CMD_AUT)
-%.CMD: %.CMD
+%.CMD: private HLPID = $(CMD_HLPID)
+%.CMD: private HLPPNLGRP = $(CMD_HLPPNLGRP)
+%.CMD: private PGM = $(CMD_PGM)
+%.CMD: private PMTFILE = $(CMD_PMTFILE)
+%.CMD: private VLDCKR = $(CMD_VLDCKR)
+%.CMD: %.CMDSRC
 	@echo "\n\n***"
 	@echo "*** Creating command [$*]"
 	@echo "***"
 	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTCMD) stmf('$<') parms('$(CRTCMDFLAGS)'))
-	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log
+	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log 2>&1
 
 
 %.FILE: private AUT = $(fileAUT)
@@ -372,6 +397,7 @@ VPATH := $(OBJPATH):$(SRCPATH)
 %.MODULE: private DBGVIEW = $(moduleDBGVIEW)
 %.MODULE: private OBJTYPE = $(moduleOBJTYPE)
 %.MODULE: private OPTION = $(moduleOPTION)
+%.MODULE: private RPGPPOPT = $(moduleRPGPPOPT)
 %.MODULE: private STGMDL = $(moduleSTGMDL)
 %.MODULE: private SYSIFCOPT = $(moduleSYSIFCOPT)
 %.MODULE: private TERASPACE = $(moduleTERASPACE)
@@ -389,8 +415,8 @@ VPATH := $(OBJPATH):$(SRCPATH)
 	@echo "\n\n***"
 	@echo "*** Creating CL module [$*]"
 	@echo "***"
-	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTCLMOD) stmf('$<'))
-	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log
+	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTCLMOD) stmf('$<') parms('$(CRTCLMODFLAGS)'))
+	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log 2>&1
 
 %.MODULE: %.RPGLE
 	@echo "\n\n***"
@@ -412,7 +438,7 @@ VPATH := $(OBJPATH):$(SRCPATH)
 	@echo "*** Creating SQLRPGLE module [$*]"
 	@echo "***"
 	$(eval crtcmd := crtsqlrpgi obj($(OBJLIB)/$*) srcstmf('$<') $(CRTSQLRPGIFLAGS))
-	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log
+	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" >$(LOGPATH)/$(notdir $<).log 2>&1
 
 
 %.PGM: private ACTGRP = $(programACTGRP)
@@ -422,6 +448,7 @@ VPATH := $(OBJPATH):$(SRCPATH)
 %.PGM: private DFTACTGRP = $(programDFTACTGRP)
 %.PGM: private OBJTYPE = $(programOBJTYPE)
 %.PGM: private OPTION = $(programOPTION)
+%.PGM: private RPGPPOPT = $(programRPGPPOPT)
 ###%.PGM: private PGM = $*
 %.PGM: private STGMDL = $(programSTGMDL)
 %.PGM: private TGTRLS = $(programTGTRLS)
@@ -451,7 +478,7 @@ VPATH := $(OBJPATH):$(SRCPATH)
 	@echo "\n\n***"
 	@echo "*** Creating program [$*] from modules [$^]"
 	@echo "***"
-	$(eval crtcmd := crtpgm pgm($(OBJLIB)/$*) module($(basename $(filter %.MODULE,$(notdir $^)))) bndsrvpgm($(basename $(filter %.SRVPGM,$(notdir $^)))) $(CRTPGMFLAGS))
+	$(eval crtcmd := crtpgm pgm($(OBJLIB)/$*) module($(basename $(filter %.MODULE,$(notdir $^)))) bndsrvpgm($(basename $(filter %.SRVPGM,$(notdir $^ $|)))) $(CRTPGMFLAGS))
 	system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$@.log
 
 
@@ -462,17 +489,14 @@ VPATH := $(OBJPATH):$(SRCPATH)
 %.SRVPGM: private TGTRLS = $(SRVPGM_TGTRLS)
 %.SRVPGM: $^
 	@echo "\n\n***"
-	@echo "*** Creating service program [$*] from modules [$(basename $(filter %.MODULE,$(notdir $^)))] and service programs [$(basename $(filter %.SRVPGM,$(notdir $^)))]"
+	@echo "*** Creating service program [$*] from modules [$(basename $(filter %.MODULE,$(notdir $^)))] and service programs [$(basename $(filter %.SRVPGM,$(notdir $^$|)))]"
 	@echo "***"
-	$(eval crtcmd := crtsrvpgm srvpgm($(OBJLIB)/$*) module($(basename $(filter %.MODULE,$(notdir $^)))) bndsrvpgm($(basename $(filter %.SRVPGM,$(notdir $^)))) $(CRTSRVPGMFLAGS))
-	system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$@.log 2>&1
+	$(eval externalsrvpgms := $(filter %.SRVPGM,$(subst .LIB,,$(subst /QSYS.LIB/,,$|))))
+	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTSRVPGM) stmf('$<') parms('MODULE($(basename $(filter %.MODULE,$(notdir $^)))) BNDSRVPGM($(basename $(filter %.SRVPGM,$(notdir $^)) $(externalsrvpgms))) $(CRTSRVPGMFLAGS)'))
+	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$@.log 2>&1
 
 $(DEPDIR)/%.d: ;
 .PRECIOUS: $(DEPDIR)/%.d
-
-### Rules
-include $(INCLUDEMAKEFILES)
-
 
 #.PHONY: make_pre
 #make_pre:
