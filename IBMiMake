@@ -1,7 +1,7 @@
 #
 # This is a generic Makefile to build IBM i objects in XP303MAKE from source in an IFS directory.
 # It should be included near the top of a project-specific makefile via the `include` directive, e.g.
-#    IBMIMAKE := /Source/SDE/Makefile
+#    IBMIMAKE := /Source/SDE/IBMiMake
 #    include $(IBMIMAKE)
 #
 # Note: When using the IFS, path case sensitivity needs to match the actual item
@@ -25,12 +25,12 @@
 #   o make all OBJPATH:='/QSYS.LIB/<object_lib>.LIB' -f /path/to/project-specific/makefile.mak
 
 
-# These variables are swapped into the compile commands.  They can be overridden on a
-# per-object basis by setting target-specific variables, e.g. `SO1001: TGTRLS = V7R1M0`.
-# They can also be overridden on a per-object-type basis by setting pattern-specific
-# variables, e.g. `%.SRVPGM: private ACTGRP = $(SRVPGM_ACTGRP)` (A variable is used in
-# the assignment instead of a constant so that all settings are defined in one place,
-# at the top.)
+# These variables are swapped into the compile commands.  Their values also serve as
+# global defaults that can be overridden on a per-object basis by setting target-specific
+# variables, e.g. `MYPGM.PGM: TGTRLS = V7R1M0`.  They can also be overridden on a
+# per-object-type basis by setting pattern-specific variables, e.g.
+# `%.SRVPGM: private ACTGRP = $(SRVPGM_ACTGRP)` (A variable is used in the assignment
+# instead of a constant so that all settings are defined in one place, at the top.)
 # tl;dr: If you want to customize a compile setting for an object, change these variables
 # in your TARGET (not here).
 ACTGRP := E_PRODUCT
@@ -69,9 +69,11 @@ BNDCL_OPTION := $(OPTION)
 BNDCL_TGTRLS := $(TGTRLS)
 
 BNDRPG_ACTGRP := $(ACTGRP)
+BNDRPG_AUT := $(AUT)
 BNDRPG_DBGVIEW := $(DBGVIEW)
 BNDRPG_DFTACTGRP := $(DFTACTGRP)
 BNDRPG_OPTION := $(OPTION)
+BNDRPG_TGTRLS := $(TGTRLS)
 
 CMD_AUT := $(AUT)
 CMD_HLPID = $*
@@ -107,7 +109,7 @@ PF_SIZE := *NOMAX
 PGM_ACTGRP := $(ACTGRP)
 PGM_AUT := $(AUT)
 PGM_DETAIL := $(DETAIL)
-PGM_OPTION := $(OPTION)
+PGM_OPTION :=
 PGM_STGMDL := *SNGLVL
 PGM_TGTRLS := $(TGTRLS)
 
@@ -153,7 +155,8 @@ SRVPGM_STGMDL := $(STGMDL)
 SRVPGM_TGTRLS := $(TGTRLS)
 
 # Creation command parameters with variables (the ones listed at the top) for the most common ones.
-CRTBNDCLFLAGS = AUT($(AUT)) DBGVIEW($(DBGVIEW)) TGTRLS($(TGTRLS)) DFTACTGRP($(DFTACTGRP)) ACTGRP($(ACTGRP)) OPTION($(OPTION))
+CRTBNDCLFLAGS = AUT($(AUT)) DBGVIEW($(DBGVIEW)) TGTRLS($(TGTRLS)) DFTACTGRP($(DFTACTGRP)) ACTGRP($(derive_ACTGRP)) OPTION($(OPTION))
+CRTBNDRPGFLAGS = AUT($(AUT)) DBGVIEW($(DBGVIEW)) TGTRLS($(TGTRLS)) DFTACTGRP($(DFTACTGRP)) ACTGRP($(derive_ACTGRP)) OPTION($(OPTION))
 CRTCLMODFLAGS = AUT($(AUT)) DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) TGTRLS($(TGTRLS))
 CRTCMDFLAGS = PGM($(PGM)) VLDCKR($(VLDCKR)) PMTFILE($(PMTFILE)) HLPPNLGRP($(HLPPNLGRP)) HLPID($(HLPID)) AUT($(AUT))
 CRTCMODFLAGS = TERASPACE($(TERASPACE)) STGMDL($(STGMDL)) OUTPUT(*PRINT) OPTION($(OPTION)) DBGVIEW($(DBGVIEW)) \
@@ -207,6 +210,9 @@ if [ "$(suffix $<)" = '.PRTF' ]; then SLTFLD='*OUTPUT'; else SLTFLD='*BOTH *KEY'
 rm $<.TH
 echo "*** Created typedef file $<.H for file [$*]"
 endef
+
+# Can't specify our default ACTGRP value if DFTACTGRP(*YES) is specified.
+derive_ACTGRP = $(if $(filter *YES,$(DFTACTGRP)),,$(ACTGRP))
 
 # These variables allow pattern-specific variables to be used when multiple source patterns exist for one object pattern (like with *FILEs, which can be PFs, LFs, DSPFs, etc.).
 # The pattern-specific variable will set itself to a variable below, which will then be evaluated
@@ -290,12 +296,14 @@ moduleTGTRLS = $(strip \
 # Determine default settings for the various source types that can make a program object.
 programACTGRP = $(strip \
 	$(if $(filter %.CLLE,$<),$(BNDCL_ACTGRP), \
+	$(if $(filter %.RPGLE,$<),$(BNDRPG_ACTGRP), \
 	$(if $(filter %.MODULE,$<),$(PGM_ACTGRP), \
-	UNKNOWN_FILE_TYPE)))
+	UNKNOWN_FILE_TYPE))))
 programAUT = $(strip \
 	$(if $(filter %.CLLE,$<),$(BNDCL_AUT), \
+	$(if $(filter %.RPGLE,$<),$(BNDRPG_AUT), \
 	$(if $(filter %.MODULE,$<),$(PGM_AUT), \
-	UNKNOWN_FILE_TYPE)))
+	UNKNOWN_FILE_TYPE))))
 programDBGVIEW = $(strip \
 	$(if $(filter %.CLLE,$<),$(BNDCL_DBGVIEW), \
 	$(if $(filter %.RPGLE,$<),$(BNDRPG_DBGVIEW), \
@@ -328,10 +336,11 @@ programSTGMDL = $(strip \
 	UNKNOWN_FILE_TYPE))
 programTGTRLS = $(strip \
 	$(if $(filter %.CLLE,$<),$(BNDCL_TGTRLS), \
+	$(if $(filter %.RPGLE,$<),$(BNDRPG_TGTRLS), \
 	$(if $(filter %.SQLC,$<),$(SQLCIPGM_TGTRLS), \
 	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIPGM_TGTRLS), \
 	$(if $(filter %.MODULE,$<),$(PGM_TGTRLS), \
-	UNKNOWN_FILE_TYPE)))))
+	UNKNOWN_FILE_TYPE))))))
 
 CRTFRMSTMFLIB := CRTFRMSTMF
 VPATH := $(OBJPATH):$(SRCPATH)
@@ -453,41 +462,41 @@ VPATH := $(OBJPATH):$(SRCPATH)
 %.PGM: private STGMDL = $(programSTGMDL)
 %.PGM: private TGTRLS = $(programTGTRLS)
 
-%.PGM: %.CLLE
-	@echo "\n\n***"
-	@echo "*** Creating bound CL program [$*]"
-	@echo "***"
-	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTBNDCL) stmf('$<') parms('$(CRTBNDCLFLAGS)'))
-	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$@.log
-
-%.PGM: %.RPGLE
-	@echo "\n\n***"
-	@echo "*** Creating bound RPG program [$*]"
-	@echo "***"
-	$(eval crtcmd := crtbndrpg pgm($(OBJLIB)/$*) srcstmf('$<') $(CRTBNDRPGFLAGS))
-	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" >$(LOGPATH)/$(notdir $<).log 2>&1
-
-%.PGM: %.SQLC
-	@echo "\n\n***"
-	@echo "*** Creating bound SQLC program [$*]"
-	@echo "***"
-	$(eval crtcmd := crtsqlci obj($(OBJLIB)/$*) srcstmf('$<') $(CRTSQLCIFLAGS))
-	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log
-
-%.PGM: %.SQLRPGLE
-	@echo "\n\n***"
-	@echo "*** Creating bound SQLRPGLE program [$*]"
-	@echo "***"
-	$(eval crtcmd := crtsqlrpgi obj($(OBJLIB)/$*) srcstmf('$<') $(CRTSQLRPGIFLAGS))
-	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log
-
 %.PGM: $^
 	@echo "\n\n***"
 	@echo "*** Creating program [$*] from modules [$(basename $(filter %.MODULE,$(notdir $^)))] and service programs [$(basename $(filter %.SRVPGM,$(notdir $^$|)))]"
 	@echo "***"
 	$(eval externalsrvpgms := $(filter %.SRVPGM,$(subst .LIB,,$(subst /QSYS.LIB/,,$|))))
 	$(eval crtcmd := crtpgm pgm($(OBJLIB)/$*) module($(basename $(filter %.MODULE,$(notdir $^)))) bndsrvpgm($(basename $(filter %.SRVPGM,$(notdir $^)) $(externalsrvpgms))) $(CRTPGMFLAGS))
-	system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$@.log
+	system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" >$(LOGPATH)/$@.log 2>&1
+
+%.PGM: %.CLLE
+	@echo "\n\n***"
+	@echo "*** Creating bound CL program [$*]"
+	@echo "***"
+	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTBNDCL) stmf('$<') parms('$(CRTBNDCLFLAGS)'))
+	system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" >$(LOGPATH)/$(notdir $<).log 2>&1
+
+%.PGM: %.RPGLE
+	@echo "\n\n***"
+	@echo "*** Creating bound RPG program [$*]"
+	@echo "***"
+	$(eval crtcmd := crtbndrpg pgm($(OBJLIB)/$*) srcstmf('$<') $(CRTBNDRPGFLAGS))
+	system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" >$(LOGPATH)/$(notdir $<).log 2>&1
+
+%.PGM: %.SQLC
+	@echo "\n\n***"
+	@echo "*** Creating bound SQLC program [$*]"
+	@echo "***"
+	$(eval crtcmd := crtsqlci obj($(OBJLIB)/$*) srcstmf('$<') $(CRTSQLCIFLAGS))
+	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" >$(LOGPATH)/$(notdir $<).log 2>&1
+
+%.PGM: %.SQLRPGLE
+	@echo "\n\n***"
+	@echo "*** Creating bound SQLRPGLE program [$*]"
+	@echo "***"
+	$(eval crtcmd := crtsqlrpgi obj($(OBJLIB)/$*) srcstmf('$<') $(CRTSQLRPGIFLAGS))
+	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" >$(LOGPATH)/$(notdir $<).log 2>&1
 
 
 %.SRVPGM: private ACTGRP = $(SRVPGM_ACTGRP)
@@ -536,6 +545,7 @@ test:
 	echo "OBJLIB:			$(OBJLIB)"; \
 	echo "INCLUDEMAKEFILES:	$(INCLUDEMAKEFILES)";
 
+### Uncomment and add the following to the END of each project-specific makefile.
 # Include all auto-generated source dependency files. Since we don't have a list of source files,
 # we have to grab everything in the `$DEPDIR` directory.
--include $(wildcard $(DEPDIR)/*.d)
+#-include $(wildcard $(DEPDIR)/*.d)
