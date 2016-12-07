@@ -197,7 +197,7 @@ cleanCDeps = awk '$$2 !~ /^\/QIBM\// && $$2 !~ /$(notdir $<)$$/ && $$2 !~ /$(bas
 # This defines the steps taken after a C compile to massage the auto-generated dependencies into a useable form.
 # See http://make.mad-scientist.net/papers/advanced-auto-dependency-generation/#tldr
 define POSTCCOMPILE =
-iconv -f IBM-037 -t ISO8859-1 $(DEPDIR)/$*.Td | tr -d '\r' > $(DEPDIR)/$*.T2d
+$(ICONV) -f IBM-037 -t ISO8859-1 $(DEPDIR)/$*.Td | tr -d '\r' > $(DEPDIR)/$*.T2d
 $(cleanCDeps) <$(DEPDIR)/$*.T2d | sort -u >$(DEPDIR)/$*.d
 touch -cr $(OBJPATH)/$@ $(DEPDIR)/$*.d
 rm $(DEPDIR)/$*.Td $(DEPDIR)/$*.T2d
@@ -206,10 +206,13 @@ endef
 # Commands to generate typedef structure for *FILE objects (for use by C code)
 define TYPEDEF_SCRIPT =
 if [ "$(suffix $<)" = '.PRTF' ]; then SLTFLD='*OUTPUT'; else SLTFLD='*BOTH *KEY'; fi; system -v "GENCSRC OBJ('$(OBJPATH)/$@') SRCSTMF('$<.TH') SLTFLD($$SLTFLD) TYPEDEFPFX('$(basename $@)')" > /dev/null
-(file=$(subst .,_,$(notdir $<))_H; echo "#ifndef $${file}"; echo "   #define $${file}"; iconv -f IBM-037 -t ISO8859-1 $<.TH | tr -d '\r'; echo "#endif  /* $${file} */") > $<.H
+(file=$(subst .,_,$(notdir $<))_H; echo "#ifndef $${file}"; echo "   #define $${file}"; $(ICONV) -f IBM-037 -t ISO8859-1 $<.TH | tr -d '\r'; echo "#endif  /* $${file} */") > $<.H
 rm $<.TH
 echo "*** Created typedef file $<.H for file [$*]"
 endef
+
+# Escape out special characters that need escaping when passed to the shell during a recipe.
+escape_string = $(subst \#,\\\#,$(1))
 
 # Can't specify our default ACTGRP value if DFTACTGRP(*YES) is specified.
 derive_ACTGRP = $(if $(filter *YES,$(DFTACTGRP)),,$(ACTGRP))
@@ -343,6 +346,7 @@ programTGTRLS = $(strip \
 	UNKNOWN_FILE_TYPE))))))
 
 CRTFRMSTMFLIB := CRTFRMSTMF
+ICONV := /QOpenSys/usr/bin/iconv
 VPATH := $(OBJPATH):$(SRCPATH)
 
 ### Implicit rules
@@ -429,9 +433,9 @@ VPATH := $(OBJPATH):$(SRCPATH)
 
 %.MODULE: %.RPGLE
 	@echo "\n\n***"
-	@echo "*** Creating module [$*]"
+	@echo "*** Creating RPG module [$*]"
 	@echo "***"
-	$(eval crtcmd := crtrpgmod module($(OBJLIB)/$*) srcstmf('$<') $(CRTRPGMODFLAGS))
+	$(eval crtcmd := crtrpgmod module($(OBJLIB)/$(call escape_string,$*)) srcstmf('$(call escape_string,$<)') $(CRTRPGMODFLAGS))
 	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log
 
 %.MODULE: %.SQLC
@@ -462,41 +466,27 @@ VPATH := $(OBJPATH):$(SRCPATH)
 %.PGM: private STGMDL = $(programSTGMDL)
 %.PGM: private TGTRLS = $(programTGTRLS)
 
-%.PGM: $^
+#%.PGM: %.SQLC
+#	@echo "\n\n***"
+#	@echo "*** Creating bound SQLC program [$*]"
+#	@echo "***"
+#	$(eval crtcmd := crtsqlci obj($(OBJLIB)/$*) srcstmf('$<') $(CRTSQLCIFLAGS))
+#	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" >$(LOGPATH)/$(notdir $<).log 2>&1
+
+#%.PGM: %.SQLRPGLE
+#	@echo "\n\n***"
+#	@echo "*** Creating bound SQLRPGLE program [$*]"
+#	@echo "***"
+#	$(eval crtcmd := crtsqlrpgi obj($(OBJLIB)/$*) srcstmf('$<') $(CRTSQLRPGIFLAGS))
+#	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" >$(LOGPATH)/$(notdir $<).log 2>&1
+
+%.PGM:
 	@echo "\n\n***"
 	@echo "*** Creating program [$*] from modules [$(basename $(filter %.MODULE,$(notdir $^)))] and service programs [$(basename $(filter %.SRVPGM,$(notdir $^$|)))]"
 	@echo "***"
 	$(eval externalsrvpgms := $(filter %.SRVPGM,$(subst .LIB,,$(subst /QSYS.LIB/,,$|))))
-	$(eval crtcmd := crtpgm pgm($(OBJLIB)/$*) module($(basename $(filter %.MODULE,$(notdir $^)))) bndsrvpgm($(basename $(filter %.SRVPGM,$(notdir $^)) $(externalsrvpgms))) $(CRTPGMFLAGS))
-	system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" >$(LOGPATH)/$@.log 2>&1
-
-%.PGM: %.CLLE
-	@echo "\n\n***"
-	@echo "*** Creating bound CL program [$*]"
-	@echo "***"
-	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTBNDCL) stmf('$<') parms('$(CRTBNDCLFLAGS)'))
-	system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" >$(LOGPATH)/$(notdir $<).log 2>&1
-
-%.PGM: %.RPGLE
-	@echo "\n\n***"
-	@echo "*** Creating bound RPG program [$*]"
-	@echo "***"
-	$(eval crtcmd := crtbndrpg pgm($(OBJLIB)/$*) srcstmf('$<') $(CRTBNDRPGFLAGS))
-	system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" >$(LOGPATH)/$(notdir $<).log 2>&1
-
-%.PGM: %.SQLC
-	@echo "\n\n***"
-	@echo "*** Creating bound SQLC program [$*]"
-	@echo "***"
-	$(eval crtcmd := crtsqlci obj($(OBJLIB)/$*) srcstmf('$<') $(CRTSQLCIFLAGS))
-	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" >$(LOGPATH)/$(notdir $<).log 2>&1
-
-%.PGM: %.SQLRPGLE
-	@echo "\n\n***"
-	@echo "*** Creating bound SQLRPGLE program [$*]"
-	@echo "***"
-	$(eval crtcmd := crtsqlrpgi obj($(OBJLIB)/$*) srcstmf('$<') $(CRTSQLRPGIFLAGS))
-	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" >$(LOGPATH)/$(notdir $<).log 2>&1
+	$(eval crtcmd := crtpgm pgm($(OBJLIB)/$(call escape_string,$*)) module($(basename $(filter %.MODULE,$(notdir $^)))) bndsrvpgm($(basename $(filter %.SRVPGM,$(notdir $^)) $(externalsrvpgms))) $(CRTPGMFLAGS))
+	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" >$(LOGPATH)/$@.log 2>&1
 
 
 %.SRVPGM: private ACTGRP = $(SRVPGM_ACTGRP)
