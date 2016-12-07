@@ -90,7 +90,8 @@ if [ $? -ne 0 ]; then
 	exit 1
 fi
 
-echo "#ifndef ${file}_${suffix}_H"; echo "   #define ${file}_${suffix}_H"; iconv -f IBM-037 -t ISO8859-1 /tmp/${tempfile} | tr -d '\r'; echo "#endif  /* ${file}_${suffix}_H */"
+# The `sed` statement below converts 'int' to 'long int', as the SQL precompiler needs the type explicitly stated.
+echo "#ifndef ${file}_${suffix}_H"; echo "   #define ${file}_${suffix}_H"; /QOpenSys/usr/bin/iconv -f IBM-037 -t ISO8859-1 /tmp/${tempfile} | tr -d '\r' | sed -e '/^ *int/ s/;     /;/' -e '/^ *int/ s/int/long int/'; echo "#endif  /* ${file}_${suffix}_H */"
 
 rm /tmp/${tempfile} 2>/dev/null
 
