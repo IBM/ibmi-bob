@@ -211,9 +211,6 @@ rm $<.TH
 echo "*** Created typedef file $<.H for file [$*]"
 endef
 
-# Escape out special characters that need escaping when passed to the shell during a recipe.
-escape_string = $(subst \#,\\\#,$(1))
-
 # Can't specify our default ACTGRP value if DFTACTGRP(*YES) is specified.
 derive_ACTGRP = $(if $(filter *YES,$(DFTACTGRP)),,$(ACTGRP))
 
@@ -435,7 +432,7 @@ VPATH := $(OBJPATH):$(SRCPATH)
 	@echo "\n\n***"
 	@echo "*** Creating RPG module [$*]"
 	@echo "***"
-	$(eval crtcmd := crtrpgmod module($(OBJLIB)/$(call escape_string,$*)) srcstmf('$(call escape_string,$<)') $(CRTRPGMODFLAGS))
+	$(eval crtcmd := crtrpgmod module($(OBJLIB)/$*) srcstmf('$<') $(CRTRPGMODFLAGS))
 	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log
 
 %.MODULE: %.SQLC
@@ -466,26 +463,12 @@ VPATH := $(OBJPATH):$(SRCPATH)
 %.PGM: private STGMDL = $(programSTGMDL)
 %.PGM: private TGTRLS = $(programTGTRLS)
 
-#%.PGM: %.SQLC
-#	@echo "\n\n***"
-#	@echo "*** Creating bound SQLC program [$*]"
-#	@echo "***"
-#	$(eval crtcmd := crtsqlci obj($(OBJLIB)/$*) srcstmf('$<') $(CRTSQLCIFLAGS))
-#	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" >$(LOGPATH)/$(notdir $<).log 2>&1
-
-#%.PGM: %.SQLRPGLE
-#	@echo "\n\n***"
-#	@echo "*** Creating bound SQLRPGLE program [$*]"
-#	@echo "***"
-#	$(eval crtcmd := crtsqlrpgi obj($(OBJLIB)/$*) srcstmf('$<') $(CRTSQLRPGIFLAGS))
-#	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" >$(LOGPATH)/$(notdir $<).log 2>&1
-
 %.PGM:
 	@echo "\n\n***"
 	@echo "*** Creating program [$*] from modules [$(basename $(filter %.MODULE,$(notdir $^)))] and service programs [$(basename $(filter %.SRVPGM,$(notdir $^$|)))]"
 	@echo "***"
 	$(eval externalsrvpgms := $(filter %.SRVPGM,$(subst .LIB,,$(subst /QSYS.LIB/,,$|))))
-	$(eval crtcmd := crtpgm pgm($(OBJLIB)/$(call escape_string,$*)) module($(basename $(filter %.MODULE,$(notdir $^)))) bndsrvpgm($(basename $(filter %.SRVPGM,$(notdir $^)) $(externalsrvpgms))) $(CRTPGMFLAGS))
+	$(eval crtcmd := crtpgm pgm($(OBJLIB)/$*) module($(basename $(filter %.MODULE,$(notdir $^)))) bndsrvpgm($(basename $(filter %.SRVPGM,$(notdir $^)) $(externalsrvpgms))) $(CRTPGMFLAGS))
 	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" >$(LOGPATH)/$@.log 2>&1
 
 
