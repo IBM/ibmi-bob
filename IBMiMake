@@ -27,7 +27,7 @@
 
 # These variables are swapped into the compile commands.  Their values also serve as
 # global defaults that can be overridden on a per-object basis by setting target-specific
-# variables, e.g. `MYPGM.PGM: TGTRLS = V7R1M0`.  They can also be overridden on a
+# variables, e.g. `MYPGM.PGM: private TGTRLS = V7R1M0`.  They can also be overridden on a
 # per-object-type basis by setting pattern-specific variables, e.g.
 # `%.SRVPGM: private ACTGRP = $(SRVPGM_ACTGRP)` (A variable is used in the assignment
 # instead of a constant so that all settings are defined in one place, at the top.)
@@ -37,6 +37,7 @@ ACTGRP := E_PRODUCT
 AUT := *EXCLUDE
 BNDDIR :=
 COMMIT := *NONE
+CURLIB :=
 DBGVIEW := *ALL
 DETAIL := *EXTENDED
 DFTACTGRP := *NO
@@ -47,6 +48,7 @@ OPTION := *EVENTF
 PAGESIZE :=
 PGM :=
 PMTFILE :=
+PRDLIB :=
 RPGPPOPT :=
 RSTDSP :=
 SIZE :=
@@ -54,6 +56,7 @@ STGMDL := *SNGLVL
 SYSIFCOPT :=
 TERASPACE :=
 TEXT :=
+TYPE :=
 TGTRLS := V6R1M0
 VLDCKR :=
 
@@ -101,6 +104,12 @@ DSPF_RSTDSP := *YES
 
 LF_AUT := $(AUT)
 LF_OPTION := *EVENTF *SRC *LIST
+
+MNU_AUT := $(AUT)
+MNU_CURLIB := *NOCHG
+MNU_OPTION := *EVENTF *SRC
+MNU_PRDLIB := *NOCHG
+MNU_TYPE :=
 
 PF_AUT := $(AUT)
 PF_OPTION := *EVENTF *SRC *LIST
@@ -163,6 +172,7 @@ CRTCMODFLAGS = TERASPACE($(TERASPACE)) STGMDL($(STGMDL)) OUTPUT(*PRINT) OPTION($
                SYSIFCOPT($(SYSIFCOPT)) AUT($(AUT)) TGTRLS($(TGTRLS)) MAKEDEP('$(DEPDIR)/$*.Td')
 CRTDSPFFLAGS = ENHDSP(*YES) RSTDSP($(RSTDSP)) DFRWRT(*YES) AUT($(AUT)) OPTION($(OPTION)) TEXT($(TEXT))
 CRTLFFLAGS = AUT($(AUT)) OPTION($(OPTION))
+CRTMNUFLAGS = AUT($(AUT)) OPTION($(OPTION)) CURLIB($(CURLIB)) PRDLIB($(PRDLIB)) TYPE($(TYPE))
 CRTPFFLAGS = AUT($(AUT)) OPTION($(OPTION)) SIZE($(SIZE)) TEXT($(TEXT))
 CRTPGMFLAGS = ACTGRP($(ACTGRP)) USRPRF(*USER) TGTRLS($(TGTRLS)) AUT($(AUT)) DETAIL($(DETAIL)) OPTION($(OPTION)) STGMDL($(STGMDL))
 CRTPRTFFLAGS = AUT($(AUT)) OPTION($(OPTION)) PAGESIZE($(PAGESIZE))
@@ -357,7 +367,7 @@ VPATH := $(OBJPATH):$(SRCPATH)
 	@echo "\n\n***"
 	@echo "*** Creating command [$*]"
 	@echo "***"
-	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTCMD) stmf('$<') parms('$(CRTCMDFLAGS)'))
+	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTCMD) srcstmf('$<') parms('$(CRTCMDFLAGS)'))
 	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log 2>&1
 
 
@@ -372,7 +382,7 @@ VPATH := $(OBJPATH):$(SRCPATH)
 	@echo "\n\n***"
 	@echo "*** Creating DSPF [$*]"
 	@echo "***"
-	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTDSPF) stmf('$<') parms('$(CRTDSPFFLAGS)'))
+	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTDSPF) srcstmf('$<') parms('$(CRTDSPFFLAGS)'))
 	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log
 
 %.FILE: %.LF
@@ -380,7 +390,7 @@ VPATH := $(OBJPATH):$(SRCPATH)
 	@echo "*** Creating LF [$*]"
 	@echo "***"
 	@if [ -d $(OBJPATH)/$@ ]; then rm -r $(OBJPATH)/$@; fi
-	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTLF) stmf('$<') parms('$(CRTLFFLAGS)'))
+	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTLF) srcstmf('$<') parms('$(CRTLFFLAGS)'))
 	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log
 	@$(TYPEDEF)
 
@@ -389,7 +399,7 @@ VPATH := $(OBJPATH):$(SRCPATH)
 	@echo "*** Creating PF [$*]"
 	@echo "***"
 	@$(SDEPATH)/dltpfdeps -p $* $(OBJLIB)
-	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTPF) stmf('$<') parms('$(CRTPFFLAGS)'))
+	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTPF) srcstmf('$<') parms('$(CRTPFFLAGS)'))
 	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log
 	@$(TYPEDEF)
 
@@ -398,9 +408,22 @@ VPATH := $(OBJPATH):$(SRCPATH)
 	@echo "\n\n***"
 	@echo "*** Creating PRTF [$*]"
 	@echo "***"
-	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTPRTF) stmf('$<') parms('$(CRTPRTFFLAGS)'))
+	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTPRTF) srcstmf('$<') parms('$(CRTPRTFFLAGS)'))
 	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log
 	@$(TYPEDEF)
+
+
+%.MENU: private AUT = $(MNU_AUT)
+%.MENU: private OPTION = $(MNU_OPTION)
+%.MENU: private CURLIB = $(MNU_CURLIB)
+%.MENU: private PRDLIB = $(MNU_PRDLIB)
+%.MENU: private TYPE = $(MNU_TYPE)
+%.MENU: %.MENUSRC
+	@echo "\n\n***"
+	@echo "*** Creating menu [$*]"
+	@echo "***"
+	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTMNU) srcstmf('$<') parms('$(CRTMNUFLAGS)'))
+	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log 2>&1
 
 
 %.MODULE: private AUT = $(moduleAUT)
@@ -425,7 +448,7 @@ VPATH := $(OBJPATH):$(SRCPATH)
 	@echo "\n\n***"
 	@echo "*** Creating CL module [$*]"
 	@echo "***"
-	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTCLMOD) stmf('$<') parms('$(CRTCLMODFLAGS)'))
+	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTCLMOD) srcstmf('$<') parms('$(CRTCLMODFLAGS)'))
 	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log 2>&1
 
 %.MODULE: %.RPGLE
@@ -482,7 +505,7 @@ VPATH := $(OBJPATH):$(SRCPATH)
 	@echo "*** Creating service program [$*] from modules [$(basename $(filter %.MODULE,$(notdir $^)))] and service programs [$(basename $(filter %.SRVPGM,$(notdir $^$|)))]"
 	@echo "***"
 	$(eval externalsrvpgms := $(filter %.SRVPGM,$(subst .LIB,,$(subst /QSYS.LIB/,,$|))))
-	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTSRVPGM) stmf('$<') parms('MODULE($(basename $(filter %.MODULE,$(notdir $^)))) BNDSRVPGM($(basename $(filter %.SRVPGM,$(notdir $^)) $(externalsrvpgms))) $(CRTSRVPGMFLAGS)'))
+	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTSRVPGM) srcstmf('$<') parms('MODULE($(basename $(filter %.MODULE,$(notdir $^)))) BNDSRVPGM($(basename $(filter %.SRVPGM,$(notdir $^)) $(externalsrvpgms))) $(CRTSRVPGMFLAGS)'))
 	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$@.log 2>&1
 
 $(DEPDIR)/%.d: ;
