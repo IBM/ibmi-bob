@@ -111,6 +111,9 @@ MNU_OPTION := *EVENTF *SRC
 MNU_PRDLIB := *NOCHG
 MNU_TYPE :=
 
+PNLGRP_AUT := $(AUT)
+PNLGRP_OPTION := *EVENTF *SRC
+
 PF_AUT := $(AUT)
 PF_OPTION := *EVENTF *SRC *LIST
 PF_SIZE := *NOMAX
@@ -175,6 +178,7 @@ CRTLFFLAGS = AUT($(AUT)) OPTION($(OPTION))
 CRTMNUFLAGS = AUT($(AUT)) OPTION($(OPTION)) CURLIB($(CURLIB)) PRDLIB($(PRDLIB)) TYPE($(TYPE))
 CRTPFFLAGS = AUT($(AUT)) OPTION($(OPTION)) SIZE($(SIZE)) TEXT($(TEXT))
 CRTPGMFLAGS = ACTGRP($(ACTGRP)) USRPRF(*USER) TGTRLS($(TGTRLS)) AUT($(AUT)) DETAIL($(DETAIL)) OPTION($(OPTION)) STGMDL($(STGMDL))
+CRTPNLGRPFLAGS = AUT($(AUT)) OPTION($(OPTION))
 CRTPRTFFLAGS = AUT($(AUT)) OPTION($(OPTION)) PAGESIZE($(PAGESIZE))
 CRTRPGMODFLAGS = AUT($(AUT)) DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) OUTPUT(*PRINT) TGTRLS($(TGTRLS))
 CRTSQLCIFLAGS = COMMIT($(COMMIT)) OBJTYPE($(OBJTYPE)) OUTPUT(*PRINT) TGTRLS($(TGTRLS)) DBGVIEW($(DBGVIEW)) \
@@ -493,6 +497,16 @@ VPATH := $(OBJPATH):$(SRCPATH)
 	$(eval externalsrvpgms := $(filter %.SRVPGM,$(subst .LIB,,$(subst /QSYS.LIB/,,$|))))
 	$(eval crtcmd := crtpgm pgm($(OBJLIB)/$*) module($(basename $(filter %.MODULE,$(notdir $^)))) bndsrvpgm($(basename $(filter %.SRVPGM,$(notdir $^)) $(externalsrvpgms))) $(CRTPGMFLAGS))
 	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" >$(LOGPATH)/$@.log 2>&1
+
+
+%.PNLGRP: private AUT = $(PNLGRP_AUT)
+%.PNLGRP: private OPTION = $(PNLGRP_OPTION)
+%.PNLGRP: %.PNLGRPSRC
+	@echo "\n\n***"
+	@echo "*** Creating panel group [$*]"
+	@echo "***"
+	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTPNLGRP) srcstmf('$<') parms('$(CRTPNLGRPFLAGS)'))
+	@system -v "$(SDELIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log 2>&1
 
 
 %.SRVPGM: private ACTGRP = $(SRVPGM_ACTGRP)
