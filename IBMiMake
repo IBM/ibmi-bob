@@ -191,12 +191,11 @@ CRTSRVPGMFLAGS = ACTGRP($(ACTGRP)) TGTRLS($(TGTRLS)) AUT($(AUT)) DETAIL($(DETAIL
 ADHOCCRTFLAGS =
 
 # Miscellaneous variables
-INCLUDEMAKEFILES :=
-SRCPATH := /home/JBERMAN/Source/xp33make
+SRCPATH := $(MAKEFILEDIR)
 OBJPATH := $(CURDIR)
 override OBJPATH := $(shell echo "$(OBJPATH)" | tr '[:lower:]' '[:upper:]')
 OBJLIB := $(basename $(notdir $(OBJPATH)))
-SDEPATH := /home/jberman/Source/SDE
+SDEPATH := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 SDELIB := SDE
 runDate := $(shell date +"%F_%H.%M.%S-%a")
 LOGPATH := $(SRCPATH)/Logs/$(runDate)
@@ -553,7 +552,8 @@ test:
 	echo "DEPDIR:			$(DEPDIR)"; \
 	echo "OBJPATH:		$(OBJPATH)"; \
 	echo "OBJLIB:			$(OBJLIB)"; \
-	echo "INCLUDEMAKEFILES:	$(INCLUDEMAKEFILES)";
+	echo "SDEPATH:		$(SDEPATH)"; \
+	echo "MAKEFILEDIR:		$(MAKEFILEDIR)";
 
 ### Uncomment and add the following to the END of each project-specific makefile.
 # Include all auto-generated source dependency files. Since we don't have a list of source files,
