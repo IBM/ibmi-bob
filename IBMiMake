@@ -191,7 +191,7 @@ CRTSRVPGMFLAGS = ACTGRP($(ACTGRP)) TGTRLS($(TGTRLS)) AUT($(AUT)) DETAIL($(DETAIL
 ADHOCCRTFLAGS =
 
 # Miscellaneous variables
-SRCPATH := $(MAKEFILEDIR)
+SRCPATH := $(PROJECTDIR)
 OBJPATH := $(CURDIR)
 override OBJPATH := $(shell echo "$(OBJPATH)" | tr '[:lower:]' '[:upper:]')
 OBJLIB := $(basename $(notdir $(OBJPATH)))
