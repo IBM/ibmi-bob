@@ -441,7 +441,7 @@ VPATH := $(OBJPATH):$(SRCPATH)
 
 %.MODULE: %.C $(DEPDIR)/%.d
 	@echo "\n\n***"
-	@echo "*** Creating module [$*]"
+	@echo "*** Creating C module [$*]"
 	@echo "***"
 	$(eval crtcmd := crtcmod module($(OBJLIB)/$*) srcstmf('$<') $(CRTCMODFLAGS) $(ADHOCCRTFLAGS))
 	@system -v "$(TOOLSLIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" >$(LOGPATH)/$(notdir $<).log 2>&1 || (ret=$$?; rm $(DEPDIR)/$*.Td 2>/dev/null; exit $$ret)
