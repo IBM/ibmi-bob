@@ -219,7 +219,7 @@ endef
 # Commands to generate typedef structure for *FILE objects (for use by C code)
 define TYPEDEF_SCRIPT =
 if [ "$(suffix $<)" = '.PRTF' ]; then SLTFLD='*OUTPUT'; else SLTFLD='*BOTH *KEY'; fi; system -v "GENCSRC OBJ('$(OBJPATH)/$@') SRCSTMF('$<.TH') SLTFLD($$SLTFLD) TYPEDEFPFX('$(basename $@)')" > /dev/null
-(file=$(subst .,_,$(notdir $<))_H; echo "#ifndef $${file}"; echo "   #define $${file}"; $(ICONV) -f IBM-037 -t ISO8859-1 $<.TH | tr -d '\r'; echo "#endif  /* $${file} */") > $<.H
+(file=$(subst .,_,$(notdir $<))_H; echo "#ifndef $${file}"; echo "   #define $${file}"; $(ICONV) -f IBM-037 -t ISO8859-1 $<.TH | tr -d '\r' | sed -e '/^ *int/ s/;     /;/' -e '/^ *int/ s/int/long int/'; echo "#endif  /* $${file} */") > $<.H
 rm $<.TH
 echo "*** Created typedef file $<.H for file [$*]"
 endef
@@ -553,7 +553,7 @@ test:
 	echo "OBJPATH:		$(OBJPATH)"; \
 	echo "OBJLIB:			$(OBJLIB)"; \
 	echo "TOOLSPATH:		$(TOOLSPATH)"; \
-	echo "MAKEFILEDIR:		$(MAKEFILEDIR)";
+	echo "PROJECTDIR:		$(PROJECTDIR)";
 
 ### Uncomment and add the following to the END of each project-specific makefile.
 # Include all auto-generated source dependency files. Since we don't have a list of source files,
