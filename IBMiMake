@@ -224,7 +224,7 @@ if [ "$(suffix $<)" = '.PRTF' ]; then SLTFLD='*OUTPUT'; else SLTFLD='*BOTH *KEY'
 rm $<.TH
 if [ -f "$<.H" ]; then sed -e '/^\/\//d' $<.H >$<.H-old; fi
 sed -e '/^\/\//d' $<.H1 >$<.H-new
-if ! diff -q $<.H-new $<.H-old >/dev/null 2>&1; then mv -f $<.H1 $<.H; echo "*** Created new typedef file $<.H for file [$*]"; fi
+if ! cmp $<.H-new $<.H-old >/dev/null 2>&1; then mv -f $<.H1 $<.H; echo "*** Created new typedef file $<.H for file [$*]"; fi
 if [ -f "$<.H-old" ]; then rm "$<.H-old"; fi
 if [ -f "$<.H-new" ]; then rm "$<.H-new"; fi
 if [ -f "$<.H1" ]; then rm "$<.H1"; fi
