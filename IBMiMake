@@ -530,6 +530,22 @@ VPATH := $(OBJPATH):$(SRCPATH)
 $(DEPDIR)/%.d: ;
 .PRECIOUS: $(DEPDIR)/%.d
 
+# The *.rebuild file is used as a way of controlling the rebuild of items whose
+# rebuild scripts are external to Make.
+# Example: 
+#    THIRDPARTY.SRVPGM: $(DEPDIR)/THIRDPARTY.SRVPGM.rebuild
+#        build_thirdparty.sh
+#    MYPGM.PGM: MYPGM.MODULE THIRDPARTY.SRVPGM
+# 'THIRDPARTY.SRVPGM' is built outside of our Makefile, so Make has no way of knowing
+# when its source code has changed and it should be recompiled.  If we
+# executed the recipe every time, it would cause all items dependent on it to
+# also be rebuilt.  By making the 3rd-party item dependent on this dummy .rebuild
+# file, we can cause its recipe to normally not run, and we can force its recipe
+# to run by manually `touch`ing its .rebuild file.
+# The following rule causes the initial .rebuild file to be automatically created.
+$(DEPDIR)/%.rebuild:
+	@touch $@
+
 #.PHONY: make_pre
 #make_pre:
 #	mkdir -p $(LOGPATH)
