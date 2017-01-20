@@ -184,7 +184,7 @@ CRTRPGMODFLAGS = AUT($(AUT)) DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) OUTPUT(*PRINT
 CRTSQLCIFLAGS = COMMIT($(COMMIT)) OBJTYPE($(OBJTYPE)) OUTPUT(*PRINT) TGTRLS($(TGTRLS)) DBGVIEW($(DBGVIEW)) \
 				COMPILEOPT('INCDIR(''$(SRCPATH)'') OPTION($(OPTION)) STGMDL($(STGMDL)) SYSIFCOPT($(SYSIFCOPT)) \
 							TERASPACE($(TERASPACE)) MAKEDEP(''$(DEPDIR)/$*.Td'')')
-CRTSQLRPGIFLAGS = COMMIT($(COMMIT)) OBJTYPE($(OBJTYPE)) OUTPUT(*PRINT) TGTRLS($(TGTRLS)) DBGVIEW($(DBGVIEW)) RPGPPOPT($(RPGPPOPT))
+CRTSQLRPGIFLAGS = COMMIT($(COMMIT)) OBJTYPE($(OBJTYPE)) OPTION($(OPTION)) OUTPUT(*PRINT) TGTRLS($(TGTRLS)) DBGVIEW($(DBGVIEW)) RPGPPOPT($(RPGPPOPT))
 CRTSRVPGMFLAGS = ACTGRP($(ACTGRP)) TGTRLS($(TGTRLS)) AUT($(AUT)) DETAIL($(DETAIL)) STGMDL($(STGMDL))
 
 # Extra command string for adhoc addition of extra parameters to a creation command.
@@ -214,6 +214,36 @@ $(ICONV) -f IBM-037 -t ISO8859-1 $(DEPDIR)/$*.Td | tr -d '\r' > $(DEPDIR)/$*.T2d
 $(cleanCDeps) <$(DEPDIR)/$*.T2d | sort -u >$(DEPDIR)/$*.d
 touch -cr $(OBJPATH)/$@ $(DEPDIR)/$*.d
 rm $(DEPDIR)/$*.Td $(DEPDIR)/$*.T2d
+$(removeEmptyDep)
+endef
+
+# cleanRPGDeps removes from the CRTRPGMOD- and CRTSQLRPGI-generated events file any system header files
+# plus the original source file that is included for some reason, and returns what's left.
+cleanRPGDeps = awk '$$1 == "FILEID" && $$6 !~ /^QTEMP/ && toupper($$6) !~ /QSYS/ && $$6 !~ /EVFTEMPF0[12]/ && $$6 !~ /$(notdir $<)$$/ && $$6 !~ /$(basename $(notdir $<)).MBR$$/ { print toupper($$6) }'
+
+# This defines the steps taken after an RPG compile to scrape dependencies from the EVFEVENT file and turn them
+# into a useable form.
+# See http://make.mad-scientist.net/papers/advanced-auto-dependency-generation/#tldr
+# In a nutshell, retrieve the flattened list of include files from the EVFEVENT file, then for each one discover
+# if any externally-described files are declared.  If so, isolate the actual source file name from its path,
+# convert everything to upper case, format in makefile dependency format, and output all these dependencies
+# to a file that will be included by Make.
+define POSTRPGCOMPILE =
+system "CPYTOSTMF FROMMBR('$(OBJPATH)/EVFEVENT.FILE/$*.MBR') TOSTMF('$(DEPDIR)/$*.Td') STMFCCSID(*STDASCII) ENDLINFMT(*LF) CVTDTA(*AUTO) STMFOPT(*REPLACE)" >/dev/null
+{ for f in $$($(cleanRPGDeps) <$(DEPDIR)/$*.Td | sort -u); do \
+    echo "$${f}"; \
+    sed -n -r -e '/^.{6}[^*].{14}[^Ff]/ s/^.{5}[Ff]([^ ]{,10}).*(DISK|WORKSTN|PRINTER).*/  \1\.FILE/I p' -e '/^.{6}[^*]/ s/^.{5}[Dd].*EXTNAME\(([^ \)]*).*/  \1\.FILE/I p' "$${f}"; \
+  done; } | sed -e 's/^\/.*\///' -e 's/^/$@: /' | tr '[:lower:]' '[:upper:]' >$(DEPDIR)/$*.d
+touch -cr $(OBJPATH)/$@ $(DEPDIR)/$*.d
+rm $(DEPDIR)/$*.Td
+$(removeEmptyDep)
+endef
+
+# Deletes .d dependency file if it's empty.
+define removeEmptyDep =
+if [ ! -s $(DEPDIR)/$*.d ]; then \
+  rm $(DEPDIR)/$*.d; \
+fi
 endef
 
 # Commands to generate typedef structure for *FILE objects (for use by C code)
@@ -466,6 +496,7 @@ VPATH := $(OBJPATH):$(SRCPATH)
 	@echo "***"
 	$(eval crtcmd := crtrpgmod module($(OBJLIB)/$*) srcstmf('$<') $(CRTRPGMODFLAGS))
 	@system -v "$(TOOLSLIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log
+	@$(POSTRPGCOMPILE)
 
 %.MODULE: %.SQLC
 	@echo "\n\n***"
@@ -481,6 +512,7 @@ VPATH := $(OBJPATH):$(SRCPATH)
 	@echo "***"
 	$(eval crtcmd := crtsqlrpgi obj($(OBJLIB)/$*) srcstmf('$<') $(CRTSQLRPGIFLAGS))
 	@system -v "$(TOOLSLIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" >$(LOGPATH)/$(notdir $<).log 2>&1
+	@$(POSTRPGCOMPILE)
 
 
 %.PGM: private ACTGRP = $(programACTGRP)
@@ -519,7 +551,7 @@ VPATH := $(OBJPATH):$(SRCPATH)
 %.SRVPGM: private DETAIL = $(SRVPGM_DETAIL)
 %.SRVPGM: private STGMDL = $(SRVPGM_STGMDL)
 %.SRVPGM: private TGTRLS = $(SRVPGM_TGTRLS)
-%.SRVPGM: $^
+%.SRVPGM:
 	@echo "\n\n***"
 	@echo "*** Creating service program [$*] from modules [$(basename $(filter %.MODULE,$(notdir $^)))] and service programs [$(basename $(filter %.SRVPGM,$(notdir $^$|)))]"
 	@echo "***"
@@ -574,6 +606,7 @@ test:
 	echo "DEPDIR:			$(DEPDIR)"; \
 	echo "OBJPATH:		$(OBJPATH)"; \
 	echo "OBJLIB:			$(OBJLIB)"; \
+	echo "CRTFRMSTFMLIB:		$(CRTFRMSTMFLIB)"; \
 	echo "TOOLSPATH:		$(TOOLSPATH)"; \
 	echo "PROJECTDIR:		$(PROJECTDIR)";
 
