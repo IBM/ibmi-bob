@@ -129,6 +129,8 @@ PRTF_AUT := $(AUT)
 PRTF_OPTION := *EVENTF *SRC *LIST
 PRTF_PAGESIZE := 66 132
 
+QMQRY_AUT := $(AUT)
+
 RPGMOD_AUT := $(AUT)
 RPGMOD_DBGVIEW := $(DBGVIEW)
 RPGMOD_OPTION := $(OPTION)
@@ -166,6 +168,8 @@ SRVPGM_DETAIL := *BASIC
 SRVPGM_STGMDL := $(STGMDL)
 SRVPGM_TGTRLS := $(TGTRLS)
 
+WSCST_AUT := $(AUT)
+
 # Creation command parameters with variables (the ones listed at the top) for the most common ones.
 CRTBNDCLFLAGS = AUT($(AUT)) DBGVIEW($(DBGVIEW)) TGTRLS($(TGTRLS)) DFTACTGRP($(DFTACTGRP)) ACTGRP($(derive_ACTGRP)) OPTION($(OPTION))
 CRTBNDRPGFLAGS = AUT($(AUT)) DBGVIEW($(DBGVIEW)) TGTRLS($(TGTRLS)) DFTACTGRP($(DFTACTGRP)) ACTGRP($(derive_ACTGRP)) OPTION($(OPTION))
@@ -181,11 +185,13 @@ CRTPGMFLAGS = ACTGRP($(ACTGRP)) USRPRF(*USER) TGTRLS($(TGTRLS)) AUT($(AUT)) DETA
 CRTPNLGRPFLAGS = AUT($(AUT)) OPTION($(OPTION))
 CRTPRTFFLAGS = AUT($(AUT)) OPTION($(OPTION)) PAGESIZE($(PAGESIZE))
 CRTRPGMODFLAGS = AUT($(AUT)) DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) OUTPUT(*PRINT) TGTRLS($(TGTRLS))
+CRTQMQRYFLAGS = AUT($(AUT))
 CRTSQLCIFLAGS = COMMIT($(COMMIT)) OBJTYPE($(OBJTYPE)) OUTPUT(*PRINT) TGTRLS($(TGTRLS)) DBGVIEW($(DBGVIEW)) \
 				COMPILEOPT('INCDIR(''$(SRCPATH)'') OPTION($(OPTION)) STGMDL($(STGMDL)) SYSIFCOPT($(SYSIFCOPT)) \
 							TERASPACE($(TERASPACE)) MAKEDEP(''$(DEPDIR)/$*.Td'')')
 CRTSQLRPGIFLAGS = COMMIT($(COMMIT)) OBJTYPE($(OBJTYPE)) OPTION($(OPTION)) OUTPUT(*PRINT) TGTRLS($(TGTRLS)) DBGVIEW($(DBGVIEW)) RPGPPOPT($(RPGPPOPT))
 CRTSRVPGMFLAGS = ACTGRP($(ACTGRP)) TGTRLS($(TGTRLS)) AUT($(AUT)) DETAIL($(DETAIL)) STGMDL($(STGMDL))
+CRTWSCSTFLAGS = AUT($(AUT))
 
 # Extra command string for adhoc addition of extra parameters to a creation command.
 ADHOCCRTFLAGS =
@@ -546,6 +552,15 @@ VPATH := $(OBJPATH):$(SRCPATH)
 	@system -v "$(TOOLSLIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log 2>&1
 
 
+%.QMQRY: private AUT = $(QMQRY_AUT)
+%.QMQRY: %.SQL
+	@echo "\n\n***"
+	@echo "*** Creating QM query [$*]"
+	@echo "***"
+	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTQMQRY) srcstmf('$<') parms('$(CRTQMQRYFLAGS)'))
+	@system -v "$(TOOLSLIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log 2>&1
+
+
 %.SRVPGM: private ACTGRP = $(SRVPGM_ACTGRP)
 %.SRVPGM: private AUT = $(SRVPGM_AUT)
 %.SRVPGM: private DETAIL = $(SRVPGM_DETAIL)
@@ -558,6 +573,15 @@ VPATH := $(OBJPATH):$(SRCPATH)
 	$(eval externalsrvpgms := $(filter %.SRVPGM,$(subst .LIB,,$(subst /QSYS.LIB/,,$|))))
 	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTSRVPGM) srcstmf('$<') parms('MODULE($(basename $(filter %.MODULE,$(notdir $^)))) BNDSRVPGM($(basename $(filter %.SRVPGM,$(notdir $^)) $(externalsrvpgms))) $(CRTSRVPGMFLAGS)'))
 	@system -v "$(TOOLSLIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$@.log 2>&1
+
+
+%.WSCST: private AUT = $(WSCST_AUT)
+%.WSCST: %.SQL
+	@echo "\n\n***"
+	@echo "*** Creating work station customizing object [$*]"
+	@echo "***"
+	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTWSCST) srcstmf('$<') parms('$(CRTWSCSTFLAGS)'))
+	@system -v "$(TOOLSLIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log 2>&1
 
 $(DEPDIR)/%.d: ;
 .PRECIOUS: $(DEPDIR)/%.d
