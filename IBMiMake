@@ -1,7 +1,7 @@
 #
-# This is a generic Makefile to build IBM i objects in XP303MAKE from source in an IFS directory.
+# This is a generic Makefile to build IBM i objects from source code located in an IFS directory.
 # It should be included near the top of a project-specific makefile via the `include` directive, e.g.
-#    IBMIMAKE := /Source/SDE/IBMiMake
+#    IBMIMAKE := /Source/ibm-i-make/IBMiMake
 #    include $(IBMIMAKE)
 #
 # Note: When using the IFS, path case sensitivity needs to match the actual item
@@ -576,7 +576,7 @@ VPATH := $(OBJPATH):$(SRCPATH)
 
 
 %.WSCST: private AUT = $(WSCST_AUT)
-%.WSCST: %.SQL
+%.WSCST: %.WSCSTSRC
 	@echo "\n\n***"
 	@echo "*** Creating work station customizing object [$*]"
 	@echo "***"
