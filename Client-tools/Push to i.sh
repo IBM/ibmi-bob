@@ -2,12 +2,12 @@
 
 # Push files to the build directory
 
-thisDir="${0%/*}"
-srcDir="${thisDir}/../../express-xp/"
-tgtDir="/Build/XP/jeff2"
-system=S814JAZZ
-user=JBERMAN
+localScriptDir="${0%/*}"
+privateKeyDir="/cygdrive/c/Users/$(whoami)/.ssh"  # Change this if not using Cygwin. It should point to user's .ssh directory
 
-echo "Source directory: ${srcDir}"
-echo "Target directory: ${system}:${tgtDir}"
-rsync -avzh --dry-run --exclude .git  --exclude removed "${srcDir}" ${user}@${system}:"${tgtDir}"
+# Load in settings specific to this user.
+. ${localScriptDir}/../../my_build_settings.sh
+
+echo "Source directory: $(realpath ${localSourceDir})"
+echo "Target directory: ${system}:${remoteSourceDir}"
+rsync -avzh --dry-run --exclude .git  --exclude removed -e "ssh -i ${privateKeyDir}/id_rsa" "${localSourceDir}" ${user}@${system}:"${remoteSourceDir}"

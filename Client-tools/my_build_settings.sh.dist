@@ -1,0 +1,9 @@
+#!/bin/bash
+#
+# The template file should be copied to the root source code directory, outside of any project, and then populated with valid values.
+
+localSourceDir="${localScriptDir}/../../express-xp/"	# Directory on local PC to push to i. Should terminate with a slash.
+remoteSourceDir="/Build/XP/jeff2"						# Build directory on IBM i. The target of the code push; the source code that is compiled.
+buildLib="XPJEFF2"										# Library to receive compiled objects
+system=S814JAZZ											# Name of the IBM i
+user=JBERMAN											# User profile on IBM i
