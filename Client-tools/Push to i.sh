@@ -10,4 +10,4 @@ privateKeyDir="/cygdrive/c/Users/$(whoami)/.ssh"  # Change this if not using Cyg
 
 echo "Source directory: $(realpath ${localSourceDir})"
 echo "Target directory: ${system}:${remoteSourceDir}"
-rsync -avzh --dry-run --exclude .git  --exclude removed -e "ssh -i ${privateKeyDir}/id_rsa" "${localSourceDir}" ${user}@${system}:"${remoteSourceDir}"
+rsync -avzh --exclude .git --exclude .deps --exclude removed --exclude Logs --exclude temp --delete -e "ssh -i ${privateKeyDir}/id_rsa" "${localSourceDir}" ${user}@${system}:"${remoteSourceDir}"

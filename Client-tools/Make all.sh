@@ -2,7 +2,7 @@
 
 # Kick off a `make all` on the build directory to the target library.
 
-thisDir="${0%/*}"
+localScriptDir="${0%/*}"
 privateKeyDir="/cygdrive/c/Users/$(whoami)/.ssh"  # Change this if not using Cygwin. It should point to user's .ssh directory
 
 # Load in settings specific to this user.
