@@ -4,7 +4,7 @@
 <listAttribute key="org.eclipse.debug.ui.favoriteGroups">
 <listEntry value="org.eclipse.ui.externaltools.launchGroup"/>
 </listAttribute>
-<stringAttribute key="org.eclipse.ui.externaltools.ATTR_LOCATION" value="${ibmimake_bash_location}"/>
-<stringAttribute key="org.eclipse.ui.externaltools.ATTR_TOOL_ARGUMENTS" value="-l -c &quot;./Make\ all.sh ${ibmimake_build_settings_location}&quot;"/>
-<stringAttribute key="org.eclipse.ui.externaltools.ATTR_WORKING_DIRECTORY" value="${ibmimake_client_tools_location}"/>
+<stringAttribute key="org.eclipse.ui.externaltools.ATTR_LOCATION" value="${ibmimake_bash}"/>
+<stringAttribute key="org.eclipse.ui.externaltools.ATTR_TOOL_ARGUMENTS" value="-l -c &quot;./Make\ all.sh ${ibmimake_build_settings}&quot;"/>
+<stringAttribute key="org.eclipse.ui.externaltools.ATTR_WORKING_DIRECTORY" value="${ibmimake_client_tools}"/>
 </launchConfiguration>
