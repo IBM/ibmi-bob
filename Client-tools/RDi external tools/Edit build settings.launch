@@ -3,5 +3,5 @@
 <listEntry value="org.eclipse.ui.externaltools.launchGroup"/>
 </listAttribute>
 <stringAttribute key="org.eclipse.ui.externaltools.ATTR_LOCATION" value="${ibmimake_bash}"/>
-<stringAttribute key="org.eclipse.ui.externaltools.ATTR_TOOL_ARGUMENTS" value="-l -c &quot;cd '${ibmimake_client_tools}' &amp;&amp; ./Push\ to\ i.sh ${ibmimake_build_settings}&quot;"/>
+<stringAttribute key="org.eclipse.ui.externaltools.ATTR_TOOL_ARGUMENTS" value="-l -c &quot;cd '${ibmimake_client_tools}' &amp;&amp; ./Edit\ build\ settings.sh ${ibmimake_build_settings}&quot;"/>
 </launchConfiguration>

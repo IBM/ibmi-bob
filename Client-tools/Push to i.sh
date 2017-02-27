@@ -10,7 +10,6 @@ function realpath {
     echo "${p}"
 }
 
-
 argError=0
 localScriptDir="${0%/*}"
 
@@ -27,7 +26,16 @@ if (( argError )); then
     exit ${argError}
 fi
 
+# If using Windows, generate Windows-friendly path name for display purposes.
+if [[ "$(uname -s)" == CYGWIN* ]]; then
+    localSourceDirDisplay=$(cygpath -wa "${localSourceDir}")
+else
+    localSourceDirDisplay=$(realpath "${localSourceDir}")
+fi
+
 # Push code to i
-echo "Source directory: $(realpath ${localSourceDir})"
+echo "*** Pushing source code to IBM i ***"
+echo "Source directory: ${localSourceDirDisplay}"
 echo "Target directory: ${system}:${remoteSourceDir}"
 rsync -avzh --exclude .git --exclude .deps --exclude removed --exclude Logs --exclude temp --exclude .project --delete -e "ssh -i ${privateKey}" "${localSourceDir}" ${user}@${system}:"${remoteSourceDir}"
+echo "*** End of source code push ***"
