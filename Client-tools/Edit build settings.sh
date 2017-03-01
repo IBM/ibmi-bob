@@ -42,8 +42,13 @@ settingsHash=$(openssl sha1 "${buildSettings}")
 # Since we're likely called in the background from an editor, open the settings file in a new window (this part is OS-specific)
 case "$(uname -s)" in
     Darwin)
-        osascript -e 'tell application \"Terminal\" to do script \"nano  ${buildSettings}; exit\"'
-        osascript -e 'tell application "System Events" to set frontmost of process "Terminal" to true'
+        echo "Launching Build Settings editor.  Please set values to fit your environment, then press control-x, 'y', Enter to save and exit."
+        sed -e "s|^buildSettings=.*|buildSettings=${buildSettings}|" "Launch Nano.sh" >"/tmp/Launch Nano.sh"
+        chmod +x "/tmp/Launch Nano.sh"
+        open -a Terminal.app "/tmp/Launch Nano.sh"
+        while [[ -f "/tmp/Launch Nano.sh" ]]; do
+            sleep .1
+        done
         ;;
     
     CYGWIN*)
@@ -57,6 +62,7 @@ esac
 
 # Note if settings actually changed.
 newSettingsHash=$(openssl sha1 "${buildSettings}")
+echo
 if [[ "${settingsHash}" != "${newSettingsHash}" ]]; then
     echo "New settings detected!"
 else
