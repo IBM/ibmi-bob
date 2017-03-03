@@ -204,6 +204,7 @@ TOOLSLIB := MAKETOOLS
 runDate := $(shell date +"%F_%H.%M.%S-%a")
 LOGPATH := $(SRCPATH)/Logs/$(runDate)
 $(shell mkdir -p $(LOGPATH))
+$(info IBMiMake log directory: $(LOGPATH))
 DEPDIR := $(SRCPATH)/.deps
 $(shell mkdir -p $(DEPDIR) >/dev/null)
 
@@ -407,9 +408,7 @@ VPATH := $(OBJPATH):$(SRCPATH)
 %.CMD: private PMTFILE = $(CMD_PMTFILE)
 %.CMD: private VLDCKR = $(CMD_VLDCKR)
 %.CMD: %.CMDSRC
-	@echo "\n\n***"
 	@echo "*** Creating command [$*]"
-	@echo "***"
 	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTCMD) srcstmf('$<') parms('$(CRTCMDFLAGS)'))
 	@system -v "$(TOOLSLIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log 2>&1
 
@@ -422,25 +421,19 @@ VPATH := $(OBJPATH):$(SRCPATH)
 %.FILE: private TYPEDEF = $(if $(filter YES,$(CREATE_TYPEDEF)),$(TYPEDEF_SCRIPT),)
 
 %.FILE: %.DSPF
-	@echo "\n\n***"
 	@echo "*** Creating DSPF [$*]"
-	@echo "***"
 	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTDSPF) srcstmf('$<') parms('$(CRTDSPFFLAGS)'))
 	@system -v "$(TOOLSLIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log
 
 %.FILE: %.LF
-	@echo "\n\n***"
 	@echo "*** Creating LF [$*]"
-	@echo "***"
 	@if [ -d $(OBJPATH)/$@ ]; then rm -r $(OBJPATH)/$@; fi
 	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTLF) srcstmf('$<') parms('$(CRTLFFLAGS)'))
 	@system -v "$(TOOLSLIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log
 	@$(TYPEDEF)
 
 %.FILE: %.PF
-	@echo "\n\n***"
 	@echo "*** Creating PF [$*]"
-	@echo "***"
 	@$(TOOLSPATH)/dltpfdeps -p $* $(OBJLIB)
 	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTPF) srcstmf('$<') parms('$(CRTPFFLAGS)'))
 	@system -v "$(TOOLSLIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log
@@ -448,9 +441,7 @@ VPATH := $(OBJPATH):$(SRCPATH)
 
 
 %.FILE: %.PRTF
-	@echo "\n\n***"
 	@echo "*** Creating PRTF [$*]"
-	@echo "***"
 	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTPRTF) srcstmf('$<') parms('$(CRTPRTFFLAGS)'))
 	@system -v "$(TOOLSLIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log
 	@$(TYPEDEF)
@@ -462,9 +453,7 @@ VPATH := $(OBJPATH):$(SRCPATH)
 %.MENU: private PRDLIB = $(MNU_PRDLIB)
 %.MENU: private TYPE = $(MNU_TYPE)
 %.MENU: %.MENUSRC
-	@echo "\n\n***"
 	@echo "*** Creating menu [$*]"
-	@echo "***"
 	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTMNU) srcstmf('$<') parms('$(CRTMNUFLAGS)'))
 	@system -v "$(TOOLSLIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log 2>&1
 
@@ -480,40 +469,30 @@ VPATH := $(OBJPATH):$(SRCPATH)
 %.MODULE: private TGTRLS = $(moduleTGTRLS)
 
 %.MODULE: %.C $(DEPDIR)/%.d
-	@echo "\n\n***"
 	@echo "*** Creating C module [$*]"
-	@echo "***"
 	$(eval crtcmd := crtcmod module($(OBJLIB)/$*) srcstmf('$<') $(CRTCMODFLAGS) $(ADHOCCRTFLAGS))
 	@system -v "$(TOOLSLIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" >$(LOGPATH)/$(notdir $<).log 2>&1 || (ret=$$?; rm $(DEPDIR)/$*.Td 2>/dev/null; exit $$ret)
 	@$(POSTCCOMPILE)
 
 %.MODULE: %.CLLE
-	@echo "\n\n***"
 	@echo "*** Creating CL module [$*]"
-	@echo "***"
 	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTCLMOD) srcstmf('$<') parms('$(CRTCLMODFLAGS)'))
 	@system -v "$(TOOLSLIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log 2>&1
 
 %.MODULE: %.RPGLE
-	@echo "\n\n***"
 	@echo "*** Creating RPG module [$*]"
-	@echo "***"
 	$(eval crtcmd := crtrpgmod module($(OBJLIB)/$*) srcstmf('$<') $(CRTRPGMODFLAGS))
 	@system -v "$(TOOLSLIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log
 	@$(POSTRPGCOMPILE)
 
 %.MODULE: %.SQLC
-	@echo "\n\n***"
 	@echo "*** Creating SQLC module [$*]"
-	@echo "***"
 	$(eval crtcmd := crtsqlci obj($(OBJLIB)/$*) srcstmf('$<') $(CRTSQLCIFLAGS))
 	@system -v "$(TOOLSLIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" >$(LOGPATH)/$(notdir $<).log 2>&1 || (ret=$$?; rm $(DEPDIR)/$*.Td 2>/dev/null; exit $$ret)
 	@$(POSTCCOMPILE)
 
 %.MODULE: %.SQLRPGLE
-	@echo "\n\n***"
 	@echo "*** Creating SQLRPGLE module [$*]"
-	@echo "***"
 	$(eval crtcmd := crtsqlrpgi obj($(OBJLIB)/$*) srcstmf('$<') $(CRTSQLRPGIFLAGS))
 	@system -v "$(TOOLSLIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" >$(LOGPATH)/$(notdir $<).log 2>&1
 	@$(POSTRPGCOMPILE)
@@ -532,9 +511,7 @@ VPATH := $(OBJPATH):$(SRCPATH)
 %.PGM: private TGTRLS = $(programTGTRLS)
 
 %.PGM:
-	@echo "\n\n***"
 	@echo "*** Creating program [$*] from modules [$(basename $(filter %.MODULE,$(notdir $^)))] and service programs [$(basename $(filter %.SRVPGM,$(notdir $^$|)))]"
-	@echo "***"
 	$(eval externalsrvpgms := $(filter %.SRVPGM,$(subst .LIB,,$(subst /QSYS.LIB/,,$|))))
 	$(eval crtcmd := crtpgm pgm($(OBJLIB)/$*) module($(basename $(filter %.MODULE,$(notdir $^)))) bndsrvpgm($(basename $(filter %.SRVPGM,$(notdir $^)) $(externalsrvpgms))) $(CRTPGMFLAGS))
 	@system -v "$(TOOLSLIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" >$(LOGPATH)/$@.log 2>&1
@@ -543,18 +520,14 @@ VPATH := $(OBJPATH):$(SRCPATH)
 %.PNLGRP: private AUT = $(PNLGRP_AUT)
 %.PNLGRP: private OPTION = $(PNLGRP_OPTION)
 %.PNLGRP: %.PNLGRPSRC
-	@echo "\n\n***"
 	@echo "*** Creating panel group [$*]"
-	@echo "***"
 	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTPNLGRP) srcstmf('$<') parms('$(CRTPNLGRPFLAGS)'))
 	@system -v "$(TOOLSLIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log 2>&1
 
 
 %.QMQRY: private AUT = $(QMQRY_AUT)
 %.QMQRY: %.SQL
-	@echo "\n\n***"
 	@echo "*** Creating QM query [$*]"
-	@echo "***"
 	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTQMQRY) srcstmf('$<') parms('$(CRTQMQRYFLAGS)'))
 	@system -v "$(TOOLSLIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log 2>&1
 
@@ -565,9 +538,7 @@ VPATH := $(OBJPATH):$(SRCPATH)
 %.SRVPGM: private STGMDL = $(SRVPGM_STGMDL)
 %.SRVPGM: private TGTRLS = $(SRVPGM_TGTRLS)
 %.SRVPGM:
-	@echo "\n\n***"
 	@echo "*** Creating service program [$*] from modules [$(basename $(filter %.MODULE,$(notdir $^)))] and service programs [$(basename $(filter %.SRVPGM,$(notdir $^$|)))]"
-	@echo "***"
 	$(eval externalsrvpgms := $(filter %.SRVPGM,$(subst .LIB,,$(subst /QSYS.LIB/,,$|))))
 	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTSRVPGM) srcstmf('$<') parms('MODULE($(basename $(filter %.MODULE,$(notdir $^)))) BNDSRVPGM($(basename $(filter %.SRVPGM,$(notdir $^)) $(externalsrvpgms))) $(CRTSRVPGMFLAGS)'))
 	@system -v "$(TOOLSLIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$@.log 2>&1
@@ -575,9 +546,7 @@ VPATH := $(OBJPATH):$(SRCPATH)
 
 %.WSCST: private AUT = $(WSCST_AUT)
 %.WSCST: %.WSCSTSRC
-	@echo "\n\n***"
 	@echo "*** Creating work station customizing object [$*]"
-	@echo "***"
 	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTWSCST) srcstmf('$<') parms('$(CRTWSCSTFLAGS)'))
 	@system -v "$(TOOLSLIB)/EXECWTHLIB LIB($(OBJLIB)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log 2>&1
 

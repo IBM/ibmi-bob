@@ -37,7 +37,7 @@ fi
 echo "*** Building code on IBM i ***"
 echo "Source code directory: ${system}:${remoteSourceDir}"
 echo "Target build library: ${buildLib}"
-ssh -i ${privateKey} ${user}@${system} ". /QOpenSys/etc/profile && make all OBJPATH:=/QSYS.LIB/${buildLib}.LIB -f ${remoteSourceDir}/xpmake"
+ssh -i ${privateKey} ${user}@${system} ". /QOpenSys/etc/profile && /Build/ibm-i-make/makelog all OBJPATH:=/QSYS.LIB/${buildLib}.LIB -f ${remoteSourceDir}/${makefile}"
 
 # Update our local Logs directory with the new stuff from the i.
 echo
