@@ -1,7 +1,5 @@
-#!/bin/bash
 #
 # ibm-i-make client tools build settings.  Set these values to fit your environment.
-# The template file should be duplicated, renamed to remove the '.dist', and then populated with valid values.
 
 # Name of the IBM i
 system=S814JAZZ
@@ -17,6 +15,9 @@ remoteSourceDir="/Build/XP/jeff2"
 
 # Library to receive compiled objects
 buildLib="XPJEFF2"
+
+# Makefile to build with
+makefile="xpmake"
 
 # User's private key file (used to ssh into IBM i without requiring a password)
 privateKey="~/s4i/.ssh/id_rsa"

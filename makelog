@@ -1,0 +1,35 @@
+#!/bin/sh
+
+#
+# Wrapper around `make` command so its output can be captured and logged into
+# a log directory.  The directory name is gleaned by scraping the output of IBMiMake.
+#
+# A named pipe is created, and a reader process (`tee`) is started in the background.  Make's
+# output is redirected to the pipe, where the reader writes it to both stdout and a log file.
+# The complexity is needed because merely using `tee` loses Make's exit code.  An alternate
+# solution, redirecting Make's output to a file and later sending it to stdout, preserves the
+# exit code but then nothing would be displayed until Make had ended.
+#
+
+# Create a named pipe that stdout and stderr will be funneled through, and start a tee reader process.
+pid=$$
+pipe="/tmp/pipe$pid"
+log="/tmp/makelog${pid}.log"
+mkfifo "$pipe"
+tee "$log" < "$pipe" &
+
+# Call make with the arguments that were passed in, redirect stdout and stderr to the pipe.
+make $@ > "$pipe" 2>&1
+exit=$?
+
+# Determine the logging directory used by Make and move the logfile there.
+# The directory is written to stdout by the IBMiMake makefile.
+makeLogDir=$(sed -n -e 's/^IBMiMake log directory: \(.*\)$/\1/p' "$log")
+if [ -d "$makeLogDir" ] && [ -f "$log" ]; then
+    echo "Make: Invoked with command > make $@ <" > "${makeLogDir}/IBMiMake.log"
+    echo >> "${makeLogDir}/IBMiMake.log"
+    sed -e '/^IBMiMake log directory:.*\/Logs\//d' "$log" >> "${makeLogDir}/IBMiMake.log"
+fi
+
+rm "$pipe"
+exit $exit
