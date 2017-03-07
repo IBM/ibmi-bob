@@ -2,10 +2,11 @@
 
 #
 # Determine platform and then open build settings file appropriately.
+# The path to the build settings file in the project folder is passed in as an argument.
 #
 
 function realpath {
-    local p="$(cd $1 && echo $PWD)"
+    local p=$(cd "$1" && echo "$PWD")
     
     echo "${p}"
 }
@@ -13,11 +14,18 @@ function realpath {
 argError=0
 localScriptDir="${0%/*}"
 
-# Verify that path to settings file was passed in.
+# Verify that path to settings file was passed in and is valid.
 if (( $# != 0 )); then
     buildSettings="$1"
+    buildSettingsDir=$(dirname "$1")
+    buildSettingsFile=$(basename "$1")
 else
     echo 'No build settings file was passed in. Exiting script.'
+    exit 1
+fi
+
+if [[ ! -d "${buildSettingsDir}" ]]; then
+    echo "The build settings (project) directory '${buildSettingsDir}' does not exist. Exiting script."
     exit 1
 fi
 
@@ -27,13 +35,20 @@ if [[ "$(uname -s)" == CYGWIN* ]]; then
     buildSettingsDisplay=$(cygpath -w "${buildSettings}")
 fi
 
-# Create a build settings file, if it doesn't already exist.
+# Create a build settings file, if it doesn't already exist, defaulting the local source code path to the passed-in directory.
 if [[ ! -f "${buildSettings}" ]]; then
     echo "No build settings file exists at '${buildSettingsDisplay}'."
     echo "(Perhaps this is the first run?)"
     echo "Created new settings file with default values."
-    mkdir -p "${buildSettings%/*}"
-    cp "./my_build_settings.sh.dist" "${buildSettings}"
+    sed -e "s|^\(localSourceDir\)=.*|\1=\"${buildSettingsDir}/\"|" ./buildsettings.sh.dist > "${buildSettings}"
+
+	# Add .buildsettings file to .gitignore, if .gitignore already exists.
+	if [[ -f "${buildSettingsDir}/.gitignore" ]]; then
+		if ! grep -q "${buildSettingsFile}" "${buildSettingsDir}/.gitignore"; then
+			echo "${buildSettingsFile}" >> "${buildSettingsDir}/.gitignore"
+			echo "'${buildSettingsFile}' added to .gitignore."
+		fi
+	fi
 fi
 
 # Record hash of settings file to later see if something changed.
@@ -43,7 +58,7 @@ settingsHash=$(openssl sha1 "${buildSettings}")
 case "$(uname -s)" in
     Darwin)
         echo "Launching Build Settings editor.  Please set values to fit your environment, then press control-x, 'y', Enter to save and exit."
-        sed -e "s|^buildSettings=.*|buildSettings=${buildSettings}|" "Launch Nano.sh" >"/tmp/Launch Nano.sh"
+        sed -e "s|^buildSettings=.*|buildSettings=\"${buildSettings}\"|" "Launch Nano.sh" >"/tmp/Launch Nano.sh"
         chmod +x "/tmp/Launch Nano.sh"
         open -a Terminal.app "/tmp/Launch Nano.sh"
         while [[ -f "/tmp/Launch Nano.sh" ]]; do

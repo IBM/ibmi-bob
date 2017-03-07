@@ -14,10 +14,10 @@ localSourceDir="${localScriptDir}/../../express-xp/"
 remoteSourceDir="/Build/XP/jeff2"
 
 # Library to receive compiled objects
-buildLib="XPJEFF2"
+buildLib=XPJEFF2
 
-# Makefile to build with
-makefile="xpmake"
+# Makefile name to build with
+makefile=xpmake
 
 # User's private key file (used to ssh into IBM i without requiring a password)
 privateKey="~/s4i/.ssh/id_rsa"
