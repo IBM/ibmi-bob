@@ -8,7 +8,7 @@ system=S814JAZZ
 user=JBERMAN
 
 # Directory on local PC to push to i. Should terminate with a slash.
-localSourceDir="${localScriptDir}/../../express-xp/"
+localSourceDir="/Users/username/Develop/Source/myproject/"
 
 # Build directory on IBM i. The target of the code push; the source code that is compiled.
 remoteSourceDir="/Build/XP/jeff2"
@@ -20,4 +20,4 @@ buildLib=XPJEFF2
 makefile=xpmake
 
 # User's private key file (used to ssh into IBM i without requiring a password)
-privateKey="~/s4i/.ssh/id_rsa"
+privateKey="/cygdrive/c/Users/jberman/.ssh/id_rsa"

@@ -3,8 +3,7 @@
 #
 # "Cleans" a directory of recently-imported IBM i source files, or a single file, by removing the line number
 # and date fields from the beginning of each line, as well as the spaces from the end of each line.
-#
-# Accepts one argument: the path to a directory or file to clean.
+# $1 = The path to a directory or file to clean.
 
 # If every line starts with 12 digits of numbers (sequence # plus date field) then strip them out,
 # convert CRLF to LF, and remove trailing spaces.  Otherwise, convert CRLF to LF and remove trailing
@@ -25,7 +24,8 @@ function clean_file {
     
     # Only replace file with cleaned version if it contains text and something was changed.
     if [ -s "/tmp/$f" ]; then
-        if [[ $(openssl sha1 "$p" | sed -e 's/^.*= //') != $(openssl sha1 "/tmp/$f" | sed -e 's/^.*= //') ]]; then
+###        if [[ $(openssl sha1 "$p" | sed -e 's/^.*= //') != $(openssl sha1 "/tmp/$f" | sed -e 's/^.*= //') ]]; then
+        if ! cmp --quiet "$p" "/tmp/$f"; then
             mv "/tmp/$f" "$p"
             echo "${f} cleaned."
             (( cleanTotal += 1 ))
@@ -57,8 +57,9 @@ if [[ "$(uname -s)" == CYGWIN* ]]; then
     path=$(cygpath -u "${path}")
 fi
 
-# Clean file(s).  Ignore '.' files (like .project).
-find "${path}" -type f -name '*.*' -not -name '.*' |
+# Clean file(s).  Ignore '.' files (like .project).  Ignore directories starting with '.' (like .git).  Ignore
+# our own Logs directory.
+find "${path}" -not \( -path '*/.*' -prune \) -not \( -path "${path}/Logs" -prune \) -not -name '.*' -type f -print |
 {
     while read f; do
         clean_file "$f"

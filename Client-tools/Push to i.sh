@@ -2,6 +2,8 @@
 
 #
 # Push files to the build directory
+# $1 = The path to the project folder (Eclipse-formatted in OS-specific path nomenclature)
+# $2 = Name of the build settings file
 #
 
 function realpath {
@@ -12,13 +14,24 @@ function realpath {
 
 localScriptDir="${0%/*}"
 
-# Load in settings specific to this project. Path to settings file should have been passed in.
-if (( $# != 0 )); then
-    buildSettings="$1"
-    buildSettingsDir=$(dirname "$1")
-else
-    echo 'No build settings file was passed in. Exiting script.'
+# Validate arguments
+if (( $# != 2 )); then
+    echo "Incorrect number of incoming parameters; expected path to project directory and name of build settings file."
+    echo "Exiting script."
     exit 1
+fi
+
+buildSettingsDir="$1"
+buildSettingsFile="$2"
+
+# If using Windows, generate Windows-friendly .buildsettings path for display purposes and insure the actual path is in Cygwin format.
+if [[ "$(uname -s)" == CYGWIN* ]]; then
+    buildSettingsDir=$(cygpath -u "${buildSettingsDir}")
+    buildSettings="${buildSettingsDir}/${buildSettingsFile}"
+    buildSettingsDisplay=$(cygpath -w "${buildSettings}")
+else
+    buildSettings="${buildSettingsDir}/${buildSettingsFile}"
+    buildSettingsDisplay=$buildSettings
 fi
 
 if [[ ! -d "${buildSettingsDir}" ]]; then
@@ -27,13 +40,13 @@ if [[ ! -d "${buildSettingsDir}" ]]; then
 fi
 
 if [[ ! -f "${buildSettings}" ]]; then
-    echo "The build settings file '${buildSettings}' does not exist. Has it been set up yet? Exiting script."
+    echo "The build settings file '${buildSettingsDisplay}' does not exist. Has it been set up yet? Exiting script."
     exit 1
 fi
 
 source "${buildSettings}"
 
-# If using Windows, generate Windows-friendly path name for display purposes.
+# If using Windows, generate Windows-friendly localSourceDir path for display purposes.
 if [[ "$(uname -s)" == CYGWIN* ]]; then
     localSourceDirDisplay=$(cygpath -wa "${localSourceDir}")
 else
