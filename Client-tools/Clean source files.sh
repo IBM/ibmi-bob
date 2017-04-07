@@ -24,7 +24,6 @@ function clean_file {
     
     # Only replace file with cleaned version if it contains text and something was changed.
     if [ -s "/tmp/$f" ]; then
-###        if [[ $(openssl sha1 "$p" | sed -e 's/^.*= //') != $(openssl sha1 "/tmp/$f" | sed -e 's/^.*= //') ]]; then
         if ! cmp --quiet "$p" "/tmp/$f"; then
             mv "/tmp/$f" "$p"
             echo "${f} cleaned."

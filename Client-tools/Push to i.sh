@@ -57,5 +57,5 @@ fi
 echo "*** Pushing source code to IBM i ***"
 echo "Source directory: ${localSourceDirDisplay}"
 echo "Target directory: ${system}:${remoteSourceDir}"
-rsync -avzh --exclude .git --exclude .deps --exclude removed --exclude Logs --exclude temp --exclude .project --delete -e "ssh -i ${privateKey}" "${localSourceDir}" ${user}@${system}:"${remoteSourceDir}"
+rsync -avzh --exclude .git --exclude .deps --exclude removed --exclude Logs --exclude temp --exclude .project --delete -e "ssh -i '${privateKey}'" "${localSourceDir}" ${user}@${system}:"${remoteSourceDir}"
 echo "*** End of source code push ***"
