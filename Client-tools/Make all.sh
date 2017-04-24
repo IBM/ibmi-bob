@@ -62,7 +62,7 @@ ssh -i "${privateKey}" ${user}@${system} '. /QOpenSys/etc/profile && $(dirname "
 
 # Update our local Logs directory with the new stuff from the i.
 echo
-echo -n "Copying build logs back to ${localSourceDirDisplay}."
-rsync -azh -e "ssh -i '${privateKey}'" ${user}@${system}:"${remoteSourceDir}/Logs" "${localSourceDir}"
+echo -n "Copying build logs and dependency files back to ${localSourceDirDisplay}."
+rsync -azh -e "ssh -i '${privateKey}'" ${user}@${system}:"${remoteSourceDir}/Logs" :"${remoteSourceDir}/.deps" "${localSourceDir}"
 echo "..Done!"
 echo "*** End of build process ***"
