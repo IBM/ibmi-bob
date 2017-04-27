@@ -56,13 +56,13 @@ fi
 # Issue remote command to build everything
 # Calling the `makelog` wrapper script in the ibm-i-make directory to log `make`s output.
 echo "*** Building code on IBM i ***"
-echo "Remote source code directory: (${system}) ${remoteSourceDir}"
+echo "Remote source code directory: ${system}:${remoteSourceDir}"
 echo "Target build library: ${buildLib}"
-ssh -i ${privateKey} ${user}@${system} '. /QOpenSys/etc/profile && $(dirname "${IBMIMAKE:?Environment variable IBMIMAKE has not been set. Please set it to the location of the IBMiMake makefile. A good place to do this is in /QOpenSys/etc/profile, by including a line such as \`export IBMIMAKE=/Build/ibm-i-make/IBMiMake\`}")'"/makelog all OBJPATH:=/QSYS.LIB/${buildLib}.LIB -f ${remoteSourceDir}/${makefile}"
+ssh -i "${privateKey}" ${user}@${system} '. /QOpenSys/etc/profile && $(dirname "${IBMIMAKE:?Environment variable IBMIMAKE has not been set. Please set it to the location of the IBMiMake makefile. A good place to do this is in /QOpenSys/etc/profile, by including a line such as \`export IBMIMAKE=/Build/ibm-i-make/IBMiMake\`}")'"/makelog all OBJPATH:=/QSYS.LIB/${buildLib}.LIB -f ${remoteSourceDir}/${makefile}"
 
 # Update our local Logs directory with the new stuff from the i.
 echo
-echo -n "Copying build logs back to ${localSourceDirDisplay}."
-rsync -azh -e "ssh -i ${privateKey}" ${user}@${system}:"${remoteSourceDir}/Logs" "${localSourceDir}"
+echo -n "Copying build logs and dependency files back to ${localSourceDirDisplay}."
+rsync -azh -e "ssh -i '${privateKey}'" ${user}@${system}:"${remoteSourceDir}/Logs" :"${remoteSourceDir}/.deps" "${localSourceDir}"
 echo "..Done!"
 echo "*** End of build process ***"
