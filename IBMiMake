@@ -223,8 +223,8 @@ $(removeEmptyDep)
 endef
 
 # cleanRPGDeps removes from the CRTRPGMOD- and CRTSQLRPGI-generated events file any system header files
-# plus the original source file that is included for some reason, and returns what's left.
-cleanRPGDeps = awk '$$1 == "FILEID" && $$6 !~ /^QTEMP/ && toupper($$6) !~ /QSYS/ && $$6 !~ /EVFTEMPF0[12]/ && $$6 !~ /$(notdir $<)$$/ && $$6 !~ /$(basename $(notdir $<)).MBR$$/ { print toupper($$6) }'
+# plus any SQL precompiler-generated source member, and returns what's left.
+cleanRPGDeps = awk '$$1 == "FILEID" && $$6 !~ /^QTEMP/ && toupper($$6) !~ /QSYS/ && $$6 !~ /EVFTEMPF0[12]/ && $$6 !~ /$(basename $(notdir $<)).MBR$$/ { print toupper($$6) }'
 
 # This defines the steps taken after an RPG compile to scrape dependencies from the EVFEVENT file and turn them
 # into a useable form.
@@ -237,8 +237,9 @@ define POSTRPGCOMPILE =
 system "CPYTOSTMF FROMMBR('$(OBJPATH)/EVFEVENT.FILE/$*.MBR') TOSTMF('$(DEPDIR)/$*.Td') STMFCCSID(*STDASCII) ENDLINFMT(*LF) CVTDTA(*AUTO) STMFOPT(*REPLACE)" >/dev/null
 { for f in $$($(cleanRPGDeps) <$(DEPDIR)/$*.Td | sort -u); do \
     echo "$${f}"; \
-    sed -n -r -e '/^.{6}[^*].{14}[^Ff]/ s/^.{5}[Ff]([^ ]{,10}).*(DISK|WORKSTN|PRINTER).*/  \1\.FILE/I p' -e '/^.{6}[^*]/ s/^.{5}[Dd].*EXTNAME\(([^ \)]*).*/  \1\.FILE/I p' "$${f}"; \
-  done; } | sed -e 's/^\/.*\///' -e 's/^/$@: /' | tr '[:lower:]' '[:upper:]' >$(DEPDIR)/$*.d
+    sed -n -r -e '/^.{6}[^*].{14}[^Ff]/ s/^.{5}[Ff]([^ ]{,10}).*(DISK|WORKSTN|PRINTER).*/  \1\.FILE/I p' -e '/^.{6}[^*]/ s/^.{5}[Dd].*EXTNAME\(([^ \)]*).*/  \1\.FILE/I p' "$${f}" | sort -u; \
+  done; \
+} | sed -e 's/^\/.*\///' -e 's/^/$@: /' | tr '[:lower:]' '[:upper:]' >$(DEPDIR)/$*.d
 touch -cr $(OBJPATH)/$@ $(DEPDIR)/$*.d
 rm $(DEPDIR)/$*.Td
 $(removeEmptyDep)
