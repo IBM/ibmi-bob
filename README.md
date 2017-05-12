@@ -20,4 +20,4 @@ Learn more about IBMiMake in the [FAQ](Docs/FAQ.md).
 * Philosophy and technical [overview](Overview.md)
 * Read about the [suggested software development workflow](Docs/Workflow.md)
 * How to [install IBMiMake](Docs/Install_IBMiMake.md)
-* How to [integrate IBMiMake with RDi](Docs/Integrate_RDi.md)
+* How to [integrate IBMiMake with RDi](https://github.com/s4isystems/ibm-i-make/wiki/Integrate-RDi)
