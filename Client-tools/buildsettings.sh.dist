@@ -2,22 +2,22 @@
 # ibm-i-make client tools build settings.  Set these values to fit your environment.
 
 # Name of the IBM i
-system=S814JAZZ
+system=DEVSYS01
 
 # User profile on IBM i
 user=JBERMAN
 
 # Directory on local PC to push to i. Should terminate with a slash.
-localSourceDir="/Users/username/Develop/Source/myproject/"
+localSourceDir="/cygdrive/c/Users/username/Develop/Source/my-project/"
 
 # Build directory on IBM i. The target of the code push; the source code that is compiled.
-remoteSourceDir="/Build/XP/jeff2"
+remoteSourceDir="/Build/my-project/my-name"
 
 # Library to receive compiled objects
-buildLib=XPJEFF2
+buildLib=MYBUILDLIB
 
 # Makefile name to build with
-makefile=xpmake
+makefile=Makefile
 
 # User's private key file (used to ssh into IBM i without requiring a password)
-privateKey="/cygdrive/c/Users/jberman/.ssh/id_rsa"
+privateKey="/cygdrive/c/Users/username/.ssh/id_rsa"
