@@ -63,4 +63,5 @@ source "${buildSettings}"
 # Push code to i
 "./Push to i.sh" "${buildSettingsDir}" "${buildSettingsFile}"
 echo
+# Build all
 "./Build all.sh" "${buildSettingsDir}" "${buildSettingsFile}"
