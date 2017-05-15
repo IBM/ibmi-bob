@@ -15,9 +15,3 @@ Here's what makes IBMiMake different.
 * **Ease of use.**  Invoking a build of an entire codebase is done with just a single command.  Or, if the Rational Developer for i integration pieces are installed, a single button click.
 
 Learn more about installing and using IBMiMake in the [wiki](../../wiki).
-
-# Getting started
-* Philosophy and technical [overview](Overview.md)
-* Read about the [suggested software development workflow](Docs/Workflow.md)
-* How to [install IBMiMake](Docs/Install_IBMiMake.md)
-* How to [integrate IBMiMake with RDi](https://github.com/s4isystems/ibm-i-make/wiki/Integrate-RDi)
