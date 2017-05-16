@@ -2,5 +2,4 @@
 
 * Jeff Berman:
   [Email](mailto:jberman@s4isystems.com)  |
-  [GitHub](https://github.com/JeffBerman)
-
+  [LinkedIn](https://www.linkedin.com/in/jberman0)

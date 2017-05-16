@@ -1,0 +1,110 @@
+#
+# This is a project-specific makefile for building Product XYZ.  It defines
+# object and dependency definitions.  It also `include`s the generic IBM i
+# Makefile that specifies how IBM i objects are built.
+#
+# To invoke from a shell:
+#   o cd /some/path/that's/not/in/QSYS.LIB
+#   o make all OBJPATH:='/QSYS.LIB/<object_lib>.LIB' -f /path/to/this/makefile.mak
+#
+
+
+########## DO NOT MODIFY THIS SECTION ##########
+
+### IBMiMake setup
+PROJECTDIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
+
+# Include generic IBM i makefile.  Its location is stored in an environment variable called IBMIMAKE.
+ifeq ($(strip $(IBMIMAKE)),)
+$(warning Environment variable 'IBMIMAKE' not set.  Defaulting to $(realpath $(PROJECTDIR)/../../ibm-i-make/IBMiMake))
+IBMIMAKE := $(PROJECTDIR)/../../ibm-i-make/IBMiMake
+else
+$(info Using IBMiMake file: $(realpath $(IBMIMAKE)))
+endif
+include $(IBMIMAKE)
+
+### Define type-specific targets and their dependencies
+.PHONY: all PFs LFs DSPFs PRTFs CMDs MODULEs SRVPGMs PGMs MENUs PNLGRPs QMQRYs WSCSTs make_post
+all: PFs LFs DSPFs PRTFs CMDs MODULEs SRVPGMs PGMs MENUs PNLGRPs QMQRYs WSCSTs make_post
+
+LFs: PFs
+DSPFs PRTFs: LFs
+MODULEs: PFs LFs DSPFs PRTFs
+SRVPGMs: MODULEs
+PGMs: SRVPGMs
+
+########## END OF "DO NOT MODIFY" SECTION ##########
+
+
+### Define user objects to type-specific targets so they're compiled in the
+### correct order.  Whatever is listed here will be built by `make all` command.
+PFs: AB1SCP.FILE
+
+LFs: ANTATR01.FILE
+
+DSPFs: AB1001D.FILE
+
+PRTFs: AB2011P1.FILE
+
+CMDs: ADDBUNDOC.CMD
+
+MODULEs: AB1001.MODULE
+
+SRVPGMs: ANTATR_S.SRVPGM
+
+PGMs: AB1001.PGM
+
+MENUs: EAM.MENU
+
+PNLGRPs: AB1001H.PNLGRP
+
+QMQRYs: RP3300Q01.QMQRY
+
+WSCSTs: RYAFPTOTIF.WSCST
+
+
+### Rules section.  Defines dependency information and custom compile settings
+### for each object.
+
+# AB1001.MODULE -- CRTRPGMOD
+AB1001.MODULE: AB1001.RPGLE AB1001D.FILE
+
+# AB1001.PGM -- CRTPGM
+AB1001.PGM: private TEXT = Active bundles - Work with
+AB1001.PGM: AB1001.MODULE
+
+# AB1001C.MODULE -- CRTCLMOD
+AB1001C.MODULE: AB1001C.CLLE
+
+# AB1001D.FILE -- CRTDSPF
+AB1001D.FILE: private TEXT = Active bundles - Work with
+AB1001D.FILE: AB1001D.DSPF FLDREF.FILE FLDREFM.MSGF MSGFINM.MSGF
+
+# AB1001H.PNLGRP -- CRTPNLGRP
+AB1001H.PNLGRP: private TEXT = Active bundles - Work with
+AB1001H.PNLGRP: AB1001H.PNLGRPSRC
+
+# AB1SCP.FILE -- CRTPF
+AB1SCP.FILE: private TEXT = User screen preferences (WW Active bundles)
+AB1SCP.FILE: AB1SCP.PF FLDREF.FILE
+
+# AB2001.F.MODULE -- CRTSQLRPGI
+AB2001.F.MODULE: private TEXT = Active bundles - Close bundle driver          *PEP
+AB2001.F.MODULE: private DBGVIEW = *NONE
+AB2001.F.MODULE: AB2001.F.SQLRPGLE PKTADE01.FILE PKTDEF01.FILE
+
+# AB2011P1.FILE -- CRTPRTF
+AB2011P1.FILE: private TEXT = Merge bundles - Summary
+AB2011P1.FILE: AB2011P1.PRTF FLDREF.FILE FLDREFM.MSGF MSGFEXM.MSGF MSGFINM.MSGF
+
+# Z_ZUTIL.MODULE -- CRTCMOD
+Z_ZUTIL.MODULE: private TEXT = ZLIB Target dependent utility fuctions
+Z_ZUTIL.MODULE: Z_ZUTIL.C
+
+
+########## THIS SECTION MUST BE AT THE END OF THE MAKEFILE ##########
+
+# Include all auto-generated source dependency files. Since we don't have a
+# hard-coded list of source files, we will grab everything in the `$DEPDIR`
+# directory.
+-include $(wildcard $(DEPDIR)/*.d)
