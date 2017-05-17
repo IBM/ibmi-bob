@@ -1,3 +1,5 @@
+![](../../wiki/images/bob-logo-bw.png)
+
 # IBMiMake
 IBMiMake is a free and open source build system for the IBM i platform that is used to build native "QSYS" objects.
 
