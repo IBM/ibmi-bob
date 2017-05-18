@@ -13,9 +13,11 @@
 # limitations under the License.
 
 #
+# This file is part of Bob, the Better Object Builder for IBM i.
+#
 # This is a generic Makefile to build IBM i objects from source code located in an IFS directory.
 # It should be included near the top of a project-specific makefile via the `include` directive, e.g.
-#    IBMIMAKE := /Source/ibm-i-make/IBMiMake
+#    IBMIMAKE := /Build/Bob/IBMiMake
 #    include $(IBMIMAKE)
 #
 # Note: When using the IFS, path case sensitivity needs to match the actual item

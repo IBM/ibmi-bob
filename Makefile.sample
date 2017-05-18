@@ -1,5 +1,6 @@
 #
-# This is a project-specific makefile for building Product XYZ.  It defines
+# This is a project-specific makefile for building Product XYZ, and is to be
+# used with Bob, the Better Object Builder for IBM i.  It defines
 # object and dependency definitions.  It also `include`s the generic IBM i
 # Makefile that specifies how IBM i objects are built.
 #
