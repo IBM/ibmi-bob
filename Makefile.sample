@@ -6,7 +6,7 @@
 #
 # To invoke from a shell:
 #   o cd /some/path/that's/not/in/QSYS.LIB
-#   o make all OBJPATH:='/QSYS.LIB/<object_lib>.LIB' -f /path/to/this/makefile.mak
+#   o make all OBJPATH:='/QSYS.LIB/<object_lib>.LIB' -f /path/to/this/makefile
 #
 
 
@@ -17,8 +17,8 @@ PROJECTDIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 
 # Include generic IBM i makefile.  Its location is stored in an environment variable called IBMIMAKE.
 ifeq ($(strip $(IBMIMAKE)),)
-$(warning Environment variable 'IBMIMAKE' not set.  Defaulting to $(realpath $(PROJECTDIR)/../../ibm-i-make/IBMiMake))
-IBMIMAKE := $(PROJECTDIR)/../../ibm-i-make/IBMiMake
+$(warning Environment variable 'IBMIMAKE' not set.  Defaulting to $(realpath $(PROJECTDIR)/../../Bob/IBMiMake))
+IBMIMAKE := $(PROJECTDIR)/../../Bob/IBMiMake
 else
 $(info Using IBMiMake file: $(realpath $(IBMIMAKE)))
 endif
@@ -39,68 +39,58 @@ PGMs: SRVPGMs
 
 ### Define user objects to type-specific targets so they're compiled in the
 ### correct order.  Whatever is listed here will be built by `make all` command.
-PFs: AB1SCP.FILE
+PFs: MYPF.FILE
 
-LFs: ANTATR01.FILE
+LFs: MYLF.FILE
 
-DSPFs: AB1001D.FILE
+DSPFs: MYDSPF.FILE
 
-PRTFs: AB2011P1.FILE
+PRTFs: MYPRTF.FILE
 
-CMDs: ADDBUNDOC.CMD
+CMDs: MYCMD.CMD
 
-MODULEs: AB1001.MODULE
+MODULEs: MYMOD1.MODULE MYMOD2.MODULE
 
-SRVPGMs: ANTATR_S.SRVPGM
+SRVPGMs: MYSRVPGM.SRVPGM
 
-PGMs: AB1001.PGM
+PGMs: MYPGM.PGM
 
-MENUs: EAM.MENU
+MENUs: MYMENU.MENU
 
-PNLGRPs: AB1001H.PNLGRP
+PNLGRPs: MYPNLGRP.PNLGRP
 
-QMQRYs: RP3300Q01.QMQRY
+QMQRYs: MYQMQRY.QMQRY
 
-WSCSTs: RYAFPTOTIF.WSCST
+WSCSTs: MYWSCST.WSCST
 
 
 ### Rules section.  Defines dependency information and custom compile settings
 ### for each object.
 
-# AB1001.MODULE -- CRTRPGMOD
-AB1001.MODULE: AB1001.RPGLE AB1001D.FILE
+# MYMOD1.MODULE -- CRTRPGMOD
+MYMOD1.MODULE: MYMOD1.RPGLE MYPF.FILE
 
-# AB1001.PGM -- CRTPGM
-AB1001.PGM: private TEXT = Active bundles - Work with
-AB1001.PGM: AB1001.MODULE
+# MYMOD2.MODULE -- CRTRPGMOD
+MYMOD2.MODULE: MYMOD2.RPGLE MYLF.FILE
 
-# AB1001C.MODULE -- CRTCLMOD
-AB1001C.MODULE: AB1001C.CLLE
+# MYPGM.PGM -- CRTPGM
+MYPGM.PGM: private TEXT = My first program
+MYPGM.PGM: MYMOD1.MODULE
 
-# AB1001D.FILE -- CRTDSPF
-AB1001D.FILE: private TEXT = Active bundles - Work with
-AB1001D.FILE: AB1001D.DSPF FLDREF.FILE FLDREFM.MSGF MSGFINM.MSGF
+# MYDSPF.FILE -- CRTDSPF
+MYDSPF.FILE: private TEXT = My first display file
+MYDSPF.FILE: MYDSPF.DSPF
 
-# AB1001H.PNLGRP -- CRTPNLGRP
-AB1001H.PNLGRP: private TEXT = Active bundles - Work with
-AB1001H.PNLGRP: AB1001H.PNLGRPSRC
+# MYPNLGRP.PNLGRP -- CRTPNLGRP
+MYPNLGRP.PNLGRP: MYPNLGRP.PNLGRPSRC
 
-# AB1SCP.FILE -- CRTPF
-AB1SCP.FILE: private TEXT = User screen preferences (WW Active bundles)
-AB1SCP.FILE: AB1SCP.PF FLDREF.FILE
+# MYMOD3.MODULE -- CRTSQLRPGI
+MYMOD3.MODULE: private TEXT = Embedded SQL example
+MYMOD3.MODULE: private DBGVIEW = *SOURCE
+MYMOD3.MODULE: MYMOD3.SQLRPGLE MYPF.FILE
 
-# AB2001.F.MODULE -- CRTSQLRPGI
-AB2001.F.MODULE: private TEXT = Active bundles - Close bundle driver          *PEP
-AB2001.F.MODULE: private DBGVIEW = *NONE
-AB2001.F.MODULE: AB2001.F.SQLRPGLE PKTADE01.FILE PKTDEF01.FILE
-
-# AB2011P1.FILE -- CRTPRTF
-AB2011P1.FILE: private TEXT = Merge bundles - Summary
-AB2011P1.FILE: AB2011P1.PRTF FLDREF.FILE FLDREFM.MSGF MSGFEXM.MSGF MSGFINM.MSGF
-
-# Z_ZUTIL.MODULE -- CRTCMOD
-Z_ZUTIL.MODULE: private TEXT = ZLIB Target dependent utility fuctions
-Z_ZUTIL.MODULE: Z_ZUTIL.C
+# MYPRTF.FILE -- CRTPRTF
+MYPRTF.FILE: MYPRTF.PRTF
 
 
 ########## THIS SECTION MUST BE AT THE END OF THE MAKEFILE ##########

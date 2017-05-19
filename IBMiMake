@@ -13,7 +13,8 @@
 # limitations under the License.
 
 #
-# This file is part of Bob, the Better Object Builder for IBM i.
+# This file is a component of Bob, the Better Object Builder for IBM i.  For
+# information on how to use it, go to: https://github.com/s4isystems/Bob
 #
 # This is a generic Makefile to build IBM i objects from source code located in an IFS directory.
 # It should be included near the top of a project-specific makefile via the `include` directive, e.g.
@@ -216,13 +217,16 @@ OBJPATH := $(CURDIR)
 override OBJPATH := $(shell echo "$(OBJPATH)" | tr '[:lower:]' '[:upper:]')
 OBJLIB := $(basename $(notdir $(OBJPATH)))
 TOOLSPATH := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
-TOOLSLIB := MAKETOOLS
+TOOLSLIB := BOBTOOLS
 runDate := $(shell date +"%F_%H.%M.%S-%a")
 LOGPATH := $(SRCPATH)/Logs/$(runDate)
 $(shell mkdir -p $(LOGPATH))
 $(info IBMiMake log directory: $(LOGPATH))
 DEPDIR := $(SRCPATH)/.deps
 $(shell mkdir -p $(DEPDIR) >/dev/null)
+CRTFRMSTMFLIB := $(TOOLSLIB)
+ICONV := /QOpenSys/usr/bin/iconv
+VPATH := $(OBJPATH):$(SRCPATH)
 
 # cleanCDeps removes from the CRTCMOD-generated dependency file any header files located in /QIBM/, plus the
 # original .C file that is included for some reason, and adds the correct suffix to the target (SO1001 -> SO1001.MODULE).
@@ -412,10 +416,6 @@ programTGTRLS = $(strip \
 	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIPGM_TGTRLS), \
 	$(if $(filter %.MODULE,$<),$(PGM_TGTRLS), \
 	UNKNOWN_FILE_TYPE))))))
-
-CRTFRMSTMFLIB := CRTFRMSTMF
-ICONV := /QOpenSys/usr/bin/iconv
-VPATH := $(OBJPATH):$(SRCPATH)
 
 ### Implicit rules
 %.CMD: private AUT = $(CMD_AUT)

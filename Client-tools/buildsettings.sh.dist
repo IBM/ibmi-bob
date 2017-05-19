@@ -1,5 +1,5 @@
 #
-# ibm-i-make client tools build settings.  Set these values to fit your environment.
+# Better Object Builder client tools build settings.  Set these values to fit your environment.
 
 # Name of the IBM i
 system=DEVSYS01
@@ -16,7 +16,7 @@ remoteSourceDir="/Build/my-project/my-name"
 # Library to receive compiled objects
 buildLib=MYBUILDLIB
 
-# Makefile name to build with
+# Name of makefile to use when building this project
 makefile=Makefile
 
 # User's private key file (used to ssh into IBM i without requiring a password)

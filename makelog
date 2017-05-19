@@ -38,11 +38,12 @@ exit=$?
 
 # Determine the logging directory used by Make and move the logfile there.
 # The directory is written to stdout by the IBMiMake makefile.
+finalLog='! Build log.log'
 makeLogDir=$(sed -n -e 's/^IBMiMake log directory: \(.*\)$/\1/p' "$log")
 if [ -d "$makeLogDir" ] && [ -f "$log" ]; then
-    echo "Make: Invoked with command > make $@ <" > "${makeLogDir}/IBMiMake.log"
-    echo >> "${makeLogDir}/IBMiMake.log"
-    sed -e '/^IBMiMake log directory:.*\/Logs\//d' "$log" >> "${makeLogDir}/IBMiMake.log"
+    echo "Make: Invoked with command > make $@ <" > "${makeLogDir}/${finalLog}"
+    echo >> "${makeLogDir}/${finalLog}"
+    sed -e '/^IBMiMake log directory:.*\/Logs\//d' "$log" >> "${makeLogDir}/${finalLog}"
 fi
 
 rm "$pipe"

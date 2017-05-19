@@ -1,4 +1,4 @@
-# IBMiMake Authors
+# Better Object Builder Authors
 
 * Jeff Berman:
   [Email](mailto:jberman@s4isystems.com)  |

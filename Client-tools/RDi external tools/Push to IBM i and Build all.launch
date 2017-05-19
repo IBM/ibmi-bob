@@ -3,6 +3,6 @@
 <listAttribute key="org.eclipse.debug.ui.favoriteGroups">
 <listEntry value="org.eclipse.ui.externaltools.launchGroup"/>
 </listAttribute>
-<stringAttribute key="org.eclipse.ui.externaltools.ATTR_LOCATION" value="${ibmimake_bash}"/>
-<stringAttribute key="org.eclipse.ui.externaltools.ATTR_TOOL_ARGUMENTS" value="-l -c &quot;cd '${ibmimake_client_tools}' &amp;&amp; ./Push\ to\ i\ and\ Build\ all.sh '${project_loc}' '.buildsettings'&quot;"/>
+<stringAttribute key="org.eclipse.ui.externaltools.ATTR_LOCATION" value="${bob_bash}"/>
+<stringAttribute key="org.eclipse.ui.externaltools.ATTR_TOOL_ARGUMENTS" value="-l -c &quot;cd '${bob_client_tools}' &amp;&amp; ./Push\ to\ i\ and\ Build\ all.sh '${project_loc}' '.buildsettings'&quot;"/>
 </launchConfiguration>
