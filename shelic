@@ -80,13 +80,13 @@ if [ ! -e "./$buildFile" ]; then
     exit 1
 fi
 
-topDir=$(realpath "${0%/*}")
+pkgDir=$(realpath "$(pwd)")
 
 # Extract `name:` value.
 name=$(sed -n -e '/name:/{n;p;}' "$buildFile" | sed -e 's/^[[:space:]]*//' -e 's/ *$//')
 
 # Substitute in &INTOLIB, &DIR, and &NAME values.
-sed -e '1,/build:/d' -e '/^ *$/d' -e "s/&INTOLIB/${lib}/g" -e "s|&DIR|${topDir}|g" -e "s/&NAME/${name}/g" "$buildFile" |
+sed -e '1,/build:/d' -e '/^ *$/d' -e "s/&INTOLIB/${lib}/g" -e "s|&DIR|${pkgDir}|g" -e "s/&NAME/${name}/g" "$buildFile" |
 {
     while read cmd; do
         echo
