@@ -10,7 +10,7 @@
 #
 
 
-########## DO NOT MODIFY THIS SECTION ##########
+########## BOB HEADER SECTION -- DO NOT MODIFY ##########
 
 ### IBMiMake setup
 PROJECTDIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
@@ -37,8 +37,9 @@ PGMs: SRVPGMs
 ########## END OF "DO NOT MODIFY" SECTION ##########
 
 
+########## LIST OF OBJECTS TO BUILD, GROUPED BY TYPE ##########
 ### Define user objects to type-specific targets so they're compiled in the
-### correct order.  Whatever is listed here will be built by `make all` command.
+### correct order.  This says _what_ to build.
 PFs: MYPF.FILE
 
 LFs: MYLF.FILE
@@ -64,8 +65,9 @@ QMQRYs: MYQMQRY.QMQRY
 WSCSTs: MYWSCST.WSCST
 
 
-### Rules section.  Defines dependency information and custom compile settings
-### for each object.
+########## OBJECT RULES, DEPENDENCIES AND CUSTOM COMPILE SETTINGS ##########
+### Rules section.  Define dependency information and custom compile settings
+### for each object.  This says _how_ to build.
 
 # MYMOD1.MODULE -- CRTRPGMOD
 MYMOD1.MODULE: MYMOD1.RPGLE MYPF.FILE
