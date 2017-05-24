@@ -32,9 +32,9 @@ function clean_file {
     # Perhaps a random line of code starts with a bunch of numbers, so only remove them
     # if every line in the file starts with 12 numbers.
     if (( $(grep -E -c '^[0-9]{12}' "$p") == $(wc -l <"$p") )); then
-        tr -d '\r' <"$p" | sed -r -e 's/^.{12}//' -e 's/ *$//' >"/tmp/$f"
+        tr -d '\r' <"$p" | sed -${ere} -e 's/^.{12}//' -e 's/ *$//' >"/tmp/$f"
     else
-        tr -d '\r' <"$p" | sed -r -e 's/ *$//' >"/tmp/$f"
+        tr -d '\r' <"$p" | sed -${ere} -e 's/ *$//' >"/tmp/$f"
     fi
     
     # Only replace file with cleaned version if it contains text and something was changed.
@@ -69,6 +69,16 @@ fi
 # If using Windows, make path bash-friendly.
 if [[ "$(uname -s)" == CYGWIN* ]]; then
     path=$(cygpath -u "${path}")
+fi
+
+# Determine option for extended regexes.
+if sed -r 's/a/b/' </dev/null 2>/dev/null; then
+    ere='r'
+elif sed -E 's/a/b/' </dev/null 2>/dev/null; then
+    ere='E'
+else
+    echo 1>&2 'Sed version not recognized.  Code not cleaned.'
+    exit 1
 fi
 
 # Clean file(s).  Ignore '.' files (like .project).  Ignore directories starting with '.' (like .git).  Ignore
