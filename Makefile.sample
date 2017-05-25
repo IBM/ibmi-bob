@@ -33,13 +33,13 @@ DSPFs PRTFs: LFs
 MODULEs: PFs LFs DSPFs PRTFs
 SRVPGMs: MODULEs
 PGMs: SRVPGMs
-
 ########## END OF "DO NOT MODIFY" SECTION ##########
 
 
 ########## LIST OF OBJECTS TO BUILD, GROUPED BY TYPE ##########
 ### Define user objects to type-specific targets so they're compiled in the
-### correct order.  This says _what_ to build.
+### correct order.  This section declares _what_ to build.
+
 PFs: MYPF.FILE
 
 LFs: MYLF.FILE
@@ -66,8 +66,8 @@ WSCSTs: MYWSCST.WSCST
 
 
 ########## OBJECT RULES, DEPENDENCIES AND CUSTOM COMPILE SETTINGS ##########
-### Rules section.  Define dependency information and custom compile settings
-### for each object.  This says _how_ to build.
+### Define dependency information and custom compile settings for each object.
+### This section declares _how_ to build.  Please list rules alphabetically.
 
 # MYMOD1.MODULE -- CRTRPGMOD
 MYMOD1.MODULE: MYMOD1.RPGLE MYPF.FILE
