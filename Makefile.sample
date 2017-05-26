@@ -6,7 +6,7 @@
 #
 # To invoke from a shell:
 #   o cd /some/path/that's/not/in/QSYS.LIB
-#   o make all OBJPATH:='/QSYS.LIB/<object_lib>.LIB' -f /path/to/this/makefile
+#   o make all OBJPATH:=/QSYS.LIB/<object_lib>.LIB -f '/path/to/this/makefile'
 #
 
 

@@ -28,18 +28,18 @@
 #   o ADDLIBLE <object_lib>
 #   o CALL QP2TERM
 #   o cd /qsys.lib/<object_lib>.lib
-#   o make all -f <location of project-specific makefile>
+#   o make all -f '<location of project-specific makefile>'
 #
 # Work around for C compiler bug:
 #   o ADDLIBLE <object_lib>
 #   o CALL QP2TERM
 #   o cd /some/path/that's/not/in/QSYS.LIB
-#   o make all OBJPATH:='/QSYS.LIB/<object_lib>.LIB' -f /path/to/project-specific/makefile.mak
+#   o make all OBJPATH:=/QSYS.LIB/<object_lib>.LIB -f '/path/to/project-specific/makefile'
 #   o Use `--warn-undefined-variables` while testing to see if any variables have been used without being set.
 #
 # To invoke from a shell:
 #   o cd /some/path/that's/not/in/QSYS.LIB
-#   o make all OBJPATH:='/QSYS.LIB/<object_lib>.LIB' -f /path/to/project-specific/makefile.mak
+#   o make all OBJPATH:=/QSYS.LIB/<object_lib>.LIB -f '/path/to/project-specific/Makefile'
 
 
 # These variables are swapped into the compile commands.  Their values also serve as
