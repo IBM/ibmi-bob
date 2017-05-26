@@ -1,0 +1,3 @@
+     A          R TEST01P                   TEXT('TEST01 PF')
+     A            FIRST         15          TEXT('First name')
+     A            LAST          20          TEXT('Last name')
