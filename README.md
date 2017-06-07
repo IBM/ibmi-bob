@@ -17,3 +17,8 @@ Here's what makes Bob different.
 * **Ease of use.**  Invoking a build of an entire codebase is done with just a single command.  Or, if the Rational Developer for i integration pieces are installed, a single button click.
 
 Learn more about installing and using Bob in the [wiki](../../wiki).
+
+---
+
+_Send source code to the i and build it with one button press:_ 
+![](../../wiki/images/Bob-quick-RDi-build.mov.gif)
