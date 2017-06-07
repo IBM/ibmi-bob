@@ -37,6 +37,7 @@ fi
 
 buildSettingsDir="$1"
 buildSettingsFile="$2"
+ignoreItems=('/Logs/' '/.deps/' "/$buildSettingsFile")
 
 # If using Windows, generate Windows-friendly path name for display purposes and insure the actual path is in Cygwin format.
 if [[ "$(uname -s)" == CYGWIN* ]]; then
@@ -59,14 +60,22 @@ if [[ ! -f "${buildSettings}" ]]; then
     echo "(Perhaps this is the first run?)"
     echo "Created new settings file with default values."
     sed -e "s|^\(localSourceDir\)=.*|\1=\"${buildSettingsDir}/\"|" ./buildsettings.sh.dist > "${buildSettings}"
+fi
 
-	# Add .buildsettings file to .gitignore, if .gitignore already exists.
-	if [[ -f "${buildSettingsDir}/.gitignore" ]]; then
-		if ! grep -q "${buildSettingsFile}" "${buildSettingsDir}/.gitignore"; then
-			echo "${buildSettingsFile}" >> "${buildSettingsDir}/.gitignore"
-			echo "'${buildSettingsFile}' added to .gitignore."
+# Add Bob items to .gitignore file, if Git is being used for this project.
+if [[ -d "${buildSettingsDir}/.git" ]]; then
+    if [[ ! -f "${buildSettingsDir}/.gitignore" ]]; then
+        echo "File .gitignore created."
+    fi
+    
+    echo >> "${buildSettingsDir}/.gitignore"
+    
+    for item in ${ignoreItems[@]}; do
+        if ! grep -qs "^${item}$" "${buildSettingsDir}/.gitignore"; then
+			echo "${item}" >> "${buildSettingsDir}/.gitignore"
+			echo "'${item}' added to .gitignore."
 		fi
-	fi
+    done
 fi
 
 # Record hash of settings file to later see if something changed.
@@ -106,7 +115,7 @@ esac
 newSettingsHash=$(openssl sha1 "${buildSettings}")
 echo
 if [[ "${settingsHash}" != "${newSettingsHash}" ]]; then
-    echo "New settings detected!"
+    echo "New build settings detected!"
 else
-    echo "No settings were changed."
+    echo "No build settings were changed."
 fi
