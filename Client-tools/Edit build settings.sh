@@ -38,6 +38,7 @@ fi
 buildSettingsDir="$1"
 buildSettingsFile="$2"
 ignoreItems=('/Logs/' '/.deps/' "/$buildSettingsFile")
+first=1
 
 # If using Windows, generate Windows-friendly path name for display purposes and insure the actual path is in Cygwin format.
 if [[ "$(uname -s)" == CYGWIN* ]]; then
@@ -68,10 +69,12 @@ if [[ -d "${buildSettingsDir}/.git" ]]; then
         echo "File .gitignore created."
     fi
     
-    echo >> "${buildSettingsDir}/.gitignore"
-    
     for item in ${ignoreItems[@]}; do
         if ! grep -qs "^${item}$" "${buildSettingsDir}/.gitignore"; then
+            if [ $first -eq 1 ]; then
+                echo >> "${buildSettingsDir}/.gitignore"
+                first=0
+            fi
 			echo "${item}" >> "${buildSettingsDir}/.gitignore"
 			echo "'${item}' added to .gitignore."
 		fi
