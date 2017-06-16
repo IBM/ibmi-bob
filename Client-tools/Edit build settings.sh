@@ -97,17 +97,9 @@ case "$(uname -s)" in
         ;;
     
     CYGWIN*)
-        if [[ -d /cygdrive/c/cygwin64 ]]; then
-            cygwin='cygwin64'
-        elif [[ -d /cygdrive/c/cygwin ]]; then
-            cygwin='cygwin'
-        else
-            echo 'Cygwin directory not found (neither C:\cygwin or C:\cygwin64). Exiting script.'
-            exit 1
-        fi
-        
+        nano="$(cygpath -w $(which nano))"        
         echo "Launching Build Settings editor.  Please set values to fit your environment, then press control-x, 'y', Enter to save and exit."
-        /cygdrive/c/Windows/System32/cmd.exe /C "start /WAIT C:\\${cygwin}\bin\nano.exe '${buildSettingsDisplay}'"
+        cmd.exe /C "start /WAIT $nano '${buildSettingsDisplay}'"
         ;;
     *)
         echo "Support for this OS hasn't yet been implemented."
