@@ -27,11 +27,12 @@ print_help() {
     echo
     echo 'Converts all members in a source physical file to properly-named (Better Object Builder-compatible), ASCII, LF-terminated source files in the current directory in the IFS.  Generally speaking, the filename extension will be the source member type.  For example, RPGLE source member `AB1001` will become IFS source file `AB1001.RPGLE`.  Three exceptions exist, however: source member types CMD, MENU, and PNLGRP result in filename extensions .CMDSRC, .MENUSRC, and .PNLGRPSRC, respectively.'
     echo
-    echo "Usage: cvtsrcpf file library"
+    echo 'Usage: cvtsrcpf file library'
     echo
-    echo "EXAMPLE"
-    echo "  Convert source members for file MYLIB/MYSRCFILE."
-    echo "      cvtsrcpf mysrcfile mylib") | fold -s
+    echo 'EXAMPLE'
+    echo '  Convert source members for file MYLIB/MYSRCFILE.'
+    echo '      $ cd newdir'
+    echo '      $ cvtsrcpf mysrcfile mylib') | fold -s
         
     exit 0
 } >&2
@@ -55,6 +56,10 @@ fi
 
 srcfil=$(print_upper $1)
 lib=$(print_upper $2)
+pwd=$(pwd)
+
+# Number of files converted.
+cvtTotal=0
 
 if [[ "$lib" == "QSYS" ]]; then
     libPath="/QSYS.LIB"
@@ -77,9 +82,15 @@ fi
 # Process the list of source members
 sourceFiles=$(qsh -c "db2 \"select SYSTEM_TABLE_MEMBER, SOURCE_TYPE from qsys2.syspartitionstat where SYSTEM_TABLE_SCHEMA='${lib}' and SYSTEM_TABLE_NAME='${srcfil}'\"" | sed -e '1,/-----/d' -e '/^$/,$d' | awk '{ if ($2 == "-") suffix = ""; else suffix = "." $2; print $1 suffix; }')
 
-for file in sourceFiles; do
-    mbr=
+for file in $sourceFiles; do
+    mbr="${file%.*}"
+    qsh_out -c "cat ${libPath}/${srcfil}.FILE/${mbr}.MBR" | sed -r -e 's/ *$//' > "./$file"
+    echo "Member ${lib}/${srcfil}(${mbr}) type ${file##*.} -> ${pwd}/${file}"
+    (( cvtTotal += 1 ))
+done
 
+echo
+echo "$(script_name): ${cvtTotal} source members converted."
 
 exit 0
 
