@@ -25,7 +25,7 @@
 print_help() {
    (echo 'cvtsrcpf -- convert source physical file members to ASCII IFS files'
     echo
-    echo 'Converts all members in a source physical file to properly-named (Better Object Builder-compatible), ASCII, LF-terminated source files in the current directory in the IFS.  Generally speaking, the filename extension will be the source member type.  For example, RPGLE source member `AB1001` will become IFS source file `AB1001.RPGLE`.  Three exceptions exist, however: source member types CMD, MENU, and PNLGRP result in filename extensions .CMDSRC, .MENUSRC, and .PNLGRPSRC, respectively.'
+    echo 'Converts all members in a source physical file to properly-named (Better Object Builder-compatible), ASCII, LF-terminated source files in the current directory in the IFS.  Generally speaking, the filename extension will be the source member type.  For example, RPGLE source member `AB1001` will become IFS source file `AB1001.RPGLE`.  Four exceptions exist, however: source member types CMD, MENU, and PNLGRP result in filename extensions .CMDSRC, .MENUSRC, and .PNLGRPSRC, respectively, and source member type C residing in source physical file H results in filename extension .H.'
     echo
     echo 'It is likely that the same destination directory will contain converted members from many source physical files.  Therefore, name collisions are possible.  In the event of a duplicate member name and type, the source file name will be adjusted from `member.type` to `member (n).type`, with `n` incremented until a unique name is achieved.'
     echo
@@ -74,6 +74,11 @@ source_file_name() {
             'CMD')    type='CMDSRC';;
             'MENU')   type='MENUSRC';;
             'PNLGRP') type='PNLGRPSRC';;
+            'C')
+                if [ "${srcfil}" = 'H' ]; then
+                    type='H'
+                fi
+                ;;
         esac
         
         file="${file}.${type}"
