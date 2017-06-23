@@ -27,14 +27,16 @@ print_help() {
     echo
     echo 'Converts all members in a source physical file to properly-named (Better Object Builder-compatible), ASCII, LF-terminated source files in the current directory in the IFS.  Generally speaking, the filename extension will be the source member type.  For example, RPGLE source member `AB1001` will become IFS source file `AB1001.RPGLE`.  Three exceptions exist, however: source member types CMD, MENU, and PNLGRP result in filename extensions .CMDSRC, .MENUSRC, and .PNLGRPSRC, respectively.'
     echo
+    echo 'It is likely that the same destination directory will contain converted members from many source physical files.  Therefore, name collisions are possible.  In the event of a duplicate member name and type, the source file name will be adjusted from `member.type` to `member (n).type`, with `n` incremented until a unique name is achieved.'
+    echo
     echo 'Usage: cvtsrcpf file library'
     echo
     echo 'EXAMPLE'
-    echo '  Convert source members for file MYLIB/MYSRCFILE.'
+    echo '  Convert source members for file MYLIB/MYSRCFILE into directory `newdir`.'
     echo '      $ cd newdir'
     echo '      $ cvtsrcpf mysrcfile mylib') | fold -s
         
-    exit 0
+    exit 1
 } >&2
 
 # Print a string in upper case
@@ -47,6 +49,42 @@ print_upper() {
 script_name() {
 	echo "${0##*/}"
 }
+
+# Format source file name from member name + type
+#   &1 = member name
+#   &2 = member type (could be empty)
+#   &3 = number to append to file name (if 0 then nothing appended)
+source_file_name() {
+    local mbr="$1"
+    local type="$2"
+    local num=$3
+    local file=""
+    
+    file="${mbr}"
+    
+    # Append `(n)` to name if needed
+    if [ $num -gt 0 ]; then
+        file="${file} (${num})"
+    fi
+    
+    # Adjust filename extensions for those objects whose source and object names
+    # would otherwise be identical (when viewed from the IFS)
+    if [ -n "$type" ]; then
+        case "$type" in
+            'CMD')    type='CMDSRC';;
+            'MENU')   type='MENUSRC';;
+            'PNLGRP') type='PNLGRPSRC';;
+        esac
+        
+        file="${file}.${type}"
+    fi
+    
+    echo "$file"
+}
+
+#
+# Main script
+#
 
 # Require two arguments
 if [ "$#" -ne 2 ]; then
@@ -80,18 +118,29 @@ if [ ! -d "${libPath}/${srcfil}.FILE" ]; then
 fi
 
 # Process the list of source members
-sourceFiles=$(qsh -c "db2 \"select SYSTEM_TABLE_MEMBER, SOURCE_TYPE from qsys2.syspartitionstat where SYSTEM_TABLE_SCHEMA='${lib}' and SYSTEM_TABLE_NAME='${srcfil}'\"" | sed -e '1,/-----/d' -e '/^$/,$d' | awk '{ if ($2 == "-") suffix = ""; else suffix = "." $2; print $1 suffix; }')
+sourceFiles=$(qsh -c "db2 \"select SYSTEM_TABLE_MEMBER, SOURCE_TYPE from qsys2.syspartitionstat where SYSTEM_TABLE_SCHEMA='${lib}' and SYSTEM_TABLE_NAME='${srcfil}'\"" | sed -e '1,/-----/d' -e '/^$/,$d' | awk '{ if ($2 == "-") suffix = "."; else suffix = "." $2; print $1 suffix; }' | sort)
+
+printf "$(script_name): %d source members found.\n" $(echo "$sourceFiles" | wc -w)
 
 for file in $sourceFiles; do
     mbr="${file%.*}"
-    qsh_out -c "cat ${libPath}/${srcfil}.FILE/${mbr}.MBR" | sed -r -e 's/ *$//' > "./$file"
-    echo "Member ${lib}/${srcfil}(${mbr}) type ${file##*.} -> ${pwd}/${file}"
+    type="${file##*.}"
+    dupes=0
+    
+    file2="$(source_file_name "$mbr" "$type" $dupes)"
+    
+    # If IFS file already exists, alter name from `XYZ.RPGLE` to `XYZ (n).RPGLE`
+    while [ -f "./$file2" ]; do
+        (( dupes += 1 ))
+        file2="$(source_file_name "$mbr" "$type" $dupes)"
+    done
+    
+    # Convert to ASCII, remove trailing spaces
+    qsh_out -c "cat ${libPath}/${srcfil}.FILE/${mbr}.MBR" | sed -r -e 's/ *$//' > "./$file2"
+    echo "Member ${lib}/${srcfil}(${mbr}) type ${type} -> ${pwd}/${file2}"
     (( cvtTotal += 1 ))
 done
 
-echo
 echo "$(script_name): ${cvtTotal} source members converted."
 
 exit 0
-
-
