@@ -147,5 +147,7 @@ for file in $sourceFiles; do
 done
 
 echo "$(script_name): ${cvtTotal} source members converted."
+echo
+echo 'Remember to rename any `.RPGLE` include files to `.RPGLEINC`.'
 
 exit 0
