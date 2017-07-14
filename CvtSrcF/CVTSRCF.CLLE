@@ -21,11 +21,12 @@ dcl &BOBDIR *char 512
 
 dcl &srcfile type(*char) len(10) stg(*defined) defvar(&qualname 1)
 dcl &srclib  type(*char) len(10) stg(*defined) defvar(&qualname 11)
-dcl &cmd  type(*char) len(1024)
+dcl &shellcmd  type(*char) len(1024)
+dcl &qcmdcmd type(*char) len(1050)
+dcl &cmdlen type(*dec) len(15 5) value(1050)
 
 dcl &data *char 80
 dcl &lib *char 10
-dcl &curlib *char 10
 
 /* Determine this program's library name */
 chgvar var(%bin(&data  1 4)) value(80)
@@ -37,14 +38,12 @@ callprc prc('_MATPGMNM') parm(&data)
 chgvar var(&lib) value(%sst(&data 19 10))
 
 /* Call Bob's `cvtsrcpf` command via the RUNPASECMD command */
-rtvjoba curlib(&curlib)
-chgcurlib curlib(&lib)
 
-chgvar &cmd value('cd "' *CAT &TODIR *tcat '" ' +
+chgvar &shellcmd value('. /QOpenSys/etc/profile && cd "' *CAT &TODIR *tcat '" ' +
     *cat '&& "' *CAT &BOBDIR *tcat '/cvtsrcpf" ' +
     *cat &SRCFILE *bcat &SRCLIB)
-RUNPASECMD CMD(&CMD)
+chgvar &qcmdcmd value(&lib *tcat '/RUNPASECMD CMD(''' *cat &shellcmd *tcat ''')')
 
-if cond(&curlib *ne '*NONE') then(chgcurlib curlib(&curlib))
+call pgm(qcmdexc) parm(&qcmdcmd &cmdlen)
 
 endpgm
