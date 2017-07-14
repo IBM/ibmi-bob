@@ -1,0 +1,50 @@
+/* Copyright 2017 S4i Systems, Inc.                                         +
+ *                                                                          +
+ * Licensed under the Apache License, Version 2.0 (the "License");          +
+ * you may not use this file except in compliance with the License.         +
+ * You may obtain a copy of the License at                                  +
+ *                                                                          +
+ *     http://www.apache.org/licenses/LICENSE-2.0                           +
+ *                                                                          +
+ * Unless required by applicable law or agreed to in writing, software      +
+ * distributed under the License is distributed on an "AS IS" BASIS,        +
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. +
+ * See the License for the specific language governing permissions and      +
+ * limitations under the License.                                           +
+ */
+ 
+pgm parm(&QUALNAME &TODIR &BOBDIR)
+
+dcl &QUALNAME *char 20
+dcl &TODIR *char 512
+dcl &BOBDIR *char 512
+
+dcl &srcfile type(*char) len(10) stg(*defined) defvar(&qualname 1)
+dcl &srclib  type(*char) len(10) stg(*defined) defvar(&qualname 11)
+dcl &cmd  type(*char) len(1024)
+
+dcl &data *char 80
+dcl &lib *char 10
+dcl &curlib *char 10
+
+/* Determine this program's library name */
+chgvar var(%bin(&data  1 4)) value(80)
+chgvar var(%bin(&data  5 4)) value(80)
+chgvar var(%bin(&data  9 4)) value(0)
+chgvar var(%bin(&data 13 4)) value(0)
+
+callprc prc('_MATPGMNM') parm(&data)
+chgvar var(&lib) value(%sst(&data 19 10))
+
+/* Call Bob's `cvtsrcpf` command via the RUNPASECMD command */
+rtvjoba curlib(&curlib)
+chgcurlib curlib(&lib)
+
+chgvar &cmd value('cd "' *CAT &TODIR *tcat '" ' +
+    *cat '&& "' *CAT &BOBDIR *tcat '/cvtsrcpf" ' +
+    *cat &SRCFILE *bcat &SRCLIB)
+RUNPASECMD CMD(&CMD)
+
+if cond(&curlib *ne '*NONE') then(chgcurlib curlib(&curlib))
+
+endpgm
