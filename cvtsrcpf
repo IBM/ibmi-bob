@@ -101,6 +101,10 @@ srcfil=$(print_upper $1)
 lib=$(print_upper $2)
 pwd=$(pwd)
 
+# Capture location of GNU Sed; qsh_out invokes its own somehow, even though the GNU one
+# is in the path.
+SED="$(which sed)"
+
 # Number of files converted.
 cvtTotal=0
 
@@ -140,8 +144,8 @@ for file in $sourceFiles; do
         file2="$(source_file_name "$mbr" "$type" $dupes)"
     done
     
-    # Convert to ASCII, remove trailing spaces
-    qsh_out -c "cat ${libPath}/${srcfil}.FILE/${mbr}.MBR" | sed -r -e 's/ *$//' > "./$file2"
+    # Convert to UTF-8, remove trailing spaces
+    qsh_out -c "touch -C 1208 \"${file2}\" && cat ${libPath}/${srcfil}.FILE/${mbr}.MBR | ${SED} -r -e 's/ *$//' > \"${file2}\""
     echo "Member ${lib}/${srcfil}(${mbr}) type ${type} -> ${pwd}/${file2}"
     (( cvtTotal += 1 ))
 done
