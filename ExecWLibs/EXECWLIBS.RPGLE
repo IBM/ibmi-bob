@@ -1,12 +1,12 @@
 **free
 // Copyright 2017 S4i Systems, Inc.
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 //     http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,14 +14,14 @@
 // limitations under the License.
 
 // ============================================================================
-// EXECWTHLIB - Execute command with library in the library list
+// EXECWLIBS - Execute command with libraries added to the library list
 // ============================================================================
 
 ctl-opt stgmdl(*teraspace);
 
-dcl-pi EXECWTHLIB extpgm;
-   pLib char(10) const;
+dcl-pi EXECWLIBS extpgm;
    pCmd varchar(5000) const;
+   pLibs likeDS(libsDs_t) const;
 end-pi;
 
 // Prototypes
@@ -57,10 +57,10 @@ dcl-pr moveProgramMessages extpgm('QMHMOVPM');
 end-pr;
 
 dcl-pr receiveProgramMessage extpgm('QMHRCVPM');
-   messageInfo char(1) options(*varsize) const;
+   messageInfo char(1) options(*varsize);
    messageInfoLen int(10) const;
    formatName char(8) const;
-   callStackEntry char(1) options(*varsize) const;
+   callStackEntry char(10) const;
    callStackCounter int(10) const;
    messageType char(10) const;
    messageKey char(4) const;
@@ -73,6 +73,12 @@ end-pr;
 dcl-s cmd char(5000);
 dcl-s cmdLen packed(15:5);
 dcl-s nullPtr pointer inz;
+dcl-s i int(5);
+
+dcl-ds libsDs_t qualified template;
+  count int(5);
+  libs  char(10) dim(250);
+END-DS;
 
 dcl-ds error qualified;
    provided int(10) inz(%size(error));
@@ -97,13 +103,13 @@ end-ds;
 
 // Mainline
 
-// Add library to library list.  It's ok if it's already there.
-if  pLib <> *blanks;
-   cmd = 'ADDLIBLE ' + pLib;
+// Add libraries to library list, preserving their specified order.
+for i = pLibs.count downto 1;
+   // First remove library in case it's already there
+   cmd = 'RMVLIBLE ' + pLibs.libs(i);
    cmdLen = %len(cmd);
    callp(e) QCmdExc(cmd: cmdLen);
 
-   // Forward error message back to caller, unless it's "Library already exists".
    if %error;
       error.avail = 0;
       callp(e) receiveProgramMessage(
@@ -118,7 +124,7 @@ if  pLib <> *blanks;
                 '*SAME':
                 error);
 
-      if rcvm0100.msgId = 'CPF2103'; // Library already exists
+      if rcvm0100.msgId = 'CPF2104'; // "Library not removed" is ok
          error.avail = 0;
          callp(e) receiveProgramMessage(
                    rcvm0100:
@@ -135,7 +141,17 @@ if  pLib <> *blanks;
          forwardEscape();
       endif;
    endif;
-endif;
+
+   // Now add the library
+   cmd = 'ADDLIBLE LIB(' + %trim(pLibs.libs(i)) + ') POSITION(*FIRST)';
+   cmdLen = %len(cmd);
+   callp(e) QCmdExc(cmd: cmdLen);
+
+   // Forward error message back to caller.
+   if %error;
+         forwardEscape();
+      endif;
+endfor;
 
 // Call user's command.  If an error occurred, forward the escape message back
 // up the call stack so the Make tool will detect it.
@@ -188,3 +204,4 @@ dcl-proc forwardEscape;
       *inlr = *on;
    endif;
 end-proc;
+
