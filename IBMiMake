@@ -58,6 +58,7 @@ CURLIB :=
 DBGVIEW := *ALL
 DETAIL := *EXTENDED
 DFTACTGRP := *NO
+DLTPCT := *NONE
 HLPID =
 HLPPNLGRP =
 OBJTYPE :=
@@ -66,6 +67,7 @@ PAGESIZE :=
 PGM :=
 PMTFILE :=
 PRDLIB :=
+REUSEDLT := *NO
 RPGPPOPT :=
 RSTDSP :=
 SIZE :=
@@ -132,8 +134,10 @@ PNLGRP_AUT := $(AUT)
 PNLGRP_OPTION := *EVENTF *SRC
 
 PF_AUT := $(AUT)
+PF_DLTPCT := $(DLTPCT)
 PF_OPTION := *EVENTF *SRC *LIST
-PF_SIZE := *NOMAX
+PF_REUSEDLT := $(REUSEDLT)
+PF_SIZE :=
 
 PGM_ACTGRP := $(ACTGRP)
 PGM_AUT := $(AUT)
@@ -195,7 +199,7 @@ CRTCMODFLAGS = TERASPACE($(TERASPACE)) STGMDL($(STGMDL)) OUTPUT(*PRINT) OPTION($
 CRTDSPFFLAGS = ENHDSP(*YES) RSTDSP($(RSTDSP)) DFRWRT(*YES) AUT($(AUT)) OPTION($(OPTION)) TEXT(''$(TEXT)'')
 CRTLFFLAGS = AUT($(AUT)) OPTION($(OPTION)) TEXT(''$(TEXT)'')
 CRTMNUFLAGS = AUT($(AUT)) OPTION($(OPTION)) CURLIB($(CURLIB)) PRDLIB($(PRDLIB)) TEXT(''$(TEXT)'') TYPE($(TYPE))
-CRTPFFLAGS = AUT($(AUT)) OPTION($(OPTION)) SIZE($(SIZE)) TEXT(''$(TEXT)'')
+CRTPFFLAGS = AUT($(AUT)) DLTPCT($(DLTPCT)) OPTION($(OPTION)) REUSEDLT($(REUSEDLT)) SIZE($(SIZE)) TEXT(''$(TEXT)'')
 CRTPGMFLAGS = ACTGRP($(ACTGRP)) USRPRF(*USER) TGTRLS($(TGTRLS)) AUT($(AUT)) DETAIL($(DETAIL)) OPTION($(OPTION)) STGMDL($(STGMDL)) TEXT('$(TEXT)')
 CRTPNLGRPFLAGS = AUT($(AUT)) OPTION($(OPTION)) TEXT(''$(TEXT)'')
 CRTPRTFFLAGS = AUT($(AUT)) OPTION($(OPTION)) PAGESIZE($(PAGESIZE)) TEXT(''$(TEXT)'')
@@ -306,6 +310,9 @@ fileAUT = $(strip \
 	$(if $(filter %.PF,$<),$(PF_AUT), \
 	$(if $(filter %.PRTF,$<),$(PRTF_AUT), \
 	UNKNOWN_FILE_TYPE)))))
+fileDLTPCT = $(strip \
+	$(if $(filter %.PF,$<),$(PF_DLTPCT), \
+	UNKNOWN_FILE_TYPE))
 fileOPTION = $(strip \
 	$(if $(filter %.DSPF,$<),$(DSPF_OPTION), \
 	$(if $(filter %.LF,$<),$(LF_OPTION), \
@@ -314,6 +321,9 @@ fileOPTION = $(strip \
 	UNKNOWN_FILE_TYPE)))))
 filePAGESIZE = $(strip \
 	$(if $(filter %.PRTF,$<),$(PRTF_PAGESIZE), \
+	UNKNOWN_FILE_TYPE))
+fileREUSEDLT = $(strip \
+	$(if $(filter %.PF,$<),$(PF_REUSEDLT), \
 	UNKNOWN_FILE_TYPE))
 fileRSTDSP = $(strip \
 	$(if $(filter %.DSPF,$<),$(DSPF_RSTDSP), \
@@ -432,8 +442,10 @@ programTGTRLS = $(strip \
 
 
 %.FILE: private AUT = $(fileAUT)
+%.FILE: private DLTPCT = $(fileDLTPCT)
 %.FILE: private OPTION = $(fileOPTION)
 %.FILE: private PAGESIZE = $(filePAGESIZE)
+%.FILE: private REUSEDLT = $(fileREUSEDLT)
 %.FILE: private RSTDSP = $(fileRSTDSP)
 %.FILE: private SIZE = $(fileSIZE)
 %.FILE: private TYPEDEF = $(if $(filter YES,$(CREATE_TYPEDEF)),$(TYPEDEF_SCRIPT),)
