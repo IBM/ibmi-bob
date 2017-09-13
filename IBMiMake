@@ -509,19 +509,19 @@ programTGTRLS = $(strip \
 	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTCLMOD) srcstmf('$<') parms('$(CRTCLMODFLAGS)'))
 	@system -v "$(TOOLSLIB)/EXECWLIBS LIB($(LIBL)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log 2>&1
 
-%.MODULE: %.RPGLE
+%.MODULE: %.RPGLE $(DEPDIR)/%.d
 	@echo "*** Creating RPG module [$*]"
 	$(eval crtcmd := crtrpgmod module($(OBJLIB)/$*) srcstmf('$<') $(CRTRPGMODFLAGS))
 	@system -v "$(TOOLSLIB)/EXECWLIBS LIB($(LIBL)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log
 	@$(POSTRPGCOMPILE)
 
-%.MODULE: %.SQLC
+%.MODULE: %.SQLC $(DEPDIR)/%.d
 	@echo "*** Creating SQLC module [$*]"
 	$(eval crtcmd := crtsqlci obj($(OBJLIB)/$*) srcstmf('$<') $(CRTSQLCIFLAGS))
 	@system -v "$(TOOLSLIB)/EXECWLIBS LIB($(LIBL)) CMD($(crtcmd))" >$(LOGPATH)/$(notdir $<).log 2>&1 || (ret=$$?; rm $(DEPDIR)/$*.Td 2>/dev/null; exit $$ret)
 	@$(POSTCCOMPILE)
 
-%.MODULE: %.SQLRPGLE
+%.MODULE: %.SQLRPGLE $(DEPDIR)/%.d
 	@echo "*** Creating SQLRPGLE module [$*]"
 	$(eval crtcmd := crtsqlrpgi obj($(OBJLIB)/$*) srcstmf('$<') $(CRTSQLRPGIFLAGS))
 	@system -v "$(TOOLSLIB)/EXECWLIBS LIB($(LIBL)) CMD($(crtcmd))" >$(LOGPATH)/$(notdir $<).log 2>&1
