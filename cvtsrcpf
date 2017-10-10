@@ -16,28 +16,39 @@
 
 #
 # Converts members in a source physical file into properly-named (Better Object
-# Builder-compatible), ASCII, LF-terminated source files in the current
+# Builder-compatible), ASCII-ish, LF-terminated source files in the current
 # directory in the IFS.
 # 
 # Written by Jeff Berman, 2017-06-21
 #
 
 print_help() {
-   (echo 'cvtsrcpf -- convert source physical file members to ASCII IFS files'
+    echo "${script} -- convert source physical file members to ASCII IFS files"
     echo
-    echo 'Converts all members in a source physical file to properly-named (Better Object Builder-compatible), ASCII, LF-terminated source files in the current directory in the IFS.  Generally speaking, the filename extension will be the source member type.  For example, RPGLE source member `AB1001` will become IFS source file `AB1001.RPGLE`.  Four exceptions exist, however: source member types CMD, MENU, and PNLGRP result in filename extensions .CMDSRC, .MENUSRC, and .PNLGRPSRC, respectively, and source member type C residing in source physical file H results in filename extension .H.'
+    print_usage
+    (echo
+    echo 'DESCRIPTION'
+    echo 'Converts all members in a source physical file to properly-named (Better Object Builder-compatible), ASCII-ish, LF-terminated source files in the current directory in the IFS.  Generally speaking, the source member type will become the filename extension.  For example, RPGLE source member `AB1001` will become IFS source file `AB1001.RPGLE`.  Four exceptions exist, however: source member types CMD, MENU, and PNLGRP result in filename extensions .CMDSRC, .MENUSRC, and .PNLGRPSRC, respectively, and source member type C residing in source physical file H results in filename extension .H.'
+    echo
+    echo 'By default, source files will be encoded in UTF-8; this can be overridden by using the `-c` option and supplying a CCSID value.'
     echo
     echo 'It is likely that the same destination directory will contain converted members from many source physical files.  Therefore, name collisions are possible.  In the event of a duplicate member name and type, the source file name will be adjusted from `member.type` to `member (n).type`, with `n` incremented until a unique name is achieved.'
     echo
-    echo 'Usage: cvtsrcpf file library'
-    echo
     echo 'EXAMPLE'
-    echo '  Convert source members for file MYLIB/MYSRCFILE into directory `newdir`.'
+    echo '  Convert source members for file MYLIB/MYSRCFILE into directory `newdir` using the default (UTF-8).'
     echo '      $ cd newdir'
-    echo '      $ cvtsrcpf mysrcfile mylib') | fold -s
+    echo '      $ cvtsrcpf mysrcfile mylib'
+    echo
+    echo '  Convert source members for file MYLIB/MYSRCFILE into directory `newdir` using Windows Latin-1.'
+    echo '      $ cd newdir'
+    echo '      $ cvtsrcpf -c 1252 mysrcfile mylib') | fold -s
         
     exit 1
 } >&2
+
+print_usage() {
+    echo "Usage: ${script} [-c CCSID] file library"
+}
 
 # Print a string in upper case
 print_upper() {
@@ -88,66 +99,107 @@ source_file_name() {
 }
 
 #
-# Main script
+# Main processing
 #
 
-# Require two arguments
-if [ "$#" -ne 2 ]; then
-    print_help
-    exit 1
-fi
+main() {
+    script=$(script_name)
+    CCSID=1208  # Default to UTF-8
 
-srcfil=$(print_upper $1)
-lib=$(print_upper $2)
-pwd=$(pwd)
+	# Extract options
+	while [ $# -gt 0 ]; do
+		case "$1" in
+            -c) CCSID="$2"
+                shift;;
+			-h | '-?' | --help) print_help;;
+			-*) print_usage >&2
+				exit 1;;
+			*)	break;;
+		esac
+		shift
+	done
+	
+    # Require two arguments
+    if [ "$#" -ne 2 ]; then
+        print_usage >&2
+        exit 1
+    fi
 
-# Number of files converted.
-cvtTotal=0
+    srcfil=$(print_upper $1)
+    lib=$(print_upper $2)
+    pwd=$(pwd)
 
-if [[ "$lib" == "QSYS" ]]; then
-    libPath="/QSYS.LIB"
-else
-    libPath=/QSYS.LIB/${lib}.LIB
-fi
+    # Capture location of GNU Sed; qsh_out invokes its own somehow, even though the GNU one
+    # is in the path.
+    SED="$(which sed)"
 
-# Validate library name
-if [ ! -d ${libPath} ]; then
-    echo "$(script_name): Library ${lib} doesn't exist.  Exiting." >&2
-    exit 1
-fi
+    # Number of files converted.
+    cvtTotal=0
 
-# Validate source file name
-if [ ! -d "${libPath}/${srcfil}.FILE" ]; then
-    echo "$(script_name): Source file ${srcfil} doesn't exist.  Exiting." >&2
-    exit 1
-fi
+    if [[ "$lib" == "QSYS" ]]; then
+        libPath="/QSYS.LIB"
+    else
+        libPath=/QSYS.LIB/${lib}.LIB
+    fi
 
-# Process the list of source members
-sourceFiles=$(qsh -c "db2 \"select SYSTEM_TABLE_MEMBER, SOURCE_TYPE from qsys2.syspartitionstat where SYSTEM_TABLE_SCHEMA='${lib}' and SYSTEM_TABLE_NAME='${srcfil}'\"" | sed -e '1,/-----/d' -e '/^$/,$d' | awk '{ if ($2 == "-") suffix = "."; else suffix = "." $2; print $1 suffix; }' | sort)
+    # Validate library name
+    if [ ! -d ${libPath} ]; then
+        echo "$(script_name): Library ${lib} doesn't exist.  Exiting." >&2
+        exit 1
+    fi
 
-printf "$(script_name): %d source members found.\n" $(echo "$sourceFiles" | wc -w)
+    # Validate source file name
+    if [ ! -d "${libPath}/${srcfil}.FILE" ]; then
+        echo "$(script_name): Source file ${srcfil} doesn't exist.  Exiting." >&2
+        exit 1
+    fi
 
-for file in $sourceFiles; do
-    mbr="${file%.*}"
-    type="${file##*.}"
-    dupes=0
+    # Validate CCSID
+    rand5=$(cat /dev/urandom | env LC_CTYPE=C tr -cd '[:alnum:]' | head -c 5)
+    touch /tmp/$rand5
+    attr /tmp/${rand5} CCSID=${CCSID} 2>/dev/null
+    if [ $? -ne 0 ]; then
+        echo "$(script_name): ${CCSID} is not a valid CCSID.  Exiting." >&2
+        rm /tmp/$rand5 2>/dev/null
+        exit 1
+    else
+        rm /tmp/$rand5 2>/dev/null
+    fi
     
-    file2="$(source_file_name "$mbr" "$type" $dupes)"
+    if [ ! -d "${libPath}/${srcfil}.FILE" ]; then
+        echo "$(script_name): Source file ${srcfil} doesn't exist.  Exiting." >&2
+        exit 1
+    fi
+
+    # Process the list of source members
+    sourceFiles=$(qsh -c "db2 \"select SYSTEM_TABLE_MEMBER, SOURCE_TYPE from qsys2.syspartitionstat where SYSTEM_TABLE_SCHEMA='${lib}' and SYSTEM_TABLE_NAME='${srcfil}'\"" | sed -e '1,/-----/d' -e '/^$/,$d' | awk '{ if ($2 == "-") suffix = "."; else suffix = "." $2; print $1 suffix; }' | sort)
+
+    printf "$(script_name): %d source members found.\n" $(echo "$sourceFiles" | wc -w)
+
+    for file in $sourceFiles; do
+        mbr="${file%.*}"
+        type="${file##*.}"
+        dupes=0
     
-    # If IFS file already exists, alter name from `XYZ.RPGLE` to `XYZ (n).RPGLE`
-    while [ -f "./$file2" ]; do
-        (( dupes += 1 ))
         file2="$(source_file_name "$mbr" "$type" $dupes)"
-    done
     
-    # Convert to ASCII, remove trailing spaces
-    qsh_out -c "cat ${libPath}/${srcfil}.FILE/${mbr}.MBR" | sed -r -e 's/ *$//' > "./$file2"
-    echo "Member ${lib}/${srcfil}(${mbr}) type ${type} -> ${pwd}/${file2}"
-    (( cvtTotal += 1 ))
-done
+        # If IFS file already exists, alter name from `XYZ.RPGLE` to `XYZ (n).RPGLE`
+        while [ -f "./$file2" ]; do
+            (( dupes += 1 ))
+            file2="$(source_file_name "$mbr" "$type" $dupes)"
+        done
+    
+        # Convert to specified CCSID, remove trailing spaces
+        qsh_out -c "touch -C ${CCSID} \"${file2}\" && cat ${libPath}/${srcfil}.FILE/${mbr}.MBR | ${SED} -r -e 's/ *$//' > \"${file2}\""
+        echo "Member ${lib}/${srcfil}(${mbr}) type ${type} -> ${pwd}/${file2}"
+        (( cvtTotal += 1 ))
+    done
 
-echo "$(script_name): ${cvtTotal} source members converted."
-echo
-echo 'Remember to rename any `.RPGLE` include files to `.RPGLEINC`.'
+    echo "$(script_name): ${cvtTotal} source members converted."
+    echo
+    echo 'Remember to rename any `.RPGLE` include files to `.RPGLEINC`.'
 
-exit 0
+    exit 0
+}
+
+main "$@"
