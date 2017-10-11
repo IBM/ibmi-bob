@@ -13,10 +13,11 @@
  * limitations under the License.                                           +
  */
  
-pgm parm(&QUALNAME &TODIR &BOBDIR)
+pgm parm(&QUALNAME &TODIR &STMFCCSID &BOBDIR)
 
 dcl &QUALNAME *char 20
 dcl &TODIR *char 512
+dcl &STMFCCSID *uint 2
 dcl &BOBDIR *char 512
 
 dcl &srcfile type(*char) len(10) stg(*defined) defvar(&qualname 1)
@@ -40,8 +41,8 @@ chgvar var(&lib) value(%sst(&data 19 10))
 /* Call Bob's `cvtsrcpf` command via the RUNPASECMD command */
 
 chgvar &shellcmd value('. /QOpenSys/etc/profile && cd "' *CAT &TODIR *tcat '" ' +
-    *cat '&& "' *CAT &BOBDIR *tcat '/cvtsrcpf" ' +
-    *cat &SRCFILE *bcat &SRCLIB)
+    *cat '&& "' *CAT &BOBDIR *tcat '/cvtsrcpf" -c ' *cat %char(&stmfccsid) +
+    *bcat &SRCFILE *bcat &SRCLIB)
 chgvar &qcmdcmd value(&lib *tcat '/RUNPASECMD CMD(''' *cat &shellcmd *tcat ''')')
 
 call pgm(qcmdexc) parm(&qcmdcmd &cmdlen)
