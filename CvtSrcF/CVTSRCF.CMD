@@ -22,6 +22,8 @@
              PARM       KWD(FILE) TYPE(NAME1) MIN(1) PROMPT('File')
              PARM       KWD(TODIR) TYPE(*PNAME) LEN(512) RSTD(*NO) MIN(1) MAX(1) +
                         CASE(*MIXED) PROMPT('To directory')
+             PARM       KWD(STMFCCSID) TYPE(*UINT2) PROMPT('Stream file CCSID') +
+                        DFT(1208) PMTCTL(*PMTRQS)
              PARM       KWD(BOBDIR) TYPE(*PNAME) LEN(512) RSTD(*NO) MAX(1) +
                         CASE(*MIXED) PROMPT('Path to Bob directory') +
                         DFT('/Build/Bob') PMTCTL(*PMTRQS)
