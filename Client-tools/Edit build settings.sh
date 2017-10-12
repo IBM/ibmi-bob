@@ -37,7 +37,7 @@ fi
 
 buildSettingsDir="$1"
 buildSettingsFile="$2"
-ignoreItems=('/Logs/' '/.deps/' "/$buildSettingsFile")
+ignoreItems=('/Logs/' "/$buildSettingsFile")
 first=1
 
 # If using Windows, generate Windows-friendly path name for display purposes and insure the actual path is in Cygwin format.
