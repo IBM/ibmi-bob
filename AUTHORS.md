@@ -1,5 +1,5 @@
 # Better Object Builder Authors
 
 * Jeff Berman:
-  [Email](mailto:jberman@s4isystems.com)  |
+  [Email](mailto:jeff@gonif.org)  |
   [LinkedIn](https://www.linkedin.com/in/jberman0)
