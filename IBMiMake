@@ -77,7 +77,7 @@ TERASPACE :=
 TEXT :=
 TYPE :=
 TGTCCSID := *JOB
-TGTRLS := V6R1M0
+TGTRLS := V7R3M0
 VLDCKR :=
 
 # Object-type-specific defaults.  Not used directly, but copied to the standard ones above and then
