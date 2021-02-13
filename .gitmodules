@@ -1,3 +1,5 @@
 [submodule "crtfrmstmf"]
 	path = crtfrmstmf
 	url = https://github.com/BrianGarland/CRTFRMSTMF.git
+	path = CRTFRMSTMF
+	url = https://github.com/BrianGarland/CRTFRMSTMF.git
