@@ -274,7 +274,7 @@ system "CPYTOSTMF FROMMBR('$(OBJPATH)/EVFEVENT.FILE/$*.MBR') TOSTMF('$(DEPDIR)/$
   done; \
 } | sed -e 's/^\/.*\///' -e 's/^/$@: /' | tr '[:lower:]' '[:upper:]' >$(DEPDIR)/$*.d
 touch -cr $(OBJPATH)/$@ $(DEPDIR)/$*.d
-rm $(DEPDIR)/$*.Td
+#rm $(DEPDIR)/$*.Td
 $(removeEmptyDep)
 endef
 
@@ -483,7 +483,7 @@ programTGTRLS = $(strip \
 %.FILE: %.PF
 	@echo "*** Creating PF [$*]"
 	@$(set_STMF_CCSID)
-	@$(TOOLSPATH)/dltpfdeps -p $* $(OBJLIB)
+	#@$(TOOLSPATH)/dltpfdeps -p $* $(OBJLIB)
 	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTPF) srcstmf('$<') parms('$(CRTPFFLAGS)'))
 	@system -v "$(TOOLSLIB)/EXECWLIBS LIB($(LIBL)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log
 	@$(TYPEDEF)
