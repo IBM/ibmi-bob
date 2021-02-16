@@ -1,38 +1,38 @@
-      *********************************************************************
-      *                 Better Object Builder
-      *
-      * Copyright 2017 S4i Systems, Inc.
-      *
-      * Module       : TEST010
-      * Written By   : Jeff Berman
-      * Date Written : 05/25/17
-      *
-      * Description:
-      * ------------
-      * Read and print some names.
-      *
-      *****************************************************************
-      * Modification History
-      *
-      * Init   Task ID    Date       Description
-      * ----   --------   --------   -----------
-      *****************************************************************
+**free
+//********************************************************************
+//                 Better Object Builder
+//
+// Copyright 2017 S4i Systems, Inc.
+//
+// Module       : TEST010
+// Written By   : Jeff Berman
+// Date Written : 05/25/17
+//
+// Description:
+// ------------
+// Read and print some names.
+//
+//****************************************************************
+// Modification History
+//
+// Init   Task ID    Date       Description
+// ----   --------   --------   -----------
+//****************************************************************
 
-     ftest01a   if   e           k disk
+dcl-f test01a disk keyed;
 
-      *================== Field definitions ===========================
-     d response        s             10
+//================== Field definitions ===========================
+dcl-s response  char(10);
 
-      *========================= Mainline =============================
+//========================= Mainline =============================
+dou       %eof(test01a);
+    read      test01a;
+    if        not %eof;
+    dsply(e) first;
+    endif;
+enddo
 
-     c                   dou       %eof(test01a)
-     c                   read      test01a
-     c                   if        not %eof
-     c     first         dsply(e)
-     c                   endif
-     c                   enddo
+dsply(e)                response
 
-     c                   dsply(e)                response
-
-     c                   eval      *inlr = *on
-     c                   return
+*inlr = *on
+return;
