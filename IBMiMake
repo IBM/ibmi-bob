@@ -197,7 +197,7 @@ CRTCLMODFLAGS = AUT($(AUT)) DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) TEXT(''$(TEXT)
 CRTCMDFLAGS = PGM($(PGM)) VLDCKR($(VLDCKR)) PMTFILE($(PMTFILE)) HLPPNLGRP($(HLPPNLGRP)) HLPID($(HLPID)) AUT($(AUT)) TEXT(''$(TEXT)'')
 CRTCMODFLAGS = TERASPACE($(TERASPACE)) STGMDL($(STGMDL)) OUTPUT(*PRINT) OPTION($(OPTION)) DBGVIEW($(DBGVIEW)) \
                SYSIFCOPT($(SYSIFCOPT)) AUT($(AUT)) TEXT('$(TEXT)') TGTCCSID($(TGTCCSID)) TGTRLS($(TGTRLS)) \
-               MAKEDEP('$(DEPDIR)/$*.evfevent')
+               MAKEDEP('$(DEPDIR)/$*.Td')
 CRTDSPFFLAGS = ENHDSP(*YES) RSTDSP($(RSTDSP)) DFRWRT(*YES) AUT($(AUT)) OPTION($(OPTION)) TEXT(''$(TEXT)'')
 CRTLFFLAGS = AUT($(AUT)) OPTION($(OPTION)) TEXT(''$(TEXT)'')
 CRTMNUFLAGS = AUT($(AUT)) OPTION($(OPTION)) CURLIB($(CURLIB)) PRDLIB($(PRDLIB)) TEXT(''$(TEXT)'') TYPE($(TYPE))
@@ -210,7 +210,7 @@ CRTRPGMODFLAGS = AUT($(AUT)) DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) OUTPUT(*PRINT
 CRTQMQRYFLAGS = AUT($(AUT)) TEXT(''$(TEXT)'')
 CRTSQLCIFLAGS = COMMIT($(COMMIT)) OBJTYPE($(OBJTYPE)) OUTPUT(*PRINT) TEXT('$(TEXT)') TGTRLS($(TGTRLS)) DBGVIEW($(DBGVIEW)) \
                 COMPILEOPT('INCDIR(''$(SRCPATH)'') OPTION($(OPTION)) STGMDL($(STGMDL)) SYSIFCOPT($(SYSIFCOPT)) \
-                            TGTCCSID($(TGTCCSID)) TERASPACE($(TERASPACE)) MAKEDEP(''$(DEPDIR)/$*.evfevent'')')
+                            TGTCCSID($(TGTCCSID)) TERASPACE($(TERASPACE)) MAKEDEP(''$(DEPDIR)/$*.Td'')')
 CRTSQLRPGIFLAGS = COMMIT($(COMMIT)) OBJTYPE($(OBJTYPE)) OPTION($(OPTION)) OUTPUT(*PRINT) TEXT('$(TEXT)') \
                   TGTRLS($(TGTRLS)) DBGVIEW($(DBGVIEW)) RPGPPOPT($(RPGPPOPT)) \
                   COMPILEOPT('TGTCCSID($(TGTCCSID))')
@@ -232,8 +232,10 @@ runDate := $(shell date +"%F_%H.%M.%S-%a")
 LOGPATH := $(SRCPATH)/Logs/$(runDate)
 $(shell mkdir -p $(LOGPATH))
 $(info IBMiMake log directory: $(LOGPATH))
-DEPDIR := $(SRCPATH)/.evfevent
+DEPDIR := $(SRCPATH)/.deps
 $(shell mkdir -p $(DEPDIR) >/dev/null)
+EVTDIR := $(SRCPATH)/.evfevent
+$(shell mkdir -p $(EVTDIR) >/dev/null)
 CRTFRMSTMFLIB := $(TOOLSLIB)
 ICONV := /QOpenSys/usr/bin/iconv
 ICONV_EBCDIC := IBM-037
@@ -248,10 +250,10 @@ cleanCDeps = awk '$$2 !~ /^\/QIBM\// && $$2 !~ /$(notdir $<)$$/ && $$2 !~ /$(bas
 # This defines the steps taken after a C compile to massage the auto-generated dependencies into a useable form.
 # See http://make.mad-scientist.net/papers/advanced-auto-dependency-generation/#tldr
 define POSTCCOMPILE =
-$(ICONV) -f $(ICONV_EBCDIC) -t $(ICONV_ASCII) $(DEPDIR)/$*.evfevent | tr -d '\r' > $(DEPDIR)/$*.T2d
+$(ICONV) -f $(ICONV_EBCDIC) -t $(ICONV_ASCII) $(DEPDIR)/$*.Td | tr -d '\r' > $(DEPDIR)/$*.T2d
 $(cleanCDeps) <$(DEPDIR)/$*.T2d | sort -u >$(DEPDIR)/$*.d
 touch -cr $(OBJPATH)/$@ $(DEPDIR)/$*.d
-rm $(DEPDIR)/$*.evfevent $(DEPDIR)/$*.T2d
+rm $(DEPDIR)/$*.T2d
 $(removeEmptyDep)
 endef
 
@@ -266,15 +268,18 @@ cleanRPGDeps = awk '$$1 == "FILEID" && $$6 !~ /^QTEMP/ && toupper($$6) !~ /QSYS/
 # if any externally-described files are declared.  If so, isolate the actual source file name from its path,
 # convert everything to upper case, format in makefile dependency format, and output all these dependencies
 # to a file that will be included by Make.
+define EVFEVENT_DOWNLOAD =
+system "CPYTOSTMF FROMMBR('$(OBJPATH)/EVFEVENT.FILE/$*.MBR') TOSTMF('$(EVTDIR)/$*.evfevent') STMFCCSID(*STDASCII) ENDLINFMT(*LF) CVTDTA(*AUTO) STMFOPT(*REPLACE)" >/dev/null
+endef
 define POSTRPGCOMPILE =
-system "CPYTOSTMF FROMMBR('$(OBJPATH)/EVFEVENT.FILE/$*.MBR') TOSTMF('$(DEPDIR)/$*.evfevent') STMFCCSID(*STDASCII) ENDLINFMT(*LF) CVTDTA(*AUTO) STMFOPT(*REPLACE)" >/dev/null
-{ for f in $$($(cleanRPGDeps) <$(DEPDIR)/$*.evfevent | sort -u); do \
+$(EVFEVENT_DOWNLOAD)
+{ for f in $$($(cleanRPGDeps) <$(EVTDIR)/$*.evfevent | sort -u); do \
     echo "$${f}"; \
     sed -n -r -e '/^.{6}[^*].{14}[^Ff]/ s/^.{5}[Ff]([^ ]{,10}).*(DISK|WORKSTN|PRINTER).*/  \1\.FILE/I p' -e '/^.{6}[^*]/ s/^.{5}[Dd].*EXTNAME\(([^ \)]*).*/  \1\.FILE/I p' "$${f}" | sort -u; \
   done; \
 } | sed -e 's/^\/.*\///' -e 's/^/$@: /' | tr '[:lower:]' '[:upper:]' >$(DEPDIR)/$*.d
 touch -cr $(OBJPATH)/$@ $(DEPDIR)/$*.d
-#rm $(DEPDIR)/$*.evfevent
+#rm $(EVTDIR)/$*.evfevent
 $(removeEmptyDep)
 endef
 
@@ -523,7 +528,7 @@ programTGTRLS = $(strip \
 	@echo "*** Creating C module [$*]"
 	@$(set_STMF_CCSID)
 	$(eval crtcmd := crtcmod module($(OBJLIB)/$*) srcstmf('$<') $(CRTCMODFLAGS) $(ADHOCCRTFLAGS))
-	-@system -v "$(TOOLSLIB)/EXECWLIBS LIB($(LIBL)) CMD($(crtcmd))" >$(LOGPATH)/$(notdir $<).log 2>&1 || (ret=$$?; rm $(DEPDIR)/$*.evfevent 2>/dev/null; exit $$ret)
+	@system -v "$(TOOLSLIB)/EXECWLIBS LIB($(LIBL)) CMD($(crtcmd))" >$(LOGPATH)/$(notdir $<).log 2>&1 || (ret=$$?; rm $(DEPDIR)/$*.Td 2>/dev/null; exit $$ret)
 	@$(POSTCCOMPILE)
 
 %.MODULE: %.CLLE
@@ -536,7 +541,7 @@ programTGTRLS = $(strip \
 	@echo "*** Creating RPG module [$*]"
 	@$(set_STMF_CCSID)
 	$(eval crtcmd := crtrpgmod module($(OBJLIB)/$*) srcstmf('$<') $(CRTRPGMODFLAGS))
-	-@system -v "$(TOOLSLIB)/EXECWLIBS LIB($(LIBL)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log
+	@system -v "$(TOOLSLIB)/EXECWLIBS LIB($(LIBL)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log || $(EVFEVENT_DOWNLOAD)
 	@$(POSTRPGCOMPILE)
 
 # Temp: Convert UTF-8 to temporary Windows Latin-1, because SQLC pre-compiler doesn't understand UTF-8
@@ -545,17 +550,16 @@ programTGTRLS = $(strip \
 	@$(set_STMF_CCSID)
 	@qsh_out -c "touch -C 1252 $<-1252 && cat $< >$<-1252"
 	$(eval crtcmd := crtsqlci obj($(OBJLIB)/$*) srcstmf('$<-1252') $(CRTSQLCIFLAGS))
-	@system -v "$(TOOLSLIB)/EXECWLIBS LIB($(LIBL)) CMD($(crtcmd))" >$(LOGPATH)/$(notdir $<).log 2>&1 || (ret=$$?; rm $(DEPDIR)/$*.evfevent 2>/dev/null; rm "$<-1252" 2>/dev/null; exit $$ret)
-	-@$(POSTCCOMPILE)
+	@system -v "$(TOOLSLIB)/EXECWLIBS LIB($(LIBL)) CMD($(crtcmd))" >$(LOGPATH)/$(notdir $<).log 2>&1 || (ret=$$?; rm $(DEPDIR)/$*.Td 2>/dev/null; rm "$<-1252" 2>/dev/null; exit $$ret)
+	@$(POSTCCOMPILE)
 	@rm "$<-1252"
 
 %.MODULE: %.SQLRPGLE $(DEPDIR)/%.d
 	@echo "*** Creating SQLRPGLE module [$*]"
 	@$(set_STMF_CCSID)
 	$(eval crtcmd := crtsqlrpgi obj($(OBJLIB)/$*) srcstmf('$<') $(CRTSQLRPGIFLAGS))
-	-@system -v "$(TOOLSLIB)/EXECWLIBS LIB($(LIBL)) CMD($(crtcmd))" >$(LOGPATH)/$(notdir $<).log 2>&1
+	@system -v "$(TOOLSLIB)/EXECWLIBS LIB($(LIBL)) CMD($(crtcmd))" >$(LOGPATH)/$(notdir $<).log 2>&1 || $(EVFEVENT_DOWNLOAD)
 	@$(POSTRPGCOMPILE)
-
 
 %.PGM: private ACTGRP = $(programACTGRP)
 %.PGM: private AUT = $(programAUT)
