@@ -32,6 +32,7 @@ makeOpts=$*
 srcDir="$(pwd)"
 
 # Get the sourceCcsid from a given .ibmi.json. jq is prefered as the json parser
+# if jq not found, awk is used and assumes that the sourceCssid attribute are on the same line
 retrieve_sourceCcsid() {
     local pathToIbmiJson=$1
     local ccsid
@@ -47,6 +48,7 @@ retrieve_sourceCcsid() {
 }
 
 # Get the objectLocation from a given .ibmi.json. jq is prefered as the json parser
+# if jq not found, awk is used and assumes that the sourceCssid attribute are on the same line
 retrieve_objectLocation() {
     local pathToIbmiJson=$1
     local objLoc
