@@ -95,9 +95,9 @@ recursive_make() {
             curObjPath=/QSYS.LIB/${!curObjLoc}.LIB
         fi
 
-        echo ">> " make "$makeOpts" TGTCCSID:="$curCcsid" OBJPATH:="${curObjPath}" -f "${dir}/Makefile"
+        echo ">> " make TGTCCSID:="$curCcsid" OBJPATH:="${curObjPath}" -f "${dir}/Makefile" "$makeOpts"
         # Call make with the arguments that were passed in
-        make "$makeOpts" TGTCCSID:="$curCcsid" OBJPATH:="${curObjPath}" -f "${dir}/Makefile"
+        make TGTCCSID:="$curCcsid" OBJPATH:="${curObjPath}" -f "${dir}/Makefile" $makeOpts
         echo "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
         echo
         exitCode=$(( exitCode + $? ))
