@@ -61,7 +61,6 @@ endef
 # 	@echo "name: $$($(extractName))"; \
 # 	echo textDescriptor: $$($(extractTextDescriptor))
 
-
 # These variables are swapped into the compile commands.  Their values also serve as
 # global defaults that can be overridden on a per-object basis by setting target-specific
 # variables, e.g. `MYPGM.PGM: private TGTRLS = V7R1M0`.  They can also be overridden on a
@@ -609,11 +608,12 @@ programTGTRLS = $(strip \
 ###%.PGM: private PGM = $*
 %.PGM: private STGMDL = $(programSTGMDL)
 %.PGM: private TGTRLS = $(programTGTRLS)
+%.PGM: private BNDSRVPGMPATH = $(basename $(filter %.SRVPGM,$(notdir $^)) $(externalsrvpgms))
 
 %.PGM:
 	@echo "*** Creating program [$*] from modules [$(basename $(filter %.MODULE,$(notdir $^)))] and service programs [$(basename $(filter %.SRVPGM,$(notdir $^$|)))]"
 	$(eval externalsrvpgms := $(filter %.SRVPGM,$(subst .LIB,,$(subst /QSYS.LIB/,,$|))))
-	$(eval crtcmd := crtpgm pgm($(OBJLIB)/$*) module($(basename $(filter %.MODULE,$(notdir $^)))) bndsrvpgm($(basename $(filter %.SRVPGM,$(notdir $^)) $(externalsrvpgms))) $(CRTPGMFLAGS))
+	$(eval crtcmd := crtpgm pgm($(OBJLIB)/$*) module($(basename $(filter %.MODULE,$(notdir $^)))) bndsrvpgm($(if $(BNDSRVPGMPATH),$(BNDSRVPGMPATH),*NONE)) $(CRTPGMFLAGS))
 	system -v "$(TOOLSLIB)/EXECWLIBS LIB($(LIBL)) CMD($(crtcmd))" >$(LOGPATH)/$@.log 2>&1
 	system "CPYTOSTMF FROMMBR('$(OBJPATH)/EVFEVENT.FILE/$*.MBR') TOSTMF('$(EVTDIR)/$*.PGM.evfevent') STMFCCSID(*STDASCII) ENDLINFMT(*LF) CVTDTA(*AUTO) STMFOPT(*REPLACE)" >/dev/null
 
@@ -644,13 +644,15 @@ programTGTRLS = $(strip \
 %.SRVPGM: private DETAIL = $(SRVPGM_DETAIL)
 %.SRVPGM: private STGMDL = $(SRVPGM_STGMDL)
 %.SRVPGM: private TGTRLS = $(SRVPGM_TGTRLS)
+%.SRVPGM: private BNDSRVPGMPATH = $(basename $(filter %.SRVPGM,$(notdir $^)) $(externalsrvpgms))
+
 %.SRVPGM:
 	@echo "*** Creating service program [$*] from modules [$(basename $(filter %.MODULE,$(notdir $^)))] and service programs [$(basename $(filter %.SRVPGM,$(notdir $^$|)))]"
 
 	@$(set_STMF_CCSID)
 	$(eval externalsrvpgms := $(filter %.SRVPGM,$(subst .LIB,,$(subst /QSYS.LIB/,,$|))))
-	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTSRVPGM) srcstmf('$<') parms('MODULE($(basename $(filter %.MODULE,$(notdir $^)))) BNDSRVPGM(*NONE) $(CRTSRVPGMFLAGS)'))
-	system -vKk "$(TOOLSLIB)/EXECWLIBS LIB($(LIBL)) CMD($(crtcmd))" > $(LOGPATH)/$@.log 2>&1
+	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTSRVPGM) srcstmf('$<') parms('MODULE($(basename $(filter %.MODULE,$(notdir $^)))) BNDSRVPGM($(if $(BNDSRVPGMPATH),$(BNDSRVPGMPATH),*NONE)) $(CRTSRVPGMFLAGS)'))
+	@system -v "$(TOOLSLIB)/EXECWLIBS LIB($(LIBL)) CMD($(crtcmd))" > $(LOGPATH)/$@.log 2>&1
 	system "CPYTOSTMF FROMMBR('$(OBJPATH)/EVFEVENT.FILE/$*.MBR') TOSTMF('$(EVTDIR)/$*.SRVPGM.evfevent') STMFCCSID(*STDASCII) ENDLINFMT(*LF) CVTDTA(*AUTO) STMFOPT(*REPLACE)" >/dev/null
 
 %.WSCST: private AUT = $(WSCST_AUT)
