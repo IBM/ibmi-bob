@@ -41,7 +41,7 @@
 #   o cd /some/path/that's/not/in/QSYS.LIB
 #   o make all OBJPATH:=/QSYS.LIB/<object_lib>.LIB -f '/path/to/project-specific/Makefile'
 
-# The extractName and extractTextDescriptor are used to decomposite the long filename into module name and
+# The extractName and extractTextDescriptor are used to decompose the long filename into module name and
 # the text descriptor.
 # e.g. CUSTOME1-Customer_file.LF has `CUSTOME1` as the module name and `Customer file` as the text descriptor
 define extractName = 
