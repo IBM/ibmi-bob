@@ -48,7 +48,9 @@ define extractName =
 echo '$<' | awk -F- '{ print $$1 }'
 endef
 define extractTextDescriptor =
-echo '$<' | awk -F- '{ i = index($$0,"-");print substr($$0,i+1)}' | sed -e 's/\.[^.]*$$//' | sed -e 's/_/\ /g'
+if [[ "$<" == *"-"* ]]; then
+	echo '$<' | awk -F- '{ i = index($$0,"-");print substr($$0,i+1)}' | sed -e 's/\.[^.]*$$//' | sed -e 's/_/\ /g';
+fi
 endef
 # define extractShortName = 
 # echo MAIN.RPGLE
