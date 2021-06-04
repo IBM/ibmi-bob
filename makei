@@ -62,7 +62,7 @@ retrieve_objectLocation() {
     echo "$objLoc"
 }
 
-# A recurssive function that loops through every folder under the input src directory and issues an make command if possible
+# A recursive function that loops through every folder under the input src directory and issues an make command if possible
 recursive_make() {
     local dir=$1
     local parentObjLoc=$2
@@ -70,16 +70,19 @@ recursive_make() {
     local curObjLoc
     local curCcsid
     cd "$dir" || ( echo "${dir} not found"; exit 1)
+
+    if [[ -f ".ibmi.json" ]]; then
+        curObjLoc=$(retrieve_objectLocation "./.ibmi.json")
+        curCcsid=$(retrieve_sourceCcsid "./.ibmi.json")
+    fi
+    # If ObjLoc and curCcsid are not defined, then use the parent's configuration
+    curObjLoc="${curObjLoc:-$parentObjLoc}"
+    curCcsid="${curCcsid:-$parentCcsid}"
+
+
     if [[ -f "Makefile" ]]; then
         echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
         echo "makei: [Info] Building ${dir}"
-        if [[ -f ".ibmi.json" ]]; then
-            curObjLoc=$(retrieve_objectLocation "./.ibmi.json")
-            curCcsid=$(retrieve_sourceCcsid "./.ibmi.json")
-        fi
-        # If ObjLoc and curCcsid are not defined, then use the parent's configuration
-        curObjLoc=${curObjLoc:-$parentObjLoc}
-        curCcsid=${curCcsid:-$parentCcsid}
 
         local curObjPath='*CURLIB'
         if [[ $curObjLoc != '*CURLIB' ]]; then
@@ -92,14 +95,14 @@ recursive_make() {
             curObjPath=/QSYS.LIB/${!curObjLoc}.LIB
         fi
 
-        echo ">> " make "$makeOpts" TGTCCSID:="$curCcsid" OBJPATH:="${curObjPath}" -f "${dir}/Makefile"
+        echo ">> " make TGTCCSID:="$curCcsid" OBJPATH:="${curObjPath}" -f "${dir}/Makefile" "$makeOpts"
         # Call make with the arguments that were passed in
-        make "$makeOpts" TGTCCSID:="$curCcsid" OBJPATH:="${curObjPath}" -f "${dir}/Makefile"
+        make TGTCCSID:="$curCcsid" OBJPATH:="${curObjPath}" -f "${dir}/Makefile" $makeOpts
         echo "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
         echo
         exitCode=$(( exitCode + $? ))
     fi
-
+    
     for f in "$dir"/*; do
         if [[ -d $f ]]; then
             recursive_make "$f" "$curObjLoc" "$curCcsid"

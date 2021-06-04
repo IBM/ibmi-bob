@@ -1,0 +1,4 @@
+#! /QOpenSys/pkgs/bin/bash
+getjobid
+cl "CHGJOB LOG(4 00 *SECLVL)"
+exec system -ikKeb "$*"
