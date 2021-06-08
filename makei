@@ -97,7 +97,7 @@ recursive_make() {
 
         echo ">> " make TGTCCSID:="$curCcsid" OBJPATH:="${curObjPath}" -f "${dir}/Makefile" "$makeOpts"
         # Call make with the arguments that were passed in
-        make TGTCCSID:="$curCcsid" OBJPATH:="${curObjPath}" -f "${dir}/Makefile" $makeOpts
+        make PROJECTDIR:="${srcDir}" TGTCCSID:="$curCcsid" OBJPATH:="${curObjPath}" -f "${dir}/Makefile" $makeOpts
         echo "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
         echo
         exitCode=$(( exitCode + $? ))
