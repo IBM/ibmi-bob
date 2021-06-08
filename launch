@@ -11,6 +11,7 @@ fi
 mkfifo .tmp_pipe
 getjobid -s > tmp_pipe
 jobid=$(cat < tmp_pipe)
+rm -rf .tmp_pipe
 
 cl "CHGJOB LOG(4 00 *SECLVL)" 
 
@@ -22,4 +23,4 @@ jq -c "{cmd:\"${cmd}\", cmd_time:\"${timestamp}\",msgs:[.records[] | {msgid:.MES
 (jq -c '. += $temp' $joblog_json --slurpfile temp $temp_json1) > $temp_json2
 mv $temp_json2 $joblog_json
 
-rm -rf $temp_json1 $temp_json2 .tmp_pipe
+rm -rf $temp_json1 $temp_json2
