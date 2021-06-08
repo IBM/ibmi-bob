@@ -1,4 +1,25 @@
 #! /QOpenSys/pkgs/bin/bash
-getjobid
-cl "CHGJOB LOG(4 00 *SECLVL)"
-exec system -ikKeb "$*"
+joblog_json=$1
+cmd=$2
+temp_json1=$(mktemp)
+temp_json2=$(mktemp)
+
+if [ ! -f $joblog_json ]; then
+    echo "[]" > $joblog_json
+fi
+
+mkfifo .tmp_pipe
+getjobid -s > tmp_pipe
+jobid=$(cat < tmp_pipe)
+
+cl "CHGJOB LOG(4 00 *SECLVL)" 
+
+timestamp=$(date +"%Y-%m-%d-%H.%M.%S.%N")
+
+cl "$cmd"
+db2util -o json "SELECT MESSAGE_ID,MESSAGE_TEXT,MESSAGE_SECOND_LEVEL_TEXT,MESSAGE_TYPE,MESSAGE_TIMESTAMP FROM TABLE(QSYS2.JOBLOG_INFO('${jobid}')) A" | \
+jq -c "{cmd:\"${cmd}\", cmd_time:\"${timestamp}\",msgs:[.records[] | {msgid:.MESSAGE_ID, type:.MESSAGE_TYPE, message_time:.MESSAGE_TIMESTAMP,message_text:.MESSAGE_TEXT, second_level:.MESSAGE_SECOND_LEVEL_TEXT}]}" > $temp_json1
+(jq -c '. += $temp' $joblog_json --slurpfile temp $temp_json1) > $temp_json2
+mv $temp_json2 $joblog_json
+
+rm -rf $temp_json1 $temp_json2 .tmp_pipe
