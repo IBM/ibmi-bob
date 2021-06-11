@@ -1,4 +1,15 @@
 #! /QOpenSys/pkgs/bin/bash
+
+if [ $# -lt 2 ]; then
+  echo 1>&2 "$0: not enough arguments"
+  echo 1>&2 "Usage: launch path_to_joblog_json command"
+  exit 2
+elif [ $# -gt 2 ]; then
+  echo 1>&2 "$0: too many arguments"
+  echo 1>&2 "Usage: launch path_to_joblog_json command"
+  exit 2
+fi
+
 joblog_json=$1
 cmd=$2
 temp_json1=$(mktemp)
