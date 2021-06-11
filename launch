@@ -20,7 +20,7 @@ if [ ! -f $joblog_json ]; then
 fi
 
 tmppipe=$(mktemp -u)
-mkfifo "$tmppipe"
+mkfifo -m 600 "$tmppipe"
 
 getjobid -s > "$tmppipe"
 jobid=$(cat < "$tmppipe")
