@@ -19,13 +19,12 @@ if [ ! -f $joblog_json ]; then
     echo "[]" > $joblog_json
 fi
 
-pid=$$
-pipe="/tmp/pipe$pid"
-mkfifo "$pipe"
+tmppipe=$(mktemp -u)
+mkfifo "$tmppipe"
 
-getjobid -s > "$pipe"
-jobid=$(cat < "$pipe")
-rm -rf "$pipe"
+getjobid -s > "$tmppipe"
+jobid=$(cat < "$tmppipe")
+rm -rf "$tmppipe"
 
 cl "CHGJOB LOG(4 00 *SECLVL)" 
 
