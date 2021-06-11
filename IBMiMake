@@ -627,7 +627,7 @@ programTGTRLS = $(strip \
 %.PGM: %.PGM.RPGLE
 	@echo "*** Create Bound RPG Program [$*]"
 	$(eval crtcmd := $(TOOLSLIB)/EXECWLIBS LIB($(LIBL)) CMD(CRTBNDRPG srcstmf($<) PGM($(OBJLIB)/$*) $(CRTBNDRPGFLAGS)))
-	@launch "$(JOBLOGFILE)" "$(crtcmd)" >$(LOGPATH)/$@.log 2>&1
+	@launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1
 	@system "CPYTOSTMF FROMMBR('$(OBJPATH)/EVFEVENT.FILE/$*.MBR') TOSTMF('$(EVTDIR)/$*.PGM.RPGLE.evfevent') STMFCCSID(*STDASCII) ENDLINFMT(*LF) CVTDTA(*AUTO) STMFOPT(*REPLACE)" >/dev/null
 
 %.PGM: %.PGM.C
@@ -670,7 +670,7 @@ programTGTRLS = $(strip \
 	@$(set_STMF_CCSID)
 	$(eval externalsrvpgms := $(filter %.SRVPGM,$(subst .LIB,,$(subst /QSYS.LIB/,,$|))))
 	$(eval crtcmd := CRTSRVPGM srcstmf('$<') SRVPGM($(OBJLIB)/$*) MODULE($(basename $(filter %.MODULE,$(notdir $^)))) BNDSRVPGM($(if $(BNDSRVPGMPATH),$(BNDSRVPGMPATH),*NONE)) $(CRTSRVPGMFLAGS))
-	@launch "$(JOBLOGFILE)" "$(TOOLSLIB)/EXECWLIBS LIB($(LIBL)) CMD($(crtcmd))" > $(LOGPATH)/$@.log 2>&1
+	@launch "$(JOBLOGFILE)" "$(TOOLSLIB)/EXECWLIBS LIB($(LIBL)) CMD($(crtcmd))" >> $(LOGFILE) 2>&1
 	@system "CPYTOSTMF FROMMBR('$(OBJPATH)/EVFEVENT.FILE/$*.MBR') TOSTMF('$(EVTDIR)/$*.SRVPGM.evfevent') STMFCCSID(*STDASCII) ENDLINFMT(*LF) CVTDTA(*AUTO) STMFOPT(*REPLACE)" >/dev/null
 
 %.WSCST: private AUT = $(WSCST_AUT)
