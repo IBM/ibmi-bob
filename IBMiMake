@@ -252,7 +252,9 @@ LIBL := $(OBJLIB)
 TOOLSPATH := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 TOOLSLIB := BOBTOOLS
 runDate := $(shell date +"%F_%H.%M.%S-%a")
-LOGPATH := $(SRCPATH)/Logs/$(runDate)
+LOGPATH := $(PROJECTDIR)/logs
+LOGFILE := $(LOGPATH)/output.log
+JOBLOGFILE := $(LOGPATH)/joblog.json
 $(shell mkdir -p $(LOGPATH))
 $(info IBMiMake log directory: $(LOGPATH))
 DEPDIR := $(SRCPATH)/.deps
@@ -484,7 +486,7 @@ programTGTRLS = $(strip \
 	@echo "*** Creating command [$*]"
 	@$(set_STMF_CCSID)
 	$(eval crtcmd := CRTCMD CMD($(OBJLIB)/$*) srcstmf('$<') $(CRTCMDFLAGS))
-	@launch "$(PROJECTDIR)/logs/joblog.json" "$(TOOLSLIB)/EXECWLIBS LIB($(LIBL)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log 2>&1
+	@launch "$(JOBLOGFILE)" "$(TOOLSLIB)/EXECWLIBS LIB($(LIBL)) CMD($(crtcmd))" >> $(LOGFILE) 2>&1
 
 
 %.FILE: private AUT = $(fileAUT)
@@ -501,7 +503,7 @@ programTGTRLS = $(strip \
 	@echo "*** Creating DSPF [$*]"
 	@$(set_STMF_CCSID)
 	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTDSPF) srcstmf('$<') parms('$(CRTDSPFFLAGS)'))
-	@launch "$(PROJECTDIR)/logs/joblog.json" "$(TOOLSLIB)/EXECWLIBS LIB($(LIBL)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log
+	@launch "$(JOBLOGFILE)" "$(TOOLSLIB)/EXECWLIBS LIB($(LIBL)) CMD($(crtcmd))" >> $(LOGFILE)
 
 .SECONDEXPANSION:
 %.FILE:$$(shell getTgtObj % LF)
@@ -509,7 +511,7 @@ programTGTRLS = $(strip \
 	@$(set_STMF_CCSID)
 	@if [ -d $(OBJPATH)/$@ ]; then rm -r $(OBJPATH)/$@; fi
 	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTLF) srcstmf('$<') parms('$(CRTLFFLAGS)'))
-	@launch "$(PROJECTDIR)/logs/joblog.json" "$(TOOLSLIB)/EXECWLIBS LIB($(LIBL)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log
+	@launch "$(JOBLOGFILE)" "$(TOOLSLIB)/EXECWLIBS LIB($(LIBL)) CMD($(crtcmd))" >> $(LOGFILE)
 	@$(TYPEDEF)
 
 .SECONDEXPANSION:
@@ -518,7 +520,7 @@ programTGTRLS = $(strip \
 	@$(set_STMF_CCSID)
 	#@$(TOOLSPATH)/dltpfdeps -p $* $(OBJLIB)
 	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTPF) srcstmf('$<') parms('$(CRTPFFLAGS)'))
-	@launch "$(PROJECTDIR)/logs/joblog.json" "$(TOOLSLIB)/EXECWLIBS LIB($(LIBL)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log
+	@launch "$(JOBLOGFILE)" "$(TOOLSLIB)/EXECWLIBS LIB($(LIBL)) CMD($(crtcmd))" >> $(LOGFILE)
 	@$(TYPEDEF)
 
 .SECONDEXPANSION:
@@ -526,7 +528,7 @@ programTGTRLS = $(strip \
 	@echo "*** Creating PRTF [$<]"
 	@$(set_STMF_CCSID)
 	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTPRTF) srcstmf('$<') parms('$(CRTPRTFFLAGS)'))
-	@launch "$(PROJECTDIR)/logs/joblog.json" "$(TOOLSLIB)/EXECWLIBS LIB($(LIBL)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log
+	@launch "$(JOBLOGFILE)" "$(TOOLSLIB)/EXECWLIBS LIB($(LIBL)) CMD($(crtcmd))" >> $(LOGFILE)
 	@$(TYPEDEF)
 
 
@@ -541,7 +543,7 @@ programTGTRLS = $(strip \
 	@echo "*** Creating menu [$*]"
 	@$(set_STMF_CCSID)
 	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTMNU) srcstmf('$<') parms('$(CRTMNUFLAGS)'))
-	@launch "$(PROJECTDIR)/logs/joblog.json" "$(TOOLSLIB)/EXECWLIBS LIB($(LIBL)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log 2>&1
+	@launch "$(JOBLOGFILE)" "$(TOOLSLIB)/EXECWLIBS LIB($(LIBL)) CMD($(crtcmd))" >> $(LOGFILE) 2>&1
 
 
 %.MODULE: private AUT = $(moduleAUT)
@@ -560,7 +562,7 @@ programTGTRLS = $(strip \
 	@echo "*** Creating C module [$*]"
 	@$(set_STMF_CCSID)
 	$(eval crtcmd := crtcmod module($(OBJLIB)/$*) srcstmf('$<') $(CRTCMODFLAGS) $(ADHOCCRTFLAGS))
-	@launch "$(PROJECTDIR)/logs/joblog.json" "$(TOOLSLIB)/EXECWLIBS LIB($(LIBL)) CMD($(crtcmd))" >$(LOGPATH)/$(notdir $<).log 2>&1 || (ret=$$?; rm $(DEPDIR)/$*.Td 2>/dev/null; exit $$ret)
+	@launch "$(JOBLOGFILE)" "$(TOOLSLIB)/EXECWLIBS LIB($(LIBL)) CMD($(crtcmd))" >$(LOGPATH)/$(notdir $<).log 2>&1 || (ret=$$?; rm $(DEPDIR)/$*.Td 2>/dev/null; exit $$ret)
 	@$(POSTCCOMPILE)
 
 
@@ -569,7 +571,7 @@ programTGTRLS = $(strip \
 	@echo "*** Creating RPG module [$*] with [$<]"
 	@$(set_STMF_CCSID)
 	$(eval crtcmd := crtrpgmod module($(OBJLIB)/$*) srcstmf('$<') $(CRTRPGMODFLAGS))
-	@launch "$(PROJECTDIR)/logs/joblog.json" "$(TOOLSLIB)/EXECWLIBS LIB($(LIBL)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log 2>&1 || $(EVFEVENT_DOWNLOAD)
+	@launch "$(JOBLOGFILE)" "$(TOOLSLIB)/EXECWLIBS LIB($(LIBL)) CMD($(crtcmd))" >> $(LOGFILE) 2>&1 || $(EVFEVENT_DOWNLOAD)
 	@$(POSTRPGCOMPILE)
 
 
@@ -578,7 +580,7 @@ programTGTRLS = $(strip \
 	@echo "*** Creating CL module [$*]"
 	@$(set_STMF_CCSID)
 	@$(eval crtcmd := crtclmod module($(OBJLIB)/$*) srcstmf('$<') $(CRTCLMODFLAGS))
-	@launch "$(PROJECTDIR)/logs/joblog.json" "$(TOOLSLIB)/EXECWLIBS LIB($(LIBL)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log 2>&1 || $(EVFEVENT_DOWNLOAD)
+	@launch "$(JOBLOGFILE)" "$(TOOLSLIB)/EXECWLIBS LIB($(LIBL)) CMD($(crtcmd))" >> $(LOGFILE) 2>&1 || $(EVFEVENT_DOWNLOAD)
 	@$(EVFEVENT_DOWNLOAD)
 
 # Temp: Convert UTF-8 to temporary Windows Latin-1, because SQLC pre-compiler doesn't understand UTF-8
@@ -588,7 +590,7 @@ programTGTRLS = $(strip \
 	@$(set_STMF_CCSID)
 	@qsh_out -c "touch -C 1252 $<-1252 && cat $< >$<-1252"
 	$(eval crtcmd := crtsqlci obj($(OBJLIB)/$*) srcstmf('$<-1252') $(CRTSQLCIFLAGS))
-	@launch "$(PROJECTDIR)/logs/joblog.json" "$(TOOLSLIB)/EXECWLIBS LIB($(LIBL)) CMD($(crtcmd))" >$(LOGPATH)/$(notdir $<).log 2>&1 || (ret=$$?; rm $(DEPDIR)/$*.Td 2>/dev/null; rm "$<-1252" 2>/dev/null; exit $$ret)
+	@launch "$(JOBLOGFILE)" "$(TOOLSLIB)/EXECWLIBS LIB($(LIBL)) CMD($(crtcmd))" >$(LOGPATH)/$(notdir $<).log 2>&1 || (ret=$$?; rm $(DEPDIR)/$*.Td 2>/dev/null; rm "$<-1252" 2>/dev/null; exit $$ret)
 	@$(POSTCCOMPILE)
 	@rm "$<-1252"
 
@@ -598,7 +600,7 @@ programTGTRLS = $(strip \
 	@echo "*** Creating SQLRPGLE module [$*]"
 	@$(set_STMF_CCSID)
 	$(eval crtcmd := crtsqlrpgi obj($(OBJLIB)/$*) srcstmf('$<') $(CRTSQLRPGIFLAGS))
-	@launch "$(PROJECTDIR)/logs/joblog.json" "$(TOOLSLIB)/EXECWLIBS LIB($(LIBL)) CMD($(crtcmd))" >$(LOGPATH)/$(notdir $<).log 2>&1 || $(EVFEVENT_DOWNLOAD)
+	@launch "$(JOBLOGFILE)" "$(TOOLSLIB)/EXECWLIBS LIB($(LIBL)) CMD($(crtcmd))" >$(LOGPATH)/$(notdir $<).log 2>&1 || $(EVFEVENT_DOWNLOAD)
 	@$(POSTRPGCOMPILE)
 
 %.PGM: private ACTGRP = $(programACTGRP)
@@ -618,19 +620,19 @@ programTGTRLS = $(strip \
 	@echo "*** Creating program [$*] from modules [$(basename $(filter %.MODULE,$(notdir $^)))] and service programs [$(basename $(filter %.SRVPGM,$(notdir $^$|)))]"
 	$(eval externalsrvpgms := $(filter %.SRVPGM,$(subst .LIB,,$(subst /QSYS.LIB/,,$|))))
 	$(eval crtcmd := crtpgm pgm($(OBJLIB)/$*) module($(basename $(filter %.MODULE,$(notdir $^)))) bndsrvpgm($(if $(BNDSRVPGMPATH),$(BNDSRVPGMPATH),*NONE)) $(CRTPGMFLAGS))
-	@launch "$(PROJECTDIR)/logs/joblog.json" "$(TOOLSLIB)/EXECWLIBS LIB($(LIBL)) CMD($(crtcmd))" >$(LOGPATH)/$@.log 2>&1
+	@launch "$(JOBLOGFILE)" "$(TOOLSLIB)/EXECWLIBS LIB($(LIBL)) CMD($(crtcmd))" >$(LOGPATH)/$@.log 2>&1
 	@system "CPYTOSTMF FROMMBR('$(OBJPATH)/EVFEVENT.FILE/$*.MBR') TOSTMF('$(EVTDIR)/$*.PGM.evfevent') STMFCCSID(*STDASCII) ENDLINFMT(*LF) CVTDTA(*AUTO) STMFOPT(*REPLACE)" >/dev/null
 
 %.PGM: %.PGM.RPGLE
 	@echo "*** Create Bound RPG Program [$*]"
 	$(eval crtcmd := $(TOOLSLIB)/EXECWLIBS LIB($(LIBL)) CMD(CRTBNDRPG srcstmf($<) PGM($(OBJLIB)/$*) $(CRTBNDRPGFLAGS)))
-	@launch "$(PROJECTDIR)/logs/joblog.json" "$(crtcmd)" >$(LOGPATH)/$@.log 2>&1
+	@launch "$(JOBLOGFILE)" "$(crtcmd)" >$(LOGPATH)/$@.log 2>&1
 	@system "CPYTOSTMF FROMMBR('$(OBJPATH)/EVFEVENT.FILE/$*.MBR') TOSTMF('$(EVTDIR)/$*.PGM.RPGLE.evfevent') STMFCCSID(*STDASCII) ENDLINFMT(*LF) CVTDTA(*AUTO) STMFOPT(*REPLACE)" >/dev/null
 
 %.PGM: %.PGM.C
 	@echo "*** Create Bound RPG Program [$*]"
 	$(eval crtcmd := $(TOOLSLIB)/EXECWLIBS LIB($(LIBL)) CMD(CRTBNDC srcstmf($<) PGM($(OBJLIB)/$*) $(CRTBNDCFLAGS)))
-	@launch "$(PROJECTDIR)/logs/joblog.json" "$(crtcmd)" > $(LOGPATH)/$(notdir $<).log 2>&1
+	@launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1
 	@system "CPYTOSTMF FROMMBR('$(OBJPATH)/EVFEVENT.FILE/$*.MBR') TOSTMF('$(EVTDIR)/$*.PGM.C.evfevent') STMFCCSID(*STDASCII) ENDLINFMT(*LF) CVTDTA(*AUTO) STMFOPT(*REPLACE)" >/dev/null
 
 %.PNLGRP: private AUT = $(PNLGRP_AUT)
@@ -641,7 +643,7 @@ programTGTRLS = $(strip \
 	@echo "*** Creating panel group [$*]"
 	@$(set_STMF_CCSID)
 	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTPNLGRP) srcstmf('$<') parms('$(CRTPNLGRPFLAGS)'))
-	@launch "$(PROJECTDIR)/logs/joblog.json" "$(TOOLSLIB)/EXECWLIBS LIB($(LIBL)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log 2>&1
+	@launch "$(JOBLOGFILE)" "$(TOOLSLIB)/EXECWLIBS LIB($(LIBL)) CMD($(crtcmd))" >> $(LOGFILE) 2>&1
 
 
 %.QMQRY: private AUT = $(QMQRY_AUT)
@@ -651,7 +653,7 @@ programTGTRLS = $(strip \
 	@echo "*** Creating QM query [$*]"
 	@$(set_STMF_CCSID)
 	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTQMQRY) srcstmf('$<') parms('$(CRTQMQRYFLAGS)'))
-	@launch "$(PROJECTDIR)/logs/joblog.json" "$(TOOLSLIB)/EXECWLIBS LIB($(LIBL)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log 2>&1
+	@launch "$(JOBLOGFILE)" "$(TOOLSLIB)/EXECWLIBS LIB($(LIBL)) CMD($(crtcmd))" >> $(LOGFILE) 2>&1
 
 
 %.SRVPGM: private ACTGRP = $(SRVPGM_ACTGRP)
@@ -667,7 +669,7 @@ programTGTRLS = $(strip \
 	@$(set_STMF_CCSID)
 	$(eval externalsrvpgms := $(filter %.SRVPGM,$(subst .LIB,,$(subst /QSYS.LIB/,,$|))))
 	$(eval crtcmd := CRTSRVPGM srcstmf('$<') SRVPGM($(OBJLIB)/$*) MODULE($(basename $(filter %.MODULE,$(notdir $^)))) BNDSRVPGM($(if $(BNDSRVPGMPATH),$(BNDSRVPGMPATH),*NONE)) $(CRTSRVPGMFLAGS))
-	@launch "$(PROJECTDIR)/logs/joblog.json" "$(TOOLSLIB)/EXECWLIBS LIB($(LIBL)) CMD($(crtcmd))" > $(LOGPATH)/$@.log 2>&1
+	@launch "$(JOBLOGFILE)" "$(TOOLSLIB)/EXECWLIBS LIB($(LIBL)) CMD($(crtcmd))" > $(LOGPATH)/$@.log 2>&1
 	@system "CPYTOSTMF FROMMBR('$(OBJPATH)/EVFEVENT.FILE/$*.MBR') TOSTMF('$(EVTDIR)/$*.SRVPGM.evfevent') STMFCCSID(*STDASCII) ENDLINFMT(*LF) CVTDTA(*AUTO) STMFOPT(*REPLACE)" >/dev/null
 
 %.WSCST: private AUT = $(WSCST_AUT)
@@ -677,7 +679,7 @@ programTGTRLS = $(strip \
 	@echo "*** Creating work station customizing object [$*]"
 	@$(set_STMF_CCSID)
 	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTWSCST) srcstmf('$<') parms('$(CRTWSCSTFLAGS)'))
-	@launch "$(PROJECTDIR)/logs/joblog.json" "$(TOOLSLIB)/EXECWLIBS LIB($(LIBL)) CMD($(crtcmd))" > $(LOGPATH)/$(notdir $<).log 2>&1
+	@launch "$(JOBLOGFILE)" "$(TOOLSLIB)/EXECWLIBS LIB($(LIBL)) CMD($(crtcmd))" >> $(LOGFILE) 2>&1
 
 $(DEPDIR)/%.d: ;
 .PRECIOUS: $(DEPDIR)/%.d
