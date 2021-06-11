@@ -8,10 +8,13 @@ if [ ! -f $joblog_json ]; then
     echo "[]" > $joblog_json
 fi
 
-mkfifo .tmp_pipe
-getjobid -s > tmp_pipe
-jobid=$(cat < tmp_pipe)
-rm -rf .tmp_pipe
+pid=$$
+pipe="/tmp/pipe$pid"
+mkfifo "$pipe"
+
+getjobid -s > "$pipe"
+jobid=$(cat < "$pipe")
+rm -rf "$pipe"
 
 cl "CHGJOB LOG(4 00 *SECLVL)" 
 
