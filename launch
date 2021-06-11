@@ -19,13 +19,11 @@ if [ ! -f $joblog_json ]; then
     echo "[]" > $joblog_json
 fi
 
-tmppipe=$(mktemp -u)
-mkfifo -m 600 "$tmppipe"
+tmppipe=$(mktemp)
 
-getjobid -s > "$tmppipe" &
+getjobid -s > "$tmppipe"
 jobid=$(cat < "$tmppipe")
 rm -rf "$tmppipe"
-
 cl "CHGJOB LOG(4 00 *SECLVL)" 
 
 
