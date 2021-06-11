@@ -19,7 +19,7 @@ timestamp=$(date +"%Y-%m-%d-%H.%M.%S.%N")
 
 cl "$cmd"
 db2util -o json "SELECT MESSAGE_ID,MESSAGE_TEXT,MESSAGE_SECOND_LEVEL_TEXT,MESSAGE_TYPE,SEVERITY,MESSAGE_TIMESTAMP FROM TABLE(QSYS2.JOBLOG_INFO('${jobid}')) A" | \
-jq -c "{cmd:\"${cmd}\", cmd_time:\"${timestamp}\",msgs:[.records[] | {msgid:.MESSAGE_ID, type:.MESSAGE_TYPE, severity:.SEVERITY,message_time:.MESSAGE_TIMESTAMP,message_text:.MESSAGE_TEXT, second_level:.MESSAGE_SECOND_LEVEL_TEXT}]}" > $temp_json1
+jq -c "{cmd:\"${cmd}\", cmd_time:\"${timestamp}\",msgs:[.records[] | select(.MESSAGE_TEXT | contains(\"not safe for a multithreaded job.\") | not | {msgid:.MESSAGE_ID, type:.MESSAGE_TYPE, severity:.SEVERITY,message_time:.MESSAGE_TIMESTAMP,message_text:.MESSAGE_TEXT, second_level:.MESSAGE_SECOND_LEVEL_TEXT}]}" > $temp_json1
 (jq -c '. += $temp' $joblog_json --slurpfile temp $temp_json1) > $temp_json2
 mv $temp_json2 $joblog_json
 
