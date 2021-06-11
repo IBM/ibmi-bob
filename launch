@@ -32,7 +32,7 @@ cl "CHGJOB LOG(4 00 *SECLVL)"
 timestamp=$(date +"%Y-%m-%d-%H.%M.%S.%N")
 
 echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
-echo "Executating command: ${cmd}"
+echo "executing command: ${cmd}"
 cl "$cmd"
 echo "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
 echo
