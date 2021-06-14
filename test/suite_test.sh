@@ -28,4 +28,4 @@ suite_test_two() {
 }
 
 # Load and run shUnit2.
-. ..shunit2/shunit2
+. ../shunit2/shunit2
