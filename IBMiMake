@@ -71,8 +71,8 @@ endef
 # instead of a constant so that all settings are defined in one place, at the top.)
 # tl;dr: If you want to customize a compile setting for an object, change these variables
 # in your TARGET (not here).
-ACTGRP := E_PRODUCT
-AUT := *EXCLUDE
+ACTGRP := 
+AUT := 
 BNDDIR :=
 COMMIT := *NONE
 CURLIB :=
@@ -97,8 +97,8 @@ SYSIFCOPT :=
 TERASPACE :=
 TEXT = $(shell $(extractTextDescriptor))
 TYPE :=
-TGTCCSID := *JOB
-TGTRLS := V7R3M0
+TGTCCSID := 
+TGTRLS := 
 VLDCKR :=
 
 # Object-type-specific defaults.  Not used directly, but copied to the standard ones above and then
