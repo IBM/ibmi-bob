@@ -483,7 +483,7 @@ programTGTRLS = $(strip \
 %.CMD: private VLDCKR = $(CMD_VLDCKR)
 
 .SECONDEXPANSION:
-%.CMD: $$(shell getTgtObj % CMDSRC)
+%.CMD: $$(if $$(wildcard $$*-*.CMDSRC),$$(wildcard $$*-*.CMDSRC),$$*.CMDSRC)
 	@echo "*** Creating command [$*]"
 	@$(set_STMF_CCSID)
 	$(eval crtcmd := CRTCMD CMD($(OBJLIB)/$*) srcstmf('$<') $(CRTCMDFLAGS))
@@ -500,14 +500,14 @@ programTGTRLS = $(strip \
 %.FILE: private TYPEDEF = $(if $(filter YES,$(CREATE_TYPEDEF)),$(TYPEDEF_SCRIPT),)
 
 .SECONDEXPANSION:
-%.FILE:$$(shell getTgtObj % DSPF)
+%.FILE:$$(if $$(wildcard $$*-*.DSPF),$$(wildcard $$*-*.DSPF),$$*.DSPF)
 	@echo "*** Creating DSPF [$*]"
 	@$(set_STMF_CCSID)
 	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTDSPF) srcstmf('$<') parms('$(CRTDSPFFLAGS)'))
 	@launch "$(JOBLOGFILE)" "$(TOOLSLIB)/EXECWLIBS LIB($(LIBL)) CMD($(crtcmd))" >> $(LOGFILE)
 
 .SECONDEXPANSION:
-%.FILE:$$(shell getTgtObj % LF)
+%.FILE:$$(if $$(wildcard $$*-*.LF),$$(wildcard $$*-*.LF),$$*.LF)
 	@echo "*** Creating LF [$*]"
 	@$(set_STMF_CCSID)
 	@if [ -d $(OBJPATH)/$@ ]; then rm -r $(OBJPATH)/$@; fi
@@ -516,7 +516,7 @@ programTGTRLS = $(strip \
 	@$(TYPEDEF)
 
 .SECONDEXPANSION:
-%.FILE: $$(shell getTgtObj % PF)
+%.FILE: $$(if $$(wildcard $$*-*.PF),$$(wildcard $$*-*.PF),$$*.PF)
 	@echo "*** Creating PF [$*]"
 	@$(set_STMF_CCSID)
 	#@$(TOOLSPATH)/dltpfdeps -p $* $(OBJLIB)
@@ -525,7 +525,7 @@ programTGTRLS = $(strip \
 	@$(TYPEDEF)
 
 .SECONDEXPANSION:
-%.FILE: $$(shell getTgtObj % PRTF)
+%.FILE: $$(if $$(wildcard $$*-*.PRTF),$$(wildcard $$*-*.PRTF),$$*.PRTF)
 	@echo "*** Creating PRTF [$<]"
 	@$(set_STMF_CCSID)
 	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTPRTF) srcstmf('$<') parms('$(CRTPRTFFLAGS)'))
@@ -540,7 +540,7 @@ programTGTRLS = $(strip \
 %.MENU: private TYPE = $(MNU_TYPE)
 
 .SECONDEXPANSION:
-%.MENU: $$(shell getTgtObj % MENUSRC)
+%.MENU: $$(if $$(wildcard $$*-*.MENUSRC),$$(wildcard $$*-*.MENUSRC),$$*.MENUSRC)
 	@echo "*** Creating menu [$*]"
 	@$(set_STMF_CCSID)
 	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTMNU) srcstmf('$<') parms('$(CRTMNUFLAGS)'))
@@ -559,7 +559,7 @@ programTGTRLS = $(strip \
 
 
 .SECONDEXPANSION:
-%.MODULE: $$(shell getTgtObj % C) $(DEPDIR)/%.d
+%.MODULE: $$(if $$(wildcard $$*-*.C),$$(wildcard $$*-*.C),$$*.C) $(DEPDIR)/%.d
 	@echo "*** Creating C module [$*]"
 	@$(set_STMF_CCSID)
 	$(eval crtcmd := crtcmod module($(OBJLIB)/$*) srcstmf('$<') $(CRTCMODFLAGS) $(ADHOCCRTFLAGS))
@@ -568,7 +568,7 @@ programTGTRLS = $(strip \
 
 
 .SECONDEXPANSION:
-%.MODULE: $$(shell getTgtObj % RPGLE) $(DEPDIR)/%.d
+%.MODULE: $$(if $$(wildcard $$*-*.RPGLE),$$(wildcard $$*-*.RPGLE),$$*.RPGLE) $(DEPDIR)/%.d
 	@echo "*** Creating RPG module [$*] with [$<]"
 	@$(set_STMF_CCSID)
 	$(eval crtcmd := crtrpgmod module($(OBJLIB)/$*) srcstmf('$<') $(CRTRPGMODFLAGS))
@@ -577,7 +577,7 @@ programTGTRLS = $(strip \
 
 
 .SECONDEXPANSION:
-%.MODULE: $$(shell getTgtObj % CLLE)
+%.MODULE: $$(if $$(wildcard $$*-*.CLLE),$$(wildcard $$*-*.CLLE),$$*.CLLE)
 	@echo "*** Creating CL module [$*]"
 	@$(set_STMF_CCSID)
 	@$(eval crtcmd := crtclmod module($(OBJLIB)/$*) srcstmf('$<') $(CRTCLMODFLAGS))
@@ -586,7 +586,7 @@ programTGTRLS = $(strip \
 
 # Temp: Convert UTF-8 to temporary Windows Latin-1, because SQLC pre-compiler doesn't understand UTF-8
 .SECONDEXPANSION:
-%.MODULE: $$(shell getTgtObj % SQLC) $(DEPDIR)/%.d
+%.MODULE: $$(if $$(wildcard $$*-*.SQLC),$$(wildcard $$*-*.SQLC),$$*.SQLC) $(DEPDIR)/%.d
 	@echo "*** Creating SQLC module [$*]"
 	@$(set_STMF_CCSID)
 	@qsh_out -c "touch -C 1252 $<-1252 && cat $< >$<-1252"
@@ -597,7 +597,7 @@ programTGTRLS = $(strip \
 
 
 .SECONDEXPANSION:
-%.MODULE: $$(shell getTgtObj % SQLRPGLE) $(DEPDIR)/%.d
+%.MODULE: $$(if $$(wildcard $$*-*.SQLRPGLE),$$(wildcard $$*-*.SQLRPGLE),$$*.SQLRPGLE) $(DEPDIR)/%.d
 	@echo "*** Creating SQLRPGLE module [$*]"
 	@$(set_STMF_CCSID)
 	$(eval crtcmd := crtsqlrpgi obj($(OBJLIB)/$*) srcstmf('$<') $(CRTSQLRPGIFLAGS))
@@ -640,7 +640,7 @@ programTGTRLS = $(strip \
 %.PNLGRP: private OPTION = $(PNLGRP_OPTION)
 
 .SECONDEXPANSION:
-%.PNLGRP: $$(shell getTgtObj % PNLGRPSRC)
+%.PNLGRP: $$(if $$(wildcard $$*-*.PNLGRPSRC),$$(wildcard $$*-*.PNLGRPSRC),$$*.PNLGRPSRC)
 	@echo "*** Creating panel group [$*]"
 	@$(set_STMF_CCSID)
 	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTPNLGRP) srcstmf('$<') parms('$(CRTPNLGRPFLAGS)'))
@@ -650,7 +650,7 @@ programTGTRLS = $(strip \
 %.QMQRY: private AUT = $(QMQRY_AUT)
 
 .SECONDEXPANSION:
-%.QMQRY: $$(shell getTgtObj % SQL)
+%.QMQRY: $$(if $$(wildcard $$*-*.SQL),$$(wildcard $$*-*.SQL),$$*.SQL)
 	@echo "*** Creating QM query [$*]"
 	@$(set_STMF_CCSID)
 	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTQMQRY) srcstmf('$<') parms('$(CRTQMQRYFLAGS)'))
@@ -676,7 +676,7 @@ programTGTRLS = $(strip \
 %.WSCST: private AUT = $(WSCST_AUT)
 
 .SECONDEXPANSION:
-%.WSCST: $$(shell getTgtObj % WSCSTSRC)
+%.WSCST: $$(if $$(wildcard $$*-*.WSCSTSRC),$$(wildcard $$*-*.WSCSTSRC),$$*.WSCSTSRC)
 	@echo "*** Creating work station customizing object [$*]"
 	@$(set_STMF_CCSID)
 	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTWSCST) srcstmf('$<') parms('$(CRTWSCSTFLAGS)'))
