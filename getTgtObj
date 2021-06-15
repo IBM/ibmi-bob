@@ -1,9 +1,0 @@
-#!/bin/bash
-# Licensed Materials - Property of IBM
-# 57XX-XXX
-# (c) Copyright IBM Corp. 2021
-
-OBJNAME=$1
-FILENAME=$((ls | grep "^${1}-" || ls | grep "^${1}\.") | sed -e 's/\.[^.]*$//')
-
-echo ${FILENAME}.${2}
