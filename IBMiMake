@@ -260,7 +260,6 @@ LOGFILE := $(LOGPATH)/output.log
 JOBLOGFILE := $(LOGPATH)/joblog.json
 $(shell mkdir -p $(LOGPATH))
 $(info IBMiMake log directory: $(LOGPATH))
-$(shell echo > $(LOGFILE))
 DEPDIR := $(SRCPATH)/.deps
 $(shell mkdir -p $(DEPDIR) >/dev/null)
 EVTDIR := $(SRCPATH)/.evfevent
