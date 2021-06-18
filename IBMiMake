@@ -255,7 +255,7 @@ override OBJPATH := $(shell echo "$(OBJPATH)" | tr '[:lower:]' '[:upper:]')
 OBJLIB := $(basename $(notdir $(OBJPATH)))
 LIBL := $(OBJLIB)
 preUsrlibl :=
-preUsrlibl :=
+postUsrlibl :=
 TOOLSPATH := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 TOOLSLIB := BOBTOOLS
 runDate := $(shell date +"%F_%H.%M.%S-%a")
@@ -762,7 +762,6 @@ $(DEPDIR)/%.rebuild:
 .PHONY: clean
 clean:
 	rm -rf ./.deps ./evfevent ./logs
-	rm -rf $(OBJPATH)/*
 
 .PHONY: make_post
 make_post:
