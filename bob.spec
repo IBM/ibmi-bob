@@ -10,7 +10,7 @@ Url: https://github.com/edmundreinhardt/Bob/
 BuildRequires: make-gnu
 BuildRequires: tar-gnu
 BuildRequires: gzip
-Requires: bash >= 4.4-6
+BuildRequires: bash >= 4.4-6
 Requires: bash >= 4.4-6
 Requires: coreutils-gnu
 Requires: jq
