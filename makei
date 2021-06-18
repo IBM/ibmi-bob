@@ -1,4 +1,5 @@
-#!/bin/bash
+#! /QOpenSys/pkgs/bin/bash
+
 # Licensed Materials - Property of IBM
 # 57XX-XXX
 # (c) Copyright IBM Corp. 2021
@@ -10,6 +11,7 @@
 # Wrapper around `make` command so that runs make in every subdirectory if possible.
 # If enableLog is true, its output can be captured and logged into
 # a log directory.  The directory name is gleaned by scraping the output of IBMiMake.
+
 #
 # A named pipe is created, and a reader process (`tee`) is started in the background.  Make's
 # output is redirected to the pipe, where the reader writes it to both stdout and a log file.
@@ -17,6 +19,8 @@
 # solution, redirecting Make's output to a file and later sending it to stdout.
 #
 
+SEPSTART=">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+SEPEND="<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
 # enableLog=true
 enableLog=false
 exitCode=0
@@ -33,6 +37,52 @@ srcDir="$(pwd)"
 
 rm -rf "${srcDir}/output.log"
 rm -rf "${srcDir}/joblog.json"
+
+retrieve_from_iproj() {
+    local key=$1
+    local default_vaule=$2
+    local value
+    value=$(jq ".${key}" iproj.json | sed "s/\"//g")
+    if [[ $value = null || $value = "" ]]; then
+        echo "$default_vaule"
+    else
+        echo "$value"
+    fi
+}
+
+echo "makei: [info] Reading from iproj.json"
+objlib=$(retrieve_from_iproj objlib "*CURLIB")
+tgtCcsid=$(retrieve_from_iproj tgtccsid "*JOB")
+IBMiEnvCmd=$(retrieve_from_iproj setIBMiEnvCmd "")
+preUsrliblRaw=$(retrieve_from_iproj preUsrlibl "" | sed "s/ //g;s/,/ /g")
+postUsrliblRaw=$(retrieve_from_iproj postUsrlibl "" | sed "s/ //g;s/,/ /g")
+
+preUsrlibl=""
+postUsrlibl=""
+
+for lib in $preUsrliblRaw; do
+    if [[ $lib =~ ^\&.* ]]; then
+      lib=${lib//&/}
+      preUsrlibl+="${!lib} "
+    else
+      preUsrlibl+="${lib} "
+    fi
+done
+
+for lib in $postUsrliblRaw; do
+    if [[ $lib =~ ^\&.* ]]; then
+      lib=${lib//&/}
+      postUsrlibl+="${!lib} "
+    else
+      postUsrlibl+="${lib} "
+    fi
+done
+
+echo "    objlib: ${objlib}"
+echo "    tgtCcsid: ${tgtCcsid}"
+echo "    IBMiEnvCmd: ${IBMiEnvCmd}"
+echo "    preUsrlibl: ${preUsrlibl}"
+echo "    postUsrlibl: ${postUsrlibl}"
 
 # Get the sourceCcsid from a given .ibmi.json. jq is prefered as the json parser
 # if jq not found, awk is used and assumes that the sourceCssid attribute are on the same line
@@ -84,24 +134,24 @@ recursive_make() {
 
 
     if [[ -f "Makefile" ]]; then
-        echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+        echo "$SEPSTART"
         echo "makei: [Info] Building ${dir}"
 
         local curObjPath='*CURLIB'
         if [[ $curObjLoc != '*CURLIB' ]]; then
             if [ -z "${!curObjLoc}" ]; then
                 echo "makei: [Error] ${curObjLoc} is undefined."
-                echo "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+                echo "$SEPEND"
                 echo
                 return 1
             fi
             curObjPath=/QSYS.LIB/${!curObjLoc}.LIB
         fi
 
-        echo ">> " make TGTCCSID:="$curCcsid" OBJPATH:="${curObjPath}" -f "${dir}/Makefile" "$makeOpts"
+        echo ">> " make PROJECTDIR:="${srcDir}" TGTCCSID:="$curCcsid" OBJPATH:="${curObjPath}" IBMiEnvCmd="${IBMiEnvCmd}" preUsrlibl="'${preUsrlibl}'" postUsrlibl="'${postUsrlibl}'" -f "${dir}/Makefile" "$makeOpts"
         # Call make with the arguments that were passed in
-        make PROJECTDIR:="${srcDir}" TGTCCSID:="$curCcsid" OBJPATH:="${curObjPath}" -f "${dir}/Makefile" $makeOpts
-        echo "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+        make PROJECTDIR:="${srcDir}" TGTCCSID:="$curCcsid" OBJPATH:="${curObjPath}" IBMiEnvCmd="${IBMiEnvCmd}" preUsrlibl="${preUsrlibl}" postUsrlibl="${postUsrlibl}" -f "${dir}/Makefile" $makeOpts
+        echo "$SEPEND"
         echo
         exitCode=$(( exitCode + $? ))
     fi
@@ -116,7 +166,7 @@ recursive_make() {
 }
 
 # Redirect stdout and stderr to the pipe.
-recursive_make "$srcDir" "*CURLIB" "*JOB" >"$pipe" 2>&1
+recursive_make "$srcDir" "$objlib"  "$tgtCcsid" >"$pipe" 2>&1
 exitCode=$?
 
 # Determine the logging directory used by Make and move the logfile there.

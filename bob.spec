@@ -1,6 +1,6 @@
 %undefine _disable_source_fetch
 Name: bob
-Version: 2.0.0
+Version: 2.0.3
 Release: 0
 License: Apache-2.0
 Summary: Better Object Builder for IBM i
@@ -10,9 +10,11 @@ Url: https://github.com/edmundreinhardt/Bob/
 BuildRequires: make-gnu
 BuildRequires: tar-gnu
 BuildRequires: gzip
-Requires: bash
+Requires: bash >= 4.4-6
+Requires: bash >= 4.4-6
 Requires: coreutils-gnu
 Requires: jq
+Requires: db2util
 Requires: sed-gnu
 Requires: grep-gnu
 Requires: gawk
@@ -35,20 +37,34 @@ Here's what makes Bob different.
 %setup -n Bob-%{version}
 
 %build
-ls -la
 echo "skipping build"
 
 %install
-rm -fr CRTFRMSTMF/*
+if [ ! -d "/QSYS.LIB/CRTFRMSTMF.LIB" ]
+then
+    cl "CRTLIB LIB(CRTFRMSTMF) TEXT('Library for CRTFRMSTMF command')"
+else
+    rm -rf /QSYS.LIB/CRTFRMSTMF.LIB/*
+fi
+
 tar xzvf %{SOURCE1} -C CRTFRMSTMF --strip-components=1
+cd CRTFRMSTMF && gmake && cd ..
+
+rm -fr CRTFRMSTMF sample-project test shunit2 shelic
+
 mkdir -p %{buildroot}%{_libdir}/bob
+mkdir -p %{buildroot}%{_bindir}/
 cp -r ./* %{buildroot}%{_libdir}/bob
+ln -sf %{_libdir}/bob/makei %{buildroot}%{_bindir}/makei
+ln -sf %{_libdir}/bob/launch %{buildroot}%{_bindir}/launch
 
 %post -p %{_bindir}/bash
-echo "post processing"
+echo "skipping post processing"
 
 %files
 %defattr(-, qsys, *none)
 %{_libdir}/bob
+%{_bindir}/launch
+%{_bindir}/makei
 
 %changelog
