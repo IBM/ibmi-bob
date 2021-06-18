@@ -1,6 +1,6 @@
 %undefine _disable_source_fetch
 Name: bob
-Version: 2.0.0
+Version: 2.0.3
 Release: 0
 License: Apache-2.0
 Summary: Better Object Builder for IBM i
@@ -13,6 +13,7 @@ BuildRequires: gzip
 Requires: bash
 Requires: coreutils-gnu
 Requires: jq
+Requires: db2util
 Requires: sed-gnu
 Requires: grep-gnu
 Requires: gawk

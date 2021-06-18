@@ -238,7 +238,7 @@ CRTSQLCIFLAGS = COMMIT($(COMMIT)) OBJTYPE($(OBJTYPE)) OUTPUT(*PRINT) TEXT('$(TEX
 CRTSQLRPGIFLAGS = COMMIT($(COMMIT)) OBJTYPE($(OBJTYPE)) OPTION($(OPTION)) OUTPUT(*PRINT) TEXT('$(TEXT)') \
                   TGTRLS($(TGTRLS)) DBGVIEW($(DBGVIEW)) RPGPPOPT($(RPGPPOPT)) \
                   COMPILEOPT('TGTCCSID($(TGTCCSID))')
-CRTSRVPGMFLAGS = ACTGRP($(ACTGRP)) TEXT(''$(TEXT)'') TGTRLS($(TGTRLS)) AUT($(AUT)) DETAIL($(DETAIL)) STGMDL($(STGMDL)) OPTION($(OPTION))
+CRTSRVPGMFLAGS = ACTGRP($(ACTGRP)) TEXT(''$(TEXT)'') TGTRLS($(TGTRLS)) AUT($(AUT)) DETAIL($(DETAIL)) STGMDL($(STGMDL))
 CRTWSCSTFLAGS = AUT($(AUT)) TEXT(''$(TEXT)'')
 CRTBNDRPGFLAGS:=TGTCCSID($(TGTCCSID)) OPTION($(OPTION)) TEXT('$(TEXT)')
 CRTBNDCFLAGS:=TGTCCSID($(TGTCCSID)) OPTION($(OPTION)) TEXT('$(TEXT)')
@@ -249,9 +249,13 @@ ADHOCCRTFLAGS =
 # Miscellaneous variables
 SRCPATH := $(PROJECTDIR)
 OBJPATH := $(CURDIR)
+CURLIB :=
+IBMiEnvCmd :=
 override OBJPATH := $(shell echo "$(OBJPATH)" | tr '[:lower:]' '[:upper:]')
 OBJLIB := $(basename $(notdir $(OBJPATH)))
 LIBL := $(OBJLIB)
+preUsrlibl :=
+preUsrlibl :=
 TOOLSPATH := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 TOOLSLIB := BOBTOOLS
 runDate := $(shell date +"%F_%H.%M.%S-%a")
@@ -264,19 +268,24 @@ DEPDIR := $(SRCPATH)/.deps
 $(shell mkdir -p $(DEPDIR) >/dev/null)
 EVTDIR := $(SRCPATH)/.evfevent
 $(shell mkdir -p $(EVTDIR) >/dev/null)
-CRTFRMSTMFLIB := $(TOOLSLIB)
+CRTFRMSTMFLIB := CRTFRMSTMF
 ICONV := /QOpenSys/usr/bin/iconv
 ICONV_EBCDIC := IBM-037
 ICONV_ASCII := UTF-8
 SETCCSID_ASCII := 1208
 VPATH := $(OBJPATH):$(SRCPATH)
 
-define ADDTOLIBLIST = 
-liblist -a $(LIBL)
+define PRESETUP = 
+echo ">> Adding user libraries to liblist" >> $(LOGFILE); \
+liblist -af $(preUsrlibl) >> $(LOGFILE) 2>&1; \
+liblist -al $(postUsrlibl) >> $(LOGFILE) 2>&1; \
+echo ">> Setup IBM i Environment" >> $(LOGFILE); \
+echo ">> $(IBMiEnvCmd)" >> $(LOGFILE); \
+cl "$(IBMiEnvCmd)" >> $(LOGFILE) 2>&1
 endef
 
-define REMOVEFROMLIBLIST = 
-liblist -d $(LIBL)
+define POSTCLEANUP = 
+
 endef
 
 # cleanCDeps removes from the CRTCMOD-generated dependency file any header files located in /QIBM/, plus the
@@ -308,7 +317,7 @@ define EVFEVENT_DOWNLOAD =
 system "CPYTOSTMF FROMMBR('$(OBJPATH)/EVFEVENT.FILE/$*.MBR') TOSTMF('$(EVTDIR)/$*.evfevent') STMFCCSID(*STDASCII) ENDLINFMT(*LF) CVTDTA(*AUTO) STMFOPT(*REPLACE)" >/dev/null
 endef
 define POSTRPGCOMPILE =
-$(EVFEVENT_DOWNLOAD)
+$(EVFEVENT_DOWNLOAD); \
 { for f in $$($(cleanRPGDeps) <$(EVTDIR)/$*.evfevent | sort -u); do \
     echo "$${f}"; \
     sed -n -r -e '/^.{6}[^*].{14}[^Ff]/ s/^.{5}[Ff]([^ ]{,10}).*(DISK|WORKSTN|PRINTER).*/  \1\.FILE/I p' -e '/^.{6}[^*]/ s/^.{5}[Dd].*EXTNAME\(([^ \)]*).*/  \1\.FILE/I p' "$${f}" | sort -u; \
@@ -497,9 +506,9 @@ programTGTRLS = $(strip \
 	@echo "*** Creating command [$*]"
 	@$(set_STMF_CCSID)
 	$(eval crtcmd := CRTCMD CMD($(OBJLIB)/$*) srcstmf('$<') $(CRTCMDFLAGS))
-	@$(ADDTOLIBLIST) >> $(LOGFILE);  \
-	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE); \
-	$(REMOVEFROMLIBLIST) >> $(LOGFILE)
+	@$(PRESETUP);  \
+	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || $(EVFEVENT_DOWNLOAD); \
+	$(POSTCLEANUP)
 
 
 %.FILE: private AUT = $(fileAUT)
@@ -516,9 +525,9 @@ programTGTRLS = $(strip \
 	@echo "*** Creating DSPF [$*]"
 	@$(set_STMF_CCSID)
 	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTDSPF) srcstmf('$<') parms('$(CRTDSPFFLAGS)'))
-	@$(ADDTOLIBLIST) >> $(LOGFILE);  \
-	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE); \
-	$(REMOVEFROMLIBLIST) >> $(LOGFILE)
+	@$(PRESETUP);  \
+	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || $(EVFEVENT_DOWNLOAD); \
+	$(POSTCLEANUP)
 
 .SECONDEXPANSION:
 %.FILE:$$(if $$(wildcard $$*-*.LF),$$(wildcard $$*-*.LF),$$*.LF)
@@ -526,9 +535,9 @@ programTGTRLS = $(strip \
 	@$(set_STMF_CCSID)
 	@if [ -d $(OBJPATH)/$@ ]; then rm -r $(OBJPATH)/$@; fi
 	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTLF) srcstmf('$<') parms('$(CRTLFFLAGS)'))
-	@$(ADDTOLIBLIST) >> $(LOGFILE);  \
-	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE); \
-	$(REMOVEFROMLIBLIST) >> $(LOGFILE)
+	@$(PRESETUP);  \
+	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || $(EVFEVENT_DOWNLOAD); \
+	$(POSTCLEANUP)
 	@$(TYPEDEF)
 
 .SECONDEXPANSION:
@@ -536,9 +545,9 @@ programTGTRLS = $(strip \
 	@echo "*** Creating PF [$*]"
 	@$(set_STMF_CCSID)
 	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTPF) srcstmf('$<') parms('$(CRTPFFLAGS)'))
-	@$(ADDTOLIBLIST) >> $(LOGFILE);  \
-	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE); \
-	$(REMOVEFROMLIBLIST) >> $(LOGFILE)
+	@$(PRESETUP);  \
+	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || $(EVFEVENT_DOWNLOAD); \
+	$(POSTCLEANUP)
 	@$(TYPEDEF)
 
 .SECONDEXPANSION:
@@ -546,9 +555,9 @@ programTGTRLS = $(strip \
 	@echo "*** Creating PRTF [$<]"
 	@$(set_STMF_CCSID)
 	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTPRTF) srcstmf('$<') parms('$(CRTPRTFFLAGS)'))
-	@$(ADDTOLIBLIST) >> $(LOGFILE);  \
-	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE); \
-	$(REMOVEFROMLIBLIST) >> $(LOGFILE)
+	@$(PRESETUP);  \
+	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || $(EVFEVENT_DOWNLOAD); \
+	$(POSTCLEANUP)
 	@$(TYPEDEF)
 
 
@@ -563,9 +572,9 @@ programTGTRLS = $(strip \
 	@echo "*** Creating menu [$*]"
 	@$(set_STMF_CCSID)
 	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTMNU) srcstmf('$<') parms('$(CRTMNUFLAGS)'))
-	@$(ADDTOLIBLIST) >> $(LOGFILE);  \
-	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE); \
-	$(REMOVEFROMLIBLIST) >> $(LOGFILE)
+	@$(PRESETUP);  \
+	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || $(EVFEVENT_DOWNLOAD); \
+	$(POSTCLEANUP)
 
 
 %.MODULE: private AUT = $(moduleAUT)
@@ -584,9 +593,9 @@ programTGTRLS = $(strip \
 	@echo "*** Creating C module [$*]"
 	@$(set_STMF_CCSID)
 	$(eval crtcmd := crtcmod module($(OBJLIB)/$*) srcstmf('$<') $(CRTCMODFLAGS) $(ADHOCCRTFLAGS))
-	@$(ADDTOLIBLIST) >> $(LOGFILE);  \
-	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || (ret=$$?; rm $(DEPDIR)/$*.Td 2>/dev/null; exit $$ret); \
-	$(REMOVEFROMLIBLIST) >> $(LOGFILE)
+	@$(PRESETUP);  \
+	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || ($(EVFEVENT_DOWNLOAD); ret=$$?; rm $(DEPDIR)/$*.Td 2>/dev/null; exit $$ret); \
+	$(POSTCLEANUP)
 	@$(POSTCCOMPILE)
 
 
@@ -595,9 +604,9 @@ programTGTRLS = $(strip \
 	@echo "*** Creating RPG module [$*] with [$<]"
 	@$(set_STMF_CCSID)
 	$(eval crtcmd := crtrpgmod module($(OBJLIB)/$*) srcstmf('$<') $(CRTRPGMODFLAGS))
-	@$(ADDTOLIBLIST) >> $(LOGFILE);  \
+	@$(PRESETUP);  \
 	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || $(EVFEVENT_DOWNLOAD); \
-	$(REMOVEFROMLIBLIST) >> $(LOGFILE)
+	$(POSTCLEANUP)
 	@$(POSTRPGCOMPILE)
 
 
@@ -605,11 +614,10 @@ programTGTRLS = $(strip \
 %.MODULE: $$(if $$(wildcard $$*-*.CLLE),$$(wildcard $$*-*.CLLE),$$*.CLLE)
 	@echo "*** Creating CL module [$*]"
 	@$(set_STMF_CCSID)
-	@$(ADDTOLIBLIST)
-	@$ >> $(LOGFILE) eval crtcmd := crtclmod module($(OBJLIB)/$*) srcstmf('$<') $(CRTCLMODFLAGS))
-	@launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || $(EVFEVENT_DOWNLOAD)
-	@$(REMOVEFROMLIBLIST) >> $(LOGFILE)
-	@$(EVFEVENT_DOWNLOAD)
+	@$(eval crtcmd := crtclmod module($(OBJLIB)/$*) srcstmf('$<') $(CRTCLMODFLAGS))
+	@$(PRESETUP); \
+	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1; \
+	$(POSTCLEANUP)
 
 # Temp: Convert UTF-8 to temporary Windows Latin-1, because SQLC pre-compiler doesn't understand UTF-8
 .SECONDEXPANSION:
@@ -618,9 +626,9 @@ programTGTRLS = $(strip \
 	@$(set_STMF_CCSID)
 	@qsh_out -c "touch -C 1252 $<-1252 && cat $< >$<-1252"
 	$(eval crtcmd := crtsqlci obj($(OBJLIB)/$*) srcstmf('$<-1252') $(CRTSQLCIFLAGS))
-	@$(ADDTOLIBLIST) >> $(LOGFILE);  \
-	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || (ret=$$?; rm $(DEPDIR)/$*.Td 2>/dev/null; rm "$<-1252" 2>/dev/null; exit $$ret); \
-	$(REMOVEFROMLIBLIST) >> $(LOGFILE)
+	@$(PRESETUP);  \
+	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || ($(EVFEVENT_DOWNLOAD); ret=$$?; rm $(DEPDIR)/$*.Td 2>/dev/null; rm "$<-1252" 2>/dev/null; exit $$ret); \
+	$(POSTCLEANUP)
 	@$(POSTCCOMPILE)
 	@rm "$<-1252"
 
@@ -630,9 +638,9 @@ programTGTRLS = $(strip \
 	@echo "*** Creating SQLRPGLE module [$*]"
 	@$(set_STMF_CCSID)
 	$(eval crtcmd := crtsqlrpgi obj($(OBJLIB)/$*) srcstmf('$<') $(CRTSQLRPGIFLAGS))
-	@$(ADDTOLIBLIST) >> $(LOGFILE);  \
+	@$(PRESETUP);  \
 	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || $(EVFEVENT_DOWNLOAD); \
-	$(REMOVEFROMLIBLIST) >> $(LOGFILE)
+	$(POSTCLEANUP)
 	@$(POSTRPGCOMPILE)
 
 %.PGM: private ACTGRP = $(programACTGRP)
@@ -652,26 +660,29 @@ programTGTRLS = $(strip \
 	@echo "*** Creating program [$*] from modules [$(basename $(filter %.MODULE,$(notdir $^)))] and service programs [$(basename $(filter %.SRVPGM,$(notdir $^$|)))]"
 	$(eval externalsrvpgms := $(filter %.SRVPGM,$(subst .LIB,,$(subst /QSYS.LIB/,,$|))))
 	$(eval crtcmd := crtpgm pgm($(OBJLIB)/$*) module($(basename $(filter %.MODULE,$(notdir $^)))) bndsrvpgm($(if $(BNDSRVPGMPATH),$(BNDSRVPGMPATH),*NONE)) $(CRTPGMFLAGS))
-	@$(ADDTOLIBLIST) >> $(LOGFILE);  \
-	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1; \
-	$(REMOVEFROMLIBLIST) >> $(LOGFILE)
-	@system "CPYTOSTMF FROMMBR('$(OBJPATH)/EVFEVENT.FILE/$*.MBR') TOSTMF('$(EVTDIR)/$*.PGM.evfevent') STMFCCSID(*STDASCII) ENDLINFMT(*LF) CVTDTA(*AUTO) STMFOPT(*REPLACE)" >/dev/null
+	$(eval EVFEVENT_DOWNLOAD_PGM = system "CPYTOSTMF FROMMBR('$(OBJPATH)/EVFEVENT.FILE/$*.MBR') TOSTMF('$(EVTDIR)/$*.PGM.evfevent') STMFCCSID(*STDASCII) ENDLINFMT(*LF) CVTDTA(*AUTO) STMFOPT(*REPLACE)" >/dev/null)
+	@$(PRESETUP);  \
+	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || $(EVFEVENT_DOWNLOAD_PGM); \
+	$(POSTCLEANUP)
+	@$(EVFEVENT_DOWNLOAD_PGM)
 
 %.PGM: %.PGM.RPGLE
 	@echo "*** Create Bound RPG Program [$*]"
 	$(eval crtcmd := CRTBNDRPG srcstmf($<) PGM($(OBJLIB)/$*) $(CRTBNDRPGFLAGS))
-	@$(ADDTOLIBLIST) >> $(LOGFILE);  \
-	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1; \
-	$(REMOVEFROMLIBLIST) >> $(LOGFILE)
-	@system "CPYTOSTMF FROMMBR('$(OBJPATH)/EVFEVENT.FILE/$*.MBR') TOSTMF('$(EVTDIR)/$*.PGM.RPGLE.evfevent') STMFCCSID(*STDASCII) ENDLINFMT(*LF) CVTDTA(*AUTO) STMFOPT(*REPLACE)" >/dev/null
+	$(eval EVFEVENT_DOWNLOAD_PGM_RPGLE = system "CPYTOSTMF FROMMBR('$(OBJPATH)/EVFEVENT.FILE/$*.MBR') TOSTMF('$(EVTDIR)/$*.PGM.RPGLE.evfevent') STMFCCSID(*STDASCII) ENDLINFMT(*LF) CVTDTA(*AUTO) STMFOPT(*REPLACE)" >/dev/null)
+	@$(PRESETUP);  \
+	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || $(EVFEVENT_DOWNLOAD_PGM_RPGLE); \
+	$(POSTCLEANUP)
+	@$(EVFEVENT_DOWNLOAD_PGM_RPGLE)
 
 %.PGM: %.PGM.C
 	@echo "*** Create Bound RPG Program [$*]"
 	$(eval crtcmd := CRTBNDC srcstmf($<) PGM($(OBJLIB)/$*) $(CRTBNDCFLAGS))
-	@$(ADDTOLIBLIST) >> $(LOGFILE);  \
-	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1; \
-	$(REMOVEFROMLIBLIST) >> $(LOGFILE)
-	@system "CPYTOSTMF FROMMBR('$(OBJPATH)/EVFEVENT.FILE/$*.MBR') TOSTMF('$(EVTDIR)/$*.PGM.C.evfevent') STMFCCSID(*STDASCII) ENDLINFMT(*LF) CVTDTA(*AUTO) STMFOPT(*REPLACE)" >/dev/null
+	$(eval EVFEVENT_DOWNLOAD_PGM_C = system "CPYTOSTMF FROMMBR('$(OBJPATH)/EVFEVENT.FILE/$*.MBR') TOSTMF('$(EVTDIR)/$*.PGM.C.evfevent') STMFCCSID(*STDASCII) ENDLINFMT(*LF) CVTDTA(*AUTO) STMFOPT(*REPLACE)" >/dev/null)
+	@$(PRESETUP);  \
+	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1; || $(EVFEVENT_DOWNLOAD_PGM_C); \
+	$(POSTCLEANUP)
+	@$(EVFEVENT_DOWNLOAD_PGM_C)
 
 %.PNLGRP: private AUT = $(PNLGRP_AUT)
 %.PNLGRP: private OPTION = $(PNLGRP_OPTION)
@@ -681,9 +692,9 @@ programTGTRLS = $(strip \
 	@echo "*** Creating panel group [$*]"
 	@$(set_STMF_CCSID)
 	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTPNLGRP) srcstmf('$<') parms('$(CRTPNLGRPFLAGS)'))
-	@$(ADDTOLIBLIST) >> $(LOGFILE);  \
-	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1; \
-	$(REMOVEFROMLIBLIST) >> $(LOGFILE)
+	@$(PRESETUP);  \
+	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true; \
+	$(POSTCLEANUP)
 
 %.QMQRY: private AUT = $(QMQRY_AUT)
 
@@ -692,9 +703,9 @@ programTGTRLS = $(strip \
 	@echo "*** Creating QM query [$*]"
 	@$(set_STMF_CCSID)
 	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTQMQRY) srcstmf('$<') parms('$(CRTQMQRYFLAGS)'))
-	$(ADDTOLIBLIST) >> $(LOGFILE);  \
-	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1; \
-	$(REMOVEFROMLIBLIST) >> $(LOGFILE)
+	$(PRESETUP) >> $(LOGFILE);  \
+	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true; \
+	$(POSTCLEANUP)
 
 
 %.SRVPGM: private ACTGRP = $(SRVPGM_ACTGRP)
@@ -710,10 +721,9 @@ programTGTRLS = $(strip \
 	@$(set_STMF_CCSID)
 	$(eval externalsrvpgms := $(filter %.SRVPGM,$(subst .LIB,,$(subst /QSYS.LIB/,,$|))))
 	$(eval crtcmd := CRTSRVPGM srcstmf('$<') SRVPGM($(OBJLIB)/$*) MODULE($(basename $(filter %.MODULE,$(notdir $^)))) BNDSRVPGM($(if $(BNDSRVPGMPATH),$(BNDSRVPGMPATH),*NONE)) $(CRTSRVPGMFLAGS))
-	@$(ADDTOLIBLIST) >> $(LOGFILE);  \
-	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1; \
-	$(REMOVEFROMLIBLIST) >> $(LOGFILE)
-	@system "CPYTOSTMF FROMMBR('$(OBJPATH)/EVFEVENT.FILE/$*.MBR') TOSTMF('$(EVTDIR)/$*.SRVPGM.evfevent') STMFCCSID(*STDASCII) ENDLINFMT(*LF) CVTDTA(*AUTO) STMFOPT(*REPLACE)" >/dev/null
+	@$(PRESETUP);  \
+	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true; \
+	$(POSTCLEANUP)
 
 %.WSCST: private AUT = $(WSCST_AUT)
 
@@ -722,9 +732,9 @@ programTGTRLS = $(strip \
 	@echo "*** Creating work station customizing object [$*]"
 	@$(set_STMF_CCSID)
 	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$*) cmd(CRTWSCST) srcstmf('$<') parms('$(CRTWSCSTFLAGS)'))
-	@$(ADDTOLIBLIST) >> $(LOGFILE);  \
-	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1; \
-	$(REMOVEFROMLIBLIST) >> $(LOGFILE)
+	@$(PRESETUP);  \
+	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true; \
+	$(POSTCLEANUP)
 
 $(DEPDIR)/%.d: ;
 .PRECIOUS: $(DEPDIR)/%.d
@@ -749,6 +759,10 @@ $(DEPDIR)/%.rebuild:
 #make_pre:
 #	mkdir -p $(LOGPATH)
 
+.PHONY: clean
+clean:
+	rm -rf ./.deps ./evfevent ./logs
+	rm -rf $(OBJPATH)/*
 
 .PHONY: make_post
 make_post:
@@ -776,6 +790,9 @@ test:
 	echo "OBJPATH:		$(OBJPATH)"; \
 	echo "OBJLIB:			$(OBJLIB)"; \
 	echo "LIBL:			$(LIBL)"; \
+	echo "IBMiEnvCmd:		$(IBMiEnvCmd)"; \
+	echo "preUsrlibl:		$(preUsrlibl)"; \
+	echo "postUsrlibl:		$(postUsrlibl)"; \
 	echo "CRTFRMSTFMLIB:		$(CRTFRMSTMFLIB)"; \
 	echo "TOOLSPATH:		$(TOOLSPATH)"; \
 	echo "PROJECTDIR:		$(PROJECTDIR)";
@@ -784,3 +801,4 @@ test:
 # Include all auto-generated source dependency files. Since we don't have a list of source files,
 # we have to grab everything in the `$DEPDIR` directory.
 #-include $(wildcard $(DEPDIR)/*.d)
+
