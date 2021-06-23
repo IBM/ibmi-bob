@@ -277,11 +277,11 @@ VPATH := $(OBJPATH):$(SRCPATH)
 
 define PRESETUP = 
 echo ">> Adding user libraries to liblist" >> $(LOGFILE); \
-liblist -af $(preUsrlibl) >> $(LOGFILE) 2>&1; \
-liblist -al $(postUsrlibl) >> $(LOGFILE) 2>&1; \
+[[ ! -z "$(preUsrlibl)" ]] && liblist -af $(preUsrlibl) >> $(LOGFILE) 2>&1; \
+[[ ! -z "$(postUsrlibl)" ]] && liblist -al $(postUsrlibl) >> $(LOGFILE) 2>&1; \
 echo ">> Setup IBM i Environment" >> $(LOGFILE); \
-echo ">> $(IBMiEnvCmd)" >> $(LOGFILE); \
-cl "$(IBMiEnvCmd)" >> $(LOGFILE) 2>&1
+echo "$(IBMiEnvCmd)" >> $(LOGFILE); \
+[[ ! -z "$(IBMiEnvCmd)" ]] && cl "$(IBMiEnvCmd)" >> $(LOGFILE) 2>&1 || echo ">> Skipping IBM i Environment set up"
 endef
 
 define POSTCLEANUP = 
