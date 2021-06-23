@@ -90,10 +90,10 @@ retrieve_sourceCcsid() {
     local pathToIbmiJson=$1
     local ccsid
     if ! type jq >/dev/null 2>&1; then
-        ccsid=$(grep '^ *"sourceCcsid":' "${pathToIbmiJson}" | awk -F ":" '{ print $2 }' | sed -e 's/,$//')
+        ccsid=$(grep '^ *"tgtCcsid":' "${pathToIbmiJson}" | awk -F ":" '{ print $2 }' | sed -e 's/,$//')
         echo >&2 "makei: [Warning] jq is not found, fall back to built-in Json parser."
     else
-        ccsid=$(jq .build.sourceCcsid "${pathToIbmiJson}")
+        ccsid=$(jq .build.tgtCcsid "${pathToIbmiJson}")
     fi
     
     if [[ $ccsid = null ]]; then ccsid=""; fi
@@ -106,10 +106,10 @@ retrieve_objectLocation() {
     local pathToIbmiJson=$1
     local objLoc
     if ! type jq >/dev/null 2>&1; then
-        objLoc=$(grep '^ *"objectLocation":' "${pathToIbmiJson}" | awk -F ":" '{ print $2 }' | sed -e 's/,$//' -e 's/^"//' -e 's/"$//' -e 's/&//')
+        objLoc=$(grep '^ *"objlib":' "${pathToIbmiJson}" | awk -F ":" '{ print $2 }' | sed -e 's/,$//' -e 's/^"//' -e 's/"$//' -e 's/&//')
         echo >&2 "makei: [Warning] jq is not found, fall back to built-in Json parser."
     else
-        objLoc=$(jq .build.objectLocation "${pathToIbmiJson}" | sed -e 's/&//' -e 's/^"//' -e 's/"$//')
+        objLoc=$(jq .build.objlib "${pathToIbmiJson}" | sed -e 's/&//' -e 's/^"//' -e 's/"$//')
     fi
     if [[ $objLoc = null ]]; then objLoc=""; fi
     echo "$objLoc"
