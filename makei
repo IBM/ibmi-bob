@@ -118,7 +118,7 @@ retrieve_objectLocation() {
 # A recursive function that loops through every folder under the input src directory and issues an make command if possible
 recursive_make() {
     local dir=$1
-    local parentObjLoc=$2
+    local parentObjLoc=${2//&/}
     local parentCcsid=$3
     local curObjLoc
     local curCcsid
