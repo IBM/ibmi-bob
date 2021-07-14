@@ -50,7 +50,7 @@ cp -r ./* %{buildroot}%{_libdir}/bob
 ln -sf %{_libdir}/bob/makei %{buildroot}%{_bindir}/makei
 ln -sf %{_libdir}/bob/launch %{buildroot}%{_bindir}/launch
 
-%post
+%post -p %{_bindir}/bash
 if [ ! -d "/QSYS.LIB/CRTFRMSTMF.LIB" ]
 then
     cl "CRTLIB LIB(CRTFRMSTMF) TEXT('Library for CRTFRMSTMF command')"
