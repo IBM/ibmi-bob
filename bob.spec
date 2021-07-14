@@ -40,17 +40,9 @@ Here's what makes Bob different.
 echo "skipping build"
 
 %install
-if [ ! -d "/QSYS.LIB/CRTFRMSTMF.LIB" ]
-then
-    cl "CRTLIB LIB(CRTFRMSTMF) TEXT('Library for CRTFRMSTMF command')"
-else
-    rm -rf /QSYS.LIB/CRTFRMSTMF.LIB/*
-fi
-
 tar xzvf %{SOURCE1} -C CRTFRMSTMF --strip-components=1
-cd CRTFRMSTMF && gmake && cd ..
 
-rm -fr CRTFRMSTMF sample-project test shunit2 shelic
+rm -fr sample-project test shunit2 shelic
 
 mkdir -p %{buildroot}%{_libdir}/bob
 mkdir -p %{buildroot}%{_bindir}/
@@ -58,13 +50,19 @@ cp -r ./* %{buildroot}%{_libdir}/bob
 ln -sf %{_libdir}/bob/makei %{buildroot}%{_bindir}/makei
 ln -sf %{_libdir}/bob/launch %{buildroot}%{_bindir}/launch
 
-%post -p %{_bindir}/bash
-echo "skipping post processing"
+%post
+if [ ! -d "/QSYS.LIB/CRTFRMSTMF.LIB" ]
+then
+    cl "CRTLIB LIB(CRTFRMSTMF) TEXT('Library for CRTFRMSTMF command')"
+else
+    rm -rf /QSYS.LIB/CRTFRMSTMF.LIB/*
+fi
+
+cd %{_libdir}/bob/CRTFRMSTMF && %{_bindir}/gmake && cd ..
 
 %files
 %defattr(-, qsys, *none)
 %{_libdir}/bob
 %{_bindir}/launch
 %{_bindir}/makei
-
 %changelog
