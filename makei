@@ -7,7 +7,7 @@
 # @author Tongkun
 #
 # Usage: makei [target]
-# 
+#
 # Wrapper around `make` command so that runs make in every subdirectory if possible.
 # If enableLog is true, its output can be captured and logged into
 # a log directory.  The directory name is gleaned by scraping the output of IBMiMake.
@@ -19,30 +19,68 @@
 # solution, redirecting Make's output to a file and later sending it to stdout.
 #
 
-SEPSTART=">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
-SEPEND="<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
-# enableLog=true
-enableLog=false
-exitCode=0
+# ----------------------------------
+# Colors
+# ----------------------------------
+# COLORS=true
+COLORS=false
+if [ "$COLORS" = true ]; then
+    BOLD='\033[1m'
+    NOCOLOR='\033[0m'
+    RED='\033[0;31m'
+    GREEN='\033[0;32m'
+    ORANGE='\033[0;33m'
+    BLUE='\033[0;34m'
+    PURPLE='\033[0;35m'
+    CYAN='\033[0;36m'
+    LIGHTGRAY='\033[0;37m'
+    DARKGRAY='\033[1;30m'
+    LIGHTRED='\033[1;31m'
+    LIGHTGREEN='\033[1;32m'
+    YELLOW='\033[1;33m'
+    LIGHTBLUE='\033[1;34m'
+    LIGHTPURPLE='\033[1;35m'
+    LIGHTCYAN='\033[1;36m'
+    WHITE='\033[1;37m'
+else
+    BOLD=''
+    NOCOLOR=''
+    RED=''
+    GREEN=''
+    ORANGE=''
+    BLUE=''
+    PURPLE=''
+    CYAN=''
+    LIGHTGRAY=''
+    DARKGRAY=''
+    LIGHTRED=''
+    LIGHTGREEN=''
+    YELLOW=''
+    LIGHTBLUE=''
+    LIGHTPURPLE=''
+    LIGHTCYAN=''
+    WHITE=''
+fi
 
-# Create a named pipe that stdout and stderr will be funneled through, and start a tee reader process.
-pid=$$
-pipe="/tmp/pipe$pid"
-log="/tmp/makelog${pid}.log"
-mkfifo "$pipe"
-tee "$log" <"$pipe" &
+exitCode=0
 
 makeOpts=$*
 srcDir="$(pwd)"
 
-rm -rf "${srcDir}/output.log"
-rm -rf "${srcDir}/joblog.json"
+rm -rf "${srcDir}/logs/output.log"
+rm -rf "${srcDir}/logs/joblog.json"
+
+if [ ! -f "${srcDir}/Makefile" ]; then
+    MAKEFILE="/QOpenSys/pkgs/lib/bob/Makefile"
+else
+    MAKEFILE="${srcDir}/Makefile"
+fi
 
 retrieve_from_iproj() {
     local key=$1
     local default_vaule=$2
     local value
-    value=$(jq ".${key}" iproj.json | sed "s/\"//g")
+    value=$(jq -n ".${key}" iproj.json | sed "s/\"//g")
     if [[ $value = null || $value = "" ]]; then
         echo "$default_vaule"
     else
@@ -50,136 +88,136 @@ retrieve_from_iproj() {
     fi
 }
 
-echo "makei: [info] Reading from iproj.json"
+retrieve_from_ibmijson() {
+    local pathToIbmiJson=$1
+    local key=$2
+    local default_vaule=$3
+    local value
+    value=$(jq ".${key}" "${pathToIbmiJson}" | sed "s/\"//g")
+    if [[ $value = null || $value = "" ]]; then
+        echo "$default_vaule"
+    else
+        echo "$value"
+    fi
+}
+
+clean_up() {
+    echo -e "${BLUE}Cleaning up... ${NOCOLOR}"
+    echo
+    rm -rf "${BUILDVARSMK}"
+}
+
+parse_placeholder() {
+    local varName=$1
+    if [[ $varName =~ ^\&.* ]]; then
+        varName=${varName//&/}
+        if [ -z "${!varName}" ]; then
+            echo -e "${RED}makei: $BOLD${varName}$RED must be defined first in the environment variable.${NOCOLOR}" >&2
+            exit 1
+        fi
+        echo "${!varName}"
+    else
+        echo "${varName}"
+    fi
+}
+
+echo -e "${BLUE}makei: Reading from iproj.json${NOCOLOR}"
 objlib=$(retrieve_from_iproj objlib "*CURLIB")
 tgtCcsid=$(retrieve_from_iproj tgtccsid "*JOB")
 IBMiEnvCmd=$(retrieve_from_iproj setIBMiEnvCmd "")
 preUsrliblRaw=$(retrieve_from_iproj preUsrlibl "" | sed "s/ //g;s/,/ /g")
 postUsrliblRaw=$(retrieve_from_iproj postUsrlibl "" | sed "s/ //g;s/,/ /g")
-
 preUsrlibl=""
 postUsrlibl=""
 
 for lib in $preUsrliblRaw; do
-    if [[ $lib =~ ^\&.* ]]; then
-      lib=${lib//&/}
-      preUsrlibl+="${!lib} "
-    else
-      preUsrlibl+="${lib} "
-    fi
+    preUsrlibl+="$(parse_placeholder "$lib")"
 done
 
 for lib in $postUsrliblRaw; do
-    if [[ $lib =~ ^\&.* ]]; then
-      lib=${lib//&/}
-      postUsrlibl+="${!lib} "
-    else
-      postUsrlibl+="${lib} "
-    fi
+    postUsrlibl+="$(parse_placeholder "$lib")"
 done
 
-echo "    objlib: ${objlib}"
-echo "    tgtCcsid: ${tgtCcsid}"
-echo "    IBMiEnvCmd: ${IBMiEnvCmd}"
-echo "    preUsrlibl: ${preUsrlibl}"
-echo "    postUsrlibl: ${postUsrlibl}"
+echo -e "${DARKGRAY}......${NOCOLOR}objlib: ${ORANGE}${objlib}${NOCOLOR}"
+echo -e "${DARKGRAY}......${NOCOLOR}tgtCcsid: ${ORANGE}${tgtCcsid}${NOCOLOR}"
+echo -e "${DARKGRAY}......${NOCOLOR}IBMiEnvCmd: ${ORANGE}${IBMiEnvCmd}${NOCOLOR}"
+echo -e "${DARKGRAY}......${NOCOLOR}preUsrlibl: ${ORANGE}${preUsrlibl}${NOCOLOR}"
+echo -e "${DARKGRAY}......${NOCOLOR}postUsrlibl: ${ORANGE}${postUsrlibl}${NOCOLOR}"
+echo
 
-# Get the sourceCcsid from a given .ibmi.json. jq is prefered as the json parser
-# if jq not found, awk is used and assumes that the sourceCssid attribute are on the same line
-retrieve_sourceCcsid() {
-    local pathToIbmiJson=$1
-    local ccsid
-    if ! type jq >/dev/null 2>&1; then
-        ccsid=$(grep '^ *"tgtCcsid":' "${pathToIbmiJson}" | awk -F ":" '{ print $2 }' | sed -e 's/,$//')
-        echo >&2 "makei: [Warning] jq is not found, fall back to built-in Json parser."
-    else
-        ccsid=$(jq .build.tgtCcsid "${pathToIbmiJson}")
-    fi
-    
-    if [[ $ccsid = null ]]; then ccsid=""; fi
-    echo "$ccsid"
-}
+BUILDVARSMK=$(mktemp)
 
-# Get the objectLocation from a given .ibmi.json. jq is prefered as the json parser
-# if jq not found, awk is used and assumes that the sourceCssid attribute are on the same line
-retrieve_objectLocation() {
-    local pathToIbmiJson=$1
-    local objLoc
-    if ! type jq >/dev/null 2>&1; then
-        objLoc=$(grep '^ *"objlib":' "${pathToIbmiJson}" | awk -F ":" '{ print $2 }' | sed -e 's/,$//' -e 's/^"//' -e 's/"$//' -e 's/&//')
-        echo >&2 "makei: [Warning] jq is not found, fall back to built-in Json parser."
-    else
-        objLoc=$(jq .build.objlib "${pathToIbmiJson}" | sed -e 's/&//' -e 's/^"//' -e 's/"$//')
-    fi
-    if [[ $objLoc = null ]]; then objLoc=""; fi
-    echo "$objLoc"
-}
+{
+    echo "# This file is generated using makei, DO NOT EDIT."
+    echo "# Modify .ibmi.json to override values"
+    echo
+} >>"$BUILDVARSMK"
 
-# A recursive function that loops through every folder under the input src directory and issues an make command if possible
-recursive_make() {
+recursive_generate() {
     local dir=$1
     local parentObjLoc=${2//&/}
     local parentCcsid=$3
-    local curObjLoc
-    local curCcsid
-    cd "$dir" || ( echo "${dir} not found"; exit 1)
+    local objlibraw
+    local tgtCcsid
+    cd "$dir" || (
+        echo "${dir} not found"
+        exit 1
+    )
 
     if [[ -f ".ibmi.json" ]]; then
-        curObjLoc=$(retrieve_objectLocation "./.ibmi.json")
-        curCcsid=$(retrieve_sourceCcsid "./.ibmi.json")
+        objlibraw=$(retrieve_from_ibmijson ".ibmi.json" "build.objlib" "")
+        tgtCcsid=$(retrieve_from_ibmijson ".ibmi.json" "build.tgtCcsid" "")
     fi
-    # If ObjLoc and curCcsid are not defined, then use the parent's configuration
-    curObjLoc="${curObjLoc:-$parentObjLoc}"
-    curCcsid="${curCcsid:-$parentCcsid}"
+    objlib=$(parse_placeholder "$objlibraw")
+    if test $? -ne 0; then
+        exit 1
+    fi
 
+    if [ -z "${objlib}" ]; then
+        objPath=
+    else
+        objPath=/QSYS.LIB/${objlib}.LIB
+    fi
 
-    if [[ -f "Makefile" ]]; then
-        echo "$SEPSTART"
-        echo "makei: [Info] Building ${dir}"
+    # If ObjLoc and tgtCcsid are not defined, then use the parent's configuration
+    objPath="${objPath:-$parentObjLoc}"
+    tgtCcsid="${tgtCcsid:-$parentCcsid}"
 
-        local curObjPath='*CURLIB'
-        if [[ $curObjLoc != '*CURLIB' ]]; then
-            if [ -z "${!curObjLoc}" ]; then
-                echo "makei: [Error] ${curObjLoc} is undefined."
-                echo "$SEPEND"
-                echo
-                return 1
+    if [[ -f "Rules.mk" ]]; then
+        echo "TGTCCSID_$(pwd) := ${tgtCcsid}" >>"$BUILDVARSMK"
+        echo "OBJPATH_$(pwd) := $(parse_placeholder "$objPath")" >>"$BUILDVARSMK"
+
+        for f in "$dir"/*; do
+            if [[ -d $f ]]; then
+                recursive_generate "$f" "$objPath" "$tgtCcsid"
+                if test $? -ne 0; then
+                    exit 1
+                fi
+                cd ..
             fi
-            curObjPath=/QSYS.LIB/${!curObjLoc}.LIB
-        fi
-
-        echo ">> " make PROJECTDIR:="${srcDir}" TGTCCSID:="$curCcsid" OBJPATH:="${curObjPath}" IBMiEnvCmd="${IBMiEnvCmd}" preUsrlibl="'${preUsrlibl}'" postUsrlibl="'${postUsrlibl}'" -f "${dir}/Makefile" "$makeOpts"
-        # Call make with the arguments that were passed in
-        make PROJECTDIR:="${srcDir}" TGTCCSID:="$curCcsid" OBJPATH:="${curObjPath}" IBMiEnvCmd="${IBMiEnvCmd}" preUsrlibl="${preUsrlibl}" postUsrlibl="${postUsrlibl}" -f "${dir}/Makefile" $makeOpts
-        echo "$SEPEND"
-        echo
-        exitCode=$(( exitCode + $? ))
+        done
     fi
-    
-    for f in "$dir"/*; do
-        if [[ -d $f ]]; then
-            recursive_make "$f" "$curObjLoc" "$curCcsid"
-            cd ..
-        fi
-    done
-    return $(( exitCode + $? ))
 }
 
-# Redirect stdout and stderr to the pipe.
-recursive_make "$srcDir" "$objlib"  "$tgtCcsid" >"$pipe" 2>&1
-exitCode=$?
+echo -e "${BLUE}Generating makefile for build variables at ${BUILDVARSMK}${NOCOLOR}"
+echo
+recursive_generate "$srcDir" "$objlib" "$tgtCcsid"
+ibmijsonError=$?
+# cat $BUILDVARSMK
 
-# Determine the logging directory used by Make and move the logfile there.
-# The directory is written to stdout by the IBMiMake makefile.
-if [ "$enableLog" = true ]; then
-    finalLog='! Build log.log'
-    makeLogDir=$(sed -n -e 's/^IBMiMake log directory: \(.*\)$/\1/p' "$log")
-    if [ -d "$makeLogDir" ] && [ -f "$log" ]; then
-        echo "Make: Invoked with command > make $* <" >"${makeLogDir}/${finalLog}"
-        echo >>"${makeLogDir}/${finalLog}"
-        sed -e '/^IBMiMake log directory:.*\/Logs\//d' "$log" >>"${makeLogDir}/${finalLog}"
-    fi
+if test $ibmijsonError -eq 0; then
+    echo -e ">> ${GREEN}"make BUILDVARSMKPATH="${BUILDVARSMK}" COLOR_TTY="${COLORS}" -f "$MAKEFILE" "$makeOpts""${NOCOLOR}"
+    make BUILDVARSMKPATH="${BUILDVARSMK}" COLOR_TTY="${COLORS}" -f "$MAKEFILE" "$makeOpts"
+    echo
+
+    exitCode=$?
+else
+    echo
+    clean_up
+    exit $ibmijsonError
 fi
 
-rm "$pipe"
+clean_up
+echo -e "${BLUE}Done.${NOCOLOR}"
+
 exit $exitCode
