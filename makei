@@ -22,9 +22,9 @@
 # ----------------------------------
 # Colors
 # ----------------------------------
-# COLORS=true
-COLORS=false
-if [ "$COLORS" = true ]; then
+# COLORBOB=true
+# COLORBOB=false
+if [ "$COLORBOB" = true ]; then
     BOLD='\033[1m'
     NOCOLOR='\033[0m'
     RED='\033[0;31m'
