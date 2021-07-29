@@ -43,6 +43,7 @@ if [ "$COLORBOB" = true ]; then
     LIGHTCYAN='\033[1;36m'
     WHITE='\033[1;37m'
 else
+    COLORBOB=false
     BOLD=''
     NOCOLOR=''
     RED=''
