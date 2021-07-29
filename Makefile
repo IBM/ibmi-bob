@@ -1,5 +1,5 @@
 SHELL:=/QOpenSys/pkgs/bin/bash
-BOB:=/QOpenSys/pkgs/Bob
+BOB:=/QOpenSys/pkgs/lib/Bob
 MAKEFLAGS += --no-builtin-rules
 MAKEFLAGS += --no-builtin-variables
 COLOR_TTY :=
