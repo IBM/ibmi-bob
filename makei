@@ -81,7 +81,7 @@ retrieve_from_iproj() {
     local key=$1
     local default_vaule=$2
     local value
-    value=$(jq -n ".${key}" iproj.json | sed "s/\"//g")
+    value=$(jq ".${key}" iproj.json | sed "s/\"//g")
     if [[ $value = null || $value = "" ]]; then
         echo "$default_vaule"
     else
@@ -207,8 +207,8 @@ ibmijsonError=$?
 # cat $BUILDVARSMK
 
 if test $ibmijsonError -eq 0; then
-    echo -e ">> ${GREEN}"make BUILDVARSMKPATH="${BUILDVARSMK}" COLOR_TTY="${COLORBOB}" -f "$MAKEFILE" "$makeOpts""${NOCOLOR}"
-    make BUILDVARSMKPATH="${BUILDVARSMK}" COLOR_TTY="${COLORBOB}" -f "$MAKEFILE" "$makeOpts"
+    echo -e ">> ${GREEN}"make BUILDVARSMKPATH="${BUILDVARSMK}" COLOR_TTY="${COLORBOB}" IBMiEnvCmd="${IBMiEnvCmd}" preUsrlibl="${preUsrlibl}" postUsrlibl="${postUsrlibl}" -f "$MAKEFILE" "$makeOpts""${NOCOLOR}"
+    make BUILDVARSMKPATH="${BUILDVARSMK}" COLOR_TTY="${COLORBOB}" IBMiEnvCmd="${IBMiEnvCmd}" preUsrlibl="${preUsrlibl}" postUsrlibl="${postUsrlibl}" -f "$MAKEFILE" "$makeOpts"
     echo
 
     exitCode=$?
