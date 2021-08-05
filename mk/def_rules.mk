@@ -480,6 +480,7 @@ programTGTRLS = $(strip \
 
 .SECONDEXPANSION:
 %.CMD: $$(call genDep,$$(@D),$$*,CMDSRC)
+	$(info $(PGM) $(CMD_PGM) $(*)) 
 	$(eval d = $(@D))
 	$(call echo_cmd,"=== Creating command [$(notdir $<)]")
 	@$(set_STMF_CCSID)
