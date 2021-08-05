@@ -99,9 +99,9 @@ BNDRPG_OPTION := $(OPTION)
 BNDRPG_TGTRLS := $(TGTRLS)
 
 CMD_AUT := $(AUT)
-CMD_HLPID = $*
-CMD_HLPPNLGRP = $*
-CMD_PGM = $*
+CMD_HLPID = $(notdir $*)
+CMD_HLPPNLGRP = $(notdir $*)
+CMD_PGM = $(notdir $*)
 CMD_PMTFILE := *NONE
 CMD_VLDCKR := *NONE
 
@@ -272,10 +272,10 @@ cleanCDeps = awk '$$2 !~ /^\/QIBM\// && $$2 !~ /$(notdir $<)$$/ && $$2 !~ /$(bas
 # This defines the steps taken after a C compile to massage the auto-generated dependencies into a useable form.
 # See http://make.mad-scientist.net/papers/advanced-auto-dependency-generation/#tldr
 define POSTCCOMPILE =
-$(ICONV) -f $(ICONV_EBCDIC) -t $(ICONV_ASCII) $(DEPDIR)/$*.Td | tr -d '\r' > $(DEPDIR)/$*.T2d
-$(cleanCDeps) <$(DEPDIR)/$*.T2d | sort -u >$(DEPDIR)/$*.d
-touch -cr $(OBJPATH)/$@ $(DEPDIR)/$*.d
-rm $(DEPDIR)/$*.Td $(DEPDIR)/$*.T2d
+$(ICONV) -f $(ICONV_EBCDIC) -t $(ICONV_ASCII) $(DEPDIR)/$(notdir $*).Td | tr -d '\r' > $(DEPDIR)/$(notdir $*).T2d
+$(cleanCDeps) <$(DEPDIR)/$(notdir $*).T2d | sort -u >$(DEPDIR)/$(notdir $*).d
+touch -cr $(OBJPATH)/$@ $(DEPDIR)/$(notdir $*).d
+rm $(DEPDIR)/$(notdir $*).Td $(DEPDIR)/$(notdir $*).T2d
 $(removeEmptyDep)
 endef
 
