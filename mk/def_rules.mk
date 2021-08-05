@@ -481,7 +481,7 @@ programTGTRLS = $(strip \
 .SECONDEXPANSION:
 %.CMD: $$(call genDep,$$(@D),$$*,CMDSRC)
 	$(eval d = $(@D))
-	@echo "*** Creating command [$*]"
+	$(call echo_cmd,"=== Creating command [$(notdir $<)]")
 	@$(set_STMF_CCSID)
 	$(eval crtcmd := CRTCMD CMD($(OBJLIB)/$(basename $(@F))) srcstmf('$<') $(CRTCMDFLAGS))
 	@$(PRESETUP);  \
