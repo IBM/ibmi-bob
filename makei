@@ -207,8 +207,8 @@ ibmijsonError=$?
 # cat $BUILDVARSMK
 
 if test $ibmijsonError -eq 0; then
-    echo -e ">> ${GREEN}"make BUILDVARSMKPATH="${BUILDVARSMK}" COLOR_TTY="${COLORBOB}" IBMiEnvCmd="${IBMiEnvCmd}" preUsrlibl="${preUsrlibl}" postUsrlibl="${postUsrlibl}" -f "$MAKEFILE" "$makeOpts""${NOCOLOR}"
-    make BUILDVARSMKPATH="${BUILDVARSMK}" COLOR_TTY="${COLORBOB}" IBMiEnvCmd="${IBMiEnvCmd}" preUsrlibl="${preUsrlibl}" postUsrlibl="${postUsrlibl}" -f "$MAKEFILE" "$makeOpts"
+    echo -e ">> ${GREEN}"make -k BUILDVARSMKPATH="${BUILDVARSMK}" COLOR_TTY="${COLORBOB}" IBMiEnvCmd="${IBMiEnvCmd}" preUsrlibl="${preUsrlibl}" postUsrlibl="${postUsrlibl}" -f "$MAKEFILE" "$makeOpts""${NOCOLOR}"
+    make -k BUILDVARSMKPATH="${BUILDVARSMK}" COLOR_TTY="${COLORBOB}" IBMiEnvCmd="${IBMiEnvCmd}" preUsrlibl="${preUsrlibl}" postUsrlibl="${postUsrlibl}" -f "$MAKEFILE" "$makeOpts"
     echo
 
     exitCode=$?
