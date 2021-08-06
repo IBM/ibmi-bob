@@ -4,6 +4,19 @@ MAKEFLAGS += --no-builtin-rules
 MAKEFLAGS += --no-builtin-variables
 COLOR_TTY :=
 BUILDVARSMKPATH :=
+
+IBMiRelease :=
+ifndef IBMiRelease
+IBMiRelease := $(shell "cl 'dspdtaara qgpl/qss1MRI' | grep 'V[[:digit:]]R[[:digit:]]M[[:digit:]]' -wo | sed 's/[^0-9]*//g'")
+endif
+
+COMPATIBILITYMODE := false
+ifeq ($(shell test $(IBMiRelease) -lt 750; echo $$?), 0)
+COMPATIBILITYMODE := true
+endif
+
+
+
 ifndef BUILDVARSMKPATH
     $(error BUILDVARSMKPATH is not set)
 endif

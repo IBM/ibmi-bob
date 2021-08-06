@@ -785,6 +785,8 @@ test:
 	echo "OBJLIB:			$(OBJLIB)"; \
 	echo "LIBL:			$(LIBL)"; \
 	echo "IBMiEnvCmd:		$(IBMiEnvCmd)"; \
+	echo "IBMiRelease:		$(IBMiRelease)"; \
+	echo "COMPATIBILITYMODE:		$(COMPATIBILITYMODE)"; \
 	echo "preUsrlibl:		$(preUsrlibl)"; \
 	echo "postUsrlibl:		$(postUsrlibl)"; \
 	echo "CRTFRMSTFMLIB:		$(CRTFRMSTMFLIB)"; \
