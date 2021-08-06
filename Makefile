@@ -5,7 +5,6 @@ MAKEFLAGS += --no-builtin-variables
 COLOR_TTY :=
 BUILDVARSMKPATH :=
 
-IBMiRelease :=
 ifndef IBMiRelease
 IBMiRelease := $(shell "cl 'dspdtaara qgpl/qss1MRI' | grep 'V[[:digit:]]R[[:digit:]]M[[:digit:]]' -wo | sed 's/[^0-9]*//g'")
 endif
