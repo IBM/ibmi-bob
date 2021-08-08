@@ -6,14 +6,14 @@ COLOR_TTY :=
 BUILDVARSMKPATH :=
 
 ifndef IBMiRelease
-IBMiRelease := $(shell "cl 'dspdtaara qgpl/qss1MRI' | grep 'V[[:digit:]]R[[:digit:]]M[[:digit:]]' -wo | sed 's/[^0-9]*//g'")
+IBMiRelease := $(shell cl 'dspdtaara qgpl/qss1MRI' | grep 'V[[:digit:]]R[[:digit:]]M[[:digit:]]' -wo | sed 's/[^0-9]$*//g')
 endif
 
 COMPATIBILITYMODE := false
 ifeq ($(shell test $(IBMiRelease) -lt 750; echo $$?), 0)
+# Older than V7R5M0
 COMPATIBILITYMODE := true
 endif
-
 
 
 ifndef BUILDVARSMKPATH
