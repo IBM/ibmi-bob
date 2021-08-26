@@ -81,7 +81,7 @@ retrieve_from_iproj() {
     local key=$1
     local default_vaule=$2
     local value
-    value=$(jq ".${key}" iproj.json | sed "s/\"//g")
+    value=$(jq -r ".${key}" iproj.json)
     if [[ $value = null || $value = "" ]]; then
         echo "$default_vaule"
     else
@@ -94,7 +94,7 @@ retrieve_from_ibmijson() {
     local key=$2
     local default_vaule=$3
     local value
-    value=$(jq ".${key}" "${pathToIbmiJson}" | sed "s/\"//g")
+    value=$(jq -r ".${key}" "${pathToIbmiJson}")
     if [[ $value = null || $value = "" ]]; then
         echo "$default_vaule"
     else
@@ -105,7 +105,7 @@ retrieve_from_ibmijson() {
 clean_up() {
     echo -e "${BLUE}Cleaning up... ${NOCOLOR}"
     echo
-    rm -rf "${BUILDVARSMK}"
+    # rm -rf "${BUILDVARSMK}"
 }
 
 parse_placeholder() {
@@ -125,7 +125,7 @@ parse_placeholder() {
 echo -e "${BLUE}makei: Reading from iproj.json${NOCOLOR}"
 objlib=$(retrieve_from_iproj objlib "*CURLIB")
 tgtCcsid=$(retrieve_from_iproj tgtccsid "*JOB")
-IBMiEnvCmd=$(retrieve_from_iproj setIBMiEnvCmd "")
+IBMiEnvCmdList=$(retrieve_from_iproj setIBMiEnvCmd[] "")
 preUsrliblRaw=$(retrieve_from_iproj preUsrlibl "" | sed "s/ //g;s/,/ /g")
 postUsrliblRaw=$(retrieve_from_iproj postUsrlibl "" | sed "s/ //g;s/,/ /g")
 preUsrlibl=""
@@ -141,7 +141,7 @@ done
 
 echo -e "${DARKGRAY}......${NOCOLOR}objlib: ${ORANGE}${objlib}${NOCOLOR}"
 echo -e "${DARKGRAY}......${NOCOLOR}tgtCcsid: ${ORANGE}${tgtCcsid}${NOCOLOR}"
-echo -e "${DARKGRAY}......${NOCOLOR}IBMiEnvCmd: ${ORANGE}${IBMiEnvCmd}${NOCOLOR}"
+echo -e "${DARKGRAY}......${NOCOLOR}IBMiEnvCmdList: ${ORANGE}${IBMiEnvCmdList}${NOCOLOR}"
 echo -e "${DARKGRAY}......${NOCOLOR}preUsrlibl: ${ORANGE}${preUsrlibl}${NOCOLOR}"
 echo -e "${DARKGRAY}......${NOCOLOR}postUsrlibl: ${ORANGE}${postUsrlibl}${NOCOLOR}"
 echo
@@ -152,6 +152,12 @@ BUILDVARSMK=$(mktemp)
     echo "# This file is generated using makei, DO NOT EDIT."
     echo "# Modify .ibmi.json to override values"
     echo
+    echo "preUsrlibl := ${preUsrlibl}"
+    echo "postUsrlibl := ${postUsrlibl}"
+    while read -r cmd; do
+        IBMiEnvCmd+="cl '$cmd' && "
+    done <<<"$IBMiEnvCmdList"
+    echo "IBMiEnvCmd := $(echo "$IBMiEnvCmd" | sed 's/&& $//')"
 } >>"$BUILDVARSMK"
 
 recursive_generate() {
@@ -188,6 +194,10 @@ recursive_generate() {
         echo "TGTCCSID_$(pwd) := ${tgtCcsid}" >>"$BUILDVARSMK"
         echo "OBJPATH_$(pwd) := $(parse_placeholder "$objPath")" >>"$BUILDVARSMK"
 
+        grep -v ":=" Rules.mk | grep -v "#" | cut -d':' -f1 | grep . | sort | uniq | while read line ; do
+            echo "${line}_d := $dir" >>"$BUILDVARSMK"
+        done
+
         for f in "$dir"/*; do
             if [[ -d $f ]]; then
                 recursive_generate "$f" "$objPath" "$tgtCcsid"
@@ -207,8 +217,8 @@ ibmijsonError=$?
 # cat $BUILDVARSMK
 
 if test $ibmijsonError -eq 0; then
-    echo -e ">> ${GREEN}"make -k BUILDVARSMKPATH="${BUILDVARSMK}" COLOR_TTY="${COLORBOB}" IBMiEnvCmd="${IBMiEnvCmd}" preUsrlibl="${preUsrlibl}" postUsrlibl="${postUsrlibl}" -f "$MAKEFILE" "$makeOpts""${NOCOLOR}"
-    make -k BUILDVARSMKPATH="${BUILDVARSMK}" COLOR_TTY="${COLORBOB}" IBMiEnvCmd="${IBMiEnvCmd}" preUsrlibl="${preUsrlibl}" postUsrlibl="${postUsrlibl}" -f "$MAKEFILE" "$makeOpts"
+    echo -e ">> ${GREEN}"make -k BUILDVARSMKPATH="${BUILDVARSMK}" COLOR_TTY="${COLORBOB}" -f "$MAKEFILE" "$makeOpts""${NOCOLOR}"
+    make -k BUILDVARSMKPATH="${BUILDVARSMK}" COLOR_TTY="${COLORBOB}" -f "$MAKEFILE" "$makeOpts"
     echo
 
     exitCode=$?

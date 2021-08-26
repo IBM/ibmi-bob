@@ -1,10 +1,13 @@
 # Clear vars used by this make system
 define HEADER
 CLEAN :=
-TARGETS = $(PFs) $(LFs) $(DSPFs) $(PRTFs) $(CMDs) $(MODULEs) $(SRVPGMs) $(PGMs) $(MENUs) $(PNLGRPs) $(QMQRYs) $(WSCSTs)
+TARGETS = $(DTAs) $(SQLs) $(BNDs) $(PFs) $(LFs) $(DSPFs) $(PRTFs) $(CMDs) $(MODULEs) $(SRVPGMs) $(PGMs) $(MENUs) $(PNLGRPs) $(QMQRYs) $(WSCSTs) $(MSGs)
 SUBDIRS :=
 
 
+DTAs :=
+SQLs :=
+BNDDs :=
 PFs :=
 LFs :=
 DSPFs :=
@@ -17,6 +20,7 @@ MENUs :=
 PNLGRPs :=
 QMQRYs :=
 WSCSTs :=
+MSGs :=
 
 # Clear user vars
 $(foreach v,$(VERB_VARS) $(OBJ_VARS) $(DIR_VARS),$(eval $(v) := ))
