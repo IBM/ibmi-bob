@@ -774,6 +774,13 @@ programTGTRLS = $(strip \
 	$(MK)/extractAndLaunch "$(JOBLOGFILE)" "$<" $(OBJLIB) $(basename $(@F)) >> $(LOGFILE) 2>&1 || true; \
 	$(POSTCLEANUP)
 
+%.TRG: $$(call genDep,$$@,$$*,SYSTRG)
+	$(eval d = $($@_d))
+	$(call echo_cmd,"=== Creating System TRG from [$(notdir $<)]")
+	$(eval crtcmd := $(shell $(MK)/extractPseudoSrc $< $(OBJLIB) $(basename $(@F))))
+	@$(PRESETUP);  \
+	$(MK)/extractAndLaunch "$(JOBLOGFILE)" "$<" $(OBJLIB) $(basename $(@F)) >> $(LOGFILE) 2>&1 || true; \
+	$(POSTCLEANUP)
 
 %.SQL:
 	$(eval d = $($@_d))

@@ -1,10 +1,10 @@
 # Clear vars used by this make system
 define HEADER
 CLEAN :=
-TARGETS = $(DTAs) $(SQLs) $(BNDs) $(PFs) $(LFs) $(DSPFs) $(PRTFs) $(CMDs) $(MODULEs) $(SRVPGMs) $(PGMs) $(MENUs) $(PNLGRPs) $(QMQRYs) $(WSCSTs) $(MSGs)
+TARGETS = $(TRGs) $(DTAs) $(SQLs) $(BNDs) $(PFs) $(LFs) $(DSPFs) $(PRTFs) $(CMDs) $(MODULEs) $(SRVPGMs) $(PGMs) $(MENUs) $(PNLGRPs) $(QMQRYs) $(WSCSTs) $(MSGs)
 SUBDIRS :=
 
-
+TRGs :=
 DTAs :=
 SQLs :=
 BNDDs :=
