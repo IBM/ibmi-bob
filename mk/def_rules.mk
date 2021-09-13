@@ -34,7 +34,7 @@ fi
 endef
 
 define genDep
-$(eval d = $1)$(eval tmpName = $(wildcard $d/$2-*.$3))$(if $(tmpName),$(tmpName),$d/$2.$3)
+$(eval d = $($(1)_d))$(eval tmpName = $(wildcard $d/$2-*.$3))$(if $(tmpName),$(tmpName),$d/$2.$3)
 endef
 
 # define inheritValue
@@ -209,6 +209,7 @@ CRTMNUFLAGS = AUT($(AUT)) OPTION($(OPTION)) CURLIB($(CURLIB)) PRDLIB($(PRDLIB)) 
 CRTPFFLAGS = AUT($(AUT)) DLTPCT($(DLTPCT)) OPTION($(OPTION)) REUSEDLT($(REUSEDLT)) SIZE($(SIZE)) TEXT(''$(TEXT)'')
 CRTPGMFLAGS = ACTGRP($(ACTGRP)) USRPRF(*USER) TGTRLS($(TGTRLS)) AUT($(AUT)) DETAIL($(DETAIL)) OPTION($(CRTPGM_OPTION)) STGMDL($(STGMDL)) TEXT('$(TEXT)')
 CRTPNLGRPFLAGS = AUT($(AUT)) OPTION($(OPTION)) TEXT(''$(TEXT)'')
+CRTCBLPGMFLAGS = OPTION($(OPTION)) TEXT(''$(TEXT)'')
 CRTPRTFFLAGS = AUT($(AUT)) OPTION($(OPTION)) PAGESIZE($(PAGESIZE)) TEXT(''$(TEXT)'')
 CRTRPGMODFLAGS = AUT($(AUT)) DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) OUTPUT(*PRINT) TEXT('$(TEXT)') \
                  TGTCCSID($(TGTCCSID)) TGTRLS($(TGTRLS))
@@ -231,7 +232,7 @@ ADHOCCRTFLAGS =
 SRCPATH := $(TOP)
 OBJPATH = $(OBJPATH_$(d))
 CURLIB :=
-IBMiEnvCmd :=
+# IBMiEnvCmd :=
 # override OBJPATH = $(shell echo "$(OBJPATH)" | tr '[:lower:]' '[:upper:]')
 OBJLIB = $(basename $(notdir $(OBJPATH)))
 LIBL = $(OBJLIB)
@@ -262,7 +263,7 @@ echo ">> Adding user libraries to liblist" >> $(LOGFILE); \
 [[ ! -z "$(postUsrlibl)" ]] && liblist -al $(postUsrlibl) >> $(LOGFILE) 2>&1; \
 echo ">> Setup IBM i Environment" >> $(LOGFILE); \
 echo "$(IBMiEnvCmd)" >> $(LOGFILE); \
-[[ ! -z "$(IBMiEnvCmd)" ]] && cl "$(IBMiEnvCmd)" >> $(LOGFILE) 2>&1 ; \
+[[ ! -z "$(IBMiEnvCmd)" ]] && ($(IBMiEnvCmd)) >> $(LOGFILE) 2>&1; \
 echo "$(crtcmd)"
 endef
 
@@ -460,7 +461,8 @@ programOPTION = $(strip \
 	$(if $(filter %.SQLC,$<),$(SQLCIPGM_OPTION), \
 	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIPGM_OPTION), \
 	$(if $(filter %.MODULE,$<),$(PGM_OPTION), \
-	UNKNOWN_FILE_TYPE))))))
+	$(if $(filter %.CBL,$<),$(CBL_OPTION), \
+	UNKNOWN_FILE_TYPE)))))))
 programRPGPPOPT = $(strip \
 	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIPGM_RPGPPOPT), \
 	UNKNOWN_FILE_TYPE))
@@ -484,9 +486,9 @@ programTGTRLS = $(strip \
 %.CMD: private VLDCKR = $(CMD_VLDCKR)
 
 .SECONDEXPANSION:
-%.CMD: $$(call genDep,$$(@D),$$*,CMDSRC)
+%.CMD: $$(call genDep,$$@,$$*,CMDSRC)
 	$(info $(PGM) $(CMD_PGM) $(*)) 
-	$(eval d = $(@D))
+	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating command [$(notdir $<)]")
 	@$(set_STMF_CCSID)
 	$(eval crtcmd := CRTCMD CMD($(OBJLIB)/$(basename $(@F))) srcstmf('$<') $(CRTCMDFLAGS))
@@ -505,8 +507,8 @@ programTGTRLS = $(strip \
 %.FILE: private TYPEDEF = $(if $(filter YES,$(CREATE_TYPEDEF)),$(TYPEDEF_SCRIPT),)
 
 .SECONDEXPANSION:
-%.FILE:$$(call genDep,$$(@D),$$*,DSPF)
-	$(eval d = $(@D))
+%.FILE:$$(call genDep,$$@,$$*,DSPF)
+	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating DSPF [$(notdir $<)]")
 	@$(set_STMF_CCSID)
 	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$(basename $(@F))) cmd(CRTDSPF) srcstmf('$<') parms('$(CRTDSPFFLAGS)'))
@@ -515,8 +517,8 @@ programTGTRLS = $(strip \
 	$(POSTCLEANUP)
 
 .SECONDEXPANSION:
-%.FILE:$$(call genDep,$$(@D),$$*,LF)
-	$(eval d = $(@D))
+%.FILE: $$(call genDep,$$@,$$*,LF)
+	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating LF [$(notdir $<)]")
 	@$(set_STMF_CCSID)
 	@if [ -d $(OBJPATH)/$@ ]; then rm -r $(OBJPATH)/$@; fi
@@ -527,8 +529,8 @@ programTGTRLS = $(strip \
 	@$(TYPEDEF)
 
 .SECONDEXPANSION:
-%.FILE: $$(call genDep,$$(@D),$$*,PF)
-	$(eval d = $(@D))
+%.FILE: $$(call genDep,$$@,$$*,PF)
+	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating PF [$(notdir $<)]")
 	@$(set_STMF_CCSID)
 	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$(basename $(@F))) cmd(CRTPF) srcstmf('$<') parms('$(CRTPFFLAGS)'))
@@ -538,8 +540,8 @@ programTGTRLS = $(strip \
 	@$(TYPEDEF)
 
 .SECONDEXPANSION:
-%.FILE: $$(call genDep,$$(@D),$$*,PRTF)
-	$(eval d = $(@D))
+%.FILE: $$(call genDep,$$@,$$*,PRTF)
+	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating PRTF [$(notdir $<)]")
 	@$(set_STMF_CCSID)
 	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$(basename $(@F))) cmd(CRTPRTF) srcstmf('$<') parms('$(CRTPRTFFLAGS)'))
@@ -556,8 +558,8 @@ programTGTRLS = $(strip \
 %.MENU: private TYPE = $(MNU_TYPE)
 
 .SECONDEXPANSION:
-%.MENU: $$(call genDep,$$(@D),$$*,MENUSRC)
-	$(eval d = $(@D))
+%.MENU: $$(call genDep,$$@,$$*,MENUSRC)
+	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating menu [$(notdir $<)]")
 	@$(set_STMF_CCSID)
 	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$(basename $(@F))) cmd(CRTMNU) srcstmf('$<') parms('$(CRTMNUFLAGS)'))
@@ -578,8 +580,8 @@ programTGTRLS = $(strip \
 
 
 .SECONDEXPANSION:
-%.MODULE: $$(call genDep,$$(@D),$$*,C) $(DEPDIR)/$$*.d
-	$(eval d = $(@D))
+%.MODULE: $$(call genDep,$$@,$$*,C) $(DEPDIR)/$$*.d
+	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating C module [$(notdir $<)]")
 	@$(set_STMF_CCSID)
 	$(eval crtcmd := crtcmod module($(OBJLIB)/$(basename $(@F))) srcstmf('$<') $(CRTCMODFLAGS) $(ADHOCCRTFLAGS))
@@ -590,8 +592,8 @@ programTGTRLS = $(strip \
 
 
 .SECONDEXPANSION:
-%.MODULE: $$(call genDep,$$(@D),$$*,RPGLE) $(DEPDIR)/$$*.d
-	$(eval d = $(@D))
+%.MODULE: $$(call genDep,$$@,$$*,RPGLE) $(DEPDIR)/$$*.d
+	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating RPG module [$(notdir $<)]")
 	@$(set_STMF_CCSID)
 	$(eval crtcmd := crtrpgmod module($(OBJLIB)/$(basename $(@F))) srcstmf('$<') $(CRTRPGMODFLAGS))
@@ -602,8 +604,8 @@ programTGTRLS = $(strip \
 
 
 .SECONDEXPANSION:
-%.MODULE: $$(call genDep,$$(@D),$$*,CLLE)
-	$(eval d = $(@D))
+%.MODULE: $$(call genDep,$$@,$$*,CLLE)
+	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating CL module [$(notdir $<)]")
 	@$(set_STMF_CCSID)
 	@$(eval crtcmd := crtclmod module($(OBJLIB)/$(basename $(@F))) srcstmf('$<') $(CRTCLMODFLAGS))
@@ -613,8 +615,8 @@ programTGTRLS = $(strip \
 
 # Temp: Convert UTF-8 to temporary Windows Latin-1, because SQLC pre-compiler doesn't understand UTF-8
 .SECONDEXPANSION:
-%.MODULE: $$(call genDep,$$(@D),$$*,SQLC) $(DEPDIR)/$$*.d
-	$(eval d = $(@D))
+%.MODULE: $$(call genDep,$$@,$$*,SQLC) $(DEPDIR)/$$*.d
+	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating SQLC module [$(notdir $<)]")
 	@$(set_STMF_CCSID)
 	@qsh_out -c "touch -C 1252 $<-1252 && cat $< >$<-1252"
@@ -627,8 +629,8 @@ programTGTRLS = $(strip \
 
 
 .SECONDEXPANSION:
-%.MODULE: $$(call genDep,$$(@D),$$*,SQLRPGLE) $(DEPDIR)/$$*.d
-	$(eval d = $(@D))
+%.MODULE: $$(call genDep,$$@,$$*,SQLRPGLE) $(DEPDIR)/$$*.d
+	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating SQLRPGLE module [$(notdir $<)]")
 	@$(set_STMF_CCSID)
 	$(eval crtcmd := crtsqlrpgi obj($(OBJLIB)/$(basename $(@F))) srcstmf('$<') $(CRTSQLRPGIFLAGS))
@@ -651,7 +653,7 @@ programTGTRLS = $(strip \
 %.PGM: private BNDSRVPGMPATH = $(basename $(filter %.SRVPGM,$(notdir $^)) $(externalsrvpgms))
 
 %.PGM: %.MODULE
-	$(eval d = $(@D))
+	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating program [$*] from modules [$(basename $(filter %.MODULE,$(notdir $^)))] and service programs [$(basename $(filter %.SRVPGM,$(notdir $^$|)))]")
 	$(eval externalsrvpgms := $(filter %.SRVPGM,$(subst .LIB,,$(subst /QSYS.LIB/,,$|))))
 	$(eval crtcmd := crtpgm pgm($(OBJLIB)/$(basename $(@F))) module($(basename $(filter %.MODULE,$(notdir $^)))) bndsrvpgm($(if $(BNDSRVPGMPATH),$(BNDSRVPGMPATH),*NONE)) $(CRTPGMFLAGS))
@@ -662,7 +664,7 @@ programTGTRLS = $(strip \
 	@$(EVFEVENT_DOWNLOAD_PGM)
 
 %.PGM: %.PGM.RPGLE
-	$(eval d = $(@D))
+	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Create Bound RPG Program [$(notdir $*)]")
 	$(eval crtcmd := CRTBNDRPG srcstmf($<) PGM($(OBJLIB)/$(basename $(@F) )$(CRTBNDRPGFLAGS))
 	$(eval EVFEVENT_DOWNLOAD_PGM_RPGLE = system "CPYTOSTMF FROMMBR('$(OBJPATH)/EVFEVENT.FILE/$*.MBR') TOSTMF('$(EVTDIR)/$*.PGM.RPGLE.evfevent') STMFCCSID(*STDASCII) ENDLINFMT(*LF) CVTDTA(*AUTO) STMFOPT(*REPLACE)" >/dev/null)
@@ -672,21 +674,45 @@ programTGTRLS = $(strip \
 	@$(EVFEVENT_DOWNLOAD_PGM_RPGLE)
 
 %.PGM: %.PGM.C
-	$(eval d = $(@D))
+	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Create Bound RPG Program [$(notdir $*)]")
 	$(eval crtcmd := CRTBNDC srcstmf($<) PGM($(OBJLIB)/$(basename $(@F))) $(CRTBNDCFLAGS))
 	$(eval EVFEVENT_DOWNLOAD_PGM_C = system "CPYTOSTMF FROMMBR('$(OBJPATH)/EVFEVENT.FILE/$*.MBR') TOSTMF('$(EVTDIR)/$*.PGM.C.evfevent') STMFCCSID(*STDASCII) ENDLINFMT(*LF) CVTDTA(*AUTO) STMFOPT(*REPLACE)" >/dev/null)
 	@$(PRESETUP);  \
-	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1; || $(EVFEVENT_DOWNLOAD_PGM_C); \
+	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || $(EVFEVENT_DOWNLOAD_PGM_C); \
 	$(POSTCLEANUP)
 	@$(EVFEVENT_DOWNLOAD_PGM_C)
+
+%.PGM: $$(call genDep,$$@,$$*,CBL)
+	$(eval d = $($@_d))
+	$(call echo_cmd,"=== Create COBOL Program [$(notdir $*)]")
+	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$(basename $(@F))) cmd(CRTCBLPGM) srcstmf('$<') parms(PGM($(OBJLIB)/$(basename $(@F))) '$(CRTCBLPGMFLAGS)'))
+	@$(PRESETUP);  \
+	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 ; \
+	$(POSTCLEANUP)
+
+%.PGM: $$(call genDep,$$@,$$*,RPG)
+	$(eval d = $($@_d))
+	$(call echo_cmd,"=== Create RPG Program [$(notdir $*)]")
+	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$(basename $(@F))) cmd(CRTRPGPGM) srcstmf('$<') parms('$(CRTCBLPGMFLAGS)'))
+	@$(PRESETUP);  \
+	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 ; \
+	$(POSTCLEANUP)
+
+%.PGM: $$(call genDep,$$@,$$*,ILEPGM)
+	$(eval d = $($@_d))
+	$(call echo_cmd,"=== Creating program [$*] from Pseudo Source [$(basename $(notdir $<))]")
+	$(eval crtcmd := $(shell $(MK)/extractPseudoSrc $< $(OBJLIB) $(basename $(@F))))
+	@$(PRESETUP);  \
+	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true; \
+	$(POSTCLEANUP)
 
 %.PNLGRP: private AUT = $(PNLGRP_AUT)
 %.PNLGRP: private OPTION = $(PNLGRP_OPTION)
 
 .SECONDEXPANSION:
-%.PNLGRP: $$(call genDep,$$(@D),$$*,PNLGRPSRC)
-	$(eval d = $(@D))
+%.PNLGRP: $$(call genDep,$$@,$$*,PNLGRPSRC)
+	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Create panel group [$(notdir $*)]")
 	@$(set_STMF_CCSID)
 	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$(basename $(@F))) cmd(CRTPNLGRP) srcstmf('$<') parms('$(CRTPNLGRPFLAGS)'))
@@ -697,8 +723,8 @@ programTGTRLS = $(strip \
 %.QMQRY: private AUT = $(QMQRY_AUT)
 
 .SECONDEXPANSION:
-%.QMQRY: $$(call genDep,$$(@D),$$*,SQL)
-	$(eval d = $(@D))
+%.QMQRY: $$(call genDep,$$@,$$*,SQL)
+	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Create QM query [$(notdir $*)]")
 	@$(set_STMF_CCSID)
 	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$(basename $(@F))) cmd(CRTQMQRY) srcstmf('$<') parms('$(CRTQMQRYFLAGS)'))
@@ -714,8 +740,8 @@ programTGTRLS = $(strip \
 %.SRVPGM: private TGTRLS = $(SRVPGM_TGTRLS)
 %.SRVPGM: private BNDSRVPGMPATH = $(basename $(filter %.SRVPGM,$(notdir $^)) $(externalsrvpgms))
 
-%.SRVPGM:
-	$(eval d = $(@D))
+%.SRVPGM: $$(call genDep,$$@,$$*,BND)
+	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating service program [$*] from modules [$(basename $(filter %.MODULE,$(notdir $^)))] and service programs [$(basename $(filter %.SRVPGM,$(notdir $^$|)))]")
 	@$(set_STMF_CCSID)
 	$(eval externalsrvpgms := $(filter %.SRVPGM,$(subst .LIB,,$(subst /QSYS.LIB/,,$|))))
@@ -724,11 +750,59 @@ programTGTRLS = $(strip \
 	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true; \
 	$(POSTCLEANUP)
 
+%.SRVPGM: $$(call genDep,$$@,$$*,ILESRVPGM)
+	$(eval d = $($@_d))
+	$(call echo_cmd,"=== Creating service program [$*] from [$(notdir $<)]")
+	$(eval crtcmd := $(shell $(MK)/extractPseudoSrc $< $(OBJLIB) $(basename $(@F))))
+	@$(PRESETUP);  \
+	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true; \
+	$(POSTCLEANUP)
+
+%.BNDD: $$(call genDep,$$@,$$*,BNDDIR)
+	$(eval d = $($@_d))
+	$(call echo_cmd,"=== Creating BND from [$(notdir $<)]")
+	$(eval crtcmd := $(shell $(MK)/extractPseudoSrc $< $(OBJLIB) $(basename $(@F))))
+	@$(PRESETUP);  \
+	$(MK)/extractAndLaunch "$(JOBLOGFILE)" "$<" $(OBJLIB) $(basename $(@F)) >> $(LOGFILE) 2>&1 || true; \
+	$(POSTCLEANUP)
+
+%.DTA: $$(call genDep,$$@,$$*,DTA)
+	$(eval d = $($@_d))
+	$(call echo_cmd,"=== Creating DTA from [$(notdir $<)]")
+	$(eval crtcmd := $(shell $(MK)/extractPseudoSrc $< $(OBJLIB) $(basename $(@F))))
+	@$(PRESETUP);  \
+	$(MK)/extractAndLaunch "$(JOBLOGFILE)" "$<" $(OBJLIB) $(basename $(@F)) >> $(LOGFILE) 2>&1 || true; \
+	$(POSTCLEANUP)
+
+%.TRG: $$(call genDep,$$@,$$*,SYSTRG)
+	$(eval d = $($@_d))
+	$(call echo_cmd,"=== Creating System TRG from [$(notdir $<)]")
+	$(eval crtcmd := $(shell $(MK)/extractPseudoSrc $< $(OBJLIB) $(basename $(@F))))
+	@$(PRESETUP);  \
+	$(MK)/extractAndLaunch "$(JOBLOGFILE)" "$<" $(OBJLIB) $(basename $(@F)) >> $(LOGFILE) 2>&1 || true; \
+	$(POSTCLEANUP)
+
+%.SQL:
+	$(eval d = $($@_d))
+	$(call echo_cmd,"=== Running SQL Statement from [$(notdir $<)]")
+	$(eval crtcmd := RUNSQLSTM srcstmf('$<'))
+	@$(PRESETUP);  \
+	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true; \
+	$(POSTCLEANUP)
+
+%.MSG:
+	$(eval d = $($@_d))
+	$(call echo_cmd,"=== Creating Message from [$(notdir $<)]")
+	$(eval crtcmd := $(shell $(MK)/extractPseudoSrc $< $(OBJLIB) $(basename $(@F))))
+	@$(PRESETUP);  \
+	$(MK)/extractAndLaunch "$(JOBLOGFILE)" "$<" $(OBJLIB) $(basename $(@F)) >> $(LOGFILE) 2>&1 || true; \
+	$(POSTCLEANUP)
+
 %.WSCST: private AUT = $(WSCST_AUT)
 
 .SECONDEXPANSION:
-%.WSCST: $$(call genDep,$$(@D),$$*,WSCSTSRC)
-	$(eval d = $(@D))
+%.WSCST: $$(call genDep,$$@,$$*,WSCSTSRC)
+	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating work station customizing object [$*]")
 	@$(set_STMF_CCSID)
 	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$(basename $(@F))) cmd(CRTWSCST) srcstmf('$<') parms('$(CRTWSCSTFLAGS)'))

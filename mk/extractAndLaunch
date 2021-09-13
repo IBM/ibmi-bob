@@ -1,0 +1,20 @@
+#! /QOpenSys/pkgs/bin/bash
+
+joblog_json=$1
+pseudoSrcFile=$2
+objlib=$3
+objname=$4
+
+cmd=""
+
+while read -r line; do
+  if [[ $line = '/*'* ]]; then continue ; fi
+  if [[ $line = '' ]]; then continue ; fi
+  if [[ $line =~ \+$ ]]; then cmd+=$(echo "$line" | sed 's/+$//'); continue; fi
+  cmd+=$line
+  if [ -n "$cmd" ]; then
+    cmd=$(echo "$cmd" | sed "s/&O/$objlib/g" | sed "s/&N/$objname/g") ;
+    launch "$joblog_json" "$cmd" < /dev/null;
+    cmd="" ;
+  fi
+done < "$pseudoSrcFile"

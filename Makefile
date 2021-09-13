@@ -15,7 +15,6 @@ ifeq ($(shell test $(IBMiRelease) -lt 750; echo $$?), 0)
 COMPATIBILITYMODE := true
 endif
 
-
 ifndef BUILDVARSMKPATH
     $(error BUILDVARSMKPATH is not set)
 endif

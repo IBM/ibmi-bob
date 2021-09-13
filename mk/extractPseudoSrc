@@ -1,0 +1,15 @@
+#! /QOpenSys/pkgs/bin/bash
+
+pseudoSrcFile=$1
+objlib=$2
+objname=$3
+
+cmd=""
+
+while read -r line; do
+  if [[ $line = '/*'* ]]; then continue ; fi
+  if [[ $line = '' ]]; then continue ; fi
+  cmd+=$(echo "$line " | sed 's/+$//')
+done < "$pseudoSrcFile"
+
+echo "$cmd" | sed "s/&O/$objlib/" | sed "s/&N/$objname/"

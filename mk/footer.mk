@@ -11,6 +11,7 @@ rel_tgts := $(filter-out /%,$(TARGETS))
 # $(info rel_tgts: $(rel_tgts))
 TARGETS_$(d) := $(TARGETS)
 # $(info $(TARGETS_$(d)))
+
 $(foreach tgt,$(filter-out $(AUTO_TGTS),$(rel_tgts)),$(eval $(call save_vars,$(OBJPATH)/,$(tgt))))
 # Absolute targets are entry points for external (sub)projects which
 # have their own build system - what is really interesting is only CMD
@@ -78,7 +79,7 @@ $(eval $(call skeleton,$(d)))
 $(foreach vd,$(SRCS_VPATH),$(eval $(call skeleton,$(d)/$(vd))))
 
 # Target rules for all "non automatic" targets
-$(foreach tgt,$(filter-out $(AUTO_TGTS),$(TARGETS_$(d))),$(eval $(call tgt_rule,$(tgt))))
+# $(foreach tgt,$(filter-out $(AUTO_TGTS),$(TARGETS_$(d))),$(eval $(call tgt_rule,$(tgt))))
 
 # Way to build all targets in given subtree (not just current dir as via
 # dir_$(d) - see below)
