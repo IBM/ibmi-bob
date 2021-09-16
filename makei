@@ -190,8 +190,8 @@ main() {
     objlib=$(retrieve_from_iproj objlib "*CURLIB")
     tgtCcsid=$(retrieve_from_iproj tgtccsid "*JOB")
     IBMiEnvCmdList=$(retrieve_from_iproj setIBMiEnvCmd[] "")
-    preUsrliblRaw=$(retrieve_from_iproj preUsrlibl "" | sed "s/ //g;s/,/ /g")
-    postUsrliblRaw=$(retrieve_from_iproj postUsrlibl "" | sed "s/ //g;s/,/ /g")
+    preUsrliblRaw=$(retrieve_from_iproj preUsrlibl[] "")
+    postUsrliblRaw=$(retrieve_from_iproj postUsrlibl[] "")
     preUsrlibl=""
     postUsrlibl=""
 
