@@ -161,6 +161,15 @@ recursive_generate() {
 main() {
     exitCode=0
 
+    while getopts ":z:" options
+    do
+        case $options in
+            z ) filename=$OPTARG;;
+            * ) ;;
+        esac
+    done
+    
+    shift $(($OPTIND - 1))
     makeOpts=$*
     srcDir="$(pwd)"
 
@@ -216,9 +225,14 @@ main() {
     recursive_generate "$srcDir" "$objlib" "$tgtCcsid"
     ibmijsonError=$?
 
+    if [ -z ${filename+x} ];
+    then targetName=$(get_target_from_srcfile "$filename");
+    else targetName="";
+    fi
+
     if test $ibmijsonError -eq 0; then
-        echo -e ">> ${GREEN}"make -k BUILDVARSMKPATH="${BUILDVARSMK}" COLOR_TTY="${COLORBOB}" -f "$MAKEFILE" "$makeOpts""${NOCOLOR}"
-        make -k BUILDVARSMKPATH="${BUILDVARSMK}" COLOR_TTY="${COLORBOB}" -f "$MAKEFILE" "$makeOpts"
+        echo -e ">> ${GREEN}"make -k BUILDVARSMKPATH="${BUILDVARSMK}" COLOR_TTY="${COLORBOB}" -f "$MAKEFILE" "$makeOpts" "$targetName""${NOCOLOR}"
+        make -k BUILDVARSMKPATH="${BUILDVARSMK}" COLOR_TTY="${COLORBOB}" -f "$MAKEFILE" "$makeOpts" "$targetName"
         echo
 
         exitCode=$?
