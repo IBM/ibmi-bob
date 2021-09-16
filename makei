@@ -229,10 +229,7 @@ main() {
     recursive_generate "$srcDir" "$objlib" "$tgtCcsid"
     ibmijsonError=$?
 
-    if [ -z ${filename+x} ];
-    then targetName=$(get_target_from_srcfile "$filename");
-    else targetName="";
-    fi
+    targetName=$(get_target_from_srcfile "$filename");
 
     if test $ibmijsonError -eq 0; then
         echo -e ">> ${GREEN}"make -k BUILDVARSMKPATH="${BUILDVARSMK}" COLOR_TTY="${COLORBOB}" -f "$MAKEFILE" "$makeOpts" "$targetName""${NOCOLOR}"
