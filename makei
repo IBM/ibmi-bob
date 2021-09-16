@@ -232,8 +232,8 @@ main() {
     targetName=$(get_target_from_srcfile "$filename");
 
     if test $ibmijsonError -eq 0; then
-        echo -e ">> ${GREEN}"make -k BUILDVARSMKPATH="${BUILDVARSMK}" COLOR_TTY="${COLORBOB}" -f "$MAKEFILE" "$makeOpts" "$targetName""${NOCOLOR}"
-        make -k BUILDVARSMKPATH="${BUILDVARSMK}" COLOR_TTY="${COLORBOB}" -f "$MAKEFILE" "$makeOpts" "$targetName"
+        echo -e ">> ${GREEN}"make -k BUILDVARSMKPATH="${BUILDVARSMK}" COLOR_TTY="${COLORBOB}" -f "$MAKEFILE" "$makeOpts" $targetName"${NOCOLOR}"
+        make -k BUILDVARSMKPATH="${BUILDVARSMK}" COLOR_TTY="${COLORBOB}" -f "$MAKEFILE" "$makeOpts" $targetName
         echo
 
         exitCode=$?
