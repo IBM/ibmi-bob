@@ -24,6 +24,10 @@
 # ----------------------------------
 # COLORBOB=true
 # COLORBOB=false
+BOB=/QOpenSys/pkgs/lib/bob
+MK=${BOB}/mk
+. ${MK}/filetypeTargetMap.inc
+
 if [ "$COLORBOB" = true ]; then
     BOLD='\033[1m'
     NOCOLOR='\033[0m'
@@ -61,20 +65,6 @@ else
     LIGHTPURPLE=''
     LIGHTCYAN=''
     WHITE=''
-fi
-
-exitCode=0
-
-makeOpts=$*
-srcDir="$(pwd)"
-
-rm -rf "${srcDir}/logs/output.log"
-rm -rf "${srcDir}/logs/joblog.json"
-
-if [ ! -f "${srcDir}/Makefile" ]; then
-    MAKEFILE="/QOpenSys/pkgs/lib/Bob/Makefile"
-else
-    MAKEFILE="${srcDir}/Makefile"
 fi
 
 retrieve_from_iproj() {
@@ -121,44 +111,6 @@ parse_placeholder() {
         echo "${varName}"
     fi
 }
-
-echo -e "${BLUE}makei: Reading from iproj.json${NOCOLOR}"
-objlib=$(retrieve_from_iproj objlib "*CURLIB")
-tgtCcsid=$(retrieve_from_iproj tgtccsid "*JOB")
-IBMiEnvCmdList=$(retrieve_from_iproj setIBMiEnvCmd[] "")
-preUsrliblRaw=$(retrieve_from_iproj preUsrlibl "" | sed "s/ //g;s/,/ /g")
-postUsrliblRaw=$(retrieve_from_iproj postUsrlibl "" | sed "s/ //g;s/,/ /g")
-preUsrlibl=""
-postUsrlibl=""
-
-for lib in $preUsrliblRaw; do
-    preUsrlibl+="$(parse_placeholder "$lib")"
-done
-
-for lib in $postUsrliblRaw; do
-    postUsrlibl+="$(parse_placeholder "$lib")"
-done
-
-echo -e "${DARKGRAY}......${NOCOLOR}objlib: ${ORANGE}${objlib}${NOCOLOR}"
-echo -e "${DARKGRAY}......${NOCOLOR}tgtCcsid: ${ORANGE}${tgtCcsid}${NOCOLOR}"
-echo -e "${DARKGRAY}......${NOCOLOR}IBMiEnvCmdList: ${ORANGE}${IBMiEnvCmdList}${NOCOLOR}"
-echo -e "${DARKGRAY}......${NOCOLOR}preUsrlibl: ${ORANGE}${preUsrlibl}${NOCOLOR}"
-echo -e "${DARKGRAY}......${NOCOLOR}postUsrlibl: ${ORANGE}${postUsrlibl}${NOCOLOR}"
-echo
-
-BUILDVARSMK=$(mktemp)
-
-{
-    echo "# This file is generated using makei, DO NOT EDIT."
-    echo "# Modify .ibmi.json to override values"
-    echo
-    echo "preUsrlibl := ${preUsrlibl}"
-    echo "postUsrlibl := ${postUsrlibl}"
-    while read -r cmd; do
-        IBMiEnvCmd+="cl '$cmd' && "
-    done <<<"$IBMiEnvCmdList"
-    echo "IBMiEnvCmd := $(echo "$IBMiEnvCmd" | sed 's/&& $//')"
-} >>"$BUILDVARSMK"
 
 recursive_generate() {
     local dir=$1
@@ -210,25 +162,97 @@ recursive_generate() {
     fi
 }
 
-echo -e "${BLUE}Generating makefile for build variables at ${BUILDVARSMK}${NOCOLOR}"
-echo
-recursive_generate "$srcDir" "$objlib" "$tgtCcsid"
-ibmijsonError=$?
-# cat $BUILDVARSMK
+main() {
+    exitCode=0
 
-if test $ibmijsonError -eq 0; then
-    echo -e ">> ${GREEN}"make -k BUILDVARSMKPATH="${BUILDVARSMK}" COLOR_TTY="${COLORBOB}" -f "$MAKEFILE" "$makeOpts""${NOCOLOR}"
-    make -k BUILDVARSMKPATH="${BUILDVARSMK}" COLOR_TTY="${COLORBOB}" -f "$MAKEFILE" "$makeOpts"
+    while getopts ":z:" options
+    do
+        case $options in
+            z ) filename=$OPTARG;;
+            * ) ;;
+        esac
+    done
+    
+    shift $(($OPTIND - 1))
+    makeOpts=$*
+    srcDir="$(pwd)"
+
+    rm -rf "${srcDir}/logs/output.log"
+    rm -rf "${srcDir}/logs/joblog.json"
+
+    if [ ! -f "${srcDir}/Makefile" ]; then
+        MAKEFILE="/QOpenSys/pkgs/lib/bob/Makefile"
+    else
+        MAKEFILE="${srcDir}/Makefile"
+    fi
+
+    echo -e "${BLUE}makei: Reading from iproj.json${NOCOLOR}"
+    objlib=$(retrieve_from_iproj objlib "*CURLIB")
+    tgtCcsid=$(retrieve_from_iproj tgtccsid "*JOB")
+    IBMiEnvCmdList=$(retrieve_from_iproj setIBMiEnvCmd[] "")
+    preUsrliblRaw=$(retrieve_from_iproj preUsrlibl[] "")
+    postUsrliblRaw=$(retrieve_from_iproj postUsrlibl[] "")
+    preUsrlibl=""
+    postUsrlibl=""
+
+    for lib in $preUsrliblRaw; do
+        preUsrlibl+="$(parse_placeholder "$lib") "
+    done
+
+    for lib in $postUsrliblRaw; do
+        postUsrlibl+="$(parse_placeholder "$lib") "
+    done
+
+    echo -e "${DARKGRAY}......${NOCOLOR}objlib: ${ORANGE}${objlib}${NOCOLOR}"
+    echo -e "${DARKGRAY}......${NOCOLOR}tgtCcsid: ${ORANGE}${tgtCcsid}${NOCOLOR}"
+    echo -e "${DARKGRAY}......${NOCOLOR}IBMiEnvCmdList: ${ORANGE}${IBMiEnvCmdList}${NOCOLOR}"
+    echo -e "${DARKGRAY}......${NOCOLOR}preUsrlibl: ${ORANGE}${preUsrlibl}${NOCOLOR}"
+    echo -e "${DARKGRAY}......${NOCOLOR}postUsrlibl: ${ORANGE}${postUsrlibl}${NOCOLOR}"
     echo
 
-    exitCode=$?
-else
+    BUILDVARSMK=$(mktemp)
+
+    {
+        echo "# This file is generated using makei, DO NOT EDIT."
+        echo "# Modify .ibmi.json to override values"
+        echo
+        echo "preUsrlibl := ${preUsrlibl}"
+        echo "postUsrlibl := ${postUsrlibl}"
+        while read -r cmd; do
+            IBMiEnvCmd+="cl '$cmd' && "
+        done <<<"$IBMiEnvCmdList"
+        echo "IBMiEnvCmd := $(echo "$IBMiEnvCmd" | sed 's/&& $//')"
+    } >>"$BUILDVARSMK"
+
+    echo -e "${BLUE}Generating makefile for build variables at ${BUILDVARSMK}${NOCOLOR}"
     echo
+    recursive_generate "$srcDir" "$objlib" "$tgtCcsid"
+    ibmijsonError=$?
+
+    targetName=$(get_target_from_srcfile "$filename");
+
+    if test $ibmijsonError -eq 0; then
+        echo -e ">> ${GREEN}"make -k BUILDVARSMKPATH="${BUILDVARSMK}" COLOR_TTY="${COLORBOB}" -f "$MAKEFILE" "$makeOpts" $targetName"${NOCOLOR}"
+        make -k BUILDVARSMKPATH="${BUILDVARSMK}" COLOR_TTY="${COLORBOB}" -f "$MAKEFILE" "$makeOpts" $targetName
+        echo
+
+        exitCode=$?
+    else
+        echo
+        clean_up
+        exit $ibmijsonError
+    fi
+
     clean_up
-    exit $ibmijsonError
+    echo -e "${BLUE}Done.${NOCOLOR}"
+
+    exit $exitCode
+
+}
+
+# Execute main() if this is run in standalone mode (i.e. not in a unit test).
+ARGV0="$(basename "$0")"
+argv0="$(echo "${ARGV0}" |sed 's/_test$//;s/_test\.sh$//')"
+if [ "${ARGV0}" = "${argv0}" ]; then
+  main "$@"
 fi
-
-clean_up
-echo -e "${BLUE}Done.${NOCOLOR}"
-
-exit $exitCode
