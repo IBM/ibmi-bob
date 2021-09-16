@@ -1,10 +1,10 @@
 %undefine _disable_source_fetch
 Name: bob
-Version: 2.1.0
+Version: 2.1.3
 Release: 0
 License: Apache-2.0
 Summary: Better Object Builder for IBM i
-Url: https://github.com/edmundreinhardt/Bob/
+Url: https://github.com/IBM/ibmi-bob/
 
 
 BuildRequires: make-gnu
@@ -20,7 +20,7 @@ Requires: grep-gnu
 Requires: gawk
 Requires: make-gnu
 
-Source0: https://github.com/edmundreinhardt/Bob/archive/refs/tags/v%{version}.tar.gz
+Source0: https://github.com/IBM/ibmi-bob/archive/refs/tags/v%{version}.tar.gz
 Source1: https://github.com/BrianGarland/CRTFRMSTMF/archive/16db76aba5c94243396297f022a0dfc39dd4f8ee.tar.gz
 
 %description
