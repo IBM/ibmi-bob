@@ -24,6 +24,10 @@
 # ----------------------------------
 # COLORBOB=true
 # COLORBOB=false
+BOB=/QOpenSys/pkgs/lib/bob
+MK=${BOB}/mk
+. ${MK}/filetypeTargetMap.inc
+
 if [ "$COLORBOB" = true ]; then
     BOLD='\033[1m'
     NOCOLOR='\033[0m'
