@@ -196,11 +196,11 @@ main() {
     postUsrlibl=""
 
     for lib in $preUsrliblRaw; do
-        preUsrlibl+="$(parse_placeholder "$lib")"
+        preUsrlibl+="$(parse_placeholder "$lib") "
     done
 
     for lib in $postUsrliblRaw; do
-        postUsrlibl+="$(parse_placeholder "$lib")"
+        postUsrlibl+="$(parse_placeholder "$lib") "
     done
 
     echo -e "${DARKGRAY}......${NOCOLOR}objlib: ${ORANGE}${objlib}${NOCOLOR}"
