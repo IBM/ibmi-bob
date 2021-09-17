@@ -612,6 +612,7 @@ programTGTRLS = $(strip \
 	@$(PRESETUP); \
 	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1; \
 	$(POSTCLEANUP)
+	$(EVFEVENT_DOWNLOAD)
 
 # Temp: Convert UTF-8 to temporary Windows Latin-1, because SQLC pre-compiler doesn't understand UTF-8
 .SECONDEXPANSION:
@@ -810,8 +811,8 @@ programTGTRLS = $(strip \
 	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true; \
 	$(POSTCLEANUP)
 
-$(DEPDIR)/%.d: ;
-.PRECIOUS: $(DEPDIR)/%.d
+# $(DEPDIR)/%.d: ;
+# .PRECIOUS: $(DEPDIR)/%.d
 
 # The *.rebuild file is used as a way of controlling the rebuild of items whose
 # rebuild scripts are external to Make.
