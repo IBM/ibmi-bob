@@ -263,7 +263,7 @@ echo ">> Adding user libraries to liblist" >> $(LOGFILE); \
 [[ ! -z "$(postUsrlibl)" ]] && liblist -al $(postUsrlibl) >> $(LOGFILE) 2>&1; \
 echo ">> Setup IBM i Environment" >> $(LOGFILE); \
 echo "$(IBMiEnvCmd)" >> $(LOGFILE); \
-[[ ! -z "$(IBMiEnvCmd)" ]] && ($(IBMiEnvCmd)) >> $(LOGFILE) 2>&1; \
+[[ ! -z "$(IBMiEnvCmd)" ]] && $(IBMiEnvCmd) >> $(LOGFILE) 2>&1; \
 echo "$(crtcmd)"
 endef
 
