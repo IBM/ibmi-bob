@@ -40,8 +40,9 @@ get_target_from_srcfile() {
     do
         if [[ "$filename" == *.${i} ]]
         then
-            targetName="${filename%.${i}}.${FILETARGETMAPPING[$i]}";
-            echo ${targetName[$i]}
+            targetName="${filename%.${i}}";
+            targetName=$(echo $targetName | awk -F- '{ print $1 }')
+            echo "${targetName}.${FILETARGETMAPPING[$i]}"
         fi
     done
 }
