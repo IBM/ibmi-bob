@@ -304,15 +304,7 @@ define EVFEVENT_DOWNLOAD =
 system "CPYTOSTMF FROMMBR('$(OBJPATH)/EVFEVENT.FILE/$*.MBR') TOSTMF('$(EVTDIR)/$*.evfevent') STMFCCSID(*STDASCII) ENDLINFMT(*LF) CVTDTA(*AUTO) STMFOPT(*REPLACE)" >/dev/null
 endef
 define POSTRPGCOMPILE =
-$(EVFEVENT_DOWNLOAD); \
-{ for f in $$($(cleanRPGDeps) <$(EVTDIR)/$(notdir $*).evfevent | sort -u); do \
-    echo "$${f}"; \
-    sed -n -r -e '/^.{6}[^*].{14}[^Ff]/ s/^.{5}[Ff]([^ ]{,10}).*(DISK|WORKSTN|PRINTER).*/  \1\.FILE/I p' -e '/^.{6}[^*]/ s/^.{5}[Dd].*EXTNAME\(([^ \)]*).*/  \1\.FILE/I p' "$${f}" | sort -u; \
-  done; \
-} | sed -e 's/^\/.*\///' -e 's/^/$(notdir $@): /' | tr '[:lower:]' '[:upper:]' >$(DEPDIR)/$(notdir $*).d
-touch -cr $(OBJPATH)/$(notdir $@) $(DEPDIR)/$(notdir $*).d
-#rm $(EVTDIR)/$(notdir $*).evfevent
-$(removeEmptyDep)
+$(EVFEVENT_DOWNLOAD);
 endef
 
 # Deletes .d dependency file if it's empty.
