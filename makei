@@ -219,7 +219,7 @@ main() {
         echo "preUsrlibl := ${preUsrlibl}"
         echo "postUsrlibl := ${postUsrlibl}"
         while read -r cmd; do
-            IBMiEnvCmd+="cl '$cmd' && "
+            IBMiEnvCmd+="cl '$cmd' > /dev/null 2>&1 && "
         done <<<"$IBMiEnvCmdList"
         echo "IBMiEnvCmd := $(echo "$IBMiEnvCmd" | sed 's/&& $//')"
     } >>"$BUILDVARSMK"
