@@ -481,7 +481,7 @@ programTGTRLS = $(strip \
 	$(if $(filter %.MODULE,$<),$(PGM_TGTRLS), \
 	$(if $(filter %.CBL,$<),$(CBL_TGTRLS), \
 	$(if $(filter %.RPG,$<),$(RPG_TGTRLS), \
-	UNKNOWN_FILE_TYPE))))))
+	UNKNOWN_FILE_TYPE))))))))
 
 ### Implicit rules
 %.CMD: private AUT = $(CMD_AUT)
