@@ -152,6 +152,9 @@ PGM_OPTION := *EVENTF
 PGM_STGMDL := *SNGLVL
 PGM_TGTRLS := $(TGTRLS)
 
+CBL_TGTRLS := $(TGTRLS)
+RPG_TGTRLS := $(TGTRLS)
+
 PRTF_AUT := $(AUT)
 PRTF_OPTION := *EVENTF *SRC *LIST
 PRTF_PAGESIZE := 66 132
@@ -476,6 +479,8 @@ programTGTRLS = $(strip \
 	$(if $(filter %.SQLC,$<),$(SQLCIPGM_TGTRLS), \
 	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIPGM_TGTRLS), \
 	$(if $(filter %.MODULE,$<),$(PGM_TGTRLS), \
+	$(if $(filter %.CBL,$<),$(CBL_TGTRLS), \
+	$(if $(filter %.RPG,$<),$(RPG_TGTRLS), \
 	UNKNOWN_FILE_TYPE))))))
 
 ### Implicit rules
