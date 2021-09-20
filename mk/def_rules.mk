@@ -216,8 +216,8 @@ CRTMNUFLAGS = AUT($(AUT)) OPTION($(OPTION)) CURLIB($(CURLIB)) PRDLIB($(PRDLIB)) 
 CRTPFFLAGS = AUT($(AUT)) DLTPCT($(DLTPCT)) OPTION($(OPTION)) REUSEDLT($(REUSEDLT)) SIZE($(SIZE)) TEXT(''$(TEXT)'')
 CRTPGMFLAGS = ACTGRP($(ACTGRP)) USRPRF(*USER) TGTRLS($(TGTRLS)) AUT($(AUT)) DETAIL($(DETAIL)) OPTION($(CRTPGM_OPTION)) STGMDL($(STGMDL)) TEXT('$(TEXT)')
 CRTPNLGRPFLAGS = AUT($(AUT)) OPTION($(OPTION)) TEXT(''$(TEXT)'')
-CRTCBLPGMFLAGS = DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) OUTPUT(*PRINT) TEXT(''$(TEXT)'') TGTRLS($(TGTRLS)) CCSID($(TGTCCSID))
-CRTRPGPGMFLAGS = DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) OUTPUT(*PRINT) TEXT(''$(TEXT)'') TGTRLS($(TGTRLS)) TGTCCSID($(TGTCCSID))
+CRTCBLPGMFLAGS = DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) OUTPUT(*PRINT) TEXT('$(TEXT)') TGTRLS($(TGTRLS)) CCSID($(TGTCCSID))
+CRTRPGPGMFLAGS = DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) OUTPUT(*PRINT) TEXT('$(TEXT)') TGTRLS($(TGTRLS)) TGTCCSID($(TGTCCSID))
 CRTPRTFFLAGS = AUT($(AUT)) OPTION($(OPTION)) PAGESIZE($(PAGESIZE)) TEXT(''$(TEXT)'')
 CRTRPGMODFLAGS = AUT($(AUT)) DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) OUTPUT(*PRINT) TEXT('$(TEXT)') \
                  TGTCCSID($(TGTCCSID)) TGTRLS($(TGTRLS))
@@ -680,7 +680,7 @@ programTGTRLS = $(strip \
 %.PGM: %.PGM.RPGLE
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Create Bound RPG Program [$(notdir $*)]")
-	$(eval crtcmd := CRTBNDRPG srcstmf($<) PGM($(OBJLIB)/$(basename $(@F) )$(CRTBNDRPGFLAGS))
+	$(eval crtcmd := CRTBNDRPG srcstmf('$<') PGM($(OBJLIB)/$(basename $(@F) )$(CRTBNDRPGFLAGS))
 	$(eval EVFEVENT_DOWNLOAD_PGM_RPGLE = system "CPYTOSTMF FROMMBR('$(OBJPATH)/EVFEVENT.FILE/$*.MBR') TOSTMF('$(EVTDIR)/$*.PGM.RPGLE.evfevent') STMFCCSID(*STDASCII) ENDLINFMT(*LF) CVTDTA(*AUTO) STMFOPT(*REPLACE)" >/dev/null)
 	@$(PRESETUP);  \
 	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 ; $(EVFEVENT_DOWNLOAD_PGM_RPGLE); \
@@ -690,7 +690,7 @@ programTGTRLS = $(strip \
 %.PGM: %.PGM.C
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Create Bound RPG Program [$(notdir $*)]")
-	$(eval crtcmd := CRTBNDC srcstmf($<) PGM($(OBJLIB)/$(basename $(@F))) $(CRTBNDCFLAGS))
+	$(eval crtcmd := CRTBNDC srcstmf('$<') PGM($(OBJLIB)/$(basename $(@F))) $(CRTBNDCFLAGS))
 	$(eval EVFEVENT_DOWNLOAD_PGM_C = system "CPYTOSTMF FROMMBR('$(OBJPATH)/EVFEVENT.FILE/$*.MBR') TOSTMF('$(EVTDIR)/$*.PGM.C.evfevent') STMFCCSID(*STDASCII) ENDLINFMT(*LF) CVTDTA(*AUTO) STMFOPT(*REPLACE)" >/dev/null)
 	@$(PRESETUP);  \
 	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 ; $(EVFEVENT_DOWNLOAD_PGM_C); \
@@ -700,7 +700,7 @@ programTGTRLS = $(strip \
 %.PGM: $$(call genDep,$$@,$$*,CBL)
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Create COBOL Program [$(notdir $*)]")
-	$(eval crtcmd := CRTBNDCBL srcstmf($<) PGM($(OBJLIB)/$(basename $(@F))) $(CRTCBLPGMFLAGS))
+	$(eval crtcmd := CRTBNDCBL srcstmf('$<') PGM($(OBJLIB)/$(basename $(@F))) $(CRTCBLPGMFLAGS))
 	@$(PRESETUP);  \
 	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 ; \
 	$(POSTCLEANUP)
@@ -708,7 +708,7 @@ programTGTRLS = $(strip \
 %.PGM: $$(call genDep,$$@,$$*,RPG)
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Create RPG Program [$(notdir $*)]")
-	$(eval crtcmd := CRTBNDRPG srcstmf($<) PGM($(OBJLIB)/$(basename $(@F))) $(CRTRPGPGMFLAGS))
+	$(eval crtcmd := CRTBNDRPG srcstmf('$<') PGM($(OBJLIB)/$(basename $(@F))) $(CRTRPGPGMFLAGS))
 	@$(PRESETUP);  \
 	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 ; \
 	$(POSTCLEANUP)
