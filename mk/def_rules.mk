@@ -286,11 +286,7 @@ cleanCDeps = awk '$$2 !~ /^\/QIBM\// && $$2 !~ /$(notdir $<)$$/ && $$2 !~ /$(bas
 # This defines the steps taken after a C compile to massage the auto-generated dependencies into a useable form.
 # See http://make.mad-scientist.net/papers/advanced-auto-dependency-generation/#tldr
 define POSTCCOMPILE =
-$(ICONV) -f $(ICONV_EBCDIC) -t $(ICONV_ASCII) $(DEPDIR)/$(notdir $*).Td | tr -d '\r' > $(DEPDIR)/$(notdir $*).T2d
-$(cleanCDeps) <$(DEPDIR)/$(notdir $*).T2d | sort -u >$(DEPDIR)/$(notdir $*).d
-touch -cr $(OBJPATH)/$@ $(DEPDIR)/$(notdir $*).d
-rm $(DEPDIR)/$(notdir $*).Td $(DEPDIR)/$(notdir $*).T2d
-$(removeEmptyDep)
+
 endef
 
 # cleanRPGDeps removes from the CRTRPGMOD- and CRTSQLRPGI-generated events file any system header files
@@ -308,15 +304,7 @@ define EVFEVENT_DOWNLOAD =
 system "CPYTOSTMF FROMMBR('$(OBJPATH)/EVFEVENT.FILE/$*.MBR') TOSTMF('$(EVTDIR)/$*.evfevent') STMFCCSID(*STDASCII) ENDLINFMT(*LF) CVTDTA(*AUTO) STMFOPT(*REPLACE)" >/dev/null
 endef
 define POSTRPGCOMPILE =
-$(EVFEVENT_DOWNLOAD); \
-{ for f in $$($(cleanRPGDeps) <$(EVTDIR)/$(notdir $*).evfevent | sort -u); do \
-    echo "$${f}"; \
-    sed -n -r -e '/^.{6}[^*].{14}[^Ff]/ s/^.{5}[Ff]([^ ]{,10}).*(DISK|WORKSTN|PRINTER).*/  \1\.FILE/I p' -e '/^.{6}[^*]/ s/^.{5}[Dd].*EXTNAME\(([^ \)]*).*/  \1\.FILE/I p' "$${f}" | sort -u; \
-  done; \
-} | sed -e 's/^\/.*\///' -e 's/^/$(notdir $@): /' | tr '[:lower:]' '[:upper:]' >$(DEPDIR)/$(notdir $*).d
-touch -cr $(OBJPATH)/$(notdir $@) $(DEPDIR)/$(notdir $*).d
-#rm $(EVTDIR)/$(notdir $*).evfevent
-$(removeEmptyDep)
+$(EVFEVENT_DOWNLOAD);
 endef
 
 # Deletes .d dependency file if it's empty.
@@ -500,7 +488,6 @@ programTGTRLS = $(strip \
 
 .SECONDEXPANSION:
 %.CMD: $$(call genDep,$$@,$$*,CMDSRC)
-	$(info $(PGM) $(CMD_PGM) $(*)) 
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating command [$(notdir $<)]")
 	@$(set_STMF_CCSID)
@@ -593,7 +580,7 @@ programTGTRLS = $(strip \
 
 
 .SECONDEXPANSION:
-%.MODULE: $$(call genDep,$$@,$$*,C) $(DEPDIR)/$$*.d
+%.MODULE: $$(call genDep,$$@,$$*,C)
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating C module [$(notdir $<)]")
 	@$(set_STMF_CCSID)
@@ -605,7 +592,7 @@ programTGTRLS = $(strip \
 
 
 .SECONDEXPANSION:
-%.MODULE: $$(call genDep,$$@,$$*,RPGLE) $(DEPDIR)/$$*.d
+%.MODULE: $$(call genDep,$$@,$$*,RPGLE)
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating RPG module [$(notdir $<)]")
 	@$(set_STMF_CCSID)
@@ -629,7 +616,7 @@ programTGTRLS = $(strip \
 
 # Temp: Convert UTF-8 to temporary Windows Latin-1, because SQLC pre-compiler doesn't understand UTF-8
 .SECONDEXPANSION:
-%.MODULE: $$(call genDep,$$@,$$*,SQLC) $(DEPDIR)/$$*.d
+%.MODULE: $$(call genDep,$$@,$$*,SQLC)
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating SQLC module [$(notdir $<)]")
 	@$(set_STMF_CCSID)
@@ -643,7 +630,7 @@ programTGTRLS = $(strip \
 
 
 .SECONDEXPANSION:
-%.MODULE: $$(call genDep,$$@,$$*,SQLRPGLE) $(DEPDIR)/$$*.d
+%.MODULE: $$(call genDep,$$@,$$*,SQLRPGLE)
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating SQLRPGLE module [$(notdir $<)]")
 	@$(set_STMF_CCSID)
@@ -840,8 +827,8 @@ programTGTRLS = $(strip \
 # file, we can cause its recipe to normally not run, and we can force its recipe
 # to run by manually `touch`ing its .rebuild file.
 # The following rule causes the initial .rebuild file to be automatically created.
-$(DEPDIR)/%.rebuild:
-	@touch $@
+# $(DEPDIR)/%.rebuild:
+# 	@touch $@
 
 #.PHONY: make_pre
 #make_pre:
