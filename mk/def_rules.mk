@@ -153,7 +153,11 @@ PGM_STGMDL := *SNGLVL
 PGM_TGTRLS := $(TGTRLS)
 
 CBL_TGTRLS := $(TGTRLS)
+CBL_DBGVIEW := *SOURCE
+CBL_OPTION := $(OPTION)
 RPG_TGTRLS := $(TGTRLS)
+RPG_DBGVIEW := *SOURCE
+RPG_OPTION := $(OPTION)
 
 PRTF_AUT := $(AUT)
 PRTF_OPTION := *EVENTF *SRC *LIST
@@ -447,7 +451,9 @@ programDBGVIEW = $(strip \
 	$(if $(filter %.RPGLE,$<),$(BNDRPG_DBGVIEW), \
 	$(if $(filter %.SQLC,$<),$(SQLCIPGM_DBGVIEW), \
 	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIPGM_DBGVIEW), \
-	UNKNOWN_FILE_TYPE)))))
+	$(if $(filter %.CBL,$<),$(CBL_DBGVIEW), \
+	$(if $(filter %.RPG,$<),$(RPG_DBGVIEW), \
+	UNKNOWN_FILE_TYPE)))))))
 programDETAIL = $(strip \
 	$(if $(filter %.MODULE,$<),$(PGM_DETAIL), \
 	UNKNOWN_FILE_TYPE))
@@ -466,7 +472,8 @@ programOPTION = $(strip \
 	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIPGM_OPTION), \
 	$(if $(filter %.MODULE,$<),$(PGM_OPTION), \
 	$(if $(filter %.CBL,$<),$(CBL_OPTION), \
-	UNKNOWN_FILE_TYPE)))))))
+	$(if $(filter %.RPG,$<),$(RPG_OPTION), \
+	UNKNOWN_FILE_TYPE))))))))
 programRPGPPOPT = $(strip \
 	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIPGM_RPGPPOPT), \
 	UNKNOWN_FILE_TYPE))
