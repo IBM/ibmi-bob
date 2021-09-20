@@ -236,8 +236,8 @@ CURLIB :=
 # override OBJPATH = $(shell echo "$(OBJPATH)" | tr '[:lower:]' '[:upper:]')
 OBJLIB = $(basename $(notdir $(OBJPATH)))
 LIBL = $(OBJLIB)
-preUsrlibl :=
-postUsrlibl :=
+# preUsrlibl :=
+# postUsrlibl :=
 TOOLSPATH := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 TOOLSLIB := BOBTOOLS
 runDate := $(shell date +"%F_%H.%M.%S-%a")
@@ -263,7 +263,7 @@ echo ">> Adding user libraries to liblist" >> $(LOGFILE); \
 [[ ! -z "$(postUsrlibl)" ]] && liblist -al $(postUsrlibl) >> $(LOGFILE) 2>&1; \
 echo ">> Setup IBM i Environment" >> $(LOGFILE); \
 echo "$(IBMiEnvCmd)" >> $(LOGFILE); \
-[[ ! -z "$(IBMiEnvCmd)" ]] && ($(IBMiEnvCmd)) >> $(LOGFILE) 2>&1; \
+[[ ! -z "$(IBMiEnvCmd)" ]] && $(IBMiEnvCmd) ; \
 echo "$(crtcmd)"
 endef
 
@@ -586,7 +586,7 @@ programTGTRLS = $(strip \
 	@$(set_STMF_CCSID)
 	$(eval crtcmd := crtcmod module($(OBJLIB)/$(basename $(@F))) srcstmf('$<') $(CRTCMODFLAGS) $(ADHOCCRTFLAGS))
 	@$(PRESETUP);  \
-	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || ($(EVFEVENT_DOWNLOAD); ret=$$?; rm $(DEPDIR)/$*.Td 2>/dev/null; exit $$ret); \
+	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 ; ($(EVFEVENT_DOWNLOAD); ret=$$?; rm $(DEPDIR)/$*.Td 2>/dev/null; exit $$ret); \
 	$(POSTCLEANUP)
 	@$(POSTCCOMPILE)
 
@@ -623,7 +623,7 @@ programTGTRLS = $(strip \
 	@qsh_out -c "touch -C 1252 $<-1252 && cat $< >$<-1252"
 	$(eval crtcmd := crtsqlci obj($(OBJLIB)/$(basename $(@F))) srcstmf('$<-1252') $(CRTSQLCIFLAGS))
 	@$(PRESETUP);  \
-	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || ($(EVFEVENT_DOWNLOAD); ret=$$?; rm $(DEPDIR)/$*.Td 2>/dev/null; rm "$<-1252" 2>/dev/null; exit $$ret); \
+	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 ; ($(EVFEVENT_DOWNLOAD); ret=$$?; rm $(DEPDIR)/$*.Td 2>/dev/null; rm "$<-1252" 2>/dev/null; exit $$ret); \
 	$(POSTCLEANUP)
 	@$(POSTCCOMPILE)
 	@rm "$<-1252"
