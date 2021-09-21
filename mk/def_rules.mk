@@ -679,7 +679,7 @@ programTGTRLS = $(strip \
 	$(call echo_cmd,"=== Create COBOL Program [$(notdir $*)]")
 	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$(basename $(@F))) cmd(CRTCBLPGM) srcstmf('$<') parms('$(CRTCBLPGMFLAGS)'))
 	@$(PRESETUP);  \
-	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 \
+	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 ; $(EVFEVENT_DOWNLOAD); \
 	$(POSTCLEANUP)
 
 %.PGM: $$(call genDep,$$@,$$*,RPG)
@@ -687,7 +687,7 @@ programTGTRLS = $(strip \
 	$(call echo_cmd,"=== Create RPG Program [$(notdir $*)]")
 	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$(basename $(@F))) cmd(CRTRPGPGM) srcstmf('$<') parms('$(CRTCBLPGMFLAGS)'))
 	@$(PRESETUP);  \
-	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 \
+	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 ; $(EVFEVENT_DOWNLOAD); \
 	$(POSTCLEANUP)
 
 %.PGM: $$(call genDep,$$@,$$*,ILEPGM)
