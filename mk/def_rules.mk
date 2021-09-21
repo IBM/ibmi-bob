@@ -152,12 +152,8 @@ PGM_OPTION := *EVENTF
 PGM_STGMDL := *SNGLVL
 PGM_TGTRLS := $(TGTRLS)
 
-CBL_TGTRLS := $(TGTRLS)
-CBL_DBGVIEW := *SOURCE
-CBL_OPTION := $(OPTION)
-RPG_TGTRLS := $(TGTRLS)
-RPG_DBGVIEW := *SOURCE
-RPG_OPTION := $(OPTION)
+CBL_OPTION := *SRCDBG
+RPG_OPTION := *SRCDBG
 
 PRTF_AUT := $(AUT)
 PRTF_OPTION := *EVENTF *SRC *LIST
@@ -208,23 +204,21 @@ WSCST_AUT := $(AUT)
 CRTCLMODFLAGS = AUT($(AUT)) DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) TEXT('$(TEXT)') TGTRLS($(TGTRLS))
 CRTCMDFLAGS = PGM($(PGM)) VLDCKR($(VLDCKR)) PMTFILE($(PMTFILE)) HLPPNLGRP($(HLPPNLGRP)) HLPID($(HLPID)) AUT($(AUT)) TEXT('$(TEXT)')
 CRTCMODFLAGS = TERASPACE($(TERASPACE)) STGMDL($(STGMDL)) OUTPUT(*PRINT) OPTION($(OPTION)) DBGVIEW($(DBGVIEW)) \
-               SYSIFCOPT($(SYSIFCOPT)) AUT($(AUT)) TEXT('$(TEXT)') TGTCCSID($(TGTCCSID)) TGTRLS($(TGTRLS)) \
-               MAKEDEP('$(DEPDIR)/$*.Td')
+               SYSIFCOPT($(SYSIFCOPT)) AUT($(AUT)) TEXT('$(TEXT)') TGTCCSID($(TGTCCSID)) TGTRLS($(TGTRLS))
 CRTDSPFFLAGS = ENHDSP(*YES) RSTDSP($(RSTDSP)) DFRWRT(*YES) AUT($(AUT)) OPTION($(OPTION)) TEXT(''$(TEXT)'')
 CRTLFFLAGS = AUT($(AUT)) OPTION($(OPTION)) TEXT(''$(TEXT)'')
 CRTMNUFLAGS = AUT($(AUT)) OPTION($(OPTION)) CURLIB($(CURLIB)) PRDLIB($(PRDLIB)) TEXT(''$(TEXT)'') TYPE($(TYPE))
 CRTPFFLAGS = AUT($(AUT)) DLTPCT($(DLTPCT)) OPTION($(OPTION)) REUSEDLT($(REUSEDLT)) SIZE($(SIZE)) TEXT(''$(TEXT)'')
 CRTPGMFLAGS = ACTGRP($(ACTGRP)) USRPRF(*USER) TGTRLS($(TGTRLS)) AUT($(AUT)) DETAIL($(DETAIL)) OPTION($(CRTPGM_OPTION)) STGMDL($(STGMDL)) TEXT('$(TEXT)')
 CRTPNLGRPFLAGS = AUT($(AUT)) OPTION($(OPTION)) TEXT(''$(TEXT)'')
-CRTCBLPGMFLAGS = DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) OUTPUT(*PRINT) TEXT('$(TEXT)') TGTRLS($(TGTRLS)) CCSID($(TGTCCSID))
-CRTRPGPGMFLAGS = DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) OUTPUT(*PRINT) TEXT('$(TEXT)') TGTRLS($(TGTRLS)) TGTCCSID($(TGTCCSID))
+CRTCBLPGMFLAGS = OPTION($(OPTION)) TEXT(''$(TEXT)'')
 CRTPRTFFLAGS = AUT($(AUT)) OPTION($(OPTION)) PAGESIZE($(PAGESIZE)) TEXT(''$(TEXT)'')
 CRTRPGMODFLAGS = AUT($(AUT)) DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) OUTPUT(*PRINT) TEXT('$(TEXT)') \
                  TGTCCSID($(TGTCCSID)) TGTRLS($(TGTRLS))
 CRTQMQRYFLAGS = AUT($(AUT)) TEXT(''$(TEXT)'')
 CRTSQLCIFLAGS = COMMIT($(COMMIT)) OBJTYPE($(OBJTYPE)) OUTPUT(*PRINT) TEXT('$(TEXT)') TGTRLS($(TGTRLS)) DBGVIEW($(DBGVIEW)) \
                 COMPILEOPT('INCDIR(''$(SRCPATH)'') OPTION($(OPTION)) STGMDL($(STGMDL)) SYSIFCOPT($(SYSIFCOPT)) \
-                            TGTCCSID($(TGTCCSID)) TERASPACE($(TERASPACE)) MAKEDEP(''$(DEPDIR)/$*.Td'')')
+                            TGTCCSID($(TGTCCSID)) TERASPACE($(TERASPACE))
 CRTSQLRPGIFLAGS = COMMIT($(COMMIT)) OBJTYPE($(OBJTYPE)) OPTION($(OPTION)) OUTPUT(*PRINT) TEXT('$(TEXT)') \
                   TGTRLS($(TGTRLS)) DBGVIEW($(DBGVIEW)) RPGPPOPT($(RPGPPOPT)) \
                   COMPILEOPT('TGTCCSID($(TGTCCSID))')
@@ -439,9 +433,7 @@ programDBGVIEW = $(strip \
 	$(if $(filter %.RPGLE,$<),$(BNDRPG_DBGVIEW), \
 	$(if $(filter %.SQLC,$<),$(SQLCIPGM_DBGVIEW), \
 	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIPGM_DBGVIEW), \
-	$(if $(filter %.CBL,$<),$(CBL_DBGVIEW), \
-	$(if $(filter %.RPG,$<),$(RPG_DBGVIEW), \
-	UNKNOWN_FILE_TYPE)))))))
+	UNKNOWN_FILE_TYPE)))))
 programDETAIL = $(strip \
 	$(if $(filter %.MODULE,$<),$(PGM_DETAIL), \
 	UNKNOWN_FILE_TYPE))
@@ -474,9 +466,7 @@ programTGTRLS = $(strip \
 	$(if $(filter %.SQLC,$<),$(SQLCIPGM_TGTRLS), \
 	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIPGM_TGTRLS), \
 	$(if $(filter %.MODULE,$<),$(PGM_TGTRLS), \
-	$(if $(filter %.CBL,$<),$(CBL_TGTRLS), \
-	$(if $(filter %.RPG,$<),$(RPG_TGTRLS), \
-	UNKNOWN_FILE_TYPE))))))))
+	UNKNOWN_FILE_TYPE))))))
 
 ### Implicit rules
 %.CMD: private AUT = $(CMD_AUT)
@@ -687,7 +677,7 @@ programTGTRLS = $(strip \
 %.PGM: $$(call genDep,$$@,$$*,CBL)
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Create COBOL Program [$(notdir $*)]")
-	$(eval crtcmd := CRTBNDCBL srcstmf('$<') PGM($(OBJLIB)/$(basename $(@F))) $(CRTCBLPGMFLAGS))
+	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$(basename $(@F))) cmd(CRTCBLPGM) srcstmf('$<') parms('$(CRTCBLPGMFLAGS)'))
 	@$(PRESETUP);  \
 	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 ; $(EVFEVENT_DOWNLOAD); \
 	$(POSTCLEANUP)
@@ -695,7 +685,7 @@ programTGTRLS = $(strip \
 %.PGM: $$(call genDep,$$@,$$*,RPG)
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Create RPG Program [$(notdir $*)]")
-	$(eval crtcmd := CRTBNDRPG srcstmf('$<') PGM($(OBJLIB)/$(basename $(@F))) $(CRTRPGPGMFLAGS))
+	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$(basename $(@F))) cmd(CRTRPGPGM) srcstmf('$<') parms('$(CRTCBLPGMFLAGS)'))
 	@$(PRESETUP);  \
 	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 ; $(EVFEVENT_DOWNLOAD); \
 	$(POSTCLEANUP)
