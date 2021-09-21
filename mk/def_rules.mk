@@ -449,7 +449,9 @@ programOPTION = $(strip \
 	$(if $(filter %.SQLC,$<),$(SQLCIPGM_OPTION), \
 	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIPGM_OPTION), \
 	$(if $(filter %.MODULE,$<),$(PGM_OPTION), \
-	UNKNOWN_FILE_TYPE))))))
+	$(if $(filter %.CBL,$<),$(PGM_OPTION), \
+	$(if $(filter %.RPG,$<),$(PGM_OPTION), \
+	UNKNOWN_FILE_TYPE))))))))
 programRPGPPOPT = $(strip \
 	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIPGM_RPGPPOPT), \
 	UNKNOWN_FILE_TYPE))
