@@ -675,7 +675,7 @@ programTGTRLS = $(strip \
 %.PGM: $$(call genDep,$$@,$$*,CBL)
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Create COBOL Program [$(notdir $*)]")
-	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$(basename $(@F))) cmd(CRTCBLPGM) srcstmf('$<') parms(PGM($(OBJLIB)/$(basename $(@F))) '$(CRTCBLPGMFLAGS)'))
+	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$(basename $(@F))) cmd(CRTCBLPGM) srcstmf('$<') parms('$(CRTCBLPGMFLAGS)'))
 	@$(PRESETUP);  \
 	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 ; $(EVFEVENT_DOWNLOAD); \
 	$(POSTCLEANUP)
