@@ -13,7 +13,7 @@ TARGETS_$(d) := $(TARGETS)
 # $(info $(TARGETS_$(d)))
 
 $(foreach tgt,$(TARGETS),$(eval vpath $(tgt) $(OBJPATH_$(d))))
-$(info vpath: $(VPATH))
+$(info vpath: $(VPATH) $(OBJPATH_$(d)))
 
 $(foreach tgt,$(filter-out $(AUTO_TGTS),$(rel_tgts)),$(eval $(call save_vars,$(OBJPATH)/,$(tgt))))
 # Absolute targets are entry points for external (sub)projects which
