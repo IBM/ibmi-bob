@@ -643,18 +643,7 @@ programTGTRLS = $(strip \
 %.PGM: private TGTRLS = $(programTGTRLS)
 %.PGM: private BNDSRVPGMPATH = $(basename $(filter %.SRVPGM,$(notdir $^)) $(externalsrvpgms))
 
-%.PGM: %.MODULE
-	$(eval d = $($@_d))
-	$(call echo_cmd,"=== Creating program [$*] from modules [$(basename $(filter %.MODULE,$(notdir $^)))] and service programs [$(basename $(filter %.SRVPGM,$(notdir $^$|)))]")
-	$(eval externalsrvpgms := $(filter %.SRVPGM,$(subst .LIB,,$(subst /QSYS.LIB/,,$|))))
-	$(eval crtcmd := crtpgm pgm($(OBJLIB)/$(basename $(@F))) module($(basename $(filter %.MODULE,$(notdir $^)))) bndsrvpgm($(if $(BNDSRVPGMPATH),$(BNDSRVPGMPATH),*NONE)) $(CRTPGMFLAGS))
-	$(eval EVFEVENT_DOWNLOAD_PGM = system "CPYTOSTMF FROMMBR('$(OBJPATH)/EVFEVENT.FILE/$*.MBR') TOSTMF('$(EVTDIR)/$*.PGM.evfevent') STMFCCSID(*STDASCII) ENDLINFMT(*LF) CVTDTA(*AUTO) STMFOPT(*REPLACE)" >/dev/null)
-	@$(PRESETUP);  \
-	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 ; $(EVFEVENT_DOWNLOAD_PGM); \
-	$(POSTCLEANUP)
-	@$(EVFEVENT_DOWNLOAD_PGM)
-
-%.PGM: %.PGM.RPGLE
+%.PGM: $$(call genDep,$$@,$$*,PGM.RPGLE)
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Create Bound RPG Program [$(notdir $*)]")
 	$(eval crtcmd := CRTBNDRPG srcstmf('$<') PGM($(OBJLIB)/$(basename $(@F) )$(CRTBNDRPGFLAGS))
@@ -664,7 +653,7 @@ programTGTRLS = $(strip \
 	$(POSTCLEANUP)
 	@$(EVFEVENT_DOWNLOAD_PGM_RPGLE)
 
-%.PGM: %.PGM.C
+%.PGM: $$(call genDep,$$@,$$*,PGM.C)
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Create Bound RPG Program [$(notdir $*)]")
 	$(eval crtcmd := CRTBNDC srcstmf('$<') PGM($(OBJLIB)/$(basename $(@F))) $(CRTBNDCFLAGS))
@@ -697,6 +686,17 @@ programTGTRLS = $(strip \
 	@$(PRESETUP);  \
 	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true; \
 	$(POSTCLEANUP)
+
+%.PGM: %.MODULE
+	$(eval d = $($@_d))
+	$(call echo_cmd,"=== Creating program [$*] from modules [$(basename $(filter %.MODULE,$(notdir $^)))] and service programs [$(basename $(filter %.SRVPGM,$(notdir $^$|)))]")
+	$(eval externalsrvpgms := $(filter %.SRVPGM,$(subst .LIB,,$(subst /QSYS.LIB/,,$|))))
+	$(eval crtcmd := crtpgm pgm($(OBJLIB)/$(basename $(@F))) module($(basename $(filter %.MODULE,$(notdir $^)))) bndsrvpgm($(if $(BNDSRVPGMPATH),$(BNDSRVPGMPATH),*NONE)) $(CRTPGMFLAGS))
+	$(eval EVFEVENT_DOWNLOAD_PGM = system "CPYTOSTMF FROMMBR('$(OBJPATH)/EVFEVENT.FILE/$*.MBR') TOSTMF('$(EVTDIR)/$*.PGM.evfevent') STMFCCSID(*STDASCII) ENDLINFMT(*LF) CVTDTA(*AUTO) STMFOPT(*REPLACE)" >/dev/null)
+	@$(PRESETUP);  \
+	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 ; $(EVFEVENT_DOWNLOAD_PGM); \
+	$(POSTCLEANUP)
+	@$(EVFEVENT_DOWNLOAD_PGM)
 
 %.PNLGRP: private AUT = $(PNLGRP_AUT)
 %.PNLGRP: private OPTION = $(PNLGRP_OPTION)
