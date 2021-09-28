@@ -12,6 +12,10 @@ rel_tgts := $(filter-out /%,$(TARGETS))
 TARGETS_$(d) := $(TARGETS)
 # $(info $(TARGETS_$(d)))
 
+$(foreach tgt,$(TARGETS),$(eval vpath $(tgt) $(OBJPATH_$(d))))
+# $(info d: $(d); vpath: $(VPATH); objpath: OBJPATH_$(d) $(OBJPATH_$(d)))
+
+
 $(foreach tgt,$(filter-out $(AUTO_TGTS),$(rel_tgts)),$(eval $(call save_vars,$(OBJPATH)/,$(tgt))))
 # Absolute targets are entry points for external (sub)projects which
 # have their own build system - what is really interesting is only CMD
