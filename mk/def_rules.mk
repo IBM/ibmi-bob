@@ -548,7 +548,7 @@ programTGTRLS = $(strip \
 %.MENU: private TYPE = $(MNU_TYPE)
 
 .SECONDEXPANSION:
-%.MENU: $$(call genDep,$$@,$$*,MENUSRC)
+%.MENU: $$(call genDep,$$@,$$*,MENU)
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating menu [$(notdir $<)]")
 	@$(set_STMF_CCSID)
@@ -702,7 +702,7 @@ programTGTRLS = $(strip \
 %.PNLGRP: private OPTION = $(PNLGRP_OPTION)
 
 .SECONDEXPANSION:
-%.PNLGRP: $$(call genDep,$$@,$$*,PNLGRPSRC)
+%.PNLGRP: $$(call genDep,$$@,$$*,PNLGRP)
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Create panel group [$(notdir $*)]")
 	@$(set_STMF_CCSID)
@@ -749,7 +749,7 @@ programTGTRLS = $(strip \
 	$(MK)/extractAndLaunch "$(JOBLOGFILE)" "$<" $(OBJLIB) $(basename $(@F)) >> $(LOGFILE) 2>&1 || true; \
 	$(POSTCLEANUP)
 
-%.BNDDIR: $$(call genDep,$$@,$$*,BNDDIR.CL)
+%.BNDDIR: $$(call genDep,$$@,$$*,BNDDIR)
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating BND from [$(notdir $<)]")
 	$(eval crtcmd := $(shell $(MK)/extractPseudoSrc $< $(OBJLIB) $(basename $(@F))))
