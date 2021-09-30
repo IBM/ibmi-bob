@@ -127,15 +127,15 @@ recursive_generate() {
         objlibraw=$(retrieve_from_ibmijson ".ibmi.json" "build.objlib" "")
         tgtCcsid=$(retrieve_from_ibmijson ".ibmi.json" "build.tgtCcsid" "")
     fi
-    objlib=$(parse_placeholder "$objlibraw")
+    local objlib=$(parse_placeholder "$objlibraw")
     if test $? -ne 0; then
         exit 1
     fi
 
     if [ -z "${objlib}" ]; then
-        objPath=
+        local objPath=
     else
-        objPath=/QSYS.LIB/${objlib}.LIB
+        local objPath=/QSYS.LIB/${objlib}.LIB
     fi
 
     # If ObjLoc and tgtCcsid are not defined, then use the parent's configuration
@@ -144,7 +144,7 @@ recursive_generate() {
 
     if [[ -f "Rules.mk" ]]; then
         echo "TGTCCSID_$(pwd) := ${tgtCcsid}" >>"$BUILDVARSMK"
-        echo "OBJPATH_$(pwd) := $(parse_placeholder "$objPath")" >>"$BUILDVARSMK"
+        echo "OBJPATH_$(pwd) := $objPath" >>"$BUILDVARSMK"
 
         grep -v ":=" Rules.mk | grep -v "#" | cut -d':' -f1 | grep . | sort | uniq | while read line ; do
             echo "${line}_d := $dir" >>"$BUILDVARSMK"
@@ -187,7 +187,7 @@ main() {
     fi
 
     echo -e "${BLUE}makei: Reading from iproj.json${NOCOLOR}"
-    objlib=$(retrieve_from_iproj objlib "*CURLIB")
+    objlib=$(parse_placeholder $(retrieve_from_iproj objlib "*CURLIB"))
     tgtCcsid=$(retrieve_from_iproj tgtccsid "*JOB")
     IBMiEnvCmdList=$(retrieve_from_iproj setIBMiEnvCmd[] "")
     preUsrliblRaw=$(retrieve_from_iproj preUsrlibl[] "")
@@ -226,7 +226,7 @@ main() {
 
     echo -e "${BLUE}Generating makefile for build variables at ${BUILDVARSMK}${NOCOLOR}"
     echo
-    recursive_generate "$srcDir" "$objlib" "$tgtCcsid"
+    recursive_generate "$srcDir" "/QSYS.LIB/${objlib}.LIB" "$tgtCcsid"
     ibmijsonError=$?
 
     targetName=$(get_target_from_srcfile "$filename");
