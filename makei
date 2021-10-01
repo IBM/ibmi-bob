@@ -132,6 +132,10 @@ recursive_generate() {
         exit 1
     fi
 
+    if [[ $objlib == "*CURLIB" ]]; then
+        objlib=$curlib
+    fi
+
     if [ -z "${objlib}" ]; then
         local objPath=
     else
@@ -188,12 +192,21 @@ main() {
 
     echo -e "${BLUE}makei: Reading from iproj.json${NOCOLOR}"
     objlib=$(parse_placeholder $(retrieve_from_iproj objlib "*CURLIB"))
+    curlib=$(parse_placeholder $(retrieve_from_iproj curlib "*CURLIB"))
     tgtCcsid=$(retrieve_from_iproj tgtccsid "*JOB")
     IBMiEnvCmdList=$(retrieve_from_iproj setIBMiEnvCmd[] "")
     preUsrliblRaw=$(retrieve_from_iproj preUsrlibl[] "")
     postUsrliblRaw=$(retrieve_from_iproj postUsrlibl[] "")
     preUsrlibl=""
     postUsrlibl=""
+
+    if [[ $curlib == "*CRTDFT" ]]; then
+        curlib="QGPL"
+    fi
+
+    if [ -z "${curlib}" ]; then
+        curlib="$(liblist | grep CUR | awk '{print $1}')"
+    fi
 
     for lib in $preUsrliblRaw; do
         preUsrlibl+="$(parse_placeholder "$lib") "
@@ -204,6 +217,7 @@ main() {
     done
 
     echo -e "${DARKGRAY}......${NOCOLOR}objlib: ${ORANGE}${objlib}${NOCOLOR}"
+    echo -e "${DARKGRAY}......${NOCOLOR}curlib: ${ORANGE}${curlib}${NOCOLOR}"
     echo -e "${DARKGRAY}......${NOCOLOR}tgtCcsid: ${ORANGE}${tgtCcsid}${NOCOLOR}"
     echo -e "${DARKGRAY}......${NOCOLOR}IBMiEnvCmdList: ${ORANGE}${IBMiEnvCmdList}${NOCOLOR}"
     echo -e "${DARKGRAY}......${NOCOLOR}preUsrlibl: ${ORANGE}${preUsrlibl}${NOCOLOR}"
@@ -216,6 +230,7 @@ main() {
         echo "# This file is generated using makei, DO NOT EDIT."
         echo "# Modify .ibmi.json to override values"
         echo
+        echo "curlib := ${curlib}"
         echo "preUsrlibl := ${preUsrlibl}"
         echo "postUsrlibl := ${postUsrlibl}"
         while read -r cmd; do
