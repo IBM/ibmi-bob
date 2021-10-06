@@ -202,7 +202,6 @@ WSCST_AUT := $(AUT)
 
 # Creation command parameters with variables (the ones listed at the top) for the most common ones.
 CRTCLMODFLAGS = AUT($(AUT)) DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) TEXT('$(TEXT)') TGTRLS($(TGTRLS))
-CRTBNDCLFLAGS = AUT($(AUT)) DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) TEXT('$(TEXT)') TGTRLS($(TGTRLS))
 CRTCMDFLAGS = PGM($(PGM)) VLDCKR($(VLDCKR)) PMTFILE($(PMTFILE)) HLPPNLGRP($(HLPPNLGRP)) HLPID($(HLPID)) AUT($(AUT)) TEXT('$(TEXT)')
 CRTCMODFLAGS = TERASPACE($(TERASPACE)) STGMDL($(STGMDL)) OUTPUT(*PRINT) OPTION($(OPTION)) DBGVIEW($(DBGVIEW)) \
                SYSIFCOPT($(SYSIFCOPT)) AUT($(AUT)) TEXT('$(TEXT)') TGTCCSID($(TGTCCSID)) TGTRLS($(TGTRLS))
@@ -225,7 +224,7 @@ CRTSQLRPGIFLAGS = COMMIT($(COMMIT)) OBJTYPE($(OBJTYPE)) OPTION($(OPTION)) OUTPUT
                   COMPILEOPT('TGTCCSID($(TGTCCSID))')
 CRTSRVPGMFLAGS = ACTGRP($(ACTGRP)) TEXT(''$(TEXT)'') TGTRLS($(TGTRLS)) AUT($(AUT)) DETAIL($(DETAIL)) STGMDL($(STGMDL))
 CRTWSCSTFLAGS = AUT($(AUT)) TEXT(''$(TEXT)'')
-CRTBNDRPGFLAGS:=TGTCCSID($(TGTCCSID)) OPTION($(OPTION)) TEXT('$(TEXT)') DBGVIEW($(DBGVIEW))
+CRTBNDRPGFLAGS:= DBGVIEW($(DBGVIEW)) TGTCCSID($(TGTCCSID)) OPTION($(OPTION)) TEXT('$(TEXT)')
 CRTBNDCFLAGS:=TGTCCSID($(TGTCCSID)) OPTION($(OPTION)) TEXT('$(TEXT)')
 
 # Extra command string for adhoc addition of extra parameters to a creation command.
@@ -262,6 +261,7 @@ VPATH = $(OBJPATH):$(SRCPATH)
 
 define PRESETUP = 
 echo ">> Adding user libraries to liblist" >> $(LOGFILE); \
+[[ ! -z "$(curlib)" ]] && liblist -c $(curlib) >> $(LOGFILE) 2>&1; \
 [[ ! -z "$(preUsrlibl)" ]] && liblist -af $(preUsrlibl) >> $(LOGFILE) 2>&1; \
 [[ ! -z "$(postUsrlibl)" ]] && liblist -al $(postUsrlibl) >> $(LOGFILE) 2>&1; \
 echo ">> Setup IBM i Environment" >> $(LOGFILE); \
@@ -671,6 +671,14 @@ programTGTRLS = $(strip \
 	@$(PRESETUP);  \
 	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 ; $(EVFEVENT_DOWNLOAD); \
 	$(POSTCLEANUP)
+	
+%.PGM: $$(call genDep,$$@,$$*,PGM.CLLE)
+	$(eval d = $($@_d))
+	$(call echo_cmd,"=== Create ILE CL Program [$(notdir $*)]")
+	$(eval crtcmd := CRTBNDCL srcstmf('$<') PGM($(OBJLIB)/$(basename $(@F))) $(CRTCLMODFLAGS))
+	@$(PRESETUP);  \
+	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 ; $(EVFEVENT_DOWNLOAD); \
+	$(POSTCLEANUP)	
 
 %.PGM: $$(call genDep,$$@,$$*,RPG)
 	$(eval d = $($@_d))
@@ -686,14 +694,6 @@ programTGTRLS = $(strip \
 	$(eval crtcmd := $(shell $(MK)/extractPseudoSrc $< $(OBJLIB) $(basename $(@F))))
 	@$(PRESETUP);  \
 	$(MK)/extractAndLaunch "$(JOBLOGFILE)" "$<" $(OBJLIB) $(basename $(@F)) >> $(LOGFILE) 2>&1 || true; \
-	$(POSTCLEANUP)
-
-%.PGM: $$(call genDep,$$@,$$*,PGM.CLLE)
-	$(eval d = $($@_d))
-	$(call echo_cmd,"=== Create ILE CL Program [$(notdir $*)]")
-	$(eval crtcmd := CRTBNDCL srcstmf('$<') PGM($(OBJLIB)/$(basename $(@F))) $(CRTCLMODFLAGS))
-	@$(PRESETUP);  \
-	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 ; $(EVFEVENT_DOWNLOAD); \
 	$(POSTCLEANUP)
 
 %.PGM: %.MODULE
