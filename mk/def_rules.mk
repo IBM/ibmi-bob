@@ -243,7 +243,7 @@ LIBL = $(OBJLIB)
 TOOLSPATH := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 TOOLSLIB := BOBTOOLS
 runDate := $(shell date +"%F_%H.%M.%S-%a")
-LOGPATH := $(TOP)/logs
+LOGPATH := $(TOP)/.logs
 LOGFILE := $(LOGPATH)/output.log
 JOBLOGFILE := $(LOGPATH)/joblog.json
 $(shell mkdir -p $(LOGPATH))
@@ -835,7 +835,7 @@ programTGTRLS = $(strip \
 
 .PHONY: clean
 clean:
-	rm -rf ./.deps ./evfevent ./logs
+	rm -rf ./.deps ./evfevent ./.logs
 
 .PHONY: make_post
 make_post:
