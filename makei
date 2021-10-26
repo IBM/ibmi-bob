@@ -199,6 +199,8 @@ main() {
     curlib=$(parse_placeholder $(retrieve_from_iproj curlib ""))
     tgtCcsid=$(retrieve_from_iproj tgtccsid "*JOB")
     IBMiEnvCmdList=$(retrieve_from_iproj setIBMiEnvCmd[] "")
+    includePathList=$(retrieve_from_iproj includePath[] "")
+    includePath="${includePathList//$'\n'/ }"
     preUsrliblRaw=$(retrieve_from_iproj preUsrlibl[] "")
     postUsrliblRaw=$(retrieve_from_iproj postUsrlibl[] "")
     preUsrlibl=""
@@ -223,6 +225,7 @@ main() {
     echo -e "${DARKGRAY}......${NOCOLOR}curlib: ${ORANGE}${curlib}${NOCOLOR}"
     echo -e "${DARKGRAY}......${NOCOLOR}tgtCcsid: ${ORANGE}${tgtCcsid}${NOCOLOR}"
     echo -e "${DARKGRAY}......${NOCOLOR}IBMiEnvCmdList: ${ORANGE}${IBMiEnvCmdList}${NOCOLOR}"
+    echo -e "${DARKGRAY}......${NOCOLOR}includePathList: ${ORANGE}${includePath}${NOCOLOR}"
     echo -e "${DARKGRAY}......${NOCOLOR}preUsrlibl: ${ORANGE}${preUsrlibl}${NOCOLOR}"
     echo -e "${DARKGRAY}......${NOCOLOR}postUsrlibl: ${ORANGE}${postUsrlibl}${NOCOLOR}"
     echo
@@ -236,9 +239,12 @@ main() {
         echo "curlib := ${curlib}"
         echo "preUsrlibl := ${preUsrlibl}"
         echo "postUsrlibl := ${postUsrlibl}"
+        echo "INCDIR := ${includePath}"
+
         while read -r cmd; do
             IBMiEnvCmd+="cl '$cmd' > /dev/null 2>&1 && "
         done <<<"$IBMiEnvCmdList"
+
         echo "IBMiEnvCmd := $(echo "$IBMiEnvCmd" | sed 's/&& $//')"
     } >>"$BUILDVARSMK"
 
