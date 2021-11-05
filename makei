@@ -185,8 +185,8 @@ main() {
     makeOpts=$*
     srcDir="$(pwd)"
 
-    rm -rf "${srcDir}/logs/output.log"
-    rm -rf "${srcDir}/logs/joblog.json"
+    rm -rf "${srcDir}/.logs/output.log"
+    rm -rf "${srcDir}/.logs/joblog.json"
 
     if [ ! -f "${srcDir}/Makefile" ]; then
         MAKEFILE="/QOpenSys/pkgs/lib/bob/Makefile"
