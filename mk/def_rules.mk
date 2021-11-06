@@ -230,6 +230,7 @@ CRTSRVPGMFLAGS = ACTGRP($(ACTGRP)) TEXT(''$(TEXT)'') TGTRLS($(TGTRLS)) AUT($(AUT
 CRTWSCSTFLAGS = AUT($(AUT)) TEXT(''$(TEXT)'')
 CRTBNDRPGFLAGS:= DBGVIEW($(DBGVIEW)) TGTCCSID($(TGTCCSID)) OPTION($(OPTION)) TEXT('$(TEXT)')
 CRTBNDCFLAGS:=TGTCCSID($(TGTCCSID)) OPTION($(OPTION)) TEXT('$(TEXT)')
+RUNSQLFLAGS:= DBGVIEW($(DBGVIEW)) TGTRLS($(TGTRLS)) OUTPUT(*PRINT)
 
 # Extra command string for adhoc addition of extra parameters to a creation command.
 ADHOCCRTFLAGS =
@@ -551,6 +552,104 @@ programTGTRLS = $(strip \
 	$(POSTCLEANUP)
 	@$(TYPEDEF)
 
+.SECONDEXPANSION:
+%.FILE: $$(call genDep,$$@,$$*,TABLE)
+	$(eval d = $($@_d))
+	$(call echo_cmd,"=== Creating SQL TABLE from Sql statement [$(notdir $<)]")
+	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS)
+	@$(PRESETUP);  \
+	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true; \
+	$(POSTCLEANUP)
+
+.SECONDEXPANSION:
+%.FILE: $$(call genDep,$$@,$$*,VIEW)
+	$(eval d = $($@_d))
+	$(call echo_cmd,"=== Creating SQL TABLE from Sql statement [$(notdir $<)]")
+	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS)
+	@$(PRESETUP);  \
+	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true; \
+	$(POSTCLEANUP)
+
+.SECONDEXPANSION:
+%.FILE: $$(call genDep,$$@,$$*,SQLUDT)
+	$(eval d = $($@_d))
+	$(call echo_cmd,"=== Creating SQL TABLE from Sql statement [$(notdir $<)]")
+	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS)
+	@$(PRESETUP);  \
+	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true; \
+	$(POSTCLEANUP)
+
+.SECONDEXPANSION:
+%.FILE: $$(call genDep,$$@,$$*,SQLUDF)
+	$(eval d = $($@_d))
+	$(call echo_cmd,"=== Creating SQL TABLE from Sql statement [$(notdir $<)]")
+	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS)
+	@$(PRESETUP);  \
+	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true; \
+	$(POSTCLEANUP)
+
+.SECONDEXPANSION:
+%.FILE: $$(call genDep,$$@,$$*,SQLPRC)
+	$(eval d = $($@_d))
+	$(call echo_cmd,"=== Creating SQL TABLE from Sql statement [$(notdir $<)]")
+	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS)
+	@$(PRESETUP);  \
+	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true; \
+	$(POSTCLEANUP)
+
+.SECONDEXPANSION:
+%.FILE: $$(call genDep,$$@,$$*,SQLTRG)
+	$(eval d = $($@_d))
+	$(call echo_cmd,"=== Creating SQL TABLE from Sql statement [$(notdir $<)]")
+	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS)
+	@$(PRESETUP);  \
+	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true; \
+	$(POSTCLEANUP)	
+	
+.SECONDEXPANSION:
+%.FILE: $$(call genDep,$$@,$$*,SQLSEQ)
+	$(eval d = $($@_d))
+	$(call echo_cmd,"=== Creating SQL TABLE from Sql statement [$(notdir $<)]")
+	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS)
+	@$(PRESETUP);  \
+	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true; \
+	$(POSTCLEANUP)	
+
+.SECONDEXPANSION:
+%.FILE: $$(call genDep,$$@,$$*,SQLXSR)
+	$(eval d = $($@_d))
+	$(call echo_cmd,"=== Creating SQL TABLE from Sql statement [$(notdir $<)]")
+	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS)
+	@$(PRESETUP);  \
+	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true; \
+	$(POSTCLEANUP)	
+
+.SECONDEXPANSION:
+%.FILE: $$(call genDep,$$@,$$*,SQLALIAS)
+	$(eval d = $($@_d))
+	$(call echo_cmd,"=== Creating SQL TABLE from Sql statement [$(notdir $<)]")
+	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS)
+	@$(PRESETUP);  \
+	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true; \
+	$(POSTCLEANUP)	
+
+.SECONDEXPANSION:
+%.FILE: $$(call genDep,$$@,$$*,SQLMASK)
+	$(eval d = $($@_d))
+	$(call echo_cmd,"=== Creating SQL TABLE from Sql statement [$(notdir $<)]")
+	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS)
+	@$(PRESETUP);  \
+	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true; \
+	$(POSTCLEANUP)	
+
+.SECONDEXPANSION:
+%.FILE: $$(call genDep,$$@,$$*,SQLPERM)
+	$(eval d = $($@_d))
+	$(call echo_cmd,"=== Creating SQL TABLE from Sql statement [$(notdir $<)]")
+	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS)
+	@$(PRESETUP);  \
+	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true; \
+	$(POSTCLEANUP)	
 
 %.MENU: private AUT = $(MNU_AUT)
 %.MENU: private OPTION = $(MNU_OPTION)
