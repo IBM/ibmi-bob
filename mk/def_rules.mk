@@ -552,20 +552,24 @@ programTGTRLS = $(strip \
 	$(POSTCLEANUP)
 	@$(TYPEDEF)
 
+# @$(TOOLSPATH)/checkObjectAlreadyExists $@ $(OBJLIB)
+# @$(TOOLSPATH)/checkIfBuilt $@ $(OBJLIB)
 .SECONDEXPANSION:
 %.FILE: $$(call genDep,$$@,$$*,TABLE)
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating SQL TABLE from Sql statement [$(notdir $<)]")
-	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS)
+	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
 	@$(PRESETUP);  \
 	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true; \
 	$(POSTCLEANUP)
 
+# @$(TOOLSPATH)/checkObjectAlreadyExists $@ $(OBJLIB)
+# @$(TOOLSPATH)/checkIfBuilt $@ $(OBJLIB)
 .SECONDEXPANSION:
 %.FILE: $$(call genDep,$$@,$$*,VIEW)
 	$(eval d = $($@_d))
-	$(call echo_cmd,"=== Creating SQL TABLE from Sql statement [$(notdir $<)]")
-	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS)
+	$(call echo_cmd,"=== Creating SQL VIEW from Sql statement [$(notdir $<)]")
+	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
 	@$(PRESETUP);  \
 	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true; \
 	$(POSTCLEANUP)
@@ -573,8 +577,8 @@ programTGTRLS = $(strip \
 .SECONDEXPANSION:
 %.FILE: $$(call genDep,$$@,$$*,SQLUDT)
 	$(eval d = $($@_d))
-	$(call echo_cmd,"=== Creating SQL TABLE from Sql statement [$(notdir $<)]")
-	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS)
+	$(call echo_cmd,"=== Creating SQL UDT from Sql statement [$(notdir $<)]")
+	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
 	@$(PRESETUP);  \
 	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true; \
 	$(POSTCLEANUP)
@@ -582,8 +586,8 @@ programTGTRLS = $(strip \
 .SECONDEXPANSION:
 %.FILE: $$(call genDep,$$@,$$*,SQLUDF)
 	$(eval d = $($@_d))
-	$(call echo_cmd,"=== Creating SQL TABLE from Sql statement [$(notdir $<)]")
-	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS)
+	$(call echo_cmd,"=== Creating SQL UDF from Sql statement [$(notdir $<)]")
+	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
 	@$(PRESETUP);  \
 	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true; \
 	$(POSTCLEANUP)
@@ -591,8 +595,8 @@ programTGTRLS = $(strip \
 .SECONDEXPANSION:
 %.FILE: $$(call genDep,$$@,$$*,SQLPRC)
 	$(eval d = $($@_d))
-	$(call echo_cmd,"=== Creating SQL TABLE from Sql statement [$(notdir $<)]")
-	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS)
+	$(call echo_cmd,"=== Creating SQL PROCEDURE from Sql statement [$(notdir $<)]")
+	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
 	@$(PRESETUP);  \
 	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true; \
 	$(POSTCLEANUP)
@@ -600,8 +604,8 @@ programTGTRLS = $(strip \
 .SECONDEXPANSION:
 %.FILE: $$(call genDep,$$@,$$*,SQLTRG)
 	$(eval d = $($@_d))
-	$(call echo_cmd,"=== Creating SQL TABLE from Sql statement [$(notdir $<)]")
-	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS)
+	$(call echo_cmd,"=== Creating SQL TRIGGER from Sql statement [$(notdir $<)]")
+	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
 	@$(PRESETUP);  \
 	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true; \
 	$(POSTCLEANUP)	
@@ -609,8 +613,8 @@ programTGTRLS = $(strip \
 .SECONDEXPANSION:
 %.FILE: $$(call genDep,$$@,$$*,SQLSEQ)
 	$(eval d = $($@_d))
-	$(call echo_cmd,"=== Creating SQL TABLE from Sql statement [$(notdir $<)]")
-	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS)
+	$(call echo_cmd,"=== Creating SQL SEQUENCE from Sql statement [$(notdir $<)]")
+	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
 	@$(PRESETUP);  \
 	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true; \
 	$(POSTCLEANUP)	
@@ -618,8 +622,8 @@ programTGTRLS = $(strip \
 .SECONDEXPANSION:
 %.FILE: $$(call genDep,$$@,$$*,SQLXSR)
 	$(eval d = $($@_d))
-	$(call echo_cmd,"=== Creating SQL TABLE from Sql statement [$(notdir $<)]")
-	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS)
+	$(call echo_cmd,"=== Creating SQL XSR from Sql statement [$(notdir $<)]")
+	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
 	@$(PRESETUP);  \
 	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true; \
 	$(POSTCLEANUP)	
@@ -627,8 +631,8 @@ programTGTRLS = $(strip \
 .SECONDEXPANSION:
 %.FILE: $$(call genDep,$$@,$$*,SQLALIAS)
 	$(eval d = $($@_d))
-	$(call echo_cmd,"=== Creating SQL TABLE from Sql statement [$(notdir $<)]")
-	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS)
+	$(call echo_cmd,"=== Creating SQL ALIAS from Sql statement [$(notdir $<)]")
+	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
 	@$(PRESETUP);  \
 	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true; \
 	$(POSTCLEANUP)	
@@ -636,8 +640,8 @@ programTGTRLS = $(strip \
 .SECONDEXPANSION:
 %.FILE: $$(call genDep,$$@,$$*,SQLMASK)
 	$(eval d = $($@_d))
-	$(call echo_cmd,"=== Creating SQL TABLE from Sql statement [$(notdir $<)]")
-	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS)
+	$(call echo_cmd,"=== Creating SQL MASK from Sql statement [$(notdir $<)]")
+	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
 	@$(PRESETUP);  \
 	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true; \
 	$(POSTCLEANUP)	
@@ -645,8 +649,8 @@ programTGTRLS = $(strip \
 .SECONDEXPANSION:
 %.FILE: $$(call genDep,$$@,$$*,SQLPERM)
 	$(eval d = $($@_d))
-	$(call echo_cmd,"=== Creating SQL TABLE from Sql statement [$(notdir $<)]")
-	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS)
+	$(call echo_cmd,"=== Creating SQL PERMISSION from Sql statement [$(notdir $<)]")
+	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
 	@$(PRESETUP);  \
 	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true; \
 	$(POSTCLEANUP)	
