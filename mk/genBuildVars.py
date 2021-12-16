@@ -39,7 +39,7 @@ def parse_placeholder(varName):
         except Exception:
             print(f"{varName} must be defined first in the environment variable.")
     else:
-        return varNameß
+        return varName
 
 def read_iproj_json(iproj_json_path):
     with iproj_json_path.open() as f:
