@@ -112,64 +112,6 @@ parse_placeholder() {
     fi
 }
 
-recursive_generate() {
-    local dir=$1
-    local parentObjLoc=${2//&/}
-    local parentCcsid=$3
-    local objlibraw
-    local tgtCcsid
-    cd "$dir" || (
-        echo "${dir} not found"
-        exit 1
-    )
-
-    if [[ -f ".ibmi.json" ]]; then
-        objlibraw=$(retrieve_from_ibmijson ".ibmi.json" "build.objlib" "")
-        tgtCcsid=$(retrieve_from_ibmijson ".ibmi.json" "build.tgtCcsid" "")
-    fi
-    local objlib=$(parse_placeholder "$objlibraw")
-    if test $? -ne 0; then
-        exit 1
-    fi
-
-    if [[ $objlib == "*CURLIB" ]]; then
-        if [[ $curlib == "*CRTDFT" ]]; then
-            objlib="QGPL"
-        else
-            objlib=$curlib
-        fi
-    fi
-
-    if [ -z "${objlib}" ]; then
-        local objPath=
-    else
-        local objPath=/QSYS.LIB/${objlib}.LIB
-    fi
-
-    # If ObjLoc and tgtCcsid are not defined, then use the parent's configuration
-    objPath="${objPath:-$parentObjLoc}"
-    tgtCcsid="${tgtCcsid:-$parentCcsid}"
-
-    if [[ -f "Rules.mk" ]]; then
-        echo "TGTCCSID_$(pwd) := ${tgtCcsid}" >>"$BUILDVARSMK"
-        echo "OBJPATH_$(pwd) := $objPath" >>"$BUILDVARSMK"
-
-        grep -v ":=" Rules.mk | grep -v "#" | cut -d':' -f1 | grep . | sort | uniq | while read line ; do
-            echo "${line}_d := $dir" >>"$BUILDVARSMK"
-        done
-
-        for f in "$dir"/*; do
-            if [[ -d $f ]]; then
-                recursive_generate "$f" "$objPath" "$tgtCcsid"
-                if test $? -ne 0; then
-                    exit 1
-                fi
-                cd ..
-            fi
-        done
-    fi
-}
-
 main() {
     exitCode=0
 
@@ -193,6 +135,7 @@ main() {
     else
         MAKEFILE="${srcDir}/Makefile"
     fi
+
 
     echo -e "${BLUE}makei: Reading from iproj.json${NOCOLOR}"
     objlib=$(parse_placeholder $(retrieve_from_iproj objlib "*CURLIB"))
@@ -240,7 +183,7 @@ main() {
         echo "preUsrlibl := ${preUsrlibl}"
         echo "postUsrlibl := ${postUsrlibl}"
         echo "INCDIR := ${includePath}"
-
+        
         while read -r cmd; do
             IBMiEnvCmd+="cl '$cmd' > /dev/null 2>&1 && "
         done <<<"$IBMiEnvCmdList"
@@ -250,7 +193,8 @@ main() {
 
     echo -e "${BLUE}Generating makefile for build variables at ${BUILDVARSMK}${NOCOLOR}"
     echo
-    recursive_generate "$srcDir" "/QSYS.LIB/${objlib}.LIB" "$tgtCcsid"
+    # time recursive_generate "$srcDir" "/QSYS.LIB/${objlib}.LIB" "$tgtCcsid"
+    python3 $MK/genBuildVars.py $BUILDVARSMK $srcDir
     ibmijsonError=$?
 
     targetName=$(get_target_from_srcfile "$filename");
