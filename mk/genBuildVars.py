@@ -92,8 +92,8 @@ def main(args):
             with rules_mk.open('r') as r:
                 ls = r.readlines()
                 for l in ls:
-                    l = l.strip()
-                    if l and not l.startswith("#") and not "=" in l:
+                    l = l.rstrip()
+                    if l and not l.startswith("#") and not "=" in l and not l.startswith((' ', '\t')):
                         f.write(f"{l.split(':')[0]}_d := {rules_mk.parents[0].absolute()}\n")
                 
 
