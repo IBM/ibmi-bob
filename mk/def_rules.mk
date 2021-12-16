@@ -593,7 +593,7 @@ programTGTRLS = $(strip \
 	$(POSTCLEANUP)
 
 .SECONDEXPANSION:
-%.FILE: $$(call genDep,$$@,$$*,SQLPRC)
+%.PGM: $$(call genDep,$$@,$$*,SQLPRC)
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating SQL PROCEDURE from Sql statement [$(notdir $<)]")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
@@ -602,7 +602,7 @@ programTGTRLS = $(strip \
 	$(POSTCLEANUP)
 
 .SECONDEXPANSION:
-%.FILE: $$(call genDep,$$@,$$*,SQLTRG)
+%.PGM: $$(call genDep,$$@,$$*,SQLTRG)
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating SQL TRIGGER from Sql statement [$(notdir $<)]")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
@@ -611,7 +611,7 @@ programTGTRLS = $(strip \
 	$(POSTCLEANUP)	
 	
 .SECONDEXPANSION:
-%.FILE: $$(call genDep,$$@,$$*,SQLSEQ)
+%.DTAARA: $$(call genDep,$$@,$$*,SQLSEQ)
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating SQL SEQUENCE from Sql statement [$(notdir $<)]")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
