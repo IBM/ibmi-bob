@@ -1,6 +1,6 @@
 %undefine _disable_source_fetch
 Name: bob
-Version: 2.1.3
+Version: 2.2.1
 Release: 0
 License: Apache-2.0
 Summary: Better Object Builder for IBM i
@@ -19,12 +19,13 @@ Requires: sed-gnu
 Requires: grep-gnu
 Requires: gawk
 Requires: make-gnu
+Requires: python >= 3.4
 
 Source0: https://github.com/IBM/ibmi-bob/archive/refs/tags/v%{version}.tar.gz
 Source1: https://github.com/BrianGarland/CRTFRMSTMF/archive/16db76aba5c94243396297f022a0dfc39dd4f8ee.tar.gz
 
 %description
-Better Object Builder, or Bob, is a free and open source build system for the IBM i platform that is used to build native "QSYS" objects. 
+Better Object Builder, or Bob, is a free and open source build system for the IBM i platform that is used to build native "QSYS" objects.
 Here's what makes Bob different.
 - Speed. Bob only compiles objects that need recompiling, like from new or changed source code.
 - Reliability. Bob understands the relationships between your objects, so if an item changes, then it and everything depending on it will be rebuilt.
@@ -34,7 +35,7 @@ Here's what makes Bob different.
 
 %prep
 
-%setup -n Bob-%{version}
+%setup -n ibmi-bob-%{version}
 
 %build
 echo "skipping build"
