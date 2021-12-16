@@ -18,7 +18,7 @@ def read_ibmi_json(path, parent_value):
         with path.open() as f:
             data = json.load(f)
             try:
-                objlib = data['build']['objlib']
+                objlib = parse_placeholder(data['build']['objlib'])
                 
             except Exception:
                 objlib = parent_value[0]
