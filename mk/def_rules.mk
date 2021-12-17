@@ -584,7 +584,7 @@ programTGTRLS = $(strip \
 	$(POSTCLEANUP)
 
 .SECONDEXPANSION:
-%.FILE: $$(call genDep,$$@,$$*,SQLUDF)
+%.SRVPGM: $$(call genDep,$$@,$$*,SQLUDF)
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating SQL UDF from Sql statement [$(notdir $<)]")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
