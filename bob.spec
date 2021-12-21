@@ -36,14 +36,16 @@ Here's what makes Bob different.
 %prep
 
 %setup -n ibmi-bob-%{version}
+# %setup -q
+tar -xzvf %{SOURCE1} --strip-components=1
 
 %build
 echo "skipping build"
 
 %install
-tar xzvf %{SOURCE1} -C CRTFRMSTMF --strip-components=1
+# tar -xzvf %{SOURCE1} -C CRTFRMSTMF-master --strip-components=1
 
-rm -fr sample-project test shunit2 shelic
+# rm -fr sample-project test shunit2 shelic
 
 mkdir -p %{buildroot}%{_libdir}/bob
 mkdir -p %{buildroot}%{_bindir}/
@@ -59,7 +61,7 @@ else
     rm -rf /QSYS.LIB/CRTFRMSTMF.LIB/*
 fi
 
-cd %{_libdir}/bob/CRTFRMSTMF && %{_bindir}/gmake && cd ..
+cd %{_libdir}/bob/CRTFRMSTMF-master && %{_bindir}/gmake && cd ..
 
 %files
 %defattr(-, qsys, *none)
