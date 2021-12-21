@@ -768,6 +768,16 @@ programTGTRLS = $(strip \
 	$(POSTCLEANUP)
 	@$(EVFEVENT_DOWNLOAD_PGM_RPGLE)
 
+%.PGM: $$(call genDep,$$@,$$*,PGM.SQLRPGLE)
+	$(eval d = $($@_d))
+	$(call echo_cmd,"=== Create Bound SQLRPGLE Program [$(notdir $*)]")
+	$(eval crtcmd := CRTSQLRPGI srcstmf('$<') OBJ($(OBJLIB)/$(basename $(@F))) $(CRTSQLRPGIFLAGS))
+	$(eval EVFEVENT_DOWNLOAD_PGM_RPGLE = system "CPYTOSTMF FROMMBR('$(OBJPATH)/EVFEVENT.FILE/$*.MBR') TOSTMF('$(EVTDIR)/$*.PGM.SQLRPGLE.evfevent') STMFCCSID(*STDASCII) ENDLINFMT(*LF) CVTDTA(*AUTO) STMFOPT(*REPLACE)" >/dev/null)
+	@$(PRESETUP);  \
+	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 ; $(EVFEVENT_DOWNLOAD_PGM_RPGLE); \
+	$(POSTCLEANUP)
+	@$(EVFEVENT_DOWNLOAD_PGM_RPGLE)
+
 %.PGM: $$(call genDep,$$@,$$*,PGM.C)
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Create Bound RPG Program [$(notdir $*)]")
