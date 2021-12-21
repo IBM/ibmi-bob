@@ -22,7 +22,7 @@ Requires: make-gnu
 Requires: python3 >= 3.4
 
 Source0: https://github.com/IBM/ibmi-bob/archive/refs/tags/v%{version}.tar.gz
-Source1: https://github.com/BrianGarland/CRTFRMSTMF/archive/2e586cee00ad1a0a8824165c6113b22b12f4f479.tar.gz
+Source1: https://github.com/BrianGarland/CRTFRMSTMF/archive/master.tar.gz
 
 %description
 Better Object Builder, or Bob, is a free and open source build system for the IBM i platform that is used to build native "QSYS" objects.
