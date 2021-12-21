@@ -1,6 +1,6 @@
 %undefine _disable_source_fetch
 Name: bob
-Version: 2.2.4
+Version: 2.2.5
 Release: 0
 License: Apache-2.0
 Summary: Better Object Builder for IBM i
