@@ -1,6 +1,6 @@
 %undefine _disable_source_fetch
 Name: bob
-Version: 2.2.5
+Version: 2.2.6
 Release: 0
 License: Apache-2.0
 Summary: Better Object Builder for IBM i
@@ -37,7 +37,7 @@ Here's what makes Bob different.
 
 %setup -n ibmi-bob-%{version}
 # %setup -q
-tar -xzvf %{SOURCE1} --strip-components=1
+tar -xzvf %{SOURCE1}
 
 %build
 echo "skipping build"
