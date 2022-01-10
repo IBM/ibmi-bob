@@ -25,4 +25,4 @@ while read -r line; do
     # echo "Running $cmd"
     cmd="" ;
   fi
-done < "$pseudoSrcFile"
+done < <(grep "" $pseudoSrcFile)

@@ -25,6 +25,6 @@ while read -r line; do
     " ;
     cmd=""
   fi
-done < "$pseudoSrcFile"
+done < <(grep "" $pseudoSrcFile)
 
 echo "$result"
