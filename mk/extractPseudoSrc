@@ -5,11 +5,26 @@ objlib=$2
 objname=$3
 
 cmd=""
+result=""
 
 while read -r line; do
+  line=$(echo "$line" | sed 's/\r//');
   if [[ $line = '/*'* ]]; then continue ; fi
   if [[ $line = '' ]]; then continue ; fi
-  cmd+=$(echo "$line " | sed 's/+$//')
-done < "$pseudoSrcFile"
+  if [[ $line =~ .*\+\S* ]]; then
+    linetmp=$(echo "$line" | sed 's/\+\S*$//');
+    cmd="${cmd} ${linetmp}";
+    continue;
+    
+  fi
+ 
+  cmd+=$line
+  if [ -n "$cmd" ]; then
+    result+=$(echo "$cmd" | sed "s/&O/$objlib/g" | sed "s/&N/$objname/g") ;
+    result+="
+    " ;
+    cmd=""
+  fi
+done < <(grep "" $pseudoSrcFile)
 
-echo "$cmd" | sed "s/&O/$objlib/" | sed "s/&N/$objname/"
+echo "$result"
