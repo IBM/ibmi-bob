@@ -33,8 +33,15 @@ if [[ "$(notdir $<)" == *"-"* ]]; then
 fi
 endef
 
+# $(call genDep,$$@,$$*,SQLPRC)
 define genDep
 $(eval d = $($(1)_d))$(eval tmpName = $(wildcard $d/$2-*.$3))$(if $(tmpName),$(tmpName),$d/$2.$3)
+endef
+define transformLower
+$(shell echo $(1) | tr '[:upper:]' '[:lower:]')
+endef
+define transformUpper
+$(shell echo $(1) | tr '[:lower:]' '[:upper:]')
 endef
 
 # define inheritValue
@@ -349,135 +356,135 @@ endef
 #
 # Determine default settings for the various source types that can make a file object.
 fileAUT = $(strip \
-	$(if $(filter %.DSPF,$<),$(DSPF_AUT), \
-	$(if $(filter %.LF,$<),$(LF_AUT), \
-	$(if $(filter %.PF,$<),$(PF_AUT), \
-	$(if $(filter %.PRTF,$<),$(PRTF_AUT), \
+	$(if $(filter %.DSPF %.dspf,$<),$(DSPF_AUT), \
+	$(if $(filter %.LF %.lf,$<),$(LF_AUT), \
+	$(if $(filter %.PF %.pf,$<),$(PF_AUT), \
+	$(if $(filter %.PRTF %.prtf,$<),$(PRTF_AUT), \
 	UNKNOWN_FILE_TYPE)))))
 fileDLTPCT = $(strip \
-	$(if $(filter %.PF,$<),$(PF_DLTPCT), \
+	$(if $(filter %.PF %.pf,$<),$(PF_DLTPCT), \
 	UNKNOWN_FILE_TYPE))
 fileOPTION = $(strip \
-	$(if $(filter %.DSPF,$<),$(DSPF_OPTION), \
-	$(if $(filter %.LF,$<),$(LF_OPTION), \
-	$(if $(filter %.PF,$<),$(PF_OPTION), \
-	$(if $(filter %.PRTF,$<),$(PRTF_OPTION), \
+	$(if $(filter %.DSPF %.dspf,$<),$(DSPF_OPTION), \
+	$(if $(filter %.LF %.lf,$<),$(LF_OPTION), \
+	$(if $(filter %.PF %.pf,$<),$(PF_OPTION), \
+	$(if $(filter %.PRTF %.prtf,$<),$(PRTF_OPTION), \
 	UNKNOWN_FILE_TYPE)))))
 filePAGESIZE = $(strip \
-	$(if $(filter %.PRTF,$<),$(PRTF_PAGESIZE), \
+	$(if $(filter %.PRTF %.prtf,$<),$(PRTF_PAGESIZE), \
 	UNKNOWN_FILE_TYPE))
 fileREUSEDLT = $(strip \
-	$(if $(filter %.PF,$<),$(PF_REUSEDLT), \
+	$(if $(filter %.PF %.pf,$<),$(PF_REUSEDLT), \
 	UNKNOWN_FILE_TYPE))
 fileRSTDSP = $(strip \
-	$(if $(filter %.DSPF,$<),$(DSPF_RSTDSP), \
+	$(if $(filter %.DSPF %.dspf,$<),$(DSPF_RSTDSP), \
 	UNKNOWN_FILE_TYPE))
 fileSIZE = $(strip \
-	$(if $(filter %.PF,$<),$(PF_SIZE), \
+	$(if $(filter %.PF %.pf,$<),$(PF_SIZE), \
 	UNKNOWN_FILE_TYPE))
 
 # Determine default settings for the various source types that can make a module object.
 moduleAUT = $(strip \
-	$(if $(filter %.C,$<),$(CMOD_AUT), \
-	$(if $(filter %.CLLE,$<),$(CLMOD_AUT), \
-	$(if $(filter %.RPGLE,$<),$(RPGMOD_AUT), \
+	$(if $(filter %.C %.c,$<),$(CMOD_AUT), \
+	$(if $(filter %.CLLE %.clle,$<),$(CLMOD_AUT), \
+	$(if $(filter %.RPGLE %.rpgle,$<),$(RPGMOD_AUT), \
 	UNKNOWN_FILE_TYPE))))
 moduleDBGVIEW = $(strip \
-	$(if $(filter %.C,$<),$(CMOD_DBGVIEW), \
-	$(if $(filter %.CLLE,$<),$(CLMOD_DBGVIEW), \
-	$(if $(filter %.RPGLE,$<),$(RPGMOD_DBGVIEW), \
-	$(if $(filter %.SQLC,$<),$(SQLCIMOD_DBGVIEW), \
-	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIMOD_DBGVIEW), \
+	$(if $(filter %.C %.c,$<),$(CMOD_DBGVIEW), \
+	$(if $(filter %.CLLE %.clle,$<),$(CLMOD_DBGVIEW), \
+	$(if $(filter %.RPGLE %.rpgle,$<),$(RPGMOD_DBGVIEW), \
+	$(if $(filter %.SQLC %.sqlc,$<),$(SQLCIMOD_DBGVIEW), \
+	$(if $(filter %.SQLRPGLE %.sqlrpgle,$<),$(SQLRPGIMOD_DBGVIEW), \
 	UNKNOWN_FILE_TYPE))))))
 moduleOBJTYPE = $(strip \
-	$(if $(filter %.SQLC,$<),$(SQLCIMOD_OBJTYPE), \
-	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIMOD_OBJTYPE), \
+	$(if $(filter %.SQLC %.sqlc,$<),$(SQLCIMOD_OBJTYPE), \
+	$(if $(filter %.SQLRPGLE %.sqlrpgle,$<),$(SQLRPGIMOD_OBJTYPE), \
 	UNKNOWN_FILE_TYPE)))
 moduleOPTION = $(strip \
-	$(if $(filter %.C,$<),$(CMOD_OPTION), \
-	$(if $(filter %.CLLE,$<),$(CLMOD_OPTION), \
-	$(if $(filter %.RPGLE,$<),$(RPGMOD_OPTION), \
-	$(if $(filter %.SQLC,$<),$(SQLCIMOD_OPTION), \
-	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIMOD_OPTION), \
+	$(if $(filter %.C %.c,$<),$(CMOD_OPTION), \
+	$(if $(filter %.CLLE %.clle,$<),$(CLMOD_OPTION), \
+	$(if $(filter %.RPGLE %.rpgle,$<),$(RPGMOD_OPTION), \
+	$(if $(filter %.SQLC %.sqlc,$<),$(SQLCIMOD_OPTION), \
+	$(if $(filter %.SQLRPGLE %.sqlrpgle,$<),$(SQLRPGIMOD_OPTION), \
 	UNKNOWN_FILE_TYPE))))))
 moduleINCDIR = $(strip \
-	$(if $(filter %.C,$<),$(CMOD_INCDIR), \
-	$(if $(filter %.CLLE,$<),$(CLMOD_INCDIR), \
-	$(if $(filter %.CBLLE,$<),$(CBLMOD_INCDIR), \
-	$(if $(filter %.SQLC,$<),$(SQLCIMOD_INCDIR), \
+	$(if $(filter %.C %.c,$<),$(CMOD_INCDIR), \
+	$(if $(filter %.CLLE %.clle,$<),$(CLMOD_INCDIR), \
+	$(if $(filter %.CBLLE %.cblle,$<),$(CBLMOD_INCDIR), \
+	$(if $(filter %.SQLC %.sqlc,$<),$(SQLCIMOD_INCDIR), \
 	UNKNOWN_FILE_TYPE)))))
 moduleRPGPPOPT = $(strip \
-	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIMOD_RPGPPOPT), \
+	$(if $(filter %.SQLRPGLE %.sqlrpgle,$<),$(SQLRPGIMOD_RPGPPOPT), \
 	UNKNOWN_FILE_TYPE))
 moduleSTGMDL = $(strip \
-	$(if $(filter %.C,$<),$(CMOD_STGMDL), \
-	$(if $(filter %.SQLC,$<),$(SQLCIMOD_STGMDL), \
+	$(if $(filter %.C %.c,$<),$(CMOD_STGMDL), \
+	$(if $(filter %.SQLC %.sqlc,$<),$(SQLCIMOD_STGMDL), \
 	UNKNOWN_FILE_TYPE)))
 moduleSYSIFCOPT = $(strip \
-	$(if $(filter %.C,$<),$(CMOD_SYSIFCOPT), \
-	$(if $(filter %.SQLC,$<),$(SQLCIMOD_SYSIFCOPT), \
+	$(if $(filter %.C %.c,$<),$(CMOD_SYSIFCOPT), \
+	$(if $(filter %.SQLC %.sqlc,$<),$(SQLCIMOD_SYSIFCOPT), \
 	UNKNOWN_FILE_TYPE)))
 moduleTERASPACE = $(strip \
-	$(if $(filter %.C,$<),$(CMOD_TERASPACE), \
-	$(if $(filter %.SQLC,$<),$(SQLCIMOD_TERASPACE), \
+	$(if $(filter %.C %.c,$<),$(CMOD_TERASPACE), \
+	$(if $(filter %.SQLC %.sqlc,$<),$(SQLCIMOD_TERASPACE), \
 	UNKNOWN_FILE_TYPE)))
 moduleTGTRLS = $(strip \
-	$(if $(filter %.C,$<),$(CMOD_TGTRLS), \
-	$(if $(filter %.CLLE,$<),$(CLMOD_TGTRLS), \
-	$(if $(filter %.RPGLE,$<),$(RPGMOD_TGTRLS), \
-	$(if $(filter %.SQLC,$<),$(SQLCIMOD_TGTRLS), \
-	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIMOD_TGTRLS), \
+	$(if $(filter %.C %.c,$<),$(CMOD_TGTRLS), \
+	$(if $(filter %.CLLE %.clle,$<),$(CLMOD_TGTRLS), \
+	$(if $(filter %.RPGLE %.rpgle,$<),$(RPGMOD_TGTRLS), \
+	$(if $(filter %.SQLC %.sqlc,$<),$(SQLCIMOD_TGTRLS), \
+	$(if $(filter %.SQLRPGLE %.sqlrpgle,$<),$(SQLRPGIMOD_TGTRLS), \
 	UNKNOWN_FILE_TYPE))))))
 
 # Determine default settings for the various source types that can make a program object.
 programACTGRP = $(strip \
-	$(if $(filter %.CLLE,$<),$(BNDCL_ACTGRP), \
-	$(if $(filter %.RPGLE,$<),$(BNDRPG_ACTGRP), \
-	$(if $(filter %.MODULE,$<),$(PGM_ACTGRP), \
+	$(if $(filter %.CLLE %.clle,$<),$(BNDCL_ACTGRP), \
+	$(if $(filter %.RPGLE %.rpgle,$<),$(BNDRPG_ACTGRP), \
+	$(if $(filter %.MODULE %.module,$<),$(PGM_ACTGRP), \
 	UNKNOWN_FILE_TYPE))))
 programAUT = $(strip \
-	$(if $(filter %.CLLE,$<),$(BNDCL_AUT), \
-	$(if $(filter %.RPGLE,$<),$(BNDRPG_AUT), \
-	$(if $(filter %.MODULE,$<),$(PGM_AUT), \
+	$(if $(filter %.CLLE %.clle,$<),$(BNDCL_AUT), \
+	$(if $(filter %.RPGLE %.rpgle,$<),$(BNDRPG_AUT), \
+	$(if $(filter %.MODULE %.module,$<),$(PGM_AUT), \
 	UNKNOWN_FILE_TYPE))))
 programDBGVIEW = $(strip \
-	$(if $(filter %.CLLE,$<),$(BNDCL_DBGVIEW), \
-	$(if $(filter %.RPGLE,$<),$(BNDRPG_DBGVIEW), \
-	$(if $(filter %.SQLC,$<),$(SQLCIPGM_DBGVIEW), \
-	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIPGM_DBGVIEW), \
+	$(if $(filter %.CLLE %.clle,$<),$(BNDCL_DBGVIEW), \
+	$(if $(filter %.RPGLE %.rpgle,$<),$(BNDRPG_DBGVIEW), \
+	$(if $(filter %.SQLC %.sqlc,$<),$(SQLCIPGM_DBGVIEW), \
+	$(if $(filter %.SQLRPGLE %.sqlrpgle,$<),$(SQLRPGIPGM_DBGVIEW), \
 	UNKNOWN_FILE_TYPE)))))
 programDETAIL = $(strip \
-	$(if $(filter %.MODULE,$<),$(PGM_DETAIL), \
+	$(if $(filter %.MODULE %.module,$<),$(PGM_DETAIL), \
 	UNKNOWN_FILE_TYPE))
 programDFTACTGRP = $(strip \
-	$(if $(filter %.CLLE,$<),$(BNDCL_DFTACTGRP), \
-	$(if $(filter %.RPGLE,$<),$(BNDRPG_DFTACTGRP), \
+	$(if $(filter %.CLLE %.clle,$<),$(BNDCL_DFTACTGRP), \
+	$(if $(filter %.RPGLE %.rpgle,$<),$(BNDRPG_DFTACTGRP), \
 	UNKNOWN_FILE_TYPE)))
 programOBJTYPE = $(strip \
-	$(if $(filter %.SQLC,$<),$(SQLCIPGM_OBJTYPE), \
-	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIPGM_OBJTYPE), \
+	$(if $(filter %.SQLC %.sqlc,$<),$(SQLCIPGM_OBJTYPE), \
+	$(if $(filter %.SQLRPGLE %.sqlrpgle,$<),$(SQLRPGIPGM_OBJTYPE), \
 	UNKNOWN_FILE_TYPE)))
 programOPTION = $(strip \
-	$(if $(filter %.CLLE,$<),$(BNDCL_OPTION), \
-	$(if $(filter %.RPGLE,$<),$(BNDRPG_OPTION), \
-	$(if $(filter %.SQLC,$<),$(SQLCIPGM_OPTION), \
-	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIPGM_OPTION), \
-	$(if $(filter %.MODULE,$<),$(PGM_OPTION), \
-	$(if $(filter %.CBL,$<),$(CBL_OPTION), \
-	$(if $(filter %.RPG,$<),$(RPG_OPTION), \
+	$(if $(filter %.CLLE %.clle,$<),$(BNDCL_OPTION), \
+	$(if $(filter %.RPGLE %.rpgle,$<),$(BNDRPG_OPTION), \
+	$(if $(filter %.SQLC %.sqlc,$<),$(SQLCIPGM_OPTION), \
+	$(if $(filter %.SQLRPGLE %.sqlrpgle,$<),$(SQLRPGIPGM_OPTION), \
+	$(if $(filter %.MODULE %.module,$<),$(PGM_OPTION), \
+	$(if $(filter %.CBL %.cbl,$<),$(CBL_OPTION), \
+	$(if $(filter %.RPG %.rpg,$<),$(RPG_OPTION), \
 	UNKNOWN_FILE_TYPE))))))))
 programRPGPPOPT = $(strip \
-	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIPGM_RPGPPOPT), \
+	$(if $(filter %.SQLRPGLE %.sqlrpgle,$<),$(SQLRPGIPGM_RPGPPOPT), \
 	UNKNOWN_FILE_TYPE))
 programSTGMDL = $(strip \
-	$(if $(filter %.MODULE,$<),$(PGM_STGMDL), \
+	$(if $(filter %.MODULE %.module,$<),$(PGM_STGMDL), \
 	UNKNOWN_FILE_TYPE))
 programTGTRLS = $(strip \
-	$(if $(filter %.CLLE,$<),$(BNDCL_TGTRLS), \
-	$(if $(filter %.RPGLE,$<),$(BNDRPG_TGTRLS), \
-	$(if $(filter %.SQLC,$<),$(SQLCIPGM_TGTRLS), \
-	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIPGM_TGTRLS), \
-	$(if $(filter %.MODULE,$<),$(PGM_TGTRLS), \
+	$(if $(filter %.CLLE %.clle,$<),$(BNDCL_TGTRLS), \
+	$(if $(filter %.RPGLE %.rpgle,$<),$(BNDRPG_TGTRLS), \
+	$(if $(filter %.SQLC %.sqlc,$<),$(SQLCIPGM_TGTRLS), \
+	$(if $(filter %.SQLRPGLE %.sqlrpgle,$<),$(SQLRPGIPGM_TGTRLS), \
+	$(if $(filter %.MODULE %.module,$<),$(PGM_TGTRLS), \
 	UNKNOWN_FILE_TYPE))))))
 
 ### Implicit rules
@@ -488,8 +495,7 @@ programTGTRLS = $(strip \
 %.CMD: private PMTFILE = $(CMD_PMTFILE)
 %.CMD: private VLDCKR = $(CMD_VLDCKR)
 
-.SECONDEXPANSION:
-%.CMD: $$(call genDep,$$@,$$*,CMDSRC)
+define CMDSRC_RECIPE
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating command [$(notdir $<)]")
 	@$(set_STMF_CCSID)
@@ -497,6 +503,12 @@ programTGTRLS = $(strip \
 	@$(PRESETUP);  \
 	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 ;  \
 	$(POSTCLEANUP)
+endef
+.SECONDEXPANSION:
+%.CMD: $$(call genDep,$$@,$$(call transformUpper,$$*),CMDSRC) ; $(CMDSRC_RECIPE)
+%.CMD: $$(call genDep,$$@,$$(call transformLower,$$*),CMDSRC) ; $(CMDSRC_RECIPE)
+%.CMD: $$(call genDep,$$@,$$(call transformUpper,$$*),cmdsrc) ; $(CMDSRC_RECIPE)
+%.CMD: $$(call genDep,$$@,$$(call transformLower,$$*),cmdsrc) ; $(CMDSRC_RECIPE)
 
 
 %.FILE: private AUT = $(fileAUT)
@@ -508,8 +520,8 @@ programTGTRLS = $(strip \
 %.FILE: private SIZE = $(fileSIZE)
 %.FILE: private TYPEDEF = $(if $(filter YES,$(CREATE_TYPEDEF)),$(TYPEDEF_SCRIPT),)
 
-.SECONDEXPANSION:
-%.FILE:$$(call genDep,$$@,$$*,DSPF)
+
+define DSPF_RECIPE
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating DSPF [$(notdir $<)]")
 	@$(set_STMF_CCSID)
@@ -517,9 +529,14 @@ programTGTRLS = $(strip \
 	@$(PRESETUP);  \
 	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 ; $(EVFEVENT_DOWNLOAD); \
 	$(POSTCLEANUP)
-
+endef
 .SECONDEXPANSION:
-%.FILE: $$(call genDep,$$@,$$*,LF)
+%.FILE: $$(call genDep,$$@,$$(call transformUpper,$$*),DSPF) ; $(DSPF_RECIPE)
+%.FILE: $$(call genDep,$$@,$$(call transformLower,$$*),DSPF) ; $(DSPF_RECIPE)
+%.FILE: $$(call genDep,$$@,$$(call transformUpper,$$*),dspf) ; $(DSPF_RECIPE)
+%.FILE: $$(call genDep,$$@,$$(call transformLower,$$*),dspf) ; $(DSPF_RECIPE)
+
+define LF_RECIPE
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating LF [$(notdir $<)]")
 	@$(set_STMF_CCSID)
@@ -529,9 +546,15 @@ programTGTRLS = $(strip \
 	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 ; $(EVFEVENT_DOWNLOAD); \
 	$(POSTCLEANUP)
 	@$(TYPEDEF)
-
+endef
 .SECONDEXPANSION:
-%.FILE: $$(call genDep,$$@,$$*,PF)
+%.FILE: $$(call genDep,$$@,$$(call transformUpper,$$*),LF) ; $(LF_RECIPE)
+%.FILE: $$(call genDep,$$@,$$(call transformLower,$$*),LF) ; $(LF_RECIPE)
+%.FILE: $$(call genDep,$$@,$$(call transformUpper,$$*),lf) ; $(LF_RECIPE)
+%.FILE: $$(call genDep,$$@,$$(call transformLower,$$*),lf) ; $(LF_RECIPE)
+
+
+define PF_RECIPE
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating PF [$(notdir $<)]")
 	@$(set_STMF_CCSID)
@@ -540,9 +563,15 @@ programTGTRLS = $(strip \
 	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 ; $(EVFEVENT_DOWNLOAD); \
 	$(POSTCLEANUP)
 	@$(TYPEDEF)
-
+endef
 .SECONDEXPANSION:
-%.FILE: $$(call genDep,$$@,$$*,PRTF)
+%.FILE: $$(call genDep,$$@,$$(call transformUpper,$$*),PF) ; $(PF_RECIPE)
+%.FILE: $$(call genDep,$$@,$$(call transformLower,$$*),PF) ; $(PF_RECIPE)
+%.FILE: $$(call genDep,$$@,$$(call transformUpper,$$*),pf) ; $(PF_RECIPE)
+%.FILE: $$(call genDep,$$@,$$(call transformLower,$$*),pf) ; $(PF_RECIPE)
+
+
+define PRTF_RECIPE
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating PRTF [$(notdir $<)]")
 	@$(set_STMF_CCSID)
@@ -551,118 +580,189 @@ programTGTRLS = $(strip \
 	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 ; $(EVFEVENT_DOWNLOAD); \
 	$(POSTCLEANUP)
 	@$(TYPEDEF)
-
-# @$(TOOLSPATH)/checkObjectAlreadyExists $@ $(OBJLIB)
-# @$(TOOLSPATH)/checkIfBuilt $@ $(OBJLIB)
+endef
 .SECONDEXPANSION:
-%.FILE: $$(call genDep,$$@,$$*,TABLE)
+%.FILE: $$(call genDep,$$@,$$(call transformUpper,$$*),PRTF) ; $(PRTF_RECIPE)
+%.FILE: $$(call genDep,$$@,$$(call transformLower,$$*),PRTF) ; $(PRTF_RECIPE)
+%.FILE: $$(call genDep,$$@,$$(call transformUpper,$$*),prtf) ; $(PRTF_RECIPE)
+%.FILE: $$(call genDep,$$@,$$(call transformLower,$$*),prtf) ; $(PRTF_RECIPE)
+
+
+define TABLE_RECIPE
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating SQL TABLE from Sql statement [$(notdir $<)]")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
 	@$(PRESETUP);  \
 	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true; \
 	$(POSTCLEANUP)
-
+endef
 # @$(TOOLSPATH)/checkObjectAlreadyExists $@ $(OBJLIB)
 # @$(TOOLSPATH)/checkIfBuilt $@ $(OBJLIB)
 .SECONDEXPANSION:
-%.FILE: $$(call genDep,$$@,$$*,VIEW)
+%.FILE: $$(call genDep,$$@,$$(call transformUpper,$$*),TABLE) ; $(TABLE_RECIPE)
+%.FILE: $$(call genDep,$$@,$$(call transformLower,$$*),TABLE) ; $(TABLE_RECIPE)
+%.FILE: $$(call genDep,$$@,$$(call transformUpper,$$*),table) ; $(TABLE_RECIPE)
+%.FILE: $$(call genDep,$$@,$$(call transformLower,$$*),table) ; $(TABLE_RECIPE)
+
+
+define VIEW_RECIPE
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating SQL VIEW from Sql statement [$(notdir $<)]")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
 	@$(PRESETUP);  \
 	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true; \
 	$(POSTCLEANUP)
-
+endef
+# @$(TOOLSPATH)/checkObjectAlreadyExists $@ $(OBJLIB)
+# @$(TOOLSPATH)/checkIfBuilt $@ $(OBJLIB)
 .SECONDEXPANSION:
-%.FILE: $$(call genDep,$$@,$$*,SQLUDT)
+%.FILE: $$(call genDep,$$@,$$(call transformUpper,$$*),VIEW) ; $(VIEW_RECIPE)
+%.FILE: $$(call genDep,$$@,$$(call transformLower,$$*),VIEW) ; $(VIEW_RECIPE)
+%.FILE: $$(call genDep,$$@,$$(call transformUpper,$$*),view) ; $(VIEW_RECIPE)
+%.FILE: $$(call genDep,$$@,$$(call transformLower,$$*),view) ; $(VIEW_RECIPE)
+
+
+define SQLUDT_RECIPE
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating SQL UDT from Sql statement [$(notdir $<)]")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
 	@$(PRESETUP);  \
 	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true; \
 	$(POSTCLEANUP)
-
+endef
 .SECONDEXPANSION:
-%.SRVPGM: $$(call genDep,$$@,$$*,SQLUDF)
+%.FILE: $$(call genDep,$$@,$$(call transformUpper,$$*),SQLUDT) ; $(SQLUDT_RECIPE)
+%.FILE: $$(call genDep,$$@,$$(call transformLower,$$*),SQLUDT) ; $(SQLUDT_RECIPE)
+%.FILE: $$(call genDep,$$@,$$(call transformUpper,$$*),sqludt) ; $(SQLUDT_RECIPE)
+%.FILE: $$(call genDep,$$@,$$(call transformLower,$$*),sqludt) ; $(SQLUDT_RECIPE)
+
+
+define SQLUDF_RECIPE
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating SQL UDF from Sql statement [$(notdir $<)]")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
 	@$(PRESETUP);  \
 	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true; \
 	$(POSTCLEANUP)
-
+endef
 .SECONDEXPANSION:
-%.PGM: $$(call genDep,$$@,$$*,SQLPRC)
+%.SRVPGM: $$(call genDep,$$@,$$(call transformUpper,$$*),SQLUDF) ; $(SQLUDF_RECIPE)
+%.SRVPGM: $$(call genDep,$$@,$$(call transformLower,$$*),SQLUDF) ; $(SQLUDF_RECIPE)
+%.SRVPGM: $$(call genDep,$$@,$$(call transformUpper,$$*),sqludf) ; $(SQLUDF_RECIPE)
+%.SRVPGM: $$(call genDep,$$@,$$(call transformLower,$$*),sqludf) ; $(SQLUDF_RECIPE)
+
+
+define SQLPRC_RECIPE
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating SQL PROCEDURE from Sql statement [$(notdir $<)]")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
 	@$(PRESETUP);  \
 	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true; \
 	$(POSTCLEANUP)
-
+endef
 .SECONDEXPANSION:
-%.PGM: $$(call genDep,$$@,$$*,SQLTRG)
+%.PGM: $$(call genDep,$$@,$$(call transformUpper,$$*),SQLPRC) ; $(SQLPRC_RECIPE)
+%.PGM: $$(call genDep,$$@,$$(call transformLower,$$*),SQLPRC) ; $(SQLPRC_RECIPE)
+%.PGM: $$(call genDep,$$@,$$(call transformUpper,$$*),sqlprc) ; $(SQLPRC_RECIPE)
+%.PGM: $$(call genDep,$$@,$$(call transformLower,$$*),sqlprc) ; $(SQLPRC_RECIPE)
+
+
+define SQLTRG_RECIPE
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating SQL TRIGGER from Sql statement [$(notdir $<)]")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
 	@$(PRESETUP);  \
 	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true; \
 	$(POSTCLEANUP)	
-	
+endef
 .SECONDEXPANSION:
-%.DTAARA: $$(call genDep,$$@,$$*,SQLSEQ)
+%.PGM: $$(call genDep,$$@,$$(call transformUpper,$$*),SQLTRG) ; $(SQLTRG_RECIPE)
+%.PGM: $$(call genDep,$$@,$$(call transformLower,$$*),SQLTRG) ; $(SQLTRG_RECIPE)
+%.PGM: $$(call genDep,$$@,$$(call transformUpper,$$*),sqltrg) ; $(SQLTRG_RECIPE)
+%.PGM: $$(call genDep,$$@,$$(call transformLower,$$*),sqltrg) ; $(SQLTRG_RECIPE)
+
+	
+define SQLSEQ_RECIPE
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating SQL SEQUENCE from Sql statement [$(notdir $<)]")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
 	@$(PRESETUP);  \
 	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true; \
 	$(POSTCLEANUP)	
-
+endef
 .SECONDEXPANSION:
-%.FILE: $$(call genDep,$$@,$$*,SQLXSR)
+%.DTAARA: $$(call genDep,$$@,$$(call transformUpper,$$*),SQLSEQ) ; $(SQLSEQ_RECIPE)
+%.DTAARA: $$(call genDep,$$@,$$(call transformLower,$$*),SQLSEQ) ; $(SQLSEQ_RECIPE)
+%.DTAARA: $$(call genDep,$$@,$$(call transformUpper,$$*),sqlseq) ; $(SQLSEQ_RECIPE)
+%.DTAARA: $$(call genDep,$$@,$$(call transformLower,$$*),sqlseq) ; $(SQLSEQ_RECIPE)
+
+
+define SQLXSR_RECIPE
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating SQL XSR from Sql statement [$(notdir $<)]")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
 	@$(PRESETUP);  \
 	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true; \
 	$(POSTCLEANUP)	
-
+endef
 .SECONDEXPANSION:
-%.FILE: $$(call genDep,$$@,$$*,SQLALIAS)
+%.FILE: $$(call genDep,$$@,$$(call transformUpper,$$*),SQLXSR) ; $(SQLXSR_RECIPE)
+%.FILE: $$(call genDep,$$@,$$(call transformLower,$$*),SQLXSR) ; $(SQLXSR_RECIPE)
+%.FILE: $$(call genDep,$$@,$$(call transformUpper,$$*),sqlxsr) ; $(SQLXSR_RECIPE)
+%.FILE: $$(call genDep,$$@,$$(call transformLower,$$*),sqlxsr) ; $(SQLXSR_RECIPE)
+
+
+define SQLALIAS_RECIPE
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating SQL ALIAS from Sql statement [$(notdir $<)]")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
 	@$(PRESETUP);  \
 	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true; \
 	$(POSTCLEANUP)	
-
+endef
 .SECONDEXPANSION:
-%.FILE: $$(call genDep,$$@,$$*,SQLMASK)
+%.FILE: $$(call genDep,$$@,$$(call transformUpper,$$*),SQLALIAS) ; $(SQLALIAS_RECIPE)
+%.FILE: $$(call genDep,$$@,$$(call transformLower,$$*),SQLALIAS) ; $(SQLALIAS_RECIPE)
+%.FILE: $$(call genDep,$$@,$$(call transformUpper,$$*),sqlalias) ; $(SQLALIAS_RECIPE)
+%.FILE: $$(call genDep,$$@,$$(call transformLower,$$*),sqlalias) ; $(SQLALIAS_RECIPE)
+
+
+define SQLMASK_RECIPE
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating SQL MASK from Sql statement [$(notdir $<)]")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
 	@$(PRESETUP);  \
 	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true; \
 	$(POSTCLEANUP)	
-
+endef
 .SECONDEXPANSION:
-%.FILE: $$(call genDep,$$@,$$*,SQLPERM)
+%.FILE: $$(call genDep,$$@,$$(call transformUpper,$$*),SQLMASK) ; $(SQLMASK_RECIPE)
+%.FILE: $$(call genDep,$$@,$$(call transformLower,$$*),SQLMASK) ; $(SQLMASK_RECIPE)
+%.FILE: $$(call genDep,$$@,$$(call transformUpper,$$*),sqlmask) ; $(SQLMASK_RECIPE)
+%.FILE: $$(call genDep,$$@,$$(call transformLower,$$*),sqlmask) ; $(SQLMASK_RECIPE)
+
+
+define SQLPERM_RECIPE
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating SQL PERMISSION from Sql statement [$(notdir $<)]")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
 	@$(PRESETUP);  \
 	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true; \
 	$(POSTCLEANUP)	
+endef
+.SECONDEXPANSION:
+%.FILE: $$(call genDep,$$@,$$(call transformUpper,$$*),SQLPERM) ; $(SQLPERM_RECIPE)
+%.FILE: $$(call genDep,$$@,$$(call transformLower,$$*),SQLPERM) ; $(SQLPERM_RECIPE)
+%.FILE: $$(call genDep,$$@,$$(call transformUpper,$$*),sqlperm) ; $(SQLPERM_RECIPE)
+%.FILE: $$(call genDep,$$@,$$(call transformLower,$$*),sqlperm) ; $(SQLPERM_RECIPE)
+
 
 %.MENU: private AUT = $(MNU_AUT)
 %.MENU: private OPTION = $(MNU_OPTION)
 %.MENU: private CURLIB = $(MNU_CURLIB)
 %.MENU: private PRDLIB = $(MNU_PRDLIB)
 %.MENU: private TYPE = $(MNU_TYPE)
-
-.SECONDEXPANSION:
-%.MENU: $$(call genDep,$$@,$$*,MENU)
+define MENU_RECIPE
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating menu [$(notdir $<)]")
 	@$(set_STMF_CCSID)
@@ -670,6 +770,12 @@ programTGTRLS = $(strip \
 	@$(PRESETUP);  \
 	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 ; $(EVFEVENT_DOWNLOAD); \
 	$(POSTCLEANUP)
+endef
+.SECONDEXPANSION:
+%.MENU: $$(call genDep,$$@,$$(call transformUpper,$$*),MENU) ; $(MENU_RECIPE)
+%.MENU: $$(call genDep,$$@,$$(call transformLower,$$*),MENU) ; $(MENU_RECIPE)
+%.MENU: $$(call genDep,$$@,$$(call transformUpper,$$*),menu) ; $(MENU_RECIPE)
+%.MENU: $$(call genDep,$$@,$$(call transformLower,$$*),menu) ; $(MENU_RECIPE)
 
 
 %.MODULE: private AUT = $(moduleAUT)
@@ -682,10 +788,7 @@ programTGTRLS = $(strip \
 %.MODULE: private SYSIFCOPT = $(moduleSYSIFCOPT)
 %.MODULE: private TERASPACE = $(moduleTERASPACE)
 %.MODULE: private TGTRLS = $(moduleTGTRLS)
-
-
-.SECONDEXPANSION:
-%.MODULE: $$(call genDep,$$@,$$*,C)
+define C_RECIPE
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating C module [$(notdir $<)]")
 	@$(set_STMF_CCSID)
@@ -694,10 +797,15 @@ programTGTRLS = $(strip \
 	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 ; ($(EVFEVENT_DOWNLOAD); ret=$$?; rm $(DEPDIR)/$*.Td 2>/dev/null; exit $$ret); \
 	$(POSTCLEANUP)
 	@$(POSTCCOMPILE)
-
-
+endef
 .SECONDEXPANSION:
-%.MODULE: $$(call genDep,$$@,$$*,RPGLE)
+%.MODULE: $$(call genDep,$$@,$$(call transformUpper,$$*),C) ; $(C_RECIPE)
+%.MODULE: $$(call genDep,$$@,$$(call transformLower,$$*),C) ; $(C_RECIPE)
+%.MODULE: $$(call genDep,$$@,$$(call transformUpper,$$*),c) ; $(C_RECIPE)
+%.MODULE: $$(call genDep,$$@,$$(call transformLower,$$*),c) ; $(C_RECIPE)
+
+
+define RPGLE_RECIPE
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating RPG module [$(notdir $<)]")
 	@$(set_STMF_CCSID)
@@ -706,10 +814,15 @@ programTGTRLS = $(strip \
 	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 ; $(EVFEVENT_DOWNLOAD); \
 	$(POSTCLEANUP)
 	@$(POSTRPGCOMPILE)
-
-
+endef
 .SECONDEXPANSION:
-%.MODULE: $$(call genDep,$$@,$$*,CLLE)
+%.MODULE: $$(call genDep,$$@,$$(call transformUpper,$$*),RPGLE) ; $(RPGLE_RECIPE)
+%.MODULE: $$(call genDep,$$@,$$(call transformLower,$$*),RPGLE) ; $(RPGLE_RECIPE)
+%.MODULE: $$(call genDep,$$@,$$(call transformUpper,$$*),rpgle) ; $(RPGLE_RECIPE)
+%.MODULE: $$(call genDep,$$@,$$(call transformLower,$$*),rpgle) ; $(RPGLE_RECIPE)
+
+
+define CLLE_RECIPE
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating CL module [$(notdir $<)]")
 	@$(set_STMF_CCSID)
@@ -718,10 +831,15 @@ programTGTRLS = $(strip \
 	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1; \
 	$(POSTCLEANUP)
 	$(EVFEVENT_DOWNLOAD)
-
-# Temp: Convert UTF-8 to temporary Windows Latin-1, because SQLC pre-compiler doesn't understand UTF-8
+endef
 .SECONDEXPANSION:
-%.MODULE: $$(call genDep,$$@,$$*,SQLC)
+%.MODULE: $$(call genDep,$$@,$$(call transformUpper,$$*),CLLE) ; $(CLLE_RECIPE)
+%.MODULE: $$(call genDep,$$@,$$(call transformLower,$$*),CLLE) ; $(CLLE_RECIPE)
+%.MODULE: $$(call genDep,$$@,$$(call transformUpper,$$*),clle) ; $(CLLE_RECIPE)
+%.MODULE: $$(call genDep,$$@,$$(call transformLower,$$*),clle) ; $(CLLE_RECIPE)
+
+
+define SQLC_RECIPE
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating SQLC module [$(notdir $<)]")
 	@$(set_STMF_CCSID)
@@ -732,10 +850,17 @@ programTGTRLS = $(strip \
 	$(POSTCLEANUP)
 	@$(POSTCCOMPILE)
 	@rm "$<-1252"
-
-
+endef
+# Temp: Convert UTF-8 to temporary Windows Latin-1, because SQLC pre-compiler doesn't understand UTF-8
 .SECONDEXPANSION:
-%.MODULE: $$(call genDep,$$@,$$*,SQLRPGLE)
+%.MODULE: $$(call genDep,$$@,$$(call transformUpper,$$*),SQLC) ; $(SQLC_RECIPE)
+%.MODULE: $$(call genDep,$$@,$$(call transformLower,$$*),SQLC) ; $(SQLC_RECIPE)
+%.MODULE: $$(call genDep,$$@,$$(call transformUpper,$$*),sqlc) ; $(SQLC_RECIPE)
+%.MODULE: $$(call genDep,$$@,$$(call transformLower,$$*),sqlc) ; $(SQLC_RECIPE)
+
+
+
+define SQLRPGLE_RECIPE
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating SQLRPGLE module [$(notdir $<)]")
 	@$(set_STMF_CCSID)
@@ -744,6 +869,13 @@ programTGTRLS = $(strip \
 	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 ; $(EVFEVENT_DOWNLOAD); \
 	$(POSTCLEANUP)
 	@$(POSTRPGCOMPILE)
+endef
+.SECONDEXPANSION:
+%.MODULE: $$(call genDep,$$@,$$(call transformUpper,$$*),SQLRPGLE) ; $(SQLRPGLE_RECIPE)
+%.MODULE: $$(call genDep,$$@,$$(call transformLower,$$*),SQLRPGLE) ; $(SQLRPGLE_RECIPE)
+%.MODULE: $$(call genDep,$$@,$$(call transformUpper,$$*),sqlrpgle) ; $(SQLRPGLE_RECIPE)
+%.MODULE: $$(call genDep,$$@,$$(call transformLower,$$*),sqlrpgle) ; $(SQLRPGLE_RECIPE)
+
 
 %.PGM: private ACTGRP = $(programACTGRP)
 %.PGM: private AUT = $(programAUT)
@@ -756,9 +888,9 @@ programTGTRLS = $(strip \
 ###%.PGM: private PGM = $*
 %.PGM: private STGMDL = $(programSTGMDL)
 %.PGM: private TGTRLS = $(programTGTRLS)
-%.PGM: private BNDSRVPGMPATH = $(basename $(filter %.SRVPGM,$(notdir $^)) $(externalsrvpgms))
+%.PGM: private BNDSRVPGMPATH = $(basename $(filter %.SRVPGM %.srvpgm,$(notdir $^)) $(externalsrvpgms))
 
-%.PGM: $$(call genDep,$$@,$$*,PGM.RPGLE)
+define PGM.RPGLE_RECIPE
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Create Bound RPG Program [$(notdir $*)]")
 	$(eval crtcmd := CRTBNDRPG srcstmf('$<') PGM($(OBJLIB)/$(basename $(@F))) $(CRTBNDRPGFLAGS))
@@ -767,8 +899,15 @@ programTGTRLS = $(strip \
 	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 ; $(EVFEVENT_DOWNLOAD_PGM_RPGLE); \
 	$(POSTCLEANUP)
 	@$(EVFEVENT_DOWNLOAD_PGM_RPGLE)
+endef
+.SECONDEXPANSION:
+%.PGM: $$(call genDep,$$@,$$(call transformUpper,$$*),PGM.RPGLE) ; $(PGM.RPGLE_RECIPE)
+%.PGM: $$(call genDep,$$@,$$(call transformLower,$$*),PGM.RPGLE) ; $(PGM.RPGLE_RECIPE)
+%.PGM: $$(call genDep,$$@,$$(call transformUpper,$$*),pgm.rpgle) ; $(PGM.RPGLE_RECIPE)
+%.PGM: $$(call genDep,$$@,$$(call transformLower,$$*),pgm.rpgle) ; $(PGM.RPGLE_RECIPE)
 
-%.PGM: $$(call genDep,$$@,$$*,PGM.SQLRPGLE)
+
+define PGM.SQLRPGLE_RECIPE
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Create Bound SQLRPGLE Program [$(notdir $*)]")
 	$(eval crtcmd := CRTSQLRPGI srcstmf('$<') OBJ($(OBJLIB)/$(basename $(@F))) $(CRTSQLRPGIFLAGS))
@@ -777,8 +916,15 @@ programTGTRLS = $(strip \
 	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 ; $(EVFEVENT_DOWNLOAD_PGM_RPGLE); \
 	$(POSTCLEANUP)
 	@$(EVFEVENT_DOWNLOAD_PGM_RPGLE)
+endef
+.SECONDEXPANSION:
+%.PGM: $$(call genDep,$$@,$$(call transformUpper,$$*),PGM.SQLRPGLE) ; $(PGM.SQLRPGLE_RECIPE)
+%.PGM: $$(call genDep,$$@,$$(call transformLower,$$*),PGM.SQLRPGLE) ; $(PGM.SQLRPGLE_RECIPE)
+%.PGM: $$(call genDep,$$@,$$(call transformUpper,$$*),pgm.sqlrpgle) ; $(PGM.SQLRPGLE_RECIPE)
+%.PGM: $$(call genDep,$$@,$$(call transformLower,$$*),pgm.sqlrpgle) ; $(PGM.SQLRPGLE_RECIPE)
 
-%.PGM: $$(call genDep,$$@,$$*,PGM.C)
+
+define PGM.C_RECIPE
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Create Bound RPG Program [$(notdir $*)]")
 	$(eval crtcmd := CRTBNDC srcstmf('$<') PGM($(OBJLIB)/$(basename $(@F))) $(CRTBNDCFLAGS))
@@ -787,55 +933,92 @@ programTGTRLS = $(strip \
 	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 ; $(EVFEVENT_DOWNLOAD_PGM_C); \
 	$(POSTCLEANUP)
 	@$(EVFEVENT_DOWNLOAD_PGM_C)
+endef
+.SECONDEXPANSION:
+%.PGM: $$(call genDep,$$@,$$(call transformUpper,$$*),PGM.C) ; $(PGM.C_RECIPE)
+%.PGM: $$(call genDep,$$@,$$(call transformLower,$$*),PGM.C) ; $(PGM.C_RECIPE)
+%.PGM: $$(call genDep,$$@,$$(call transformUpper,$$*),pgm.c) ; $(PGM.C_RECIPE)
+%.PGM: $$(call genDep,$$@,$$(call transformLower,$$*),pgm.c) ; $(PGM.C_RECIPE)
 
-%.PGM: $$(call genDep,$$@,$$*,CBL)
+
+define CBL_RECIPE
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Create COBOL Program [$(notdir $*)]")
 	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$(basename $(@F))) cmd(CRTCBLPGM) srcstmf('$<') parms('$(CRTCBLPGMFLAGS)'))
 	@$(PRESETUP);  \
 	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 ; $(EVFEVENT_DOWNLOAD); \
 	$(POSTCLEANUP)
+endef
+.SECONDEXPANSION:
+%.PGM: $$(call genDep,$$@,$$(call transformUpper,$$*),CBL) ; $(CBL_RECIPE)
+%.PGM: $$(call genDep,$$@,$$(call transformLower,$$*),CBL) ; $(CBL_RECIPE)
+%.PGM: $$(call genDep,$$@,$$(call transformUpper,$$*),cbl) ; $(CBL_RECIPE)
+%.PGM: $$(call genDep,$$@,$$(call transformLower,$$*),cbl) ; $(CBL_RECIPE)
+
 	
-%.PGM: $$(call genDep,$$@,$$*,PGM.CLLE)
+define PGM.CLLE_RECIPE
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Create ILE CL Program [$(notdir $*)]")
 	$(eval crtcmd := CRTBNDCL srcstmf('$<') PGM($(OBJLIB)/$(basename $(@F))) $(CRTCLMODFLAGS))
 	@$(PRESETUP);  \
 	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 ; $(EVFEVENT_DOWNLOAD); \
 	$(POSTCLEANUP)	
+endef
+.SECONDEXPANSION:
+%.PGM: $$(call genDep,$$@,$$(call transformUpper,$$*),PGM.CLLE) ; $(PGM.CLLE_RECIPE)
+%.PGM: $$(call genDep,$$@,$$(call transformLower,$$*),PGM.CLLE) ; $(PGM.CLLE_RECIPE)
+%.PGM: $$(call genDep,$$@,$$(call transformUpper,$$*),pgm.clle) ; $(PGM.CLLE_RECIPE)
+%.PGM: $$(call genDep,$$@,$$(call transformLower,$$*),pgm.clle) ; $(PGM.CLLE_RECIPE)
 
-%.PGM: $$(call genDep,$$@,$$*,RPG)
+
+define RPG_RECIPE
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Create RPG Program [$(notdir $*)]")
 	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$(basename $(@F))) cmd(CRTRPGPGM) srcstmf('$<') parms('$(CRTCBLPGMFLAGS)'))
 	@$(PRESETUP);  \
 	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 ; $(EVFEVENT_DOWNLOAD); \
 	$(POSTCLEANUP)
+endef
+.SECONDEXPANSION:
+%.PGM: $$(call genDep,$$@,$$(call transformUpper,$$*),RPG) ; $(RPG_RECIPE)
+%.PGM: $$(call genDep,$$@,$$(call transformLower,$$*),RPG) ; $(RPG_RECIPE)
+%.PGM: $$(call genDep,$$@,$$(call transformUpper,$$*),rpg) ; $(RPG_RECIPE)
+%.PGM: $$(call genDep,$$@,$$(call transformLower,$$*),rpg) ; $(RPG_RECIPE)
 
-%.PGM: $$(call genDep,$$@,$$*,ILEPGM)
+
+define ILEPGM_RECIPE
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating program [$*] from Pseudo Source [$(basename $(notdir $<))]")
 	$(eval crtcmd := $(shell $(MK)/extractPseudoSrc $< $(OBJLIB) $(basename $(@F))))
 	@$(PRESETUP);  \
 	$(MK)/extractAndLaunch "$(JOBLOGFILE)" "$<" $(OBJLIB) $(basename $(@F)) >> $(LOGFILE) 2>&1 || true; \
 	$(POSTCLEANUP)
+endef
+.SECONDEXPANSION:
+%.PGM: $$(call genDep,$$@,$$(call transformUpper,$$*),ILEPGM) ; $(ILEPGM_RECIPE)
+%.PGM: $$(call genDep,$$@,$$(call transformLower,$$*),ILEPGM) ; $(ILEPGM_RECIPE)
+%.PGM: $$(call genDep,$$@,$$(call transformUpper,$$*),ilepgm) ; $(ILEPGM_RECIPE)
+%.PGM: $$(call genDep,$$@,$$(call transformLower,$$*),ilepgm) ; $(ILEPGM_RECIPE)
 
-%.PGM: %.MODULE
+
+define MODULE_RECIPE
 	$(eval d = $($@_d))
-	$(call echo_cmd,"=== Creating program [$*] from modules [$(basename $(filter %.MODULE,$(notdir $^)))] and service programs [$(basename $(filter %.SRVPGM,$(notdir $^$|)))]")
-	$(eval externalsrvpgms := $(filter %.SRVPGM,$(subst .LIB,,$(subst /QSYS.LIB/,,$|))))
-	$(eval crtcmd := crtpgm pgm($(OBJLIB)/$(basename $(@F))) module($(basename $(filter %.MODULE,$(notdir $^)))) bndsrvpgm($(if $(BNDSRVPGMPATH),$(BNDSRVPGMPATH),*NONE)) $(CRTPGMFLAGS))
+	$(call echo_cmd,"=== Creating program [$*] from modules [$(basename $(filter %.MODULE %.module,$(notdir $^)))] and service programs [$(basename $(filter %.SRVPGM %.srvpgm,$(notdir $^$|)))]")
+	$(eval externalsrvpgms := $(filter %.SRVPGM %.srvpgm,$(subst .LIB,,$(subst /QSYS.LIB/,,$|))))
+	$(eval crtcmd := crtpgm pgm($(OBJLIB)/$(basename $(@F))) module($(basename $(filter %.MODULE %.module,$(notdir $^)))) bndsrvpgm($(if $(BNDSRVPGMPATH),$(BNDSRVPGMPATH),*NONE)) $(CRTPGMFLAGS))
 	$(eval EVFEVENT_DOWNLOAD_PGM = system "CPYTOSTMF FROMMBR('$(OBJPATH)/EVFEVENT.FILE/$*.MBR') TOSTMF('$(EVTDIR)/$*.PGM.evfevent') STMFCCSID(*STDASCII) ENDLINFMT(*LF) CVTDTA(*AUTO) STMFOPT(*REPLACE)" >/dev/null)
 	@$(PRESETUP);  \
 	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 ; $(EVFEVENT_DOWNLOAD_PGM); \
 	$(POSTCLEANUP)
 	@$(EVFEVENT_DOWNLOAD_PGM)
+endef
+%.PGM: %.MODULE ; $(MODULE_RECIPE)
+%.PGM: %.module ; $(MODULE_RECIPE)
+
 
 %.PNLGRP: private AUT = $(PNLGRP_AUT)
 %.PNLGRP: private OPTION = $(PNLGRP_OPTION)
-
-.SECONDEXPANSION:
-%.PNLGRP: $$(call genDep,$$@,$$*,PNLGRP)
+define PNLGRP_RECIPE
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Create panel group [$(notdir $*)]")
 	@$(set_STMF_CCSID)
@@ -843,11 +1026,16 @@ programTGTRLS = $(strip \
 	@$(PRESETUP);  \
 	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true; \
 	$(POSTCLEANUP)
+endef
+.SECONDEXPANSION:
+%.PNLGRP: $$(call genDep,$$@,$$(call transformUpper,$$*),PNLGRP) ; $(PNLGRP_RECIPE)
+%.PNLGRP: $$(call genDep,$$@,$$(call transformLower,$$*),PNLGRP) ; $(PNLGRP_RECIPE)
+%.PNLGRP: $$(call genDep,$$@,$$(call transformUpper,$$*),pnlgrp) ; $(PNLGRP_RECIPE)
+%.PNLGRP: $$(call genDep,$$@,$$(call transformLower,$$*),pnlgrp) ; $(PNLGRP_RECIPE)
+
 
 %.QMQRY: private AUT = $(QMQRY_AUT)
-
-.SECONDEXPANSION:
-%.QMQRY: $$(call genDep,$$@,$$*,SQL)
+define SQL_RECIPE
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Create QM query [$(notdir $*)]")
 	@$(set_STMF_CCSID)
@@ -855,6 +1043,12 @@ programTGTRLS = $(strip \
 	$(PRESETUP) >> $(LOGFILE);  \
 	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true; \
 	$(POSTCLEANUP)
+endef
+.SECONDEXPANSION:
+%.QMQRY: $$(call genDep,$$@,$$(call transformUpper,$$*),SQL) ; $(SQL_RECIPE)
+%.QMQRY: $$(call genDep,$$@,$$(call transformLower,$$*),SQL) ; $(SQL_RECIPE)
+%.QMQRY: $$(call genDep,$$@,$$(call transformUpper,$$*),sql) ; $(SQL_RECIPE)
+%.QMQRY: $$(call genDep,$$@,$$(call transformLower,$$*),sql) ; $(SQL_RECIPE)
 
 
 %.SRVPGM: private ACTGRP = $(SRVPGM_ACTGRP)
@@ -862,49 +1056,83 @@ programTGTRLS = $(strip \
 %.SRVPGM: private DETAIL = $(SRVPGM_DETAIL)
 %.SRVPGM: private STGMDL = $(SRVPGM_STGMDL)
 %.SRVPGM: private TGTRLS = $(SRVPGM_TGTRLS)
-%.SRVPGM: private BNDSRVPGMPATH = $(basename $(filter %.SRVPGM,$(notdir $^)) $(externalsrvpgms))
-
-%.SRVPGM: $$(call genDep,$$@,$$*,BND)
+%.SRVPGM: private BNDSRVPGMPATH = $(basename $(filter %.SRVPGM %.srvpgm,$(notdir $^)) $(externalsrvpgms))
+define BND_RECIPE
 	$(eval d = $($@_d))
-	$(call echo_cmd,"=== Creating service program [$*] from modules [$(basename $(filter %.MODULE,$(notdir $^)))] and service programs [$(basename $(filter %.SRVPGM,$(notdir $^$|)))]")
+	$(call echo_cmd,"=== Creating service program [$*] from modules [$(basename $(filter %.MODULE %.module,$(notdir $^)))] and service programs [$(basename $(filter %.SRVPGM %.srvpgm,$(notdir $^$|)))]")
 	@$(set_STMF_CCSID)
-	$(eval externalsrvpgms := $(filter %.SRVPGM,$(subst .LIB,,$(subst /QSYS.LIB/,,$|))))
-	$(eval crtcmd := CRTSRVPGM srcstmf('$<') SRVPGM($(OBJLIB)/$(basename $(@F))) MODULE($(basename $(filter %.MODULE,$(notdir $^)))) BNDSRVPGM($(if $(BNDSRVPGMPATH),$(BNDSRVPGMPATH),*NONE)) $(CRTSRVPGMFLAGS))
+	$(eval externalsrvpgms := $(filter %.SRVPGM %.srvpgm,$(subst .LIB,,$(subst /QSYS.LIB/,,$|))))
+	$(eval crtcmd := CRTSRVPGM srcstmf('$<') SRVPGM($(OBJLIB)/$(basename $(@F))) MODULE($(basename $(filter %.MODULE %.module,$(notdir $^)))) BNDSRVPGM($(if $(BNDSRVPGMPATH),$(BNDSRVPGMPATH),*NONE)) $(CRTSRVPGMFLAGS))
 	@$(PRESETUP);  \
 	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true; \
 	$(POSTCLEANUP)
+endef
+.SECONDEXPANSION:
+%.SRVPGM: $$(call genDep,$$@,$$(call transformUpper,$$*),BND) ; $(BND_RECIPE)
+%.SRVPGM: $$(call genDep,$$@,$$(call transformLower,$$*),BND) ; $(BND_RECIPE)
+%.SRVPGM: $$(call genDep,$$@,$$(call transformUpper,$$*),bnd) ; $(BND_RECIPE)
+%.SRVPGM: $$(call genDep,$$@,$$(call transformLower,$$*),bnd) ; $(BND_RECIPE)
 
-%.SRVPGM: $$(call genDep,$$@,$$*,ILESRVPGM)
+
+define ILESRVPGM_RECIPE
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating service program [$*] from [$(notdir $<)]")
 	$(eval crtcmd := $(shell $(MK)/extractPseudoSrc $< $(OBJLIB) $(basename $(@F))))
 	@$(PRESETUP);  \
 	$(MK)/extractAndLaunch "$(JOBLOGFILE)" "$<" $(OBJLIB) $(basename $(@F)) >> $(LOGFILE) 2>&1 || true; \
 	$(POSTCLEANUP)
+endef
+.SECONDEXPANSION:
+%.SRVPGM: $$(call genDep,$$@,$$(call transformUpper,$$*),ILESRVPGM) ; $(ILESRVPGM_RECIPE)
+%.SRVPGM: $$(call genDep,$$@,$$(call transformLower,$$*),ILESRVPGM) ; $(ILESRVPGM_RECIPE)
+%.SRVPGM: $$(call genDep,$$@,$$(call transformUpper,$$*),ilesrvpgm) ; $(ILESRVPGM_RECIPE)
+%.SRVPGM: $$(call genDep,$$@,$$(call transformLower,$$*),ilesrvpgm) ; $(ILESRVPGM_RECIPE)
 
-%.BNDDIR: $$(call genDep,$$@,$$*,BNDDIR)
+
+define BNDDIR_RECIPE
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating BND from [$(notdir $<)]")
 	$(eval crtcmd := $(shell $(MK)/extractPseudoSrc $< $(OBJLIB) $(basename $(@F))))
 	@$(PRESETUP);  \
 	$(MK)/extractAndLaunch "$(JOBLOGFILE)" "$<" $(OBJLIB) $(basename $(@F)) >> $(LOGFILE) 2>&1 || true; \
 	$(POSTCLEANUP)
+endef
+.SECONDEXPANSION:
+%.BNDDIR: $$(call genDep,$$@,$$(call transformUpper,$$*),BNDDIR) ; $(BNDDIR_RECIPE)
+%.BNDDIR: $$(call genDep,$$@,$$(call transformLower,$$*),BNDDIR) ; $(BNDDIR_RECIPE)
+%.BNDDIR: $$(call genDep,$$@,$$(call transformUpper,$$*),bnddir) ; $(BNDDIR_RECIPE)
+%.BNDDIR: $$(call genDep,$$@,$$(call transformLower,$$*),bnddir) ; $(BNDDIR_RECIPE)
 
-%.DTA: $$(call genDep,$$@,$$*,DTA)
+
+define DTA_RECIPE
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating DTA from [$(notdir $<)]")
 	$(eval crtcmd := $(shell $(MK)/extractPseudoSrc $< $(OBJLIB) $(basename $(@F))))
 	@$(PRESETUP);  \
 	$(MK)/extractAndLaunch "$(JOBLOGFILE)" "$<" $(OBJLIB) $(basename $(@F)) >> $(LOGFILE) 2>&1 || true; \
 	$(POSTCLEANUP)
+endef
+.SECONDEXPANSION:
+%.DTA: $$(call genDep,$$@,$$(call transformUpper,$$*),DTA) ; $(DTA_RECIPE)
+%.DTA: $$(call genDep,$$@,$$(call transformLower,$$*),DTA) ; $(DTA_RECIPE)
+%.DTA: $$(call genDep,$$@,$$(call transformUpper,$$*),dta) ; $(DTA_RECIPE)
+%.DTA: $$(call genDep,$$@,$$(call transformLower,$$*),dta) ; $(DTA_RECIPE)
 
-%.TRG: $$(call genDep,$$@,$$*,SYSTRG)
+
+define SYSTRG_RECIPE
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating System TRG from [$(notdir $<)]")
 	$(eval crtcmd := $(shell $(MK)/extractPseudoSrc $< $(OBJLIB) $(basename $(@F))))
 	@$(PRESETUP);  \
 	$(MK)/extractAndLaunch "$(JOBLOGFILE)" "$<" $(OBJLIB) $(basename $(@F)) >> $(LOGFILE) 2>&1 || true; \
 	$(POSTCLEANUP)
+endef
+.SECONDEXPANSION:
+%.TRG: $$(call genDep,$$@,$$(call transformUpper,$$*),SYSTRG) ; $(SYSTRG_RECIPE)
+%.TRG: $$(call genDep,$$@,$$(call transformLower,$$*),SYSTRG) ; $(SYSTRG_RECIPE)
+%.TRG: $$(call genDep,$$@,$$(call transformUpper,$$*),systrg) ; $(SYSTRG_RECIPE)
+%.TRG: $$(call genDep,$$@,$$(call transformLower,$$*),systrg) ; $(SYSTRG_RECIPE)
+
 
 %.SQL:
 	$(eval d = $($@_d))
@@ -924,8 +1152,7 @@ programTGTRLS = $(strip \
 
 %.WSCST: private AUT = $(WSCST_AUT)
 
-.SECONDEXPANSION:
-%.WSCST: $$(call genDep,$$@,$$*,WSCSTSRC)
+define WSCSTSRC_RECIPE
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating work station customizing object [$*]")
 	@$(set_STMF_CCSID)
@@ -933,6 +1160,13 @@ programTGTRLS = $(strip \
 	@$(PRESETUP);  \
 	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true; \
 	$(POSTCLEANUP)
+endef
+.SECONDEXPANSION:
+%.WSCST: $$(call genDep,$$@,$$(call transformUpper,$$*),WSCSTSRC) ; $(WSCSTSRC_RECIPE)
+%.WSCST: $$(call genDep,$$@,$$(call transformLower,$$*),WSCSTSRC) ; $(WSCSTSRC_RECIPE)
+%.WSCST: $$(call genDep,$$@,$$(call transformUpper,$$*),wscstsrc) ; $(WSCSTSRC_RECIPE)
+%.WSCST: $$(call genDep,$$@,$$(call transformLower,$$*),wscstsrc) ; $(WSCSTSRC_RECIPE)
+
 
 # $(DEPDIR)/%.d: ;
 # .PRECIOUS: $(DEPDIR)/%.d
