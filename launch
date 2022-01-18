@@ -16,16 +16,15 @@ temp_json1=$(mktemp)
 temp_json2=$(mktemp)
 
 if [ ! -f $joblog_json ]; then
-    echo "[]" > $joblog_json
+  echo "[]" >$joblog_json
 fi
 
 tmppipe=$(mktemp)
 
-getjobid -s > "$tmppipe"
-jobid=$(cat < "$tmppipe")
+getjobid -s >"$tmppipe"
+jobid=$(cat <"$tmppipe")
 rm -rf "$tmppipe"
-cl "CHGJOB LOG(4 00 *SECLVL)" 
-
+cl "CHGJOB LOG(4 00 *SECLVL)"
 
 echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
 echo ">> executing command: ${cmd}"
@@ -37,9 +36,9 @@ cl "$cmd"
 echo "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
 echo
 
-db2util -o json "SELECT MESSAGE_ID,MESSAGE_TEXT,MESSAGE_SECOND_LEVEL_TEXT,MESSAGE_TYPE,SEVERITY,MESSAGE_TIMESTAMP FROM TABLE(QSYS2.JOBLOG_INFO('${jobid}')) A" | \
-jq -c "{cmd:\"${cmd}\", cmd_time:\"${timestamp}\",msgs:[.records[] | select(.MESSAGE_TEXT | contains(\"not safe for a multithreaded job.\") | not) | {msgid:.MESSAGE_ID, type:.MESSAGE_TYPE, severity:.SEVERITY,message_time:.MESSAGE_TIMESTAMP,message_text:.MESSAGE_TEXT, second_level:.MESSAGE_SECOND_LEVEL_TEXT}]}" > $temp_json1
-(jq -c '. += $temp' $joblog_json --slurpfile temp $temp_json1) > $temp_json2
+db2util -o json "SELECT MESSAGE_ID,MESSAGE_TEXT,MESSAGE_SECOND_LEVEL_TEXT,MESSAGE_TYPE,SEVERITY,MESSAGE_TIMESTAMP,FROM_PROGRAM, FROM_LIBRARY,FROM_INSTRUCTION,TO_PROGRAM,TO_LIBRARY,TO_MODULE,TO_PROCEDURE,TO_INSTRUCTION FROM TABLE(QSYS2.JOBLOG_INFO('${jobid}')) A" |
+  jq -c "{cmd:\"${cmd}\", cmd_time:\"${timestamp}\",msgs:[.records[] | select(.MESSAGE_TEXT | contains(\"not safe for a multithreaded job.\") | not) | {msgid:.MESSAGE_ID, type:.MESSAGE_TYPE, severity:.SEVERITY,message_time:.MESSAGE_TIMESTAMP,message_text:.MESSAGE_TEXT, second_level:.MESSAGE_SECOND_LEVEL_TEXT, from_program:.FROM_PROGRAM, from_library:.FROM_LIBRARY, from_instruction:.FROM_INSTRUCTION, to_program:.TO_PROGRAM, to_library:.TO_LIBRARY, to_module:.TO_MODULE, to_procedure:.TO_PROCEDURE, to_instruction:.TO_INSTRUCTION}]}" >$temp_json1
+(jq -c '. += $temp' $joblog_json --slurpfile temp $temp_json1) >$temp_json2
 mv $temp_json2 $joblog_json
 
 rm -rf $temp_json1 $temp_json2
