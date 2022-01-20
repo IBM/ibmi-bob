@@ -720,8 +720,6 @@ programTGTRLS = $(strip \
 
 .ONESHELL:
 %.PGM:
-	srcfile=$<
-	srcfiletype="${srcfile##*.}"
 	if [ ! -z "$(filter %.SQLPRC %.sqlprc, $<)" ]; then
 		$(eval d = $($@_d))
 		$(call echo_cmd,"=== Creating SQL PROCEDURE from Sql statement [$(notdir $<)]")
