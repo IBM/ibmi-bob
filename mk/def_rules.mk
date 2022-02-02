@@ -24,6 +24,10 @@ else # Verbose output
 echo_cmd =
 endif
 
+empty :=
+space :=$(empty) $(empty)
+uniq = $(if $1,$(firstword $1) $(call uniq,$(filter-out $(firstword $1),$1)))
+
 # The extractName and extractTextDescriptor are used to decompose the long filename into module name and
 # the text descriptor.
 # e.g. CUSTOME1-Customer_file.LF has `CUSTOME1` as the module name and `Customer file` as the text descriptor
@@ -38,6 +42,10 @@ endef
 
 define genDep
 $(eval d = $($(1)_d))$(eval tmpName = $(wildcard $d/$2-*.$3))$(if $(tmpName),$(tmpName),$d/$2.$3)
+endef
+
+define getLibPath
+ $(addsuffix .LIB,$(addprefix /QSYS.LIB/,$(1)))
 endef
 
 # define inheritValue
@@ -265,7 +273,12 @@ ICONV := /QOpenSys/usr/bin/iconv
 ICONV_EBCDIC := IBM-037
 ICONV_ASCII := UTF-8
 SETCCSID_ASCII := 1208
-VPATH = $(OBJPATH):$(SRCPATH)
+
+PREUSRLIBLPATH = $(call getLibPath,$(preUsrlibl))
+POSTUSRLIBLPATH = $(call getLibPath,$(postUsrlibl))
+CURLIBPATH = $(call getLibPath,$(curlib))
+
+VPATH = $(subst $(space),:,$(strip $(call uniq,$(PREUSRLIBLPATH) $(CURLIBPATH) $(POSTUSRLIBLPATH) $(OBJPATH) $(SRCPATH))))
 
 define PRESETUP = 
 echo ">> Adding user libraries to liblist" >> $(LOGFILE); \
@@ -516,7 +529,10 @@ programTGTRLS = $(strip \
 %.FILE: private TYPEDEF = $(if $(filter YES,$(CREATE_TYPEDEF)),$(TYPEDEF_SCRIPT),)
 
 %.FILE:
-	@if [ ! -z "$(filter %.DSPF %.dspf, $<)" ]; then
+	@srcfile=$<
+	srcfilename=$(notdir $<)
+	srcfiletype="$${srcfile##*.}"
+	if [ "$$srcfiletype" == "DSPF" -o "$$srcfiletype" == "dspf" ]; then
 		$(eval d = $($@_d))
 		$(call echo_cmd,"=== Creating DSPF [$(notdir $<)]")
 		$(set_STMF_CCSID)
@@ -524,7 +540,7 @@ programTGTRLS = $(strip \
 		$(PRESETUP); 
 		launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 ; $(EVFEVENT_DOWNLOAD);
 		$(POSTCLEANUP)
-	elif [ ! -z "$(filter %.LF %.lf, $<)" ]; then
+	elif [ "$$srcfiletype" == "LF" -o "$$srcfiletype" == "lf" ]; then
 		$(eval d = $($@_d))
 		$(call echo_cmd,"=== Creating LF [$(notdir $<)]")
 		$(set_STMF_CCSID)
@@ -534,7 +550,7 @@ programTGTRLS = $(strip \
 		launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 ; $(EVFEVENT_DOWNLOAD);
 		$(POSTCLEANUP)
 		$(TYPEDEF)
-	elif [ ! -z "$(filter %.PF %.pf, $<)" ]; then
+	elif [ "$$srcfiletype" == "PF" -o "$$srcfiletype" == "pf" ]; then
 		$(eval d = $($@_d))
 		$(call echo_cmd,"=== Creating PF [$(notdir $<)]")
 		$(set_STMF_CCSID)
@@ -543,7 +559,7 @@ programTGTRLS = $(strip \
 		launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 ; $(EVFEVENT_DOWNLOAD);
 		$(POSTCLEANUP)
 		$(TYPEDEF)
-	elif [ ! -z "$(filter %.PRTF %.prtf, $<)" ]; then
+	elif [ "$$srcfiletype" == "PRTF" -o "$$srcfiletype" == "prtf" ]; then
 		$(eval d = $($@_d))
 		$(call echo_cmd,"=== Creating PRTF [$(notdir $<)]")
 		$(set_STMF_CCSID)
@@ -552,49 +568,49 @@ programTGTRLS = $(strip \
 		launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 ; $(EVFEVENT_DOWNLOAD);
 		$(POSTCLEANUP)
 		$(TYPEDEF)
-	elif [ ! -z "$(filter %.TABLE %.table, $<)" ]; then
+	elif [ "$$srcfiletype" == "TABLE" -o "$$srcfiletype" == "table" ]; then
 		$(eval d = $($@_d))
 		$(call echo_cmd,"=== Creating SQL TABLE from Sql statement [$(notdir $<)]")
 		$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
 		$(PRESETUP); 
 		launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true;
 		$(POSTCLEANUP)
-	elif [ ! -z "$(filter %.VIEW %.view, $<)" ]; then
+	elif [ "$$srcfiletype" == "VIEW" -o "$$srcfiletype" == "view" ]; then
 		$(eval d = $($@_d))
 		$(call echo_cmd,"=== Creating SQL VIEW from Sql statement [$(notdir $<)]")
 		$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
 		$(PRESETUP); 
 		launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true;
 		$(POSTCLEANUP)
-	elif [ ! -z "$(filter %.SQLUDT %.sqludt, $<)" ]; then
+	elif [ "$$srcfiletype" == "SQLUDT" -o "$$srcfiletype" == "sqludt" ]; then
 		$(eval d = $($@_d))
 		$(call echo_cmd,"=== Creating SQL UDT from Sql statement [$(notdir $<)]")
 		$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
 		$(PRESETUP); 
 		launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true;
 		$(POSTCLEANUP)
-	elif [ ! -z "$(filter %.SQLXSR %.sqlxsr, $<)" ]; then
+	elif [ "$$srcfiletype" == "SQLXSR" -o "$$srcfiletype" == "sqlxsr" ]; then
 		$(eval d = $($@_d))
 		$(call echo_cmd,"=== Creating SQL XSR from Sql statement [$(notdir $<)]")
 		$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
 		$(PRESETUP); 
 		launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true;
 		$(POSTCLEANUP)
-	elif [ ! -z "$(filter %.SQLALIAS %.sqlalias, $<)" ]; then
+	elif [ "$$srcfiletype" == "SQLALIAS" -o "$$srcfiletype" == "sqlalias" ]; then
 		$(eval d = $($@_d))
 		$(call echo_cmd,"=== Creating SQL ALIAS from Sql statement [$(notdir $<)]")
 		$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
 		$(PRESETUP); 
 		launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true;
 		$(POSTCLEANUP)
-	elif [ ! -z "$(filter %.SQLMASK %.sqlmask, $<)" ]; then
+	elif [ "$$srcfiletype" == "SQLMASK" -o "$$srcfiletype" == "sqlmask" ]; then
 		$(eval d = $($@_d))
 		$(call echo_cmd,"=== Creating SQL MASK from Sql statement [$(notdir $<)]")
 		$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
 		$(PRESETUP); 
 		launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true;
 		$(POSTCLEANUP)
-	elif [ ! -z "$(filter %.SQLPERM %.sqlperm, $<)" ]; then
+	elif [ "$$srcfiletype" == "SQLPERM" -o "$$srcfiletype" == "sqlperm" ]; then
 		$(eval d = $($@_d))
 		$(call echo_cmd,"=== Creating SQL PERMISSION from Sql statement [$(notdir $<)]")
 		$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
@@ -654,8 +670,11 @@ programTGTRLS = $(strip \
 
 .ONESHELL:
 %.MODULE:
-	@if [ ! -z "$(filter %.C %.c, $<)" ]; then
-		$(eval d = $($@_d))
+	@srcfile=$<
+	srcfilename=$(notdir $<)
+	srcfiletype="$${srcfile##*.}"
+	$(eval d = $($@_d))
+	if [ "$$srcfiletype" == "C" -o "$$srcfiletype" == "c" ]; then
 		$(call echo_cmd,"=== Creating C module [$(notdir $<)]")
 		$(set_STMF_CCSID)
 		$(eval crtcmd := crtcmod module($(OBJLIB)/$(basename $(@F))) srcstmf('$<') $(CRTCMODFLAGS) $(ADHOCCRTFLAGS))
@@ -663,8 +682,7 @@ programTGTRLS = $(strip \
 		launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 ; ($(EVFEVENT_DOWNLOAD); ret=$$?; rm $(DEPDIR)/$*.Td 2>/dev/null; exit $$ret);
 		$(POSTCLEANUP)
 		$(POSTCCOMPILE)
-	elif [ ! -z "$(filter %.RPGLE %.rpgle, $<)" ]; then
-		$(eval d = $($@_d))
+	elif [ "$$srcfiletype" == "RPGLE" -o "$$srcfiletype" == "rpgle" ]; then
 		$(call echo_cmd,"=== Creating RPG module [$(notdir $<)]")
 		$(set_STMF_CCSID)
 		$(eval crtcmd := crtrpgmod module($(OBJLIB)/$(basename $(@F))) srcstmf('$<') $(CRTRPGMODFLAGS))
@@ -672,8 +690,7 @@ programTGTRLS = $(strip \
 		launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 ; $(EVFEVENT_DOWNLOAD);
 		$(POSTCLEANUP)
 		$(POSTRPGCOMPILE)
-	elif [ ! -z "$(filter %.CLLE %.clle, $<)" ]; then
-		$(eval d = $($@_d))
+	elif [ "$$srcfiletype" == "CLLE" -o "$$srcfiletype" == "clle" ]; then
 		$(call echo_cmd,"=== Creating CL module [$(notdir $<)]")
 		$(set_STMF_CCSID) \
 		$(eval crtcmd := crtclmod module($(OBJLIB)/$(basename $(@F))) srcstmf('$<') $(CRTCLMODFLAGS))
@@ -681,8 +698,7 @@ programTGTRLS = $(strip \
 		launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1;
 		$(POSTCLEANUP)
 		$(EVFEVENT_DOWNLOAD)
-	elif [ ! -z "$(filter %.SQLC %.sqlc, $<)" ]; then
-		$(eval d = $($@_d))
+	elif [ "$$srcfiletype" == "SQLC" -o "$$srcfiletype" == "sqlc" ]; then
 		$(call echo_cmd,"=== Creating SQLC module [$(notdir $<)]")
 		$(set_STMF_CCSID)
 		qsh_out -c "touch -C 1252 $<-1252 && cat $< >$<-1252"
@@ -692,8 +708,7 @@ programTGTRLS = $(strip \
 		$(POSTCLEANUP)
 		$(POSTCCOMPILE)
 		rm "$<-1252"
-	elif [ ! -z "$(filter %.SQLRPGLE %.sqlrpgle, $<)" ]; then
-		$(eval d = $($@_d))
+	elif [ "$$srcfiletype" == "SQLRPGLE" -o "$$srcfiletype" == "sqlrpgle" ]; then
 		$(call echo_cmd,"=== Creating SQLRPGLE module [$(notdir $<)]")
 		@$(set_STMF_CCSID)
 		$(eval crtcmd := crtsqlrpgi obj($(OBJLIB)/$(basename $(@F))) srcstmf('$<') $(CRTSQLRPGIFLAGS))
@@ -720,22 +735,23 @@ programTGTRLS = $(strip \
 
 .ONESHELL:
 %.PGM:
-	if [ ! -z "$(filter %.SQLPRC %.sqlprc, $<)" ]; then
-		$(eval d = $($@_d))
+	@srcfile=$<
+	srcfilename=$(notdir $<)
+	srcfiletype="$${srcfile##*.}"
+	$(eval d = $($@_d))
+	if [ "$$srcfiletype" == "SQLPRC" -o "$$srcfiletype" == "sqlprc" ]; then
 		$(call echo_cmd,"=== Creating SQL PROCEDURE from Sql statement [$(notdir $<)]")
 		$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
 		$(PRESETUP); 
 		launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true;
 		$(POSTCLEANUP)
-	elif [ ! -z "$(filter %.SQLTRG %.sqltrg, $<)" ]; then
-		$(eval d = $($@_d))
+	elif [ "$$srcfiletype" == "SQLTRG" -o "$$srcfiletype" == "sqltrg" ]; then
 		$(call echo_cmd,"=== Creating SQL TRIGGER from Sql statement [$(notdir $<)]")
 		$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
 		$(PRESETUP); 
 		launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true;
 		$(POSTCLEANUP)
-	elif [ ! -z "$(filter %.PGM.RPGLE %.pgm.rpgle, $<)" ]; then
-		$(eval d = $($@_d))
+	elif [ "$$srcfiletype" == "PGM.RPGLE" -o "$$srcfiletype" == "pgm.rpgle" ]; then
 		$(call echo_cmd,"=== Create Bound RPG Program [$(notdir $*)]")
 		$(eval crtcmd := CRTBNDRPG srcstmf('$<') PGM($(OBJLIB)/$(basename $(@F))) $(CRTBNDRPGFLAGS))
 		$(eval EVFEVENT_DOWNLOAD_PGM_RPGLE = system "CPYTOSTMF FROMMBR('$(OBJPATH)/EVFEVENT.FILE/$*.MBR') TOSTMF('$(EVTDIR)/$*.PGM.RPGLE.evfevent') STMFCCSID(*STDASCII) ENDLINFMT(*LF) CVTDTA(*AUTO) STMFOPT(*REPLACE)" >/dev/null)
@@ -743,8 +759,7 @@ programTGTRLS = $(strip \
 		launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 ; $(EVFEVENT_DOWNLOAD_PGM_RPGLE);
 		$(POSTCLEANUP)
 		$(EVFEVENT_DOWNLOAD_PGM_RPGLE)
-	elif [ ! -z "$(filter %.PGM.SQLRPGLE %.pgm.sqlrpgle, $<)" ]; then
-		$(eval d = $($@_d))
+	elif [ "$$srcfiletype" == "PGM.SQLRPGLE" -o "$$srcfiletype" == "pgm.sqlrpgle" ]; then
 		$(call echo_cmd,"=== Create Bound SQLRPGLE Program [$(notdir $*)]")
 		$(eval crtcmd := CRTSQLRPGI srcstmf('$<') OBJ($(OBJLIB)/$(basename $(@F))) $(CRTSQLRPGIFLAGS))
 		$(eval EVFEVENT_DOWNLOAD_PGM_RPGLE = system "CPYTOSTMF FROMMBR('$(OBJPATH)/EVFEVENT.FILE/$*.MBR') TOSTMF('$(EVTDIR)/$*.PGM.SQLRPGLE.evfevent') STMFCCSID(*STDASCII) ENDLINFMT(*LF) CVTDTA(*AUTO) STMFOPT(*REPLACE)" >/dev/null)
@@ -752,8 +767,7 @@ programTGTRLS = $(strip \
 		launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 ; $(EVFEVENT_DOWNLOAD_PGM_RPGLE);
 		$(POSTCLEANUP)
 		$(EVFEVENT_DOWNLOAD_PGM_RPGLE)
-	elif [ ! -z "$(filter %.PGM.C %.pgm.c, $<)" ]; then
-		$(eval d = $($@_d))
+	elif [ "$$srcfiletype" == "PGM.C" -o "$$srcfiletype" == "pgm.c" ]; then
 		$(call echo_cmd,"=== Create Bound RPG Program [$(notdir $*)]")
 		$(eval crtcmd := CRTBNDC srcstmf('$<') PGM($(OBJLIB)/$(basename $(@F))) $(CRTBNDCFLAGS))
 		$(eval EVFEVENT_DOWNLOAD_PGM_C = system "CPYTOSTMF FROMMBR('$(OBJPATH)/EVFEVENT.FILE/$*.MBR') TOSTMF('$(EVTDIR)/$*.PGM.C.evfevent') STMFCCSID(*STDASCII) ENDLINFMT(*LF) CVTDTA(*AUTO) STMFOPT(*REPLACE)" >/dev/null)
@@ -761,36 +775,31 @@ programTGTRLS = $(strip \
 		launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 ; $(EVFEVENT_DOWNLOAD_PGM_C);
 		$(POSTCLEANUP)
 		$(EVFEVENT_DOWNLOAD_PGM_C)
-	elif [ ! -z "$(filter %.CBL %.cbl, $<)" ]; then
-		$(eval d = $($@_d))
+	elif [ "$$srcfiletype" == "CBL" -o "$$srcfiletype" == "cbl" ]; then
 		$(call echo_cmd,"=== Create COBOL Program [$(notdir $*)]")
 		$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$(basename $(@F))) cmd(CRTCBLPGM) srcstmf('$<') parms('$(CRTCBLPGMFLAGS)'))
 		$(PRESETUP);
 		launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 ; $(EVFEVENT_DOWNLOAD);
 		$(POSTCLEANUP)
-	elif [ ! -z "$(filter %.PGM.CLLE %.pgm.clle, $<)" ]; then
-		$(eval d = $($@_d))
+	elif [ "$$srcfiletype" == "PGM.CLLE" -o "$$srcfiletype" == "pgm.clle" ]; then
 		$(call echo_cmd,"=== Create ILE CL Program [$(notdir $*)]")
 		$(eval crtcmd := CRTBNDCL srcstmf('$<') PGM($(OBJLIB)/$(basename $(@F))) $(CRTCLMODFLAGS))
 		$(PRESETUP);
 		launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 ; $(EVFEVENT_DOWNLOAD);
 		$(POSTCLEANUP)
-	elif [ ! -z "$(filter %.RPG %.rpg, $<)" ]; then
-		$(eval d = $($@_d))
+	elif [ "$$srcfiletype" == "RPG" -o "$$srcfiletype" == "rpg" ]; then
 		$(call echo_cmd,"=== Create RPG Program [$(notdir $*)]")
 		$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$(basename $(@F))) cmd(CRTRPGPGM) srcstmf('$<') parms('$(CRTCBLPGMFLAGS)'))
 		$(PRESETUP);
 		launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 ; $(EVFEVENT_DOWNLOAD);
 		$(POSTCLEANUP)
-	elif [ ! -z "$(filter %.ILEPGM %.ilepgm, $<)" ]; then
-		$(eval d = $($@_d))
+	elif [ "$$srcfiletype" == "ILEPGM" -o "$$srcfiletype" == "ilepgm" ]; then
 		$(call echo_cmd,"=== Creating program [$*] from Pseudo Source [$(basename $(notdir $<))]")
 		$(eval crtcmd := $(shell $(MK)/extractPseudoSrc $< $(OBJLIB) $(basename $(@F))))
 		$(PRESETUP);
 		$(MK)/extractAndLaunch "$(JOBLOGFILE)" "$<" $(OBJLIB) $(basename $(@F)) >> $(LOGFILE) 2>&1 || true;
 		$(POSTCLEANUP)
-	elif [ ! -z "$(filter %.MODULE %.module, $<)" ]; then
-		$(eval d = $($@_d))
+	elif [ "$$srcfiletype" == "MODULE" -o "$$srcfiletype" == "module" ]; then
 		$(call echo_cmd,"=== Creating program [$*] from modules [$(basename $(filter %.MODULE,$(notdir $^)))] and service programs [$(basename $(filter %.SRVPGM,$(notdir $^$|)))]")
 		$(eval externalsrvpgms := $(filter %.SRVPGM,$(subst .LIB,,$(subst /QSYS.LIB/,,$|))))
 		$(eval crtcmd := crtpgm pgm($(OBJLIB)/$(basename $(@F))) module($(basename $(filter %.MODULE,$(notdir $^)))) bndsrvpgm($(if $(BNDSRVPGMPATH),$(BNDSRVPGMPATH),*NONE)) $(CRTPGMFLAGS))
@@ -1000,13 +1009,15 @@ test:
 	echo "OBJPATH:		$(OBJPATH)"; \
 	echo "OBJLIB:			$(OBJLIB)"; \
 	echo "LIBL:			$(LIBL)"; \
+	echo "VPATH:			$(VPATH)"; \
 	echo "IBMiEnvCmd:		$(IBMiEnvCmd)"; \
 	echo "IBMiRelease:		$(IBMiRelease)"; \
 	echo "COMPATIBILITYMODE:$(COMPATIBILITYMODE)"; \
-	echo "INCDIR:           $(INCDIR)"; \
+	echo "INCDIR:        		   $(INCDIR)"; \
 	echo "preUsrlibl:		$(preUsrlibl)"; \
 	echo "postUsrlibl:		$(postUsrlibl)"; \
-	echo "CRTFRMSTFMLIB:		$(CRTFRMSTMFLIB)"; \
+	echo "curlib:			 $(curlib)"; \
+	echo "CRTFRMSTFMLIB:	$(CRTFRMSTMFLIB)"; \
 	echo "TOOLSPATH:		$(TOOLSPATH)"; \
 	echo "PROJECTDIR:		$(PROJECTDIR)";
 
