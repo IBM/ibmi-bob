@@ -71,7 +71,7 @@ retrieve_from_iproj() {
     local key=$1
     local default_vaule=$2
     local value
-    value=$(jq -r ".${key}" iproj.json)
+    value=$(jq -r ".${key}" iproj.json 2> /dev/null)
     if [[ $value = null || $value = "" ]]; then
         echo "$default_vaule"
     else
@@ -84,7 +84,7 @@ retrieve_from_ibmijson() {
     local key=$2
     local default_vaule=$3
     local value
-    value=$(jq -r ".${key}" "${pathToIbmiJson}")
+    value=$(jq -r ".${key}" "${pathToIbmiJson}" 2> /dev/null)
     if [[ $value = null || $value = "" ]]; then
         echo "$default_vaule"
     else
