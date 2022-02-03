@@ -12,13 +12,13 @@ BuildRequires: tar-gnu
 BuildRequires: gzip
 BuildRequires: bash >= 4.4-6
 Requires: bash >= 4.4-6
-Requires: coreutils-gnu
-Requires: jq
-Requires: db2util
-Requires: sed-gnu
-Requires: grep-gnu
-Requires: gawk
-Requires: make-gnu
+Requires: coreutils-gnu >= 8.25-5
+Requires: jq >= 1.6-2
+Requires: db2util >= 1.0.12-1
+Requires: sed-gnu >= 4.4-1
+Requires: grep-gnu >= 3.0-2
+Requires: gawk >= 4.1.4-2
+Requires: make-gnu >= 4.2-2
 Requires: python3 >= 3.4
 
 Source0: https://github.com/IBM/ibmi-bob/archive/refs/tags/v%{version}.tar.gz
