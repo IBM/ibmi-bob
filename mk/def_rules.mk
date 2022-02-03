@@ -21,6 +21,10 @@ else # Verbose output
 echo_cmd =
 endif
 
+empty :=
+space :=$(empty) $(empty)
+uniq = $(if $1,$(firstword $1) $(call uniq,$(filter-out $(firstword $1),$1)))
+
 # The extractName and extractTextDescriptor are used to decompose the long filename into module name and
 # the text descriptor.
 # e.g. CUSTOME1-Customer_file.LF has `CUSTOME1` as the module name and `Customer file` as the text descriptor
@@ -35,6 +39,10 @@ endef
 
 define genDep
 $(eval d = $($(1)_d))$(eval tmpName = $(wildcard $d/$2-*.$3))$(if $(tmpName),$(tmpName),$d/$2.$3)
+endef
+
+define getLibPath
+ $(addsuffix .LIB,$(addprefix /QSYS.LIB/,$(1)))
 endef
 
 # define inheritValue
@@ -262,8 +270,11 @@ ICONV := /QOpenSys/usr/bin/iconv
 ICONV_EBCDIC := IBM-037
 ICONV_ASCII := UTF-8
 SETCCSID_ASCII := 1208
-VPATH = $(OBJPATH):$(SRCPATH)
+PREUSRLIBLPATH = $(call getLibPath,$(preUsrlibl))
+POSTUSRLIBLPATH = $(call getLibPath,$(postUsrlibl))
+CURLIBPATH = $(call getLibPath,$(curlib))
 
+VPATH = $(subst $(space),:,$(strip $(call uniq,$(PREUSRLIBLPATH) $(CURLIBPATH) $(POSTUSRLIBLPATH) $(OBJPATH) $(SRCPATH))))
 define PRESETUP = 
 echo ">> Adding user libraries to liblist" >> $(LOGFILE); \
 [[ ! -z "$(curlib)" ]] && liblist -c $(curlib) >> $(LOGFILE) 2>&1; \
