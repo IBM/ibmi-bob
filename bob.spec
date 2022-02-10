@@ -11,7 +11,7 @@ BuildRequires: make-gnu
 BuildRequires: tar-gnu
 BuildRequires: gzip
 BuildRequires: bash >= 5.1-2
-Requires: bash >= 4.4-6
+Requires: bash >= 5.1-2
 Requires: coreutils-gnu >= 8.25-5
 Requires: jq >= 1.6-2
 Requires: db2util >= 1.0.12-1
