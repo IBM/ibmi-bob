@@ -1,6 +1,6 @@
 %undefine _disable_source_fetch
 Name: bob
-Version: %{bobVer}
+Version: 2.2-8
 Release: 0
 License: Apache-2.0
 Summary: Better Object Builder for IBM i
@@ -10,7 +10,7 @@ Url: https://github.com/IBM/ibmi-bob/
 BuildRequires: make-gnu
 BuildRequires: tar-gnu
 BuildRequires: gzip
-BuildRequires: bash >= 4.4-6
+BuildRequires: bash >= 5.1-2
 Requires: bash >= 4.4-6
 Requires: coreutils-gnu >= 8.25-5
 Requires: jq >= 1.6-2
@@ -69,3 +69,11 @@ cd %{_libdir}/bob/CRTFRMSTMF-master && %{_bindir}/gmake && cd ..
 %{_bindir}/launch
 %{_bindir}/makei
 %changelog
+
+%changelog
+* Thu Feb 10 2022 Tongkun Zhang <tongkun.zhang@ibm.com> - 2.2.8
+- Update to 2.2.8
+- Suppress errors from jq
+- Add include path and user libraries to VPATH
+- Include more joblog information
+- Set Bash 5.1-2 as the minimum
