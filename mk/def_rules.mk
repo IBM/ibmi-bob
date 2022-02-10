@@ -274,7 +274,7 @@ PREUSRLIBLPATH = $(call getLibPath,$(preUsrlibl))
 POSTUSRLIBLPATH = $(call getLibPath,$(postUsrlibl))
 CURLIBPATH = $(call getLibPath,$(curlib))
 
-VPATH = $(subst $(space),:,$(strip $(call uniq,$(PREUSRLIBLPATH) $(CURLIBPATH) $(POSTUSRLIBLPATH) $(OBJPATH) $(SRCPATH))))
+VPATH = $(subst $(space),:,$(strip $(call uniq,$(INCDIR) $(PREUSRLIBLPATH) $(CURLIBPATH) $(POSTUSRLIBLPATH) $(OBJPATH) $(SRCPATH))))
 define PRESETUP = 
 echo ">> Adding user libraries to liblist" >> $(LOGFILE); \
 [[ ! -z "$(curlib)" ]] && liblist -c $(curlib) >> $(LOGFILE) 2>&1; \
