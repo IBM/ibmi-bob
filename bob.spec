@@ -10,7 +10,7 @@ Url: https://github.com/IBM/ibmi-bob/
 BuildRequires: make-gnu
 BuildRequires: tar-gnu
 BuildRequires: gzip
-BuildRequires: bash >= 4.4-6
+BuildRequires: bash >= 5.1-2
 Requires: bash >= 4.4-6
 Requires: coreutils-gnu >= 8.25-5
 Requires: jq >= 1.6-2
