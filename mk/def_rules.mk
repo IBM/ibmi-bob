@@ -631,15 +631,6 @@ programTGTRLS = $(strip \
 	$(POSTCLEANUP)	
 
 .SECONDEXPANSION:
-%.FILE: $$(call genDep,$$@,$$*,SQLXSR)
-	$(eval d = $($@_d))
-	$(call echo_cmd,"=== Creating SQL XSR from Sql statement [$(notdir $<)]")
-	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
-	@$(PRESETUP);  \
-	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true; \
-	$(POSTCLEANUP)	
-
-.SECONDEXPANSION:
 %.FILE: $$(call genDep,$$@,$$*,SQLALIAS)
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating SQL ALIAS from Sql statement [$(notdir $<)]")
@@ -648,23 +639,6 @@ programTGTRLS = $(strip \
 	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true; \
 	$(POSTCLEANUP)	
 
-.SECONDEXPANSION:
-%.FILE: $$(call genDep,$$@,$$*,SQLMASK)
-	$(eval d = $($@_d))
-	$(call echo_cmd,"=== Creating SQL MASK from Sql statement [$(notdir $<)]")
-	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
-	@$(PRESETUP);  \
-	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true; \
-	$(POSTCLEANUP)	
-
-.SECONDEXPANSION:
-%.FILE: $$(call genDep,$$@,$$*,SQLPERM)
-	$(eval d = $($@_d))
-	$(call echo_cmd,"=== Creating SQL PERMISSION from Sql statement [$(notdir $<)]")
-	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
-	@$(PRESETUP);  \
-	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true; \
-	$(POSTCLEANUP)	
 
 %.MENU: private AUT = $(MNU_AUT)
 %.MENU: private OPTION = $(MNU_OPTION)
