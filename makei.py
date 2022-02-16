@@ -26,6 +26,9 @@ def cli():
     init_parser = subparsers.add_parser(
         'init',
         help='Set up a new or existing project.')
+    init_parser.add_argument('--force', '-f', 
+                                help='force overwrite any existing files.',
+                                action='store_true')
     init_parser.set_defaults(handle=handle_init)
 
     compile_parser = subparsers.add_parser(
@@ -58,7 +61,7 @@ def handle_init(args, unknown):
     """
     Handling the init command
     """
-    init_project.init_project()
+    init_project.init_project(force=args.force)
 
 def handle_compile(args, unknown):
     """

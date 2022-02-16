@@ -140,14 +140,14 @@ def prompt(description, default_vaule) -> str:
         input_str = default_vaule
     return input_str
 
-def create_file(file_path: Path, content: str) -> None:
-    if file_path.exists():
+def create_file(file_path: Path, content: str, force: bool = False) -> None:
+    if not force and file_path.exists():
         if not yes(prompt(colored(f'* {file_path} already exists, overwrite?', Colors.WARNING), 'no')):
             return
     with file_path.open('w') as f:
         f.write(content)
 
-def init_project():
+def init_project(force: bool = False) -> None:
     signal.signal(signal.SIGINT, signal_handler)
 
     print('\n'.join([
@@ -169,10 +169,10 @@ def init_project():
                      f"+ {ibmi_json_path}",
                      f"+ {rules_mk_path}",
                      ]))
-    if yes(input('Continue? (yes) ')):
-        create_file(iproj_json_path, proj_spec.generate_iproj_json())
-        create_file(ibmi_json_path, proj_spec.generate_ibmi_json())
-        create_file(rules_mk_path, proj_spec.generate_rules_mk())
+    if force or yes(input('Continue? (yes) ')):
+        create_file(iproj_json_path, proj_spec.generate_iproj_json(), force)
+        create_file(ibmi_json_path, proj_spec.generate_ibmi_json(), force)
+        create_file(rules_mk_path, proj_spec.generate_rules_mk(), force)
     else:
         init_cancelled()
         
