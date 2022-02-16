@@ -12,6 +12,7 @@ import sys
 
 from scripts import init_project
 
+
 def cli():
     """
     makei program entry
@@ -21,29 +22,29 @@ def cli():
         title='These are common makei commands',
         metavar='command')
 
-    subparsers.add_parser('help')
 
     init_parser = subparsers.add_parser(
         'init',
-        help='Set up a new or existing project.')
-    init_parser.add_argument('--force', '-f', 
-                                help='force overwrite any existing files.',
-                                action='store_true')
+        help='set up a new or existing project')
+
+    init_parser.add_argument('-f', '--force',
+                             help='force overwrite any existing files',
+                             action='store_true')
     init_parser.set_defaults(handle=handle_init)
 
     compile_parser = subparsers.add_parser(
         'compile',
-        help='Compile a single file')
+        help='compile a single file')
     compile_parser.add_argument(
         'sourcefile',
         help='Source file to compile',
-        nargs='*'
+        # nargs='*'
     )
     compile_parser.set_defaults(handle=handle_compile)
 
     build_parser = subparsers.add_parser(
         'build',
-        help='Build the whole project',
+        help='build the whole project',
     )
     build_parser.add_argument(
         'positional',
@@ -51,11 +52,15 @@ def cli():
         nargs='*')
     build_parser.set_defaults(handle=handle_build)
 
+    subparsers.add_parser('help',
+                          help="show this help message and exit")
+
     args, unknown = parser.parse_known_args()
     if hasattr(args, 'handle'):
         args.handle(args, unknown)
     else:
         parser.print_help()
+
 
 def handle_init(args, unknown):
     """
@@ -63,17 +68,20 @@ def handle_init(args, unknown):
     """
     init_project.init_project(force=args.force)
 
+
 def handle_compile(args, unknown):
     """
     Processing the compile command
     """
-    print(f'compile {args}')
+    print(f'compile {args} {unknown}')
+
 
 def handle_build(args, unknown):
     """
     Processing the build command
     """
     print(f'build {args} {unknown}')
+
 
 if __name__ == '__main__':
     cli()
