@@ -1,5 +1,9 @@
 #! /usr/bin/env python3
 
+# Licensed Materials - Property of IBM
+# 57XX-XXX
+# (c) Copyright IBM Corp. 2021
+
 import json
 import signal
 import sys
