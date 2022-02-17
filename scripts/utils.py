@@ -83,10 +83,10 @@ def objlib_to_path(objlib):
     if not objlib: raise ValueError()
     return f"/QSYS.LIB/{objlib}.LIB"
 
-def run_command(cmd: List[str]):
+def run_command(cmd: str):
     print(colored(f"> {' '.join(cmd)}", Colors.OKGREEN))
     try:
-        process = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
+        process = subprocess.Popen(["bash", "-c", "cmd"], stdout=subprocess.PIPE, )
         for c in iter(lambda: process.stdout.read(1), b''): 
             sys.stdout.buffer.write(c)
             sys.stdout.flush()
