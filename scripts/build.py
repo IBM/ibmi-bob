@@ -42,8 +42,11 @@ class BuildEnv():
 
         if "setIBMiEnvCmd" in self.iproj_json.keys():
             cmd_list = self.iproj_json["setIBMiEnvCmd"]
-            cmd = ' '.join(map(lambda cmd: f'cl "{cmd} >/dev/null 2>&1 &&', cmd_list))
-            cmd = cmd[:-2]
+            if len(cmd_list) > 0:
+                cmd = ' '.join(map(lambda cmd: f'cl "{cmd} >/dev/null 2>&1 &&', cmd_list))
+                cmd = cmd[:-2]
+            else:
+                cmd = ":"
             self.ibmi_env_cmds = cmd
         else:
             self.ibmi_env_cmds = ":"
