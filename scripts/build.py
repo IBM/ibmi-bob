@@ -7,7 +7,7 @@
 import os
 from pathlib import Path
 from tempfile import mkstemp
-from typing import Dict, Optional
+from typing import Any, Dict, Optional
 from scripts.const import BOB_MAKEFILE, BOB_PATH
 from scripts.utils import objlib_to_path, read_ibmi_json, read_iproj_json
 
@@ -26,7 +26,8 @@ class BuildEnv():
     post_usr_libl: str
     includePath: str
     iproj_json_path: Path
-    iproj_json: Dict[str, str]
+    iproj_json: Dict[str, Any]
+    ibmi_env_cmds: str
 
     def __init__(self, target: str = 'all', make_options: Optional[str] = None):
         self.src_dir = Path.cwd()
@@ -38,6 +39,16 @@ class BuildEnv():
         self.build_vars_path = Path(path)
         self.iproj_json_path = self.src_dir / "iproj.json"
         self.iproj_json = read_iproj_json(self.iproj_json_path)
+
+        if "setIBMiEnvCmd" in self.iproj_json.keys():
+            cmd_list = self.iproj_json["setIBMiEnvCmd"]
+            cmd = ' '.join(map(lambda cmd: f'cl "{cmd} >/dev/null 2>&1 &&', cmd_list))
+            cmd.removesuffix("&&")
+            self.ibmi_env_cmds = cmd
+        else:
+            self.ibmi_env_cmds = ""
+
+
         self.create_build_vars()
 
     def __del__(self):
@@ -75,6 +86,7 @@ class BuildEnv():
                                f"preUsrlibl := {self.iproj_json['preUsrlibl']}",
                                f"postUsrlibl := {self.iproj_json['postUsrlibl']}",
                                f"INCDIR := {self.iproj_json['includePath']}",
+                               f"IBMiEnvCmd := {self.ibmi_env_cmds}",
                                #    f"COLOR_TTY := {self.color}"
                                "",
                                "",
