@@ -13,7 +13,7 @@ from pathlib import Path
 import re
 
 
-class Proj_spec():
+class ProjSpec():
     description: str
     version: str
     include_path: List[str]
@@ -121,6 +121,16 @@ def signal_handler(sig, frame):
 
 
 def yes(input_str: str):
+    """
+    >>> yes("yes")
+    True
+    >>> yes("y")
+    True
+    >>> yes("Yes")
+    True
+    >>> yes("No")
+    False
+    """
     return input_str.strip().lower() == "yes" or \
         input_str.strip().lower() == "y" or \
         input_str.strip() == ""
@@ -157,7 +167,7 @@ def init_project(force: bool = False) -> None:
         'Press ^C at any time to quit.',
     ]))
 
-    proj_spec = Proj_spec()
+    proj_spec = ProjSpec()
 
     iproj_json_path = Path.cwd() / 'iproj.json'
     ibmi_json_path = Path.cwd() / '.ibmi.json'
@@ -175,4 +185,8 @@ def init_project(force: bool = False) -> None:
         create_file(rules_mk_path, proj_spec.generate_rules_mk(), force)
     else:
         init_cancelled()
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
         
