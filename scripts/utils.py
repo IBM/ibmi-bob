@@ -4,12 +4,12 @@
 # 57XX-XXX
 # (c) Copyright IBM Corp. 2021
 
-from ast import List
 from enum import Enum
 import json
 import os
 import subprocess
 import sys
+from typing import List
 
 from scripts.const import FILE_MAX_EXT_LENGTH, FILE_TARGET_MAPPING
 
@@ -83,7 +83,7 @@ def objlib_to_path(objlib):
     if not objlib: raise ValueError()
     return f"/QSYS.LIB/{objlib}.LIB"
 
-def run_command(cmd: List(str)):
+def run_command(cmd: List[str]):
     print(colored(f"> {' '.join(cmd)}", Colors.OKGREEN))
     try:
         process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
