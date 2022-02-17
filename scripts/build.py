@@ -9,7 +9,7 @@ from pathlib import Path
 from tempfile import mkstemp
 from typing import Any, Dict, Optional
 from scripts.const import BOB_MAKEFILE, BOB_PATH
-from scripts.utils import objlib_to_path, read_ibmi_json, read_iproj_json
+from scripts.utils import objlib_to_path, read_ibmi_json, read_iproj_json, run_command
 
 
 class BuildEnv():
@@ -109,3 +109,17 @@ class BuildEnv():
                         if l and not l.startswith("#") and not "=" in l and not l.startswith((' ', '\t')):
                             f.write(
                                 f"{l.split(':')[0]}_d := {rules_mk.parents[0].absolute()}\n")
+
+    def make(self):
+        run_command(self.generate_make_cmd())
+        self.post_make()
+
+    def post_make(self):
+        event_files = list(Path(".evfevent").rglob("*.evfevent"))
+
+        for filepath in event_files:
+            with filepath.open() as f:
+                s = f.read()
+            s = s.replace(f'{Path.cwd()}/', '')
+            with filepath.open("w") as f:
+                f.write(s)

@@ -10,7 +10,7 @@ from pathlib import Path
 
 from scripts import init_project
 from scripts.build import BuildEnv
-from scripts.utils import Colors, colored, get_compile_target_from_filename, run_command
+from scripts.utils import get_compile_target_from_filename
 
 
 def cli():
@@ -105,7 +105,7 @@ def handle_compile(args):
     """
     target = get_compile_target_from_filename(args.file)
     b = BuildEnv(''.join(target), make_options=args.make_options)
-    run_command(b.generate_make_cmd())
+    b.make()
 
 
 def handle_build(args):
@@ -119,7 +119,7 @@ def handle_build(args):
     else:
         target = "all"
     b = BuildEnv(''.join(target), make_options=args.make_options)
-    run_command(b.generate_make_cmd())
+    b.make()
 
 
 if __name__ == '__main__':
