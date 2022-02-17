@@ -104,7 +104,7 @@ def handle_compile(args):
     """
     target = get_compile_target_from_filename(args.file)
     b = BuildEnv(''.join(target), make_options=args.make_options)
-    run_command(["echo"] + b.generate_make_cmd())
+    run_command(b.generate_make_cmd())
 
 
 def handle_build(args):
@@ -118,7 +118,7 @@ def handle_build(args):
     else:
         target = "all"
     b = BuildEnv(''.join(target), make_options=args.make_options)
-    run_command(["echo"] + b.generate_make_cmd())
+    run_command(b.generate_make_cmd())
 
 
 if __name__ == '__main__':
