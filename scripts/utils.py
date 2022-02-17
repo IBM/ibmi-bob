@@ -86,7 +86,7 @@ def objlib_to_path(objlib):
 def run_command(cmd: List[str]):
     print(colored(f"> {' '.join(cmd)}", Colors.OKGREEN))
     try:
-        process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
+        process = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True)
         for c in iter(lambda: process.stdout.read(1), b''): 
             sys.stdout.buffer.write(c)
             sys.stdout.flush()
