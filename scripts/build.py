@@ -44,7 +44,10 @@ class BuildEnv():
         self.build_vars_path.unlink()
 
     def generate_make_cmd(self):
-        cmd = ['make', f'-k BUILDVARSMKPATH="{self.build_vars_path}"', f'-f "{self.bob_makefile}"', f'{self.make_options}', f'{self.target}']
+        cmd = ['make', f'-k BUILDVARSMKPATH="{self.build_vars_path}"', f'-f "{self.bob_makefile}"']
+        if self.make_options:
+            cmd.append(self.make_options)
+        cmd.append(self.target)
         return cmd
 
     def create_build_vars(self):
