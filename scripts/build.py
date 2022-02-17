@@ -46,7 +46,7 @@ class BuildEnv():
             cmd = cmd[:-2]
             self.ibmi_env_cmds = cmd
         else:
-            self.ibmi_env_cmds = ""
+            self.ibmi_env_cmds = ":"
 
 
         self.create_build_vars()
