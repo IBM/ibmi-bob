@@ -5,6 +5,7 @@
 # (c) Copyright IBM Corp. 2021
 
 import argparse
+import os
 from pathlib import Path
 
 from scripts import init_project
@@ -114,7 +115,7 @@ def handle_build(args):
     if args.target:
         target = args.target
     elif args.subdir:
-        target = f"dir_{args.subdir}"
+        target = f"dir_{os.path.basename(args.subdir)}"
     else:
         target = "all"
     b = BuildEnv(''.join(target), make_options=args.make_options)
