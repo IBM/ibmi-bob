@@ -111,7 +111,12 @@ def handle_build(args):
     """
     Processing the build command
     """
-    target = args.target if args.target else f"dir_{args.subdir}"
+    if args.target:
+        target = args.target
+    elif args.subdir:
+        target = f"dir_{args.subdir}"
+    else:
+        target = "all"
     b = BuildEnv(''.join(target), make_options=args.make_options)
     run_command(["echo"] + b.generate_make_cmd())
 
