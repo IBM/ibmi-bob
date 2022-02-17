@@ -115,7 +115,7 @@ def handle_build(args):
     if args.target:
         target = args.target
     elif args.subdir:
-        target = f"dir_{os.path.basename(args.subdir)}"
+        target = f"dir_{os.path.basename(args.subdir.strip(os.sep))}"
     else:
         target = "all"
     b = BuildEnv(''.join(target), make_options=args.make_options)
