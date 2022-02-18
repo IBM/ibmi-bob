@@ -24,8 +24,14 @@ class Colors(str, Enum):
 def colored(message: str, color: Colors) -> str:
     """Returns a colored message if supported
     """
-    return f"{color}{message}{Colors.ENDC}"
+    if support_color():
+        return f"{color}{message}{Colors.ENDC}"
+    else:
+        return f"{message}"
 
+
+def support_color():
+    return "BOB_COLOR" in os.environ.keys() and os.environ["BOB_COLOR"] is not None
 
 def read_ibmi_json(path, parent_value):
     if path.exists():
@@ -85,6 +91,7 @@ def objlib_to_path(objlib):
 
 def run_command(cmd: str):
     print(colored(f"> {cmd}", Colors.OKGREEN))
+    sys.stdout.flush()
     try:
         process = subprocess.Popen(["bash", "-c", cmd], stdout=subprocess.PIPE, )
         for c in iter(lambda: process.stdout.readline(), b''): 

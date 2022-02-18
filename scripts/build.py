@@ -9,7 +9,7 @@ from pathlib import Path
 from tempfile import mkstemp
 from typing import Any, Dict, Optional
 from scripts.const import BOB_MAKEFILE, BOB_PATH
-from scripts.utils import objlib_to_path, read_ibmi_json, read_iproj_json, run_command
+from scripts.utils import objlib_to_path, read_ibmi_json, read_iproj_json, run_command, support_color
 
 
 class BuildEnv():
@@ -39,6 +39,7 @@ class BuildEnv():
         self.build_vars_path = Path(path)
         self.iproj_json_path = self.src_dir / "iproj.json"
         self.iproj_json = read_iproj_json(self.iproj_json_path)
+        self.color = support_color()
 
         if "setIBMiEnvCmd" in self.iproj_json.keys():
             cmd_list = self.iproj_json["setIBMiEnvCmd"]
@@ -90,7 +91,7 @@ class BuildEnv():
                                f"postUsrlibl := {self.iproj_json['postUsrlibl']}",
                                f"INCDIR := {self.iproj_json['includePath']}",
                                f"IBMiEnvCmd := {self.ibmi_env_cmds}",
-                               #    f"COLOR_TTY := {self.color}"
+                               f"COLOR_TTY := {self.color}",
                                "",
                                "",
                                ]))
