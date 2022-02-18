@@ -87,7 +87,7 @@ def run_command(cmd: str):
     print(colored(f"> {cmd}", Colors.OKGREEN))
     try:
         process = subprocess.Popen(["bash", "-c", cmd], stdout=subprocess.PIPE, )
-        for c in iter(lambda: process.stdout.readline(1), b''): 
+        for c in iter(lambda: process.stdout.readline(), b''): 
             sys.stdout.buffer.write(c)
             sys.stdout.flush()
     except FileNotFoundError as e:
