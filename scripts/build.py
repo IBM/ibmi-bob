@@ -7,7 +7,7 @@
 import os
 from pathlib import Path
 from tempfile import mkstemp
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 from scripts.const import BOB_MAKEFILE, BOB_PATH
 from scripts.utils import objlib_to_path, read_ibmi_json, read_iproj_json, run_command, support_color
 
@@ -15,7 +15,7 @@ from scripts.utils import objlib_to_path, read_ibmi_json, read_iproj_json, run_c
 class BuildEnv():
     color_tty: bool
     src_dir: Path
-    target: str
+    targets: List[str]
     make_options: Optional[str]
     bob_path: Path
     bob_makefile: Path
@@ -29,9 +29,9 @@ class BuildEnv():
     iproj_json: Dict[str, Any]
     ibmi_env_cmds: str
 
-    def __init__(self, target: str = 'all', make_options: Optional[str] = None):
+    def __init__(self, targets: List[str] = ['all'], make_options: Optional[str] = None):
         self.src_dir = Path.cwd()
-        self.target = target
+        self.targets = targets
         self.make_options = make_options if make_options else ""
         self.bob_path = BOB_PATH
         self.bob_makefile = BOB_MAKEFILE
@@ -62,7 +62,7 @@ class BuildEnv():
         cmd = f'make -k BUILDVARSMKPATH="{self.build_vars_path}" -f "{self.bob_makefile}"'
         if self.make_options:
             cmd = f"{cmd} {self.make_options}"
-        cmd = f"{cmd} {self.target}"
+        cmd = f"{cmd} {' '.join(self.targets)}"
         return cmd
 
     def create_build_vars(self):

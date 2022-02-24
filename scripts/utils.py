@@ -10,6 +10,7 @@ import os
 import subprocess
 import sys
 from typing import List
+from unittest import result
 
 from scripts.const import FILE_MAX_EXT_LENGTH, FILE_TARGET_MAPPING
 
@@ -63,22 +64,26 @@ def parse_placeholder(varName):
         return varName
 
 def read_iproj_json(iproj_json_path):
-    with iproj_json_path.open() as f:
-        iproj_json = json.load(f)
-        objlib = parse_placeholder(iproj_json["objlib"]) if "objlib" in iproj_json else ""
-        curlib = parse_placeholder(iproj_json["curlib"]) if "curlib" in iproj_json else ""
-        if objlib == "*CURLIB":
-            if curlib == "*CRTDFT":
-                objlib="QGPL"
-            else:
-                objlib=curlib
-        iproj_json["preUsrlibl"] =" ".join(map(lambda lib: parse_placeholder(lib), iproj_json["preUsrlibl"]))
-        iproj_json["postUsrlibl"] =" ".join(map(lambda lib: parse_placeholder(lib), iproj_json["postUsrlibl"]))
-        iproj_json["includePath"] =" ".join(iproj_json["includePath"])
-        iproj_json["objlib"] = objlib
-        iproj_json["curlib"] = curlib
-        iproj_json["tgtCcsid"] = iproj_json["tgtCcsid"] if "tgtCcsid" in iproj_json else "*JOB"
-        return iproj_json
+    try:
+        with iproj_json_path.open() as f:
+            iproj_json = json.load(f)
+            objlib = parse_placeholder(iproj_json["objlib"]) if "objlib" in iproj_json else ""
+            curlib = parse_placeholder(iproj_json["curlib"]) if "curlib" in iproj_json else ""
+            if objlib == "*CURLIB":
+                if curlib == "*CRTDFT":
+                    objlib="QGPL"
+                else:
+                    objlib=curlib
+            iproj_json["preUsrlibl"] =" ".join(map(lambda lib: parse_placeholder(lib), iproj_json["preUsrlibl"]))
+            iproj_json["postUsrlibl"] =" ".join(map(lambda lib: parse_placeholder(lib), iproj_json["postUsrlibl"]))
+            iproj_json["includePath"] =" ".join(iproj_json["includePath"])
+            iproj_json["objlib"] = objlib
+            iproj_json["curlib"] = curlib
+            iproj_json["tgtCcsid"] = iproj_json["tgtCcsid"] if "tgtCcsid" in iproj_json else "*JOB"
+            return iproj_json
+    except FileNotFoundError:
+        print(colored("iproj.json not found!", Colors.FAIL))
+        exit(1)
 
 def objlib_to_path(objlib):
     """Returns the path for the given objlib in IFS
@@ -100,24 +105,29 @@ def run_command(cmd: str):
     except FileNotFoundError as e:
         print(colored(f'Cannot find command {e.filename}!', Colors.FAIL))
 
-def get_compile_target_from_filename(filename: str):
+def get_compile_targets_from_filenames(filenames: List[str]) -> List[str]:
     """ Returns the possible target name for the given filename
 
-    >>> get_compile_target_from_filename("test.PGM.RPGLE")
-    'test.PGM'
-    >>> get_compile_target_from_filename("test.RPGLE")
-    'test.MODULE'
-    >>> get_compile_target_from_filename("functionsVAT/VAT300.RPGLE")
-    'VAT300.MODULE'
+    >>> get_compile_targets_from_filenames(["test.PGM.RPGLE"])
+    ['test.PGM']
+    >>> get_compile_targets_from_filenames(["test.RPGLE"])
+    ['test.MODULE']
+    >>> get_compile_targets_from_filenames(["functionsVAT/VAT300.RPGLE", "test.RPGLE"])
+    ['VAT300.MODULE', 'test.MODULE']
     """
-    parts = os.path.basename(filename).split(".")
+    result = []
+    for filename in filenames:
+        parts = os.path.basename(filename).split(".")
 
-    ext_len = FILE_MAX_EXT_LENGTH
-    while ext_len > 0:
-        base, ext = '.'.join(parts[:-ext_len]), '.'.join(parts[-ext_len:]).upper()
-        if ext in FILE_TARGET_MAPPING.keys():
-            return f'{base}.{FILE_TARGET_MAPPING[ext]}'
-        ext_len -= 1
+        ext_len = FILE_MAX_EXT_LENGTH
+        while ext_len > 0:
+            base, ext = '.'.join(parts[:-ext_len]), '.'.join(parts[-ext_len:]).upper()
+            if ext in FILE_TARGET_MAPPING.keys():
+                result.append(f'{base}.{FILE_TARGET_MAPPING[ext]}')
+                break
+            ext_len -= 1
+    return result
+
 
 if __name__ == "__main__":
     import doctest

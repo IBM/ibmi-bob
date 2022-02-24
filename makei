@@ -6,11 +6,11 @@
 
 import argparse
 import os
-from pathlib import Path
 
 from scripts import init_project
 from scripts.build import BuildEnv
-from scripts.utils import get_compile_target_from_filename
+from scripts.const import BOB_PATH
+from scripts.utils import get_compile_targets_from_filenames
 
 
 def cli():
@@ -58,6 +58,11 @@ def add_build_parser(subparsers):
         help='options to pass to make',
         metavar='<options>',
     )
+    build_parser.add_argument(
+        '--bob-path',
+        help='path to the bob directory',
+        metavar='<path>',
+    )
     build_parser.set_defaults(handle=handle_build)
 
 
@@ -66,17 +71,26 @@ def add_compile_parser(subparsers):
         'compile',
         aliases=['c'],
         help='compile a single file')
-    compile_parser.add_argument(
+    compile_target_group = compile_parser.add_mutually_exclusive_group(required=True)
+    compile_target_group.add_argument(
         '-f',
         '--file',
         help='file to compile',
-        metavar='<filename>',
-        required=True)
+        metavar='<filename>')
+    compile_target_group.add_argument(
+        '--files',
+        help='files to compile',
+        metavar='<filepaths>')
     compile_parser.add_argument(
         '-o',
         '--make-options',
         help='options to pass to make',
         metavar='<options>',
+    )
+    compile_parser.add_argument(
+        '--bob-path',
+        help='path to the bob directory',
+        metavar='<path>',
     )
     compile_parser.set_defaults(handle=handle_compile)
 
@@ -103,8 +117,13 @@ def handle_compile(args):
     """
     Processing the compile command
     """
-    target = get_compile_target_from_filename(args.file)
-    b = BuildEnv(''.join(target), make_options=args.make_options)
+    override_const(args)
+    if args.file:
+        filenames = [args.file]
+    elif args.files:
+        filenames = map(lambda path: os.path.basename(path), args.files.split(':'))
+    targets = get_compile_targets_from_filenames(filenames)
+    b = BuildEnv(targets, make_options=args.make_options)
     b.make()
 
 
@@ -112,15 +131,20 @@ def handle_build(args):
     """
     Processing the build command
     """
+    override_const(args)
     if args.target:
         target = args.target
     elif args.subdir:
         target = f"dir_{os.path.basename(args.subdir.strip(os.sep))}"
     else:
         target = "all"
-    b = BuildEnv(''.join(target), make_options=args.make_options)
+    b = BuildEnv([target], make_options=args.make_options)
     b.make()
 
+def override_const(args):
+    if args.bob_path:
+        global BOB_PATH 
+        BOB_PATH = args.bob_path
 
 if __name__ == '__main__':
     cli()
