@@ -2,8 +2,8 @@ from pathlib import Path
 
 
 BOB_PATH = Path('/QOpenSys/pkgs/lib/bob/')
-BOB_MK = BOB_PATH / 'mk'
-BOB_MAKEFILE = BOB_PATH / 'Makefile'
+GET_BOB_MK = lambda : BOB_PATH / 'mk'
+GET_BOB_MAKEFILE = lambda : BOB_PATH / 'Makefile'
 
 
 FILE_TARGET_MAPPING = {
