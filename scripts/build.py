@@ -91,7 +91,7 @@ class BuildEnv():
                                f"postUsrlibl := {self.iproj_json['postUsrlibl']}",
                                f"INCDIR := {self.iproj_json['includePath']}",
                                f"IBMiEnvCmd := {self.ibmi_env_cmds}",
-                               f"COLOR_TTY := {self.color}",
+                               f"COLOR_TTY := {'true' if self.color else 'false'}",
                                "",
                                "",
                                ]))
