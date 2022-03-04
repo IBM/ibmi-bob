@@ -1,10 +1,6 @@
 from pathlib import Path
 
-
-BOB_PATH = Path('/QOpenSys/pkgs/lib/bob/')
-GET_BOB_MK = lambda : BOB_PATH / 'mk'
-GET_BOB_MAKEFILE = lambda : BOB_PATH / 'Makefile'
-
+BOB_PATH = Path(__file__).parent.parent.resolve()
 
 FILE_TARGET_MAPPING = {
     "PGM.RPGLE": "PGM",
