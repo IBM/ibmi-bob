@@ -8,7 +8,7 @@ import os
 from pathlib import Path
 from tempfile import mkstemp
 from typing import Any, Dict, List, Optional
-from scripts.const import GET_BOB_MAKEFILE, BOB_PATH
+from scripts.const import BOB_PATH
 from scripts.utils import objlib_to_path, read_ibmi_json, read_iproj_json, run_command, support_color
 
 
@@ -29,12 +29,12 @@ class BuildEnv():
     iproj_json: Dict[str, Any]
     ibmi_env_cmds: str
 
-    def __init__(self, targets: List[str] = ['all'], make_options: Optional[str] = None):
+    def __init__(self, targets: List[str] = ['all'], make_options: Optional[str] = None, overrides: Dict[str, Any] = {}):
         self.src_dir = Path.cwd()
         self.targets = targets
         self.make_options = make_options if make_options else ""
-        self.bob_path = BOB_PATH
-        self.bob_makefile = GET_BOB_MAKEFILE()
+        self.bob_path = Path(overrides["bob_path"]) if "bob_path" in overrides else BOB_PATH
+        self.bob_makefile = self.bob_path / 'Makefile'
         self.build_vars_handle, path = mkstemp()
         self.build_vars_path = Path(path)
         self.iproj_json_path = self.src_dir / "iproj.json"

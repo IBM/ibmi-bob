@@ -117,13 +117,12 @@ def handle_compile(args):
     """
     Processing the compile command
     """
-    override_const(args)
     if args.file:
         filenames = [args.file]
     elif args.files:
         filenames = map(lambda path: os.path.basename(path), args.files.split(':'))
     targets = get_compile_targets_from_filenames(filenames)
-    b = BuildEnv(targets, make_options=args.make_options)
+    b = BuildEnv(targets, args.make_options, get_override_vars(args))
     b.make()
 
 
@@ -131,20 +130,20 @@ def handle_build(args):
     """
     Processing the build command
     """
-    override_const(args)
     if args.target:
         target = args.target
     elif args.subdir:
         target = f"dir_{os.path.basename(args.subdir.strip(os.sep))}"
     else:
         target = "all"
-    b = BuildEnv([target], make_options=args.make_options)
+    b = BuildEnv([target], args.make_options, get_override_vars(args))
     b.make()
 
-def override_const(args):
+def get_override_vars(args):
     if args.bob_path:
-        global BOB_PATH 
-        BOB_PATH = args.bob_path
+        return {"bob_path" : args.bob_path}
+    else:
+        return {}
 
 if __name__ == '__main__':
     cli()
