@@ -189,7 +189,7 @@ def set_environment_vars(args):
     for e in args.env:
         kv = e.split("=")
         if len(kv) != 2:
-            print(f"invalid format: {e}")
+            print(colored(f"invalid format: {e}", Colors.FAIL))
             exit(1)
         k, v = kv[0], kv[1]
         os.environ[k] = v
