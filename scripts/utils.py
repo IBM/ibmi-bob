@@ -32,7 +32,7 @@ def colored(message: str, color: Colors) -> str:
 
 
 def support_color():
-    return "BOB_COLOR" in os.environ.keys() and os.environ["BOB_COLOR"] is not None
+    return True
 
 def read_ibmi_json(path, parent_value):
     if path.exists():
