@@ -10,8 +10,9 @@ import os
 from scripts import init_project
 from scripts.build import BuildEnv
 from scripts.const import BOB_PATH
-from scripts.utils import get_compile_targets_from_filenames
+from scripts.utils import Colors, colored, get_compile_targets_from_filenames
 
+__version__ = "2.2.9"
 
 def cli():
     """
@@ -23,11 +24,20 @@ def cli():
         metavar='command')
 
     add_init_parser(subparsers)
+    add_info_parser(subparsers)
     add_compile_parser(subparsers)
     add_build_parser(subparsers)
 
+    parser.add_argument(
+        '-v', '--version',
+        help="print version information and exit",
+        action='store_true'
+    )
+
     args = parser.parse_args()
-    if hasattr(args, 'handle'):
+    if args.version:
+        print(f"Bob version {__version__}");
+    elif hasattr(args, 'handle'):
         args.handle(args)
     else:
         parser.print_help()
@@ -63,6 +73,13 @@ def add_build_parser(subparsers):
         help='path to the bob directory',
         metavar='<path>',
     )
+    build_parser.add_argument(
+        '-e',
+        '--env',
+        help='override environment variables',
+        metavar='<var>=<value>',
+        action='append'
+    )
     build_parser.set_defaults(handle=handle_build)
 
 
@@ -88,6 +105,13 @@ def add_compile_parser(subparsers):
         metavar='<options>',
     )
     compile_parser.add_argument(
+        '-e',
+        '--env',
+        help='override environment variables',
+        metavar='<var>=<value>',
+        action='append'
+    )
+    compile_parser.add_argument(
         '--bob-path',
         help='path to the bob directory',
         metavar='<path>',
@@ -105,6 +129,15 @@ def add_init_parser(subparsers):
                              action='store_true')
     init_parser.set_defaults(handle=handle_init)
 
+def add_info_parser(subparsers):
+    info_parser = subparsers.add_parser(
+        'info',
+        help='get information about the current project')
+
+    info_parser.add_argument('-f', '--force',
+                             help='force overwrite any existing files',
+                             action='store_true')
+    info_parser.set_defaults(handle=handle_info)
 
 def handle_init(args):
     """
@@ -112,11 +145,17 @@ def handle_init(args):
     """
     init_project.init_project(force=args.force)
 
+def handle_info(args):
+    """
+    Handling the info command
+    """
+    print("Not implemented!")
 
 def handle_compile(args):
     """
     Processing the compile command
     """
+    set_environment_vars(args)
     if args.file:
         filenames = [args.file]
     elif args.files:
@@ -130,6 +169,7 @@ def handle_build(args):
     """
     Processing the build command
     """
+    set_environment_vars(args)
     if args.target:
         target = args.target
     elif args.subdir:
@@ -144,6 +184,17 @@ def get_override_vars(args):
         return {"bob_path" : args.bob_path}
     else:
         return {}
+
+def set_environment_vars(args):
+    for e in args.env:
+        kv = e.split("=")
+        if len(kv) != 2:
+            print(f"invalid format: {e}")
+            exit(1)
+        k, v = kv[0], kv[1]
+        os.environ[k] = v
+        print(colored(f"Set variable <{k}> to '{v}'", Colors.OKBLUE))
+
 
 if __name__ == '__main__':
     cli()
