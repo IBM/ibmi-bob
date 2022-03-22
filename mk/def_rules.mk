@@ -286,6 +286,11 @@ echo "$(IBMiEnvCmd)" >> $(LOGFILE); \
 echo "$(crtcmd)"
 endef
 
+define SETCURLIBTOOBJLIB = 
+echo ">> Temporarily set curlib to $(OBJLIB)" >> $(LOGFILE); \
+liblist -c $(OBJLIB) >> $(LOGFILE) 2>&1
+endef
+
 define POSTCLEANUP = 
 
 endef
@@ -570,7 +575,8 @@ programTGTRLS = $(strip \
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating SQL TABLE from Sql statement [$(notdir $<)]")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
-	@$(PRESETUP);  \
+	@$(PRESETUP); \
+	$(SETCURLIBTOOBJLIB); \
 	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true; \
 	$(POSTCLEANUP)
 
@@ -581,7 +587,8 @@ programTGTRLS = $(strip \
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating SQL VIEW from Sql statement [$(notdir $<)]")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
-	@$(PRESETUP);  \
+	@$(PRESETUP); \
+	$(SETCURLIBTOOBJLIB); \
 	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true; \
 	$(POSTCLEANUP)
 
@@ -590,7 +597,8 @@ programTGTRLS = $(strip \
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating SQL UDT from Sql statement [$(notdir $<)]")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
-	@$(PRESETUP);  \
+	@$(PRESETUP); \
+	$(SETCURLIBTOOBJLIB); \
 	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true; \
 	$(POSTCLEANUP)
 
@@ -599,7 +607,8 @@ programTGTRLS = $(strip \
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating SQL UDF from Sql statement [$(notdir $<)]")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
-	@$(PRESETUP);  \
+	@$(PRESETUP); \
+	$(SETCURLIBTOOBJLIB); \
 	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true; \
 	$(POSTCLEANUP)
 
@@ -608,7 +617,8 @@ programTGTRLS = $(strip \
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating SQL PROCEDURE from Sql statement [$(notdir $<)]")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
-	@$(PRESETUP);  \
+	@$(PRESETUP); \
+	$(SETCURLIBTOOBJLIB); \
 	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true; \
 	$(POSTCLEANUP)
 
@@ -617,7 +627,8 @@ programTGTRLS = $(strip \
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating SQL TRIGGER from Sql statement [$(notdir $<)]")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
-	@$(PRESETUP);  \
+	@$(PRESETUP); \
+	$(SETCURLIBTOOBJLIB); \
 	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true; \
 	$(POSTCLEANUP)	
 	
@@ -626,7 +637,8 @@ programTGTRLS = $(strip \
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating SQL SEQUENCE from Sql statement [$(notdir $<)]")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
-	@$(PRESETUP);  \
+	@$(PRESETUP); \
+	$(SETCURLIBTOOBJLIB); \
 	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true; \
 	$(POSTCLEANUP)	
 
@@ -635,7 +647,8 @@ programTGTRLS = $(strip \
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating SQL ALIAS from Sql statement [$(notdir $<)]")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
-	@$(PRESETUP);  \
+	@$(PRESETUP); \
+	$(SETCURLIBTOOBJLIB); \
 	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true; \
 	$(POSTCLEANUP)	
 
@@ -895,7 +908,8 @@ programTGTRLS = $(strip \
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Running SQL Statement from [$(notdir $<)]")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<'))
-	@$(PRESETUP);  \
+	@$(PRESETUP); \
+	$(SETCURLIBTOOBJLIB); \
 	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true; \
 	$(POSTCLEANUP)
 
