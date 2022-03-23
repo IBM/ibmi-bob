@@ -5,16 +5,19 @@
 # (c) Copyright IBM Corp. 2021
 
 import json
-import signal
-import sys
-from scripts.const import DEFAULT_CURLIB, DEFAULT_TGT_CCSID, DEFAULT_OBJLIB
-from scripts.utils import colored, Colors
-from typing import List, Optional
 from pathlib import Path
 import re
+import signal
+import sys
+from typing import List, Optional
+
+from scripts.const import DEFAULT_CURLIB, DEFAULT_TGT_CCSID, DEFAULT_OBJLIB
+from scripts.utils import colored, Colors
 
 
 class ProjSpec():
+    """ Class containing information about a project. """
+
     description: str
     version: str
     include_path: List[str]
@@ -24,33 +27,33 @@ class ProjSpec():
     pre_usr_libl: List[str]
     post_usr_libl: List[str]
     license: Optional[str]
-    set_IBM_i_env_cmd: Optional[str]
+    set_ibm_i_env_cmd: Optional[str]
     tgt_ccsid: str
 
     def __init__(self):
         try:
             self.description = prompt(
-                f'descriptive application name', Path.cwd().name)
+                'descriptive application name', Path.cwd().name)
             self.version = "1.0.0"
-            self.repository = prompt(f'git repository', self._get_repository())
+            self.repository = prompt('git repository', self._get_repository())
             self.include_path = self._input_str_to_list(
-                prompt(f'include path, separated by commas', ""))
+                prompt('include path, separated by commas', ""))
             self.objlib = prompt(
-                f'What library should objects be compiled into (objlib)', DEFAULT_OBJLIB)
+                'What library should objects be compiled into (objlib)', DEFAULT_OBJLIB)
             self.tgt_ccsid = prompt(
-                f'What EBCDIC CCSID should the source be compiled in', DEFAULT_TGT_CCSID)
-            self.curlib = prompt(f'curlib', DEFAULT_CURLIB)
+                'What EBCDIC CCSID should the source be compiled in', DEFAULT_TGT_CCSID)
+            self.curlib = prompt('curlib', DEFAULT_CURLIB)
             self.pre_usr_libl = self._input_str_to_list(
-                prompt(f'Pre user libraries, separated by commas', ""))
+                prompt('Pre user libraries, separated by commas', ""))
             self.post_usr_libl = self._input_str_to_list(
-                prompt(f'Post user libraries, separated by commas', ""))
-            self.set_IBM_i_env_cmd = self._input_str_to_list(prompt(
-                f'Set up commands to be executed, separated by commas', ""))
-            self.license = prompt(f'license', "")
+                prompt('Post user libraries, separated by commas', ""))
+            self.set_ibm_i_env_cmd = self._input_str_to_list(prompt(
+                'Set up commands to be executed, separated by commas', ""))
+            self.license = prompt('license', "")
 
         except Exception:
             print(colored("\nInvalid input", Colors.FAIL))
-            init_cancelled()
+            _init_cancelled()
 
     def _get_repository(self) -> str:
         try:
@@ -64,16 +67,18 @@ class ProjSpec():
                     u = None
                 else:
                     u = re.sub(r"^\s*url = ", '', u)
-                if u != None and re.match(r"^git@github.com:", u):
+                if u is not None and re.match(r"^git@github.com:", u):
                     u = re.sub(r"^git@github.com:", 'https://github.com/', u)
                 return u
-        except Exception as e:
+        except Exception:
             return ""
 
     def _input_str_to_list(self, input_str: str) -> List[str]:
         return list(map(lambda s: s.strip(), input_str.split(",")))
 
     def generate_iproj_json(self) -> str:
+        """ Returns a string representation of the iproj.json file of current project"""
+
         iproj = {
             "description": self.description,
             "version": self.version,
@@ -84,11 +89,13 @@ class ProjSpec():
             "curlib": self.curlib,
             "preUsrLibl": self.pre_usr_libl,
             "postUsrLibl": self.post_usr_libl,
-            "setIBMiEnvCmd": self.set_IBM_i_env_cmd
+            "setIBMiEnvCmd": self.set_ibm_i_env_cmd
         }
         return json.dumps(iproj, indent=4)
 
     def generate_ibmi_json(self) -> Optional[str]:
+        """ Returns a string representation of the .ibmi.json file of current project"""
+
         build = {}
         # if self.objlib != DEFAULT_OBJLIB:
         #     build["objlib"] = self.objlib
@@ -106,6 +113,7 @@ class ProjSpec():
             return None
 
     def generate_rules_mk(self) -> str:
+        """ Generates a Rules.mk template"""
         return '\n'.join(['# Check out the documentation on creating the rules at https://github.com/IBM/ibmi-bob/wiki/Create-Rules.mk',
                           "SUBDIRS :=",
                           "",
@@ -130,8 +138,8 @@ class ProjSpec():
                           ])
 
 
-def signal_handler(sig, frame):
-    init_cancelled()
+def _signal_handler(sig, frame):
+    _init_cancelled()
 
 
 def yes(input_str: str):
@@ -150,12 +158,13 @@ def yes(input_str: str):
         input_str.strip() == ""
 
 
-def init_cancelled():
+def _init_cancelled():
     print(colored('\nInit cancelled!', Colors.WARNING))
     sys.exit(0)
 
 
 def prompt(description, default_value) -> str:
+    """ Prompt with description for user input, a default value can be provided"""
     prompt_text = f'{description}:'
     if default_value:
         prompt_text += f' ({default_value})'
@@ -166,6 +175,13 @@ def prompt(description, default_value) -> str:
 
 
 def create_file(file_path: Path, content: Optional[str], force: bool = False) -> None:
+    """ Create a new file with the given content,
+
+    Args:
+        file_path (Path): Path to the file to be created
+        content (Optional[str]): the content of the file
+        force (bool, optional): Force overwrite of existing file; Defaults to False.
+    """
     if content is None:
         return
     if not force and file_path.exists():
@@ -176,7 +192,8 @@ def create_file(file_path: Path, content: Optional[str], force: bool = False) ->
 
 
 def init_project(force: bool = False) -> None:
-    signal.signal(signal.SIGINT, signal_handler)
+    """ A CLI utility to create a project"""
+    signal.signal(signal.SIGINT, _signal_handler)
 
     print('\n'.join([
         'This utility will walk you through creating a project.',
@@ -206,7 +223,7 @@ def init_project(force: bool = False) -> None:
         create_file(ibmi_json_path, proj_spec.generate_ibmi_json(), force)
         create_file(rules_mk_path, proj_spec.generate_rules_mk(), force)
     else:
-        init_cancelled()
+        _init_cancelled()
 
 
 if __name__ == "__main__":

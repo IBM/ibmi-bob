@@ -9,7 +9,6 @@ import os
 
 from scripts import init_project
 from scripts.build import BuildEnv
-from scripts.const import BOB_PATH
 from scripts.utils import Colors, colored, get_compile_targets_from_filenames
 
 __version__ = "2.2.9"
@@ -45,6 +44,7 @@ def cli():
 
 
 def add_build_parser(subparsers):
+    """Add subparsers for build commands"""
     build_parser = subparsers.add_parser(
         'build',
         aliases=['b'],
@@ -85,6 +85,7 @@ def add_build_parser(subparsers):
 
 
 def add_compile_parser(subparsers):
+    """Add subparsers for compile commands"""
     compile_parser = subparsers.add_parser(
         'compile',
         aliases=['c'],
@@ -122,6 +123,7 @@ def add_compile_parser(subparsers):
 
 
 def add_init_parser(subparsers):
+    """Add subparsers for init commands"""
     init_parser = subparsers.add_parser(
         'init',
         help='set up a new or existing project')
@@ -133,6 +135,7 @@ def add_init_parser(subparsers):
 
 
 def add_info_parser(subparsers):
+    """Add subparsers for info commands"""
     info_parser = subparsers.add_parser(
         'info',
         help='get information about the current project')
@@ -162,8 +165,7 @@ def handle_compile(args):
     if args.file:
         filenames = [args.file]
     elif args.files:
-        filenames = map(lambda path: os.path.basename(
-            path), args.files.split(':'))
+        filenames = map(os.path.basename, args.files.split(':'))
     targets = get_compile_targets_from_filenames(filenames)
     b = BuildEnv(targets, args.make_options, get_override_vars(args))
     b.make()
@@ -185,6 +187,7 @@ def handle_build(args):
 
 
 def get_override_vars(args):
+    """ Get the override variables from the arguments"""
     if args.bob_path:
         return {"bob_path": args.bob_path}
     else:
@@ -192,6 +195,7 @@ def get_override_vars(args):
 
 
 def set_environment_vars(args):
+    """ Set the environment variables defined in the arguments"""
     if "env" in args and args.env:
         for e in args.env:
             kv = e.split("=")
