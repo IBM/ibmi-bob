@@ -288,7 +288,7 @@ endef
 
 define SETCURLIBTOOBJLIB = 
 echo ">> Temporarily set curlib to $(OBJLIB)" >> $(LOGFILE); \
-liblist -c $(OBJLIB) >> $(LOGFILE) 2>&1
+liblist -c $(OBJLIB) >> $(LOGFILE) 2>&1; \
 liblist -af $(curlib) >> $(LOGFILE) 2>&1
 endef
 
