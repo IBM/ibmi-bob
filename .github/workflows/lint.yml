@@ -7,7 +7,7 @@ jobs:
         runs-on: ubuntu-latest
         strategy:
             matrix:
-                python-version: ["3.5", "3.6", "3.10"]
+                python-version: ["3.6", "3.10"]
         steps:
             - uses: actions/checkout@v2
             - name: Set up Python ${{ matrix.python-version }}
@@ -20,7 +20,7 @@ jobs:
                   pip install pylint
             - name: Analysing the code with pylint
               run: |
-                  pylint $(git ls-files '*.py')
+                  pylint $(git ls-files '*.py') --fail-under=8
     shelllint:
         runs-on: ubuntu-latest
         steps:
@@ -28,3 +28,5 @@ jobs:
               uses: actions/checkout@v2
             - name: Run ShellCheck
               uses: azohra/shell-linter@latest
+              with:
+                  exclude-paths: "Client-tools/,RunPaseCmd/"
