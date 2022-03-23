@@ -84,7 +84,7 @@ def parse_variable(var_name: str):
         try:
             value = os.environ[var_name]
             return value
-        except NameError:
+        except KeyError:
             print(colored(
                 f"{var_name} must be defined first in the environment variable.", Colors.FAIL))
             sys.exit(1)
