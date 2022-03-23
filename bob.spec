@@ -33,42 +33,41 @@ Here's what makes Bob different.
 - Flexibility. Most objects defined to Bob typically build using your default values. Have a program that requires a custom activation group or a data area that needs to be created with a certain value? No problem, overriding compile parameters is trivial, and writing custom recipes for special objects is very straightforward. If you can code it, you can build it.
 - Ease of use. Invoking a build of an entire codebase is done with just a single command. Or, if the Rational Developer for i integration pieces are installed, a single button click.
 
-%prep
 
+%prep
 %setup -n ibmi-bob-%{version}
-# %setup -q
 tar -xzvf %{SOURCE1}
 
+
 %build
-echo "skipping build"
+cd CRTFRMSTMF-master && %{_bindir}/gmake && cd ..
+
+system 'DLTF FILE(CRTFRMSTMF/CRTFRMSTMF)' || true
+system 'CRTSAVF FILE(CRTFRMSTMF/CRTFRMSTMF)'
+system "SAVOBJ OBJ(CRTFRMSTMF) LIB(CRTFRMSTMF) DEV(*SAVF) OBJTYPE(*PGM *PNLGRP *CMD) SAVF(CRTFRMSTMF/CRTFRMSTMF)"
+rm -f ./crtfrmstmf.savf
+system "CPYTOSTMF FROMMBR('/QSYS.LIB/CRTFRMSTMF.LIB/CRTFRMSTMF.FILE') TOSTMF('./crtfrmstmf.savf')" || true
 
 %install
-# tar -xzvf %{SOURCE1} -C CRTFRMSTMF-master --strip-components=1
-
-# rm -fr sample-project test shunit2 shelic
-
 mkdir -p %{buildroot}%{_libdir}/bob
 mkdir -p %{buildroot}%{_bindir}/
 cp -r ./* %{buildroot}%{_libdir}/bob
 ln -sf %{_libdir}/bob/makei %{buildroot}%{_bindir}/makei
 ln -sf %{_libdir}/bob/launch %{buildroot}%{_bindir}/launch
 
-%post -p %{_bindir}/bash
-if [ ! -d "/QSYS.LIB/CRTFRMSTMF.LIB" ]
-then
-    cl "CRTLIB LIB(CRTFRMSTMF) TEXT('Library for CRTFRMSTMF command')"
-else
-    rm -rf /QSYS.LIB/CRTFRMSTMF.LIB/*
-fi
 
-cd %{_libdir}/bob/CRTFRMSTMF-master && %{_bindir}/gmake && cd ..
+%post
+echo "Installing CRTFRMSTMF..."
+system "CRTLIB LIB(CRTFRMSTMF)" || true
+system 'DLTF FILE(CRTFRMSTMF/CRTFRMSTMF)' || true
+system "CPYFRMSTMF FROMSTMF('%{_libdir}/bob/crtfrmstmf.savf') TOMBR('/QSYS.LIB/CRTFRMSTMF.LIB/CRTFRMSTMF.FILE')"
+system "RSTOBJ OBJ(CRTFRMSTMF) SAVLIB(CRTFRMSTMF) DEV(*SAVF) OBJTYPE(*PGM *PNLGRP *CMD) SAVF(CRTFRMSTMF/CRTFRMSTMF)"
 
 %files
 %defattr(-, qsys, *none)
 %{_libdir}/bob
 %{_bindir}/launch
 %{_bindir}/makei
-%changelog
 
 %changelog
 * Thu Feb 10 2022 Tongkun Zhang <tongkun.zhang@ibm.com> - 2.2.8
@@ -77,3 +76,4 @@ cd %{_libdir}/bob/CRTFRMSTMF-master && %{_bindir}/gmake && cd ..
 - Add include path and user libraries to VPATH
 - Include more joblog information
 - Set Bash 5.1-2 as the minimum
+
