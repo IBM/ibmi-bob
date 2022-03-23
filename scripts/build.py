@@ -110,8 +110,8 @@ class BuildEnv():
                     f"OBJPATH_{subdir.absolute()} := {objlib_to_path(dir_var_map[subdir][0])}\n")
 
             for rules_mk in rules_mks:
-                with rules_mk.open('r') as file:
-                    lines = file.readlines()
+                with rules_mk.open('r') as rules_mk_file:
+                    lines = rules_mk_file.readlines()
                     for line in lines:
                         line = line.rstrip()
                         if line and not line.startswith("#") \
