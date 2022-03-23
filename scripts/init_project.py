@@ -96,7 +96,7 @@ class ProjSpec():
         if self.tgt_ccsid != DEFAULT_TGT_CCSID:
             build["tgtCcsid"] = self.tgt_ccsid
 
-        if len(build.keys) > 0:
+        if len(build.keys()) > 0:
             ibmi = {
                 "version": self.version,
                 "build": build
@@ -191,15 +191,18 @@ def init_project(force: bool = False) -> None:
     ibmi_json_path = Path.cwd() / '.ibmi.json'
     rules_mk_path = Path.cwd() / 'Rules.mk'
 
+    iproj_json_content = proj_spec.generate_iproj_json()
+    ibmi_json_content = proj_spec.generate_ibmi_json()
+    rules_mk_content = proj_spec.generate_rules_mk()
+
     print('\n'.join(['',
-                     "The following files will be added to the project",
-                     f"+ {iproj_json_path}",
-                     f"+ {ibmi_json_path}",
-                     f"+ {rules_mk_path}",
-                     ]))
+                     "The following files will be added to the project"] + filter(None, [
+                         f"+ {iproj_json_path}" if iproj_json_content else None,
+                         f"+ {ibmi_json_path}" if iproj_json_content else None,
+                         f"+ {rules_mk_path}" if iproj_json_content else None,
+                     ])))
     if force or yes(input('Continue? (yes) ')):
         create_file(iproj_json_path, proj_spec.generate_iproj_json(), force)
-
         create_file(ibmi_json_path, proj_spec.generate_ibmi_json(), force)
         create_file(rules_mk_path, proj_spec.generate_rules_mk(), force)
     else:
