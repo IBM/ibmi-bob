@@ -93,7 +93,7 @@ class ProjSpec():
         # if self.objlib != DEFAULT_OBJLIB:
         #     build["objlib"] = self.objlib
 
-        if self.tgtCcsid != DEFAULT_TGT_CCSID:
+        if self.tgt_ccsid != DEFAULT_TGT_CCSID:
             build["tgtCcsid"] = self.tgt_ccsid
 
         if len(build.keys) > 0:
