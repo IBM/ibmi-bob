@@ -3,9 +3,11 @@
 # Licensed Materials - Property of IBM
 # 57XX-XXX
 # (c) Copyright IBM Corp. 2021
+""" The CLI entry for BOB"""
 
 import argparse
 import os
+import sys
 
 from scripts import init_project
 from scripts.build import BuildEnv
@@ -150,7 +152,7 @@ def handle_init(args):
     init_project.init_project(force=args.force)
 
 
-def handle_info(args):
+def handle_info(_args):
     """
     Handling the info command
     """
@@ -167,8 +169,8 @@ def handle_compile(args):
     elif args.files:
         filenames = map(os.path.basename, args.files.split(':'))
     targets = get_compile_targets_from_filenames(filenames)
-    b = BuildEnv(targets, args.make_options, get_override_vars(args))
-    b.make()
+    build_env = BuildEnv(targets, args.make_options, get_override_vars(args))
+    build_env.make()
 
 
 def handle_build(args):
@@ -182,8 +184,8 @@ def handle_build(args):
         target = f"dir_{os.path.basename(args.subdir.strip(os.sep))}"
     else:
         target = "all"
-    b = BuildEnv([target], args.make_options, get_override_vars(args))
-    b.make()
+    build_env = BuildEnv([target], args.make_options, get_override_vars(args))
+    build_env.make()
 
 
 def get_override_vars(args):
@@ -197,14 +199,14 @@ def get_override_vars(args):
 def set_environment_vars(args):
     """ Set the environment variables defined in the arguments"""
     if "env" in args and args.env:
-        for e in args.env:
-            kv = e.split("=")
-            if len(kv) != 2:
-                print(colored(f"invalid format: {e}", Colors.FAIL))
-                exit(1)
-            k, v = kv[0], kv[1]
-            os.environ[k] = v
-            print(colored(f"Set variable <{k}> to '{v}'", Colors.OKBLUE))
+        for env in args.env:
+            kv_pair = env.split("=")
+            if len(kv_pair) != 2:
+                print(colored(f"invalid format: {env}", Colors.FAIL))
+                sys.exit(1)
+            key, value = kv_pair[0], kv_pair[1]
+            os.environ[key] = value
+            print(colored(f"Set variable <{key}> to '{value}'", Colors.OKBLUE))
 
 
 if __name__ == '__main__':

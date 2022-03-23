@@ -4,6 +4,8 @@
 # 57XX-XXX
 # (c) Copyright IBM Corp. 2021
 
+""" The utility module"""
+
 from enum import Enum
 import json
 import os
@@ -50,16 +52,15 @@ def read_ibmi_json(path: Path, parent_value: Tuple[str, str]) -> Tuple[str, str]
         Tuple[str, str]: (objlib, tgtCcsid)
     """
     if path.exists():
-        with path.open() as f:
-            data = json.load(f)
+        with path.open() as file:
+            data = json.load(file)
             try:
                 objlib = parse_all_variables(data['build']['objlib'])
-
-            except Exception:
+            except KeyError:
                 objlib = parent_value[0]
             try:
                 tgt_ccsid = data['build']['tgtCcsid']
-            except Exception:
+            except KeyError:
                 tgt_ccsid = parent_value[1]
             return (objlib, tgt_ccsid)
     else:
@@ -83,7 +84,7 @@ def parse_variable(var_name: str):
         try:
             value = os.environ[var_name]
             return value
-        except Exception:
+        except NameError:
             print(colored(
                 f"{var_name} must be defined first in the environment variable.", Colors.FAIL))
             sys.exit(1)
@@ -133,8 +134,8 @@ def read_iproj_json(iproj_json_path: Path) -> Dict:
     will be used.
     """
     try:
-        with iproj_json_path.open() as f:
-            iproj_json = json.load(f)
+        with iproj_json_path.open() as file:
+            iproj_json = json.load(file)
             objlib = parse_all_variables(
                 iproj_json["objlib"]) if "objlib" in iproj_json else DEFAULT_OBJLIB
             curlib = parse_all_variables(
@@ -181,8 +182,8 @@ def run_command(cmd: str):
     try:
         process = subprocess.Popen(
             ["bash", "-c", cmd], stdout=subprocess.PIPE, )
-        for c in iter(process.stdout.readline, b''):
-            sys.stdout.buffer.write(c)
+        for char in iter(process.stdout.readline, b''):
+            sys.stdout.buffer.write(char)
             sys.stdout.flush()
     except FileNotFoundError as error:
         print(colored(f'Cannot find command {error.filename}!', Colors.FAIL))

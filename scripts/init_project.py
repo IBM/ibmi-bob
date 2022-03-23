@@ -4,6 +4,8 @@
 # 57XX-XXX
 # (c) Copyright IBM Corp. 2021
 
+"""This module is """
+
 import json
 from pathlib import Path
 import re
@@ -31,45 +33,45 @@ class ProjSpec():
     tgt_ccsid: str
 
     def __init__(self):
-        try:
-            self.description = prompt(
-                'descriptive application name', Path.cwd().name)
-            self.version = "1.0.0"
-            self.repository = prompt('git repository', self._get_repository())
-            self.include_path = self._input_str_to_list(
-                prompt('include path, separated by commas', ""))
-            self.objlib = prompt(
-                'What library should objects be compiled into (objlib)', DEFAULT_OBJLIB)
-            self.tgt_ccsid = prompt(
-                'What EBCDIC CCSID should the source be compiled in', DEFAULT_TGT_CCSID)
-            self.curlib = prompt('curlib', DEFAULT_CURLIB)
-            self.pre_usr_libl = self._input_str_to_list(
-                prompt('Pre user libraries, separated by commas', ""))
-            self.post_usr_libl = self._input_str_to_list(
-                prompt('Post user libraries, separated by commas', ""))
-            self.set_ibm_i_env_cmd = self._input_str_to_list(prompt(
-                'Set up commands to be executed, separated by commas', ""))
-            self.license = prompt('license', "")
-
-        except Exception:
-            print(colored("\nInvalid input", Colors.FAIL))
-            _init_cancelled()
+        # try:
+        self.description = prompt(
+            'descriptive application name', Path.cwd().name)
+        self.version = "1.0.0"
+        self.repository = prompt('git repository', self._get_repository())
+        self.include_path = self._input_str_to_list(
+            prompt('include path, separated by commas', ""))
+        self.objlib = prompt(
+            'What library should objects be compiled into (objlib)', DEFAULT_OBJLIB)
+        self.tgt_ccsid = prompt(
+            'What EBCDIC CCSID should the source be compiled in', DEFAULT_TGT_CCSID)
+        self.curlib = prompt('curlib', DEFAULT_CURLIB)
+        self.pre_usr_libl = self._input_str_to_list(
+            prompt('Pre user libraries, separated by commas', ""))
+        self.post_usr_libl = self._input_str_to_list(
+            prompt('Post user libraries, separated by commas', ""))
+        self.set_ibm_i_env_cmd = self._input_str_to_list(prompt(
+            'Set up commands to be executed, separated by commas', ""))
+        self.license = prompt('license', "")
+        # except Exception:
+        #     print(colored("\nInvalid input", Colors.FAIL))
+        #     _init_cancelled()
 
     def _get_repository(self) -> str:
         try:
-            with (Path.cwd() / '.git' / 'config').open() as f:
-                gconf = f.read().splitlines()
+            with (Path.cwd() / '.git' / 'config').open() as file:
+                gconf = file.read().splitlines()
                 i = gconf.index('[remote "origin"]')
-                u = gconf[i + 1]
-                if not re.match(r"^\s*url =", u):
-                    u = gconf[i + 2]
-                if not re.match(r"^\s*url =", u):
-                    u = None
+                line = gconf[i + 1]
+                if not re.match(r"^\s*url =", line):
+                    line = gconf[i + 2]
+                if not re.match(r"^\s*url =", line):
+                    line = None
                 else:
-                    u = re.sub(r"^\s*url = ", '', u)
-                if u is not None and re.match(r"^git@github.com:", u):
-                    u = re.sub(r"^git@github.com:", 'https://github.com/', u)
-                return u
+                    line = re.sub(r"^\s*url = ", '', line)
+                if line is not None and re.match(r"^git@github.com:", line):
+                    line = re.sub(r"^git@github.com:",
+                                  'https://github.com/', line)
+                return line
         except Exception:
             return ""
 
@@ -114,7 +116,8 @@ class ProjSpec():
 
     def generate_rules_mk(self) -> str:
         """ Generates a Rules.mk template"""
-        return '\n'.join(['# Check out the documentation on creating the rules at https://github.com/IBM/ibmi-bob/wiki/Create-Rules.mk',
+        return '\n'.join(['# Check out the documentation on creating the rules at' +
+                          'https://github.com/IBM/ibmi-bob/wiki/Create-Rules.mk',
                           "SUBDIRS :=",
                           "",
                           "TRGs :=",
@@ -138,7 +141,7 @@ class ProjSpec():
                           ])
 
 
-def _signal_handler(sig, frame):
+def _signal_handler(_sig, _frame):
     _init_cancelled()
 
 
@@ -185,10 +188,11 @@ def create_file(file_path: Path, content: Optional[str], force: bool = False) ->
     if content is None:
         return
     if not force and file_path.exists():
-        if not yes(prompt(colored(f'* {file_path} already exists, overwrite?', Colors.WARNING), 'no')):
+        if not yes(prompt(colored(f'* {file_path} already exists, overwrite?',
+                                  Colors.WARNING), 'no')):
             return
-    with file_path.open('w') as f:
-        f.write(content)
+    with file_path.open('w') as file:
+        file.write(content)
 
 
 def init_project(force: bool = False) -> None:
