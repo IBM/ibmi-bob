@@ -30,17 +30,23 @@ class ProjSpec():
         try:
             self.description = prompt(
                 f'descriptive application name', Path.cwd().name)
-            self.version = prompt(f'version', "1.0.0")
+            self.version = "1.0.0"
             self.repository = prompt(f'git repository', self._get_repository())
-            self.license = prompt(f'license', "")
-            self.include_path = self._input_str_to_list(prompt(f'include path, seperated by commas', ""))
-            self.objlib = prompt(f'objlib', "*CURLIB")
-            self.tgt_ccsid = prompt(f'Target CCSID', "*JOB")
+            self.include_path = self._input_str_to_list(
+                prompt(f'include path, separated by commas', ""))
+            self.objlib = prompt(
+                f'What library should objects be compiled into (objlib)', "*CURLIB")
+            self.tgt_ccsid = prompt(
+                f'What EBCDIC CCSID should the source be compiled in', "*JOB")
             self.curlib = prompt(f'curlib', "")
-            self.pre_usr_libl = self._input_str_to_list(prompt(f'Pre user libraries, seperated by commas', ""))
-            self.post_usr_libl = self._input_str_to_list(prompt(f'Post user libraries, seperated by commas', ""))
+            self.pre_usr_libl = self._input_str_to_list(
+                prompt(f'Pre user libraries, separated by commas', ""))
+            self.post_usr_libl = self._input_str_to_list(
+                prompt(f'Post user libraries, separated by commas', ""))
             self.set_IBM_i_env_cmd = self._input_str_to_list(prompt(
-                f'Set up commands to be executed, seperated by commas', ""))
+                f'Set up commands to be executed, separated by commas', ""))
+            self.license = prompt(f'license', "")
+
         except Exception:
             print(colored("\nInvalid input", Colors.FAIL))
             init_cancelled()
@@ -150,12 +156,14 @@ def prompt(description, default_vaule) -> str:
         input_str = default_vaule
     return input_str
 
+
 def create_file(file_path: Path, content: str, force: bool = False) -> None:
     if not force and file_path.exists():
         if not yes(prompt(colored(f'* {file_path} already exists, overwrite?', Colors.WARNING), 'no')):
             return
     with file_path.open('w') as f:
         f.write(content)
+
 
 def init_project(force: bool = False) -> None:
     signal.signal(signal.SIGINT, signal_handler)
@@ -186,7 +194,7 @@ def init_project(force: bool = False) -> None:
     else:
         init_cancelled()
 
+
 if __name__ == "__main__":
     import doctest
     doctest.testmod()
-        

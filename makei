@@ -14,6 +14,7 @@ from scripts.utils import Colors, colored, get_compile_targets_from_filenames
 
 __version__ = "2.2.9"
 
+
 def cli():
     """
     makei program entry
@@ -36,7 +37,7 @@ def cli():
 
     args = parser.parse_args()
     if args.version:
-        print(f"Bob version {__version__}");
+        print(f"Bob version {__version__}")
     elif hasattr(args, 'handle'):
         args.handle(args)
     else:
@@ -88,7 +89,8 @@ def add_compile_parser(subparsers):
         'compile',
         aliases=['c'],
         help='compile a single file')
-    compile_target_group = compile_parser.add_mutually_exclusive_group(required=True)
+    compile_target_group = compile_parser.add_mutually_exclusive_group(
+        required=True)
     compile_target_group.add_argument(
         '-f',
         '--file',
@@ -96,7 +98,7 @@ def add_compile_parser(subparsers):
         metavar='<filename>')
     compile_target_group.add_argument(
         '--files',
-        help='files to compile',
+        help='files to compile, separated by colon (:)',
         metavar='<filepaths>')
     compile_parser.add_argument(
         '-o',
@@ -129,15 +131,14 @@ def add_init_parser(subparsers):
                              action='store_true')
     init_parser.set_defaults(handle=handle_init)
 
+
 def add_info_parser(subparsers):
     info_parser = subparsers.add_parser(
         'info',
         help='get information about the current project')
 
-    info_parser.add_argument('-f', '--force',
-                             help='force overwrite any existing files',
-                             action='store_true')
     info_parser.set_defaults(handle=handle_info)
+
 
 def handle_init(args):
     """
@@ -145,11 +146,13 @@ def handle_init(args):
     """
     init_project.init_project(force=args.force)
 
+
 def handle_info(args):
     """
     Handling the info command
     """
     print("Not implemented!")
+
 
 def handle_compile(args):
     """
@@ -159,7 +162,8 @@ def handle_compile(args):
     if args.file:
         filenames = [args.file]
     elif args.files:
-        filenames = map(lambda path: os.path.basename(path), args.files.split(':'))
+        filenames = map(lambda path: os.path.basename(
+            path), args.files.split(':'))
     targets = get_compile_targets_from_filenames(filenames)
     b = BuildEnv(targets, args.make_options, get_override_vars(args))
     b.make()
@@ -179,11 +183,13 @@ def handle_build(args):
     b = BuildEnv([target], args.make_options, get_override_vars(args))
     b.make()
 
+
 def get_override_vars(args):
     if args.bob_path:
-        return {"bob_path" : args.bob_path}
+        return {"bob_path": args.bob_path}
     else:
         return {}
+
 
 def set_environment_vars(args):
     if "env" in args and args.env:
