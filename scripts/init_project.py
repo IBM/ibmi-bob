@@ -155,13 +155,13 @@ def init_cancelled():
     sys.exit(0)
 
 
-def prompt(description, default_vaule) -> str:
+def prompt(description, default_value) -> str:
     prompt_text = f'{description}:'
-    if default_vaule:
-        prompt_text += f' ({default_vaule})'
+    if default_value:
+        prompt_text += f' ({default_value})'
     input_str = input(f'{prompt_text} ')
     if not input_str:
-        input_str = default_vaule
+        input_str = default_value
     return input_str
 
 
