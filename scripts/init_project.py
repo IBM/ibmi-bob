@@ -198,8 +198,8 @@ def init_project(force: bool = False) -> None:
     print('\n'.join(['',
                      "The following files will be added to the project"] + list(filter(None, [
                          f"+ {iproj_json_path}" if iproj_json_content else None,
-                         f"+ {ibmi_json_path}" if iproj_json_content else None,
-                         f"+ {rules_mk_path}" if iproj_json_content else None,
+                         f"+ {ibmi_json_path}" if ibmi_json_content else None,
+                         f"+ {rules_mk_path}" if rules_mk_content else None,
                      ]))))
     if force or yes(input('Continue? (yes) ')):
         create_file(iproj_json_path, proj_spec.generate_iproj_json(), force)
