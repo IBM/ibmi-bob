@@ -14,6 +14,7 @@ from unittest import result
 
 from scripts.const import FILE_MAX_EXT_LENGTH, FILE_TARGET_MAPPING
 
+
 class Colors(str, Enum):
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
@@ -21,6 +22,7 @@ class Colors(str, Enum):
     WARNING = '\033[93m'
     FAIL = '\033[91m'
     ENDC = '\033[0m'
+
 
 def colored(message: str, color: Colors) -> str:
     """Returns a colored message if supported
@@ -34,13 +36,14 @@ def colored(message: str, color: Colors) -> str:
 def support_color():
     return True
 
+
 def read_ibmi_json(path, parent_value):
     if path.exists():
         with path.open() as f:
             data = json.load(f)
             try:
-                objlib = parse_placeholder(data['build']['objlib'])
-                
+                objlib = parse_all_variables(data['build']['objlib'])
+
             except Exception:
                 objlib = parent_value[0]
             try:
@@ -51,32 +54,87 @@ def read_ibmi_json(path, parent_value):
     else:
         return parent_value
 
-def parse_placeholder(varName):
+
+def parse_variable(varName):
+    """ Returns the value of the given variable name in the system environment,
+        or the input value itself if it is not a variable name.
+
+    >>> os.environ["key1"] = "value1"
+    >>> parse_variable("key1")
+    'key1'
+    >>> parse_variable("&key1")
+    'value1'
+    >>> parse_variable("&key1")
+    'value1'
+    """
     if varName.startswith("&") and len(varName) > 1:
         varName = varName[1:]
         try:
             value = os.environ[varName]
             return value
         except Exception:
-            print(colored(f"{varName} must be defined first in the environment variable.", Colors.FAIL))
+            print(colored(
+                f"{varName} must be defined first in the environment variable.", Colors.FAIL))
             exit(1)
     else:
         return varName
+
+
+def parse_all_variables(input: str) -> str:
+    """ Resolve and return the input string with all variables being replaced
+
+    >>> os.environ["key1"] = "value1"
+    >>> os.environ["key2"] = "value2"
+    >>> os.environ["key3"] = "value3"
+    >>> os.environ["dependency_dir"] = "dep_dir_value"
+    >>> parse_all_variables("key1")
+    'key1'
+    >>> parse_all_variables("key1/key2")
+    'key1/key2'
+    >>> parse_all_variables("&key1")
+    'value1'
+    >>> parse_all_variables("&key1/key2")
+    'value1/key2'
+    >>> parse_all_variables("key1/&key2")
+    'key1/value2'
+    >>> parse_all_variables("key1/")
+    'key1/'
+    >>> parse_all_variables("/key1/")
+    '/key1/'
+    >>> parse_all_variables("/&key1/")
+    '/value1/'
+    >>> parse_all_variables("/&key1///&key2/&key3")
+    '/value1///value2/value3'
+    >>> parse_all_variables("&dependency_dir/includes")
+    'dep_dir_value/includes'
+    """
+    parts = input.split("/")
+    result = ""
+    for part in parts:
+        result = result + parse_variable(part) + "/"
+    result = result[:-1]
+    return result
+
 
 def read_iproj_json(iproj_json_path):
     try:
         with iproj_json_path.open() as f:
             iproj_json = json.load(f)
-            objlib = parse_placeholder(iproj_json["objlib"]) if "objlib" in iproj_json else ""
-            curlib = parse_placeholder(iproj_json["curlib"]) if "curlib" in iproj_json else ""
+            objlib = parse_all_variables(
+                iproj_json["objlib"]) if "objlib" in iproj_json else ""
+            curlib = parse_all_variables(
+                iproj_json["curlib"]) if "curlib" in iproj_json else ""
             if objlib == "*CURLIB":
                 if curlib == "*CRTDFT":
-                    objlib="QGPL"
+                    objlib = "QGPL"
                 else:
-                    objlib=curlib
-            iproj_json["preUsrlibl"] =" ".join(map(lambda lib: parse_placeholder(lib), iproj_json["preUsrlibl"]))
-            iproj_json["postUsrlibl"] =" ".join(map(lambda lib: parse_placeholder(lib), iproj_json["postUsrlibl"]))
-            iproj_json["includePath"] =" ".join(iproj_json["includePath"])
+                    objlib = curlib
+            iproj_json["preUsrlibl"] = " ".join(
+                map(lambda lib: parse_all_variables(lib), iproj_json["preUsrlibl"]))
+            iproj_json["postUsrlibl"] = " ".join(
+                map(lambda lib: parse_all_variables(lib), iproj_json["postUsrlibl"]))
+            iproj_json["includePath"] = " ".join(
+                map(lambda path: parse_all_variables(path), iproj_json["includePath"]))
             iproj_json["objlib"] = objlib
             iproj_json["curlib"] = curlib
             iproj_json["tgtCcsid"] = iproj_json["tgtCcsid"] if "tgtCcsid" in iproj_json else "*JOB"
@@ -85,25 +143,30 @@ def read_iproj_json(iproj_json_path):
         print(colored("iproj.json not found!", Colors.FAIL))
         exit(1)
 
+
 def objlib_to_path(objlib):
     """Returns the path for the given objlib in IFS
 
     >>> objlib_to_path("TONGKUN")
     '/QSYS.LIB/TONGKUN.LIB'
     """
-    if not objlib: raise ValueError()
+    if not objlib:
+        raise ValueError()
     return f"/QSYS.LIB/{objlib}.LIB"
+
 
 def run_command(cmd: str):
     print(colored(f"> {cmd}", Colors.OKGREEN))
     sys.stdout.flush()
     try:
-        process = subprocess.Popen(["bash", "-c", cmd], stdout=subprocess.PIPE, )
-        for c in iter(lambda: process.stdout.readline(), b''): 
+        process = subprocess.Popen(
+            ["bash", "-c", cmd], stdout=subprocess.PIPE, )
+        for c in iter(lambda: process.stdout.readline(), b''):
             sys.stdout.buffer.write(c)
             sys.stdout.flush()
     except FileNotFoundError as e:
         print(colored(f'Cannot find command {e.filename}!', Colors.FAIL))
+
 
 def get_compile_targets_from_filenames(filenames: List[str]) -> List[str]:
     """ Returns the possible target name for the given filename
@@ -121,7 +184,8 @@ def get_compile_targets_from_filenames(filenames: List[str]) -> List[str]:
 
         ext_len = FILE_MAX_EXT_LENGTH
         while ext_len > 0:
-            base, ext = '.'.join(parts[:-ext_len]), '.'.join(parts[-ext_len:]).upper()
+            base, ext = '.'.join(
+                parts[:-ext_len]), '.'.join(parts[-ext_len:]).upper()
             if ext in FILE_TARGET_MAPPING.keys():
                 result.append(f'{base}.{FILE_TARGET_MAPPING[ext]}')
                 break
