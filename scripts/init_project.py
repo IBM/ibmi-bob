@@ -7,7 +7,7 @@
 import json
 import signal
 import sys
-from scripts.const import DEFAULT_TGT_CCSID, DEFAULT_OBJLIB
+from scripts.const import DEFAULT_CURLIB, DEFAULT_TGT_CCSID, DEFAULT_OBJLIB
 from scripts.utils import colored, Colors
 from typing import List, Optional
 from pathlib import Path
@@ -39,7 +39,7 @@ class ProjSpec():
                 f'What library should objects be compiled into (objlib)', DEFAULT_OBJLIB)
             self.tgt_ccsid = prompt(
                 f'What EBCDIC CCSID should the source be compiled in', DEFAULT_TGT_CCSID)
-            self.curlib = prompt(f'curlib', "")
+            self.curlib = prompt(f'curlib', DEFAULT_CURLIB)
             self.pre_usr_libl = self._input_str_to_list(
                 prompt(f'Pre user libraries, separated by commas', ""))
             self.post_usr_libl = self._input_str_to_list(

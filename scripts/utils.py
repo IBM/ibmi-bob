@@ -10,9 +10,8 @@ import os
 import subprocess
 import sys
 from typing import List
-from unittest import result
 
-from scripts.const import FILE_MAX_EXT_LENGTH, FILE_TARGET_MAPPING
+from scripts.const import DEFAULT_CURLIB, DEFAULT_OBJLIB, FILE_MAX_EXT_LENGTH, FILE_TARGET_MAPPING
 
 
 class Colors(str, Enum):
@@ -117,13 +116,17 @@ def parse_all_variables(input: str) -> str:
 
 
 def read_iproj_json(iproj_json_path):
+    """ Returns a dictionary representing the iproj.json file content
+    If `objlib` or `curlib` is not defined, the default value for those
+    will be used.
+    """
     try:
         with iproj_json_path.open() as f:
             iproj_json = json.load(f)
             objlib = parse_all_variables(
-                iproj_json["objlib"]) if "objlib" in iproj_json else ""
+                iproj_json["objlib"]) if "objlib" in iproj_json else DEFAULT_OBJLIB
             curlib = parse_all_variables(
-                iproj_json["curlib"]) if "curlib" in iproj_json else ""
+                iproj_json["curlib"]) if "curlib" in iproj_json else DEFAULT_CURLIB
             if objlib == "*CURLIB":
                 if curlib == "*CRTDFT":
                     objlib = "QGPL"
