@@ -4,17 +4,21 @@
 # 57XX-XXX
 # (c) Copyright IBM Corp. 2021
 
+""" The utility module"""
+
 from enum import Enum
 import json
 import os
+from pathlib import Path
 import subprocess
 import sys
-from typing import List
+from typing import Dict, List, Tuple
 
 from scripts.const import DEFAULT_CURLIB, DEFAULT_OBJLIB, FILE_MAX_EXT_LENGTH, FILE_TARGET_MAPPING
 
 
 class Colors(str, Enum):
+    """ An enum of colors to be used for output"""
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
     OKGREEN = '\033[92m'
@@ -33,28 +37,37 @@ def colored(message: str, color: Colors) -> str:
 
 
 def support_color():
+    """ Detects if the terminal supports color."""
     return True
 
 
-def read_ibmi_json(path, parent_value):
+def read_ibmi_json(path: Path, parent_value: Tuple[str, str]) -> Tuple[str, str]:
+    """Read and return the value defined in the given .ibmi.json
+
+    Args:
+        path (Path): path to the ibmi.json
+        parent_value (Tuple[str, str]): (objlib, tgtCcsid) as defined the the parent directory
+
+    Returns:
+        Tuple[str, str]: (objlib, tgtCcsid)
+    """
     if path.exists():
-        with path.open() as f:
-            data = json.load(f)
+        with path.open() as file:
+            data = json.load(file)
             try:
                 objlib = parse_all_variables(data['build']['objlib'])
-
-            except Exception:
+            except KeyError:
                 objlib = parent_value[0]
             try:
-                tgtCcsid = data['build']['tgtCcsid']
-            except Exception:
-                tgtCcsid = parent_value[1]
-            return (objlib, tgtCcsid)
+                tgt_ccsid = data['build']['tgtCcsid']
+            except KeyError:
+                tgt_ccsid = parent_value[1]
+            return (objlib, tgt_ccsid)
     else:
         return parent_value
 
 
-def parse_variable(varName):
+def parse_variable(var_name: str):
     """ Returns the value of the given variable name in the system environment,
         or the input value itself if it is not a variable name.
 
@@ -66,20 +79,20 @@ def parse_variable(varName):
     >>> parse_variable("&key1")
     'value1'
     """
-    if varName.startswith("&") and len(varName) > 1:
-        varName = varName[1:]
+    if var_name.startswith("&") and len(var_name) > 1:
+        var_name = var_name[1:]
         try:
-            value = os.environ[varName]
+            value = os.environ[var_name]
             return value
-        except Exception:
+        except NameError:
             print(colored(
-                f"{varName} must be defined first in the environment variable.", Colors.FAIL))
-            exit(1)
+                f"{var_name} must be defined first in the environment variable.", Colors.FAIL))
+            sys.exit(1)
     else:
-        return varName
+        return var_name
 
 
-def parse_all_variables(input: str) -> str:
+def parse_all_variables(input_str: str) -> str:
     """ Resolve and return the input string with all variables being replaced
 
     >>> os.environ["key1"] = "value1"
@@ -107,7 +120,7 @@ def parse_all_variables(input: str) -> str:
     >>> parse_all_variables("&dependency_dir/includes")
     'dep_dir_value/includes'
     """
-    parts = input.split("/")
+    parts = input_str.split("/")
     result = ""
     for part in parts:
         result = result + parse_variable(part) + "/"
@@ -115,14 +128,14 @@ def parse_all_variables(input: str) -> str:
     return result
 
 
-def read_iproj_json(iproj_json_path):
+def read_iproj_json(iproj_json_path: Path) -> Dict:
     """ Returns a dictionary representing the iproj.json file content
     If `objlib` or `curlib` is not defined, the default value for those
     will be used.
     """
     try:
-        with iproj_json_path.open() as f:
-            iproj_json = json.load(f)
+        with iproj_json_path.open() as file:
+            iproj_json = json.load(file)
             objlib = parse_all_variables(
                 iproj_json["objlib"]) if "objlib" in iproj_json else DEFAULT_OBJLIB
             curlib = parse_all_variables(
@@ -133,18 +146,18 @@ def read_iproj_json(iproj_json_path):
                 else:
                     objlib = curlib
             iproj_json["preUsrlibl"] = " ".join(
-                map(lambda lib: parse_all_variables(lib), iproj_json["preUsrlibl"]))
+                map(parse_all_variables, iproj_json["preUsrlibl"]))
             iproj_json["postUsrlibl"] = " ".join(
-                map(lambda lib: parse_all_variables(lib), iproj_json["postUsrlibl"]))
+                map(parse_all_variables, iproj_json["postUsrlibl"]))
             iproj_json["includePath"] = " ".join(
-                map(lambda path: parse_all_variables(path), iproj_json["includePath"]))
+                map(parse_all_variables, iproj_json["includePath"]))
             iproj_json["objlib"] = objlib
             iproj_json["curlib"] = curlib
             iproj_json["tgtCcsid"] = iproj_json["tgtCcsid"] if "tgtCcsid" in iproj_json else "*JOB"
             return iproj_json
     except FileNotFoundError:
         print(colored("iproj.json not found!", Colors.FAIL))
-        exit(1)
+        sys.exit(1)
 
 
 def objlib_to_path(objlib):
@@ -159,16 +172,21 @@ def objlib_to_path(objlib):
 
 
 def run_command(cmd: str):
+    """ Run a command in a shell environment and redirect its stdout and stderr
+
+    Args:
+        cmd (str): The command to run
+    """
     print(colored(f"> {cmd}", Colors.OKGREEN))
     sys.stdout.flush()
     try:
         process = subprocess.Popen(
             ["bash", "-c", cmd], stdout=subprocess.PIPE, )
-        for c in iter(lambda: process.stdout.readline(), b''):
-            sys.stdout.buffer.write(c)
+        for char in iter(process.stdout.readline, b''):
+            sys.stdout.buffer.write(char)
             sys.stdout.flush()
-    except FileNotFoundError as e:
-        print(colored(f'Cannot find command {e.filename}!', Colors.FAIL))
+    except FileNotFoundError as error:
+        print(colored(f'Cannot find command {error.filename}!', Colors.FAIL))
 
 
 def get_compile_targets_from_filenames(filenames: List[str]) -> List[str]:
@@ -189,7 +207,7 @@ def get_compile_targets_from_filenames(filenames: List[str]) -> List[str]:
         while ext_len > 0:
             base, ext = '.'.join(
                 parts[:-ext_len]), '.'.join(parts[-ext_len:]).upper()
-            if ext in FILE_TARGET_MAPPING.keys():
+            if ext in FILE_TARGET_MAPPING:
                 result.append(f'{base}.{FILE_TARGET_MAPPING[ext]}')
                 break
             ext_len -= 1

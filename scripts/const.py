@@ -1,3 +1,4 @@
+""" Constants """
 from pathlib import Path
 
 DEFAULT_TGT_CCSID = "*JOB"
