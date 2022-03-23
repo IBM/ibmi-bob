@@ -1,5 +1,8 @@
 from pathlib import Path
 
+DEFAULT_TGT_CCSID = "*JOB"
+DEFAULT_OBJLIB = "*CURLIB"
+
 BOB_PATH = Path(__file__).parent.parent.resolve()
 
 FILE_TARGET_MAPPING = {
@@ -38,4 +41,5 @@ FILE_TARGET_MAPPING = {
     "WSCSTSRC": "WSCST",
 }
 # This is the maximum number of dot seperated parts in the file extensions defined above.
-FILE_MAX_EXT_LENGTH = max(map(lambda ext: len(ext.split('.')), FILE_TARGET_MAPPING.keys()))
+FILE_MAX_EXT_LENGTH = max(
+    map(lambda ext: len(ext.split('.')), FILE_TARGET_MAPPING.keys()))

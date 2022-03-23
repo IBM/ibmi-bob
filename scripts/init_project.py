@@ -7,6 +7,7 @@
 import json
 import signal
 import sys
+from scripts.const import DEFAULT_TGT_CCSID, DEFAULT_OBJLIB
 from scripts.utils import colored, Colors
 from typing import List, Optional
 from pathlib import Path
@@ -35,9 +36,9 @@ class ProjSpec():
             self.include_path = self._input_str_to_list(
                 prompt(f'include path, separated by commas', ""))
             self.objlib = prompt(
-                f'What library should objects be compiled into (objlib)', "*CURLIB")
+                f'What library should objects be compiled into (objlib)', DEFAULT_OBJLIB)
             self.tgt_ccsid = prompt(
-                f'What EBCDIC CCSID should the source be compiled in', "*JOB")
+                f'What EBCDIC CCSID should the source be compiled in', DEFAULT_TGT_CCSID)
             self.curlib = prompt(f'curlib', "")
             self.pre_usr_libl = self._input_str_to_list(
                 prompt(f'Pre user libraries, separated by commas', ""))
@@ -87,15 +88,22 @@ class ProjSpec():
         }
         return json.dumps(iproj, indent=4)
 
-    def generate_ibmi_json(self) -> str:
-        ibmi = {
-            "version": self.version,
-            "build": {
-                "objlib": self.objlib,
-                "tgtCcsid": self.tgt_ccsid
+    def generate_ibmi_json(self) -> Optional[str]:
+        build = {}
+        # if self.objlib != DEFAULT_OBJLIB:
+        #     build["objlib"] = self.objlib
+
+        if self.tgtCcsid != DEFAULT_TGT_CCSID:
+            build["tgtCcsid"] = self.tgt_ccsid
+
+        if len(build.keys) > 0:
+            ibmi = {
+                "version": self.version,
+                "build": build
             }
-        }
-        return json.dumps(ibmi, indent=4)
+            return json.dumps(ibmi, indent=4)
+        else:
+            return None
 
     def generate_rules_mk(self) -> str:
         return '\n'.join(['# Check out the documentation on creating the rules at https://github.com/IBM/ibmi-bob/wiki/Create-Rules.mk',
@@ -157,7 +165,9 @@ def prompt(description, default_vaule) -> str:
     return input_str
 
 
-def create_file(file_path: Path, content: str, force: bool = False) -> None:
+def create_file(file_path: Path, content: Optional[str], force: bool = False) -> None:
+    if content is None:
+        return
     if not force and file_path.exists():
         if not yes(prompt(colored(f'* {file_path} already exists, overwrite?', Colors.WARNING), 'no')):
             return
@@ -189,6 +199,7 @@ def init_project(force: bool = False) -> None:
                      ]))
     if force or yes(input('Continue? (yes) ')):
         create_file(iproj_json_path, proj_spec.generate_iproj_json(), force)
+
         create_file(ibmi_json_path, proj_spec.generate_ibmi_json(), force)
         create_file(rules_mk_path, proj_spec.generate_rules_mk(), force)
     else:
