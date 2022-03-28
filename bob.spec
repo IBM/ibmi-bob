@@ -19,7 +19,7 @@ Requires: sed-gnu >= 4.4-1
 Requires: grep-gnu >= 3.0-2
 Requires: gawk >= 4.1.4-2
 Requires: make-gnu >= 4.2-2
-Requires: python3 >= 3.4
+Requires: python3 >= 3.6
 
 Source0: https://github.com/IBM/ibmi-bob/archive/refs/tags/v%{version}.tar.gz
 Source1: https://github.com/BrianGarland/CRTFRMSTMF/archive/master.tar.gz
