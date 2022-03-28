@@ -1,0 +1,232 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+import argparse
+from datetime import datetime
+from pathlib import Path
+import sys
+
+import ibm_db_dbi
+
+try:
+    conn = ibm_db_dbi.connect()
+    # https://kadler.io/2018/09/20/using-python-ibm-db-with-un-journaled-files.html#
+    conn.set_option({ibm_db_dbi.SQL_ATTR_TXN_ISOLATION:
+                     ibm_db_dbi.SQL_TXN_NO_COMMIT})
+except Exception:
+    pass
+if conn is None:
+    print("Cannot connect to the database")
+    exit(1)
+cursor = conn.cursor()
+
+
+COMMAND_MAP = {'CRTCMD': 'CMD',
+               'CRTBNDCL': 'PGM',
+               'CRTCLMOD': 'MODULE',
+               'CRTDSPF': 'FILE',
+               'CRTPRTF': 'FILE',
+               'CRTLF': 'FILE',
+               'CRTPF': 'FILE',
+               'CRTMNU': 'MENU',
+               'CRTPNLGRP': 'PNLGRP',
+               'CRTQMQRY': 'QMQRY',
+               'CRTSRVPGM': 'SRVPGM',
+               'CRTWSCST': 'WSCST',
+               'CRTRPGPGM': 'PGM',
+               'CRTSQLRPG': 'PGM'}
+
+TMP_LIB = "QTEMP"
+TMP_SRC = "QSOURCE"
+
+
+def _crt_tmp_src_file(obj: str, srcstmf: str):
+    _dltf(TMP_LIB, TMP_SRC)
+    ccsid = retreive_ccsid(srcstmf)
+    if ccsid == "1208" or ccsid == "819":
+        ccsid_c = '*JOB'
+    else:
+        ccsid_c = str(ccsid)
+    _crtsrcpf(TMP_LIB, TMP_SRC, obj, ccsid_c)
+
+
+def _copy_srcstmf_to_tmp_src(mbr: str, srcstmf: str):
+    run_cl(
+        f'CPYFRMSTMF FROMSTMF("{srcstmf}") TOMBR("/QSYS.LIB/{TMP_LIB}.LIB/{TMP_SRC}.FILE/{mbr}.MBR") MBROPT(*REPLACE)')
+
+
+def _crt_obj(obj: str, lib: str, srcstmf: str, command: str, params: str):
+    obj_type = COMMAND_MAP[command]
+
+    cmd = f"{command} {obj_type}({lib}/{obj}) SRCFILE({TMP_LIB}/{TMP_SRC}) SRCMBR({obj})"
+    if params is not None:
+        cmd = cmd + ' ' + params
+    run_cl(cmd)
+    # _process_command(cmd)
+    if "*EVENTF" in cmd or "*SRCDBG" in cmd or "*LSTDBG" in cmd:
+        if lib == "*CURLIB":
+            lib = _retrieve_current_library()
+        if lib == "*NONE":
+            lib = "*QGPL"
+        _update_event_file(lib, obj, srcstmf, '37')
+
+
+def crtfrmstmf(obj: str, lib: str, srcstmf: str, command: str, params: str):
+    # Get absolute path of srcstmf
+    srcstmf = str(Path(srcstmf).resolve())
+    _crt_tmp_src_file(obj, srcstmf)
+    _copy_srcstmf_to_tmp_src(obj, srcstmf)
+    _crt_obj(obj, lib, srcstmf, command, params)
+    exit(0)
+
+
+def exit(code: int):
+    try:
+        print("closing the connection...")
+        conn.close()
+        print("Done")
+    except Exception as e:
+        print(e)
+    sys.exit(code)
+
+
+def cli():
+    """
+    crtfrmstmf program cli entry
+    """
+    parser = argparse.ArgumentParser(prog='crtfrmstmf')
+
+    parser.add_argument(
+        "-f",
+        '--stream-file',
+        help='Specifies the path name of the stream file containing the source code to be compiled.',
+        metavar='<srcstmf>',
+        required=True
+    )
+
+    parser.add_argument(
+        "-o",
+        "--object",
+        help='Enter the name of the object.',
+        metavar='<object>',
+        required=True
+    )
+
+    parser.add_argument(
+        "-l",
+        '--library',
+        help='Enter the name of the library. If no library is specified, the created object is stored in the current library.',
+        metavar='<library>',
+        default="*CURLIB"
+    )
+
+    parser.add_argument(
+        "-c",
+        '--command',
+        help='Specifies the compile command used to create the object.',
+        metavar='<cmd>',
+        required=True,
+        choices=COMMAND_MAP.keys(),
+
+    )
+
+    parser.add_argument(
+        "-p",
+        '--parameters',
+        help='Specifies the parameters added to the compile command.',
+        metavar='<parms>',
+        nargs='?'
+    )
+
+    args = parser.parse_args()
+    print(args)
+    crtfrmstmf(args.object.strip(), args.library.strip(),
+               args.stream_file.strip(), args.command.strip(), args.parameters)
+
+
+# Helper functions
+
+def run_cl(cmd: str, ignore_error: bool = False):
+    print(f"▶️  {cmd}")
+    try:
+        cursor.execute(f"call qsys2.qcmdexc('{cmd}',{len(cmd)})")
+    except Exception as e:
+        if not ignore_error:
+            print(f"❌ {e}")
+            exit(1)
+
+
+def run_sql(sql: str, ignore_error: bool = False):
+    try:
+        print(f"🔎 {sql}")
+        cursor.execute(sql)
+        try:
+            rows = cursor.fetchall()
+        except:
+            return None
+        return rows
+    except Exception as e:
+        if not ignore_error:
+            print(f"❌ {e}")
+            exit(1)
+
+
+def _get_attr(srcstmf: str):
+    import os
+    stream = os.popen(f'/QOpenSys/usr/bin/attr {srcstmf}')
+    output = stream.read().strip()
+    attrs = {}
+    for attr in output.split("\n"):
+        [key, value] = attr.split("=")
+        attrs[key] = value
+    return attrs
+
+
+def retreive_ccsid(srcstmf: str) -> str:
+    return _get_attr(srcstmf)["CCSID"]
+
+# CL Wrappers functions
+
+
+def _dltf(library: str, file: str):
+    run_cl(f'DLTF FILE({library}/{file})', True)
+
+
+def _crtsrcpf(lib: str, file: str, mbr: str, ccsid: str):
+    run_cl(
+        f'CRTSRCPF FILE({lib}/{file}) RCDLEN(198) MBR({mbr}) CCSID({ccsid})')
+
+
+def _retrieve_current_library() -> str:
+    rows = run_sql(
+        "SELECT SYSTEM_SCHEMA_NAME AS LIBRARY FROM QSYS2.LIBRARY_LIST_INFO WHERE TYPE='CURRENT'")
+    row = rows[0]
+    if row:
+        return row[0]
+    else:
+        return "*NONE"
+
+
+def _update_event_file(library: str, mbr: str, srcstmf: str, ccsid: str):
+    run_sql(
+        f"CREATE OR REPLACE ALIAS {TMP_LIB}.{mbr} FOR {library}.EVFEVENT ({mbr});")
+    results = run_sql(" ".join(["SELECT",
+                               f"CAST(EVFEVENT AS VARCHAR(300) CCSID {ccsid}) AS FULL",
+                                f"FROM {TMP_LIB}.{mbr}",
+                                f"WHERE Cast(evfevent As Varchar(300) Ccsid {ccsid}) LIKE 'FILEID%{TMP_LIB}/{TMP_SRC}({mbr})%'",
+                                ]))
+
+    parts = results[0][0].split()
+    run_sql(" ".join([f"Update {TMP_LIB}.{mbr}",
+                     "Set evfevent =",
+                      "(",
+                      f"SELECT Cast(evfevent As Varchar(24) Ccsid {ccsid}) CONCAT '{len(srcstmf):03} {srcstmf} {parts[-2]} {parts[-1]}'",
+                      f"FROM {TMP_LIB}.{mbr}",
+                      f"WHERE Cast(evfevent As Varchar(300) Ccsid {ccsid}) LIKE 'FILEID%{TMP_LIB}/{TMP_SRC}({mbr})%'",
+                      "FETCH First 1 Row Only)",
+                      f"WHERE Cast(evfevent As Varchar(300) Ccsid {ccsid}) LIKE 'FILEID%{TMP_LIB}/{TMP_SRC}({mbr})%'"]))
+
+    run_sql(f"DROP ALIAS {TMP_LIB}.{mbr}")
+
+
+if __name__ == "__main__":
+    cli()
