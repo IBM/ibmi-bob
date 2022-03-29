@@ -5,16 +5,16 @@
 # (c) Copyright IBM Corp. 2021
 """ The CLI entry for BOB"""
 
-
-from makei.utils import Colors, colored, get_compile_targets_from_filenames
-from makei.build import BuildEnv
-from makei import init_project
 import argparse
 import os
 from pathlib import Path
 import sys
 
 sys.path.append(str(Path(__file__).resolve().parent.parent))
+
+from makei import init_project
+from makei.build import BuildEnv
+from makei.utils import Colors, colored, get_compile_targets_from_filenames
 
 
 __version__ = "2.2.9"

@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from makei.ibm_job import save_joblog_json
 import argparse
 from pathlib import Path
 import sys
-# print(Path(__file__).resolve().parent.parent)
 sys.path.append(str(Path(__file__).resolve().parent.parent))
+from makei.ibm_job import save_joblog_json
 
 
 def cli():
