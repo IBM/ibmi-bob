@@ -280,7 +280,7 @@ echo "$(crtcmd)"; \
 ENVCURLIB=$(curlib) \
 ENVPREUSRLIBL=$(preUsrlibl) \
 ENVPOSTUSRLIBL=$(postUsrlibl) \
-ENVIBMiEnvCmd=$(IBMiEnvCmd) \
+ENVIBMiEnvCmd=$(IBMiEnvCmd)
 endef
 
 define SETCURLIBTOOBJLIB = 
