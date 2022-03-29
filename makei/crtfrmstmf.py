@@ -63,14 +63,21 @@ class CrtFrmStmf():
             f'CPYFRMSTMF FROMSTMF("{self.srcstmf}") TOMBR("/QSYS.LIB/{self.tmp_lib}.LIB/{self.tmp_src}.FILE/{self.obj}.MBR") MBROPT(*REPLACE)')
 
         obj_type = COMMAND_MAP[self.cmd]
-        obj_name = f"{self.obj}.{obj_type}"
+        # obj_name = f"{self.obj}.{obj_type}"
 
-        if check_object_exists(self.obj, self.lib, obj_type):
-            print(f"Object ${self.lib}/${self.obj} already exists")
-            if check_object_exists(self.obj, self.tmp_lib, obj_type):
-                Path(objlib_to_path(self.tmp_lib, obj_name)).unlink()
-            Path(objlib_to_path(self.lib, obj_name)).rename(
-                objlib_to_path(self.tmp_lib, obj_name))
+        back_up_job = IBMJob()
+        back_up_job.run_cl(f"CRTSAVF FILE({self.tmp_lib}/SAVEFILE)")
+        back_up_job.run_cl(
+            f"SAVOBJ OBJ({self.obj}) LIB({self.lib}) DEV(*SAVF) OBJTYPE(*{obj_type}) SAVF({self.tmp_lib}/SAVEFILE)", True)
+        back_up_job.run_cl(
+            f"DLTOBJ OBJ({self.lib}/{self.obj}) OBJTYPE(*{obj_type})")
+
+        # if check_object_exists(self.obj, self.lib, obj_type):
+        #     print(f"Object ${self.lib}/${self.obj} already exists")
+        #     if check_object_exists(self.obj, self.tmp_lib, obj_type):
+        #         Path(objlib_to_path(self.tmp_lib, obj_name)).unlink()
+        #     Path(objlib_to_path(self.lib, obj_name)).rename(
+        #         objlib_to_path(self.tmp_lib, obj_name))
 
         cmd = f"{self.cmd} {obj_type}({self.lib}/{self.obj}) SRCFILE({self.tmp_lib}/{self.tmp_src}) SRCMBR({self.obj})"
         if self.parameters is not None:
@@ -79,11 +86,13 @@ class CrtFrmStmf():
             self.job.run_cl(cmd)
         except:
             print(f"Build not successful for {self.lib}/{self.obj}")
-            if check_object_exists(self.obj, self.tmp_lib, obj_type):
-                print("restoring...")
-                Path(objlib_to_path(self.tmp_lib, obj_name)).rename(
-                    objlib_to_path(self.lib, obj_name))
-                print("Done")
+            back_up_job.run_cl(
+                f"RSTOBJ OBJ({self.obj}) SAVLIB({self.lib}) DEV(*SAVF) OBJTYPE(*{obj_type}) SAVF({self.tmp_lib}/SAVEFILE)", True)
+            # if check_object_exists(self.obj, self.tmp_lib, obj_type):
+            # print("restoring...")
+            # Path(objlib_to_path(self.tmp_lib, obj_name)).rename(
+            #     objlib_to_path(self.lib, obj_name))
+            # print("Done")
 
             # Process the event file
         if "*EVENTF" in cmd or "*SRCDBG" in cmd or "*LSTDBG" in cmd:
