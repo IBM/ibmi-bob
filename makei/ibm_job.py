@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from typing import Any, List, Tuple
+import json
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple
 import ibm_db_dbi
 from contextlib import closing
 
@@ -60,24 +62,72 @@ class IBMJob():
         return record_dicts
 
     def dump_joblog(self):
-        sql = f"SELECT MESSAGE_ID," + \
-            "MESSAGE_TEXT," + \
-            "MESSAGE_SECOND_LEVEL_TEXT," + \
-            "MESSAGE_TYPE," + \
-            "SEVERITY," + \
-            "MESSAGE_TIMESTAMP," + \
-            "FROM_PROGRAM," + \
-            "FROM_LIBRARY," + \
-            "FROM_INSTRUCTION," + \
-            "TO_PROGRAM," + \
-            "TO_LIBRARY," + \
-            "TO_MODULE," + \
-            "TO_PROCEDURE," + \
-            "TO_INSTRUCTION" + \
-            " " + \
-            "FROM TABLE(" + \
-            f"QSYS2.JOBLOG_INFO('{self.job_id}')" + \
-            ") A"
-        results = self.run_sql(sql)
-        joblog_dict = self._dump_results_to_dict(results)
-        return joblog_dict
+        return get_joblog_for_job(self.job_id)
+
+
+def get_joblog_for_job(id: str) -> List[Dict[str, Any]]:
+    query_job = IBMJob()
+    sql = f"SELECT MESSAGE_ID," + \
+        "MESSAGE_TEXT," + \
+        "MESSAGE_SECOND_LEVEL_TEXT," + \
+        "MESSAGE_TYPE," + \
+        "SEVERITY," + \
+        "MESSAGE_TIMESTAMP," + \
+        "FROM_PROGRAM," + \
+        "FROM_LIBRARY," + \
+        "FROM_INSTRUCTION," + \
+        "TO_PROGRAM," + \
+        "TO_LIBRARY," + \
+        "TO_MODULE," + \
+        "TO_PROCEDURE," + \
+        "TO_INSTRUCTION" + \
+        " " + \
+        "FROM TABLE(" + \
+        f"QSYS2.JOBLOG_INFO('{id}')" + \
+        ") A"
+    results = query_job.run_sql(sql)
+    joblog_dict = query_job._dump_results_to_dict(results)
+    return joblog_dict
+
+
+def save_joblog_json(cmd: str, cmd_time: str, jobid: str, joblog_json: Optional[str]):
+    records = get_joblog_for_job(jobid)
+    messages = []
+    for record in records:
+        if "not safe for a multithreaded job" in record["MESSAGE_TEXT"]:
+            continue
+        messages.append({"msgid": record["MESSAGE_ID"],
+                         "type": record["MESSAGE_TYPE"],
+                         "severity": record["SEVERITY"],
+                         # 2022-03-25-09.33.34.064676
+                         "message_time": record["MESSAGE_TIMESTAMP"].strftime("%Y-%m-%d-%H.%M.%S.%f"),
+                         "message_text": record["MESSAGE_TEXT"],
+                         "second_level": record["MESSAGE_SECOND_LEVEL_TEXT"],
+                         "from_program": record["FROM_PROGRAM"],
+                         "from_library": record["FROM_LIBRARY"],
+                         "from_instruction": record["FROM_INSTRUCTION"],
+                         "to_program": record["TO_PROGRAM"],
+                         "to_library": record["TO_LIBRARY"],
+                         "to_module": record["TO_MODULE"],
+                         "to_procedure": record["TO_PROCEDURE"],
+                         "to_instruction": record["TO_INSTRUCTION"]})
+
+    dumped_joblog = {
+        "cmd": cmd,
+        "cmd_time": cmd_time,
+        "msgs": messages
+    }
+
+    if joblog_json is not None:
+        joblog_json_path = Path(joblog_json)
+        if (joblog_json_path.is_file()):
+            with joblog_json_path.open() as json_file:
+                data = json.load(json_file)
+                data.append(dumped_joblog)
+        else:
+            data = [dumped_joblog]
+
+        with joblog_json_path.open('w') as json_file:
+            json.dump(data, json_file, indent=4)
+    else:
+        print(json.dumps([dumped_joblog], indent=4))
