@@ -34,4 +34,4 @@ echo
 cl "$cmd"
 echo "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
 echo
-"$SCRIPT_DIR"/getJobLog "$cmd" "$timestamp" "$jobid" "$joblog_json"
+"$SCRIPT_DIR"/getJobLog "$cmd" "$timestamp" "$jobid" -f "$joblog_json"
