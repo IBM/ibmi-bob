@@ -277,10 +277,10 @@ CURLIBPATH = $(call getLibPath,$(curlib))
 VPATH = $(subst $(space),:,$(strip $(call uniq,$(INCDIR) $(PREUSRLIBLPATH) $(CURLIBPATH) $(POSTUSRLIBLPATH) $(OBJPATH) $(SRCPATH))))
 define PRESETUP = 
 echo "$(crtcmd)"; \
-ENVCURLIB=$(curlib) \
-ENVPREUSRLIBL=$(preUsrlibl) \
-ENVPOSTUSRLIBL=$(postUsrlibl) \
-ENVIBMiEnvCmd=$(IBMiEnvCmd)
+curlib="$(curlib)" \
+preUsrlibl="$(preUsrlibl)" \
+postUsrlibl="$(postUsrlibl)" \
+IBMiEnvCmd="$(IBMiEnvCmd)"
 endef
 
 define SETCURLIBTOOBJLIB = 
@@ -522,19 +522,20 @@ programTGTRLS = $(strip \
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating DSPF [$(notdir $<)]")
 	@$(set_STMF_CCSID)
-	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$(basename $(@F))) cmd(CRTDSPF) srcstmf('$<') parms('$(CRTDSPFFLAGS)'))
+	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTDSPF" -p "$(CRTDSPFFLAGS)"")
 	@$(PRESETUP) \
-	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 ; $(call EVFEVENT_DOWNLOAD,$*.evfevent)
+	$(SCRIPTSPATH)/crtfrmstmf -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTDSPF" -p "$(CRTDSPFFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 || true
+	$(call EVFEVENT_DOWNLOAD,$*.evfevent)
 
 .SECONDEXPANSION:
 %.FILE: $$(call genDep,$$@,$$*,LF)
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating LF [$(notdir $<)]")
 	@$(set_STMF_CCSID)
-	@if [ -d $(OBJPATH)/$@ ]; then rm -r $(OBJPATH)/$@; fi
-	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$(basename $(@F))) cmd(CRTLF) srcstmf('$<') parms('$(CRTLFFLAGS)'))
+	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTLF" -p "$(CRTLFFLAGS)"")
 	@$(PRESETUP) \
-	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 ; $(call EVFEVENT_DOWNLOAD,$*.evfevent)
+	$(SCRIPTSPATH)/crtfrmstmf -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTLF" -p "$(CRTLFFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 || true
+	$(call EVFEVENT_DOWNLOAD,$*.evfevent)
 	@$(TYPEDEF)
 
 .SECONDEXPANSION:
@@ -542,9 +543,10 @@ programTGTRLS = $(strip \
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating PF [$(notdir $<)]")
 	@$(set_STMF_CCSID)
-	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$(basename $(@F))) cmd(CRTPF) srcstmf('$<') parms('$(CRTPFFLAGS)'))
+	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTPF" -p "$(CRTPFFLAGS)"")
 	@$(PRESETUP) \
-	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 ; $(call EVFEVENT_DOWNLOAD,$*.evfevent)
+	$(SCRIPTSPATH)/crtfrmstmf -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTPF" -p "$(CRTPFFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 || true
+	$(call EVFEVENT_DOWNLOAD,$*.evfevent)
 	@$(TYPEDEF)
 
 .SECONDEXPANSION:
@@ -552,9 +554,10 @@ programTGTRLS = $(strip \
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating PRTF [$(notdir $<)]")
 	@$(set_STMF_CCSID)
-	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$(basename $(@F))) cmd(CRTPRTF) srcstmf('$<') parms('$(CRTPRTFFLAGS)'))
+	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTPRTF" -p "$(CRTPRTFFLAGS)"")
 	@$(PRESETUP) \
-	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 ; $(call EVFEVENT_DOWNLOAD,$*.evfevent)
+	$(SCRIPTSPATH)/crtfrmstmf -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTPRTF" -p "$(CRTPRTFFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 || true
+	$(call EVFEVENT_DOWNLOAD,$*.evfevent)
 	@$(TYPEDEF)
 
 # @$(TOOLSPATH)/checkObjectAlreadyExists $@ $(OBJLIB)
@@ -645,9 +648,10 @@ programTGTRLS = $(strip \
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating menu [$(notdir $<)]")
 	@$(set_STMF_CCSID)
-	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$(basename $(@F))) cmd(CRTMNU) srcstmf('$<') parms('$(CRTMNUFLAGS)'))
+	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTMNU" -p "$(CRTMNUFLAGS)"")
 	@$(PRESETUP) \
-	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 ; $(call EVFEVENT_DOWNLOAD,$*.evfevent)
+	$(SCRIPTSPATH)/crtfrmstmf -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTMNU" -p "$(CRTMNUFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 || true
+	$(call EVFEVENT_DOWNLOAD,$*.evfevent)
 
 
 %.MODULE: private AUT = $(moduleAUT)
@@ -669,7 +673,8 @@ programTGTRLS = $(strip \
 	@$(set_STMF_CCSID)
 	$(eval crtcmd := crtcmod module($(OBJLIB)/$(basename $(@F))) srcstmf('$<') $(CRTCMODFLAGS) $(ADHOCCRTFLAGS))
 	@$(PRESETUP) \
-	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 ; ($(call EVFEVENT_DOWNLOAD,$*.evfevent); ret=$$?; rm $(DEPDIR)/$*.Td 2>/dev/null; exit $$ret)
+	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true
+	($(call EVFEVENT_DOWNLOAD,$*.evfevent); ret=$$?; rm $(DEPDIR)/$*.Td 2>/dev/null; exit $$ret)
 	@$(POSTCCOMPILE)
 
 
@@ -680,7 +685,8 @@ programTGTRLS = $(strip \
 	@$(set_STMF_CCSID)
 	$(eval crtcmd := crtrpgmod module($(OBJLIB)/$(basename $(@F))) srcstmf('$<') $(CRTRPGMODFLAGS))
 	@$(PRESETUP) \
-	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 ; $(call EVFEVENT_DOWNLOAD,$*.evfevent)
+	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true
+	$(call EVFEVENT_DOWNLOAD,$*.evfevent)
 
 
 .SECONDEXPANSION:
@@ -690,7 +696,8 @@ programTGTRLS = $(strip \
 	@$(set_STMF_CCSID)
 	@$(eval crtcmd := crtclmod module($(OBJLIB)/$(basename $(@F))) srcstmf('$<') $(CRTCLMODFLAGS))
 	@$(PRESETUP) \
-	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 ; $(call EVFEVENT_DOWNLOAD,$*.evfevent)
+	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true
+	$(call EVFEVENT_DOWNLOAD,$*.evfevent)
 
 # Temp: Convert UTF-8 to temporary Windows Latin-1, because SQLC pre-compiler doesn't understand UTF-8
 .SECONDEXPANSION:
@@ -701,8 +708,8 @@ programTGTRLS = $(strip \
 	@qsh_out -c "touch -C 1252 $<-1252 && cat $< >$<-1252"
 	$(eval crtcmd := crtsqlci obj($(OBJLIB)/$(basename $(@F))) srcstmf('$<-1252') $(CRTSQLCIFLAGS))
 	@$(PRESETUP) \
-	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 ; ($(call EVFEVENT_DOWNLOAD,$*.evfevent); ret=$$?; rm $(DEPDIR)/$*.Td 2>/dev/null; rm "$<-1252" 2>/dev/null; exit $$ret)
-	@$(POSTCCOMPILE)
+	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true
+	($(call EVFEVENT_DOWNLOAD,$*.evfevent); ret=$$?; rm $(DEPDIR)/$*.Td 2>/dev/null; rm "$<-1252" 2>/dev/null; exit $$ret)
 	@rm "$<-1252"
 
 
@@ -713,7 +720,8 @@ programTGTRLS = $(strip \
 	@$(set_STMF_CCSID)
 	$(eval crtcmd := crtsqlrpgi obj($(OBJLIB)/$(basename $(@F))) srcstmf('$<') $(CRTSQLRPGIFLAGS))
 	@$(PRESETUP) \
-	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 ; $(call EVFEVENT_DOWNLOAD,$*.evfevent)
+	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true
+	$(call EVFEVENT_DOWNLOAD,$*.evfevent)
 
 %.PGM: private ACTGRP = $(programACTGRP)
 %.PGM: private AUT = $(programAUT)
@@ -733,43 +741,48 @@ programTGTRLS = $(strip \
 	$(call echo_cmd,"=== Create Bound RPG Program [$(notdir $*)]")
 	$(eval crtcmd := CRTBNDRPG srcstmf('$<') PGM($(OBJLIB)/$(basename $(@F))) $(CRTBNDRPGFLAGS))
 	@$(PRESETUP) \
-	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 ; $(call EVFEVENT_DOWNLOAD,$*.PGM.RPGLE.evfevent)
-	@$(EVFEVENT_DOWNLOAD_PGM_RPGLE)
+	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true
+	$(call EVFEVENT_DOWNLOAD,$*.PGM.RPGLE.evfevent)
 
 %.PGM: $$(call genDep,$$@,$$*,PGM.SQLRPGLE)
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Create Bound SQLRPGLE Program [$(notdir $*)]")
 	$(eval crtcmd := CRTSQLRPGI srcstmf('$<') OBJ($(OBJLIB)/$(basename $(@F))) $(CRTSQLRPGIFLAGS))
 	@$(PRESETUP) \
-	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 ; $(call EVFEVENT_DOWNLOAD,$*.PGM.SQLRPGLE.evfevent)
+	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true
+	$(call EVFEVENT_DOWNLOAD,$*.PGM.SQLRPGLE.evfevent)
 
 %.PGM: $$(call genDep,$$@,$$*,PGM.C)
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Create Bound RPG Program [$(notdir $*)]")
 	$(eval crtcmd := CRTBNDC srcstmf('$<') PGM($(OBJLIB)/$(basename $(@F))) $(CRTBNDCFLAGS))
 	@$(PRESETUP) \
-	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 ; $(call EVFEVENT_DOWNLOAD,$*.PGM.C.evfevent)
+	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true
+	$(call EVFEVENT_DOWNLOAD,$*.PGM.C.evfevent)
 
 %.PGM: $$(call genDep,$$@,$$*,CBL)
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Create COBOL Program [$(notdir $*)]")
-	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$(basename $(@F))) cmd(CRTCBLPGM) srcstmf('$<') parms('$(CRTCBLPGMFLAGS)'))
+	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTPRTF" -p "$(CRTPRTFFLAGS)"")
 	@$(PRESETUP) \
-	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 ; $(call EVFEVENT_DOWNLOAD,$*.evfevent)
+	$(SCRIPTSPATH)/crtfrmstmf -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTPRTF" -p "$(CRTPRTFFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 || true
+	$(call EVFEVENT_DOWNLOAD,$*.evfevent)
 	
 %.PGM: $$(call genDep,$$@,$$*,PGM.CLLE)
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Create ILE CL Program [$(notdir $*)]")
 	$(eval crtcmd := CRTBNDCL srcstmf('$<') PGM($(OBJLIB)/$(basename $(@F))) $(CRTCLMODFLAGS))
 	@$(PRESETUP) \
-	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 ; $(call EVFEVENT_DOWNLOAD,$*.evfevent)
+	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true
+	$(call EVFEVENT_DOWNLOAD,$*.evfevent)
 
 %.PGM: $$(call genDep,$$@,$$*,RPG)
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Create RPG Program [$(notdir $*)]")
-	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$(basename $(@F))) cmd(CRTRPGPGM) srcstmf('$<') parms('$(CRTCBLPGMFLAGS)'))
+	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTRPGPGM" -p "$(CRTCBLPGMFLAGS)"")
 	@$(PRESETUP) \
-	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 ; $(call EVFEVENT_DOWNLOAD,$*.evfevent)
+	$(SCRIPTSPATH)/crtfrmstmf -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTRPGPGM" -p "$(CRTCBLPGMFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 || true
+	$(call EVFEVENT_DOWNLOAD,$*.evfevent)
 
 %.PGM: $$(call genDep,$$@,$$*,ILEPGM)
 	$(eval d = $($@_d))
@@ -784,7 +797,8 @@ programTGTRLS = $(strip \
 	$(eval externalsrvpgms := $(filter %.SRVPGM,$(subst .LIB,,$(subst /QSYS.LIB/,,$|))))
 	$(eval crtcmd := crtpgm pgm($(OBJLIB)/$(basename $(@F))) module($(basename $(filter %.MODULE,$(notdir $^)))) bndsrvpgm($(if $(BNDSRVPGMPATH),$(BNDSRVPGMPATH),*NONE)) $(CRTPGMFLAGS))
 	@$(PRESETUP) \
-	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 ; $(call EVFEVENT_DOWNLOAD,$*.PGM.evfevent)
+	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true
+	$(call EVFEVENT_DOWNLOAD,$*.PGM.evfevent)
 
 %.PNLGRP: private AUT = $(PNLGRP_AUT)
 %.PNLGRP: private OPTION = $(PNLGRP_OPTION)
@@ -794,9 +808,9 @@ programTGTRLS = $(strip \
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Create panel group [$(notdir $*)]")
 	@$(set_STMF_CCSID)
-	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$(basename $(@F))) cmd(CRTPNLGRP) srcstmf('$<') parms('$(CRTPNLGRPFLAGS)'))
+	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTPNLGRP" -p "$(CRTPNLGRPFLAGS)"")
 	@$(PRESETUP) \
-	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true
+	$(SCRIPTSPATH)/crtfrmstmf -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTPNLGRP" -p "$(CRTPNLGRPFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 || true
 
 %.QMQRY: private AUT = $(QMQRY_AUT)
 
@@ -805,9 +819,9 @@ programTGTRLS = $(strip \
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Create QM query [$(notdir $*)]")
 	@$(set_STMF_CCSID)
-	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$(basename $(@F))) cmd(CRTQMQRY) srcstmf('$<') parms('$(CRTQMQRYFLAGS)'))
-	$(PRESETUP) >> $(LOGFILE);  \
-	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true
+	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTQMQRY" -p "$(CRTQMQRYFLAGS)"")
+	$(PRESETUP) \
+	$(SCRIPTSPATH)/crtfrmstmf -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTQMQRY" -p "$(CRTQMQRYFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 || true
 
 
 %.SRVPGM: private ACTGRP = $(SRVPGM_ACTGRP)
@@ -876,9 +890,9 @@ programTGTRLS = $(strip \
 	$(eval d = $($@_d))
 	$(call echo_cmd,"=== Creating work station customizing object [$*]")
 	@$(set_STMF_CCSID)
-	$(eval crtcmd := $(CRTFRMSTMFLIB)/crtfrmstmf obj($(OBJLIB)/$(basename $(@F))) cmd(CRTWSCST) srcstmf('$<') parms('$(CRTWSCSTFLAGS)'))
+	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTWSCST" -p "$(CRTWSCSTFLAGS)"")
 	@$(PRESETUP) \
-	launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 || true
+	$(SCRIPTSPATH)/crtfrmstmf -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTWSCST" -p "$(CRTWSCSTFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 || true
 
 # $(DEPDIR)/%.d: ;
 # .PRECIOUS: $(DEPDIR)/%.d
@@ -939,7 +953,7 @@ test:
 	echo "INCDIR:           $(INCDIR)"; \
 	echo "preUsrlibl:		$(preUsrlibl)"; \
 	echo "postUsrlibl:		$(postUsrlibl)"; \
-	echo "CRTFRMSTFMLIB:		$(CRTFRMSTMFLIB)"; \
+	echo "ScriptPath:		$(SCRIPTPATH)"; \
 	echo "TOOLSPATH:		$(TOOLSPATH)"; \
 	echo "PROJECTDIR:		$(PROJECTDIR)";
 
