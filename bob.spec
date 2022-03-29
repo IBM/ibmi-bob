@@ -52,11 +52,13 @@ mkdir -p %{buildroot}%{_libdir}/bob
 mkdir -p %{buildroot}%{_bindir}/
 cp -r ./* %{buildroot}%{_libdir}/bob
 ln -sf %{_libdir}/bob/scripts/makei %{buildroot}%{_bindir}/makei
+ln -sf %{_libdir}/bob/scripts/crtfrmstmf %{buildroot}%{_bindir}/crtfrmstmf
 
 %files
 %defattr(-, qsys, *none)
 %{_libdir}/bob
 %{_bindir}/makei
+%{_bindir}/crtfrmstmf
 
 %changelog
 * Tue Mar 29 2022 Tongkun Zhang <tongkun.zhang@ibm.com> - 2.2.9
