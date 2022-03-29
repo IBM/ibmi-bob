@@ -287,8 +287,6 @@ define SETCURLIBTOOBJLIB =
 echo ">> Temporarily set curlib to $(OBJLIB)" >> $(LOGFILE); \
 liblist -c $(OBJLIB) >> $(LOGFILE) 2>&1; \
 liblist -af $(curlib) >> $(LOGFILE) 2>&1 || true
-end
-
 endef
 
 # cleanCDeps removes from the CRTCMOD-generated dependency file any header files located in /QIBM/, plus the
