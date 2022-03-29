@@ -318,9 +318,9 @@ cleanRPGDeps = awk '$$1 == "FILEID" && $$6 !~ /^QTEMP/ && toupper($$6) !~ /QSYS/
 define EVFEVENT_DOWNLOAD =
 system "CPYTOSTMF FROMMBR('$(OBJPATH)/EVFEVENT.FILE/$*.MBR') TOSTMF('$(EVTDIR)/$1) STMFCCSID(*STDASCII) ENDLINFMT(*LF) CVTDTA(*AUTO) STMFOPT(*REPLACE)" >/dev/null
 endef
-define POSTRPGCOMPILE =
-$(call EVFEVENT_DOWNLOAD,$*.evfevent.evfevent);
-endef
+# define POSTRPGCOMPILE =
+# $(call EVFEVENT_DOWNLOAD,$*.evfevent.evfevent);
+# endef
 
 # Deletes .d dependency file if it's empty.
 define removeEmptyDep =
