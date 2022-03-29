@@ -20,6 +20,19 @@ fi
 
 tmppipe=$(mktemp)
 
+echo ">> Adding user libraries to liblist"
+[[ ! -z "$curlib" ]] && liblist -c "$curlib"
+[[ ! -z "$preUsrlibl" ]] && liblist -af "$preUsrlibl"
+[[ ! -z "$postUsrlibl" ]] && liblist -al "$postUsrlibl"
+echo ">> Setup IBM i Environment"
+IFS=$'\\n'
+echo "$IBMiEnvCmd"
+if [ ! -z "$IBMiEnvCmd" ]; then
+  for envcmd in $IBMiEnvCmd; do
+    [[ ! -z "$envcmd" ]] && cl "$envcmd"
+  done
+fi
+
 getjobid -s >"$tmppipe"
 jobid=$(cat <"$tmppipe")
 rm -rf "$tmppipe"
