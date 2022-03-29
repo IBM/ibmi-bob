@@ -3,9 +3,9 @@
 
 import argparse
 from pathlib import Path
-import sys
-sys.path.append(str(Path(__file__).resolve().parent.parent))
-from makei.ibm_job import save_joblog_json
+import sys  # nopep8
+sys.path.append(str(Path(__file__).resolve().parent.parent))  # nopep8
+from makei.ibm_job import save_joblog_json  # nopep8
 
 
 def cli():
