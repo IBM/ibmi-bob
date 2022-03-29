@@ -3,8 +3,10 @@
 import argparse
 from pathlib import Path
 from typing import Optional
+from datetime import datetime
 
-from makei.ibm_job import IBMJob
+from makei.ibm_job import IBMJob, save_joblog_json
+from makei.utils import format_datetime
 
 COMMAND_MAP = {'CRTCMD': 'CMD',
                'CRTBNDCL': 'PGM',
@@ -30,14 +32,16 @@ class CrtFrmStmf():
     cmd: str
     parameters: Optional[str]
     ccsid_c: str
+    joblog_path: Optional[str]
 
-    def __init__(self, srcstmf: str, obj: str, lib: str, cmd: str, parameters: Optional[str] = None, tmp_lib="QTEMP", tmp_src="QSOURCE") -> None:
+    def __init__(self, srcstmf: str, obj: str, lib: str, cmd: str, parameters: Optional[str] = None, joblog_path: Optional[str] = None, tmp_lib="QTEMP", tmp_src="QSOURCE") -> None:
         self.job = IBMJob()
         self.srcstmf = srcstmf
         self.obj = obj
         self.lib = lib
         self.cmd = cmd
         self.parameters = parameters
+        self.joblog_path = joblog_path
         self.job.run_cl("CHGJOB LOG(4 00 * SECLVL)", True)
         self.tmp_lib = tmp_lib
         self.tmp_src = tmp_src
@@ -48,6 +52,7 @@ class CrtFrmStmf():
             self.ccsid_c = str(ccsid)
 
     def run(self):
+        run_datetime = datetime.now()
         # Delete the temp source file
         self.job.run_cl(f'DLTF FILE({self.tmp_lib}/{self.tmp_src})', True)
         # Create the temp source file
@@ -71,6 +76,10 @@ class CrtFrmStmf():
             if self.lib == "*NONE":
                 self.lib = "*QGPL"
             self._update_event_file('37')
+
+        if self.joblog_path is not None:
+            save_joblog_json(self.cmd, format_datetime(
+                run_datetime), self.job.job_id, self.joblog_path)
 
     def _retrieve_current_library(self):
         records, _ = self.job.run_sql(
@@ -155,13 +164,13 @@ def cli():
     parser.add_argument(
         "--save-joblog",
         help='Output the joblog to the specified json file.',
-        metavar='{path to joblog json file}',
+        metavar='<path to joblog json file>',
     )
 
     args = parser.parse_args()
     srcstmf_absolute_path = str(Path(args.stream_file.strip()).resolve())
     handle = CrtFrmStmf(srcstmf_absolute_path, args.object.strip(
-    ), args.library.strip(), args.command.strip(), args.parameters)
+    ), args.library.strip(), args.command.strip(), args.parameters, args.save_joblog)
     handle.run()
 
 # Helper functions
