@@ -62,14 +62,15 @@ class CrtFrmStmf():
         self.job.run_cl(
             f'CPYFRMSTMF FROMSTMF("{self.srcstmf}") TOMBR("/QSYS.LIB/{self.tmp_lib}.LIB/{self.tmp_src}.FILE/{self.obj}.MBR") MBROPT(*REPLACE)')
 
-        if check_object_exists(self.obj, self.lib):
-            print(f"Object ${self.lib}/${self.obj} already exists")
-            if check_object_exists(self.obj, self.tmp_lib):
-                Path(objlib_to_path(self.tmp_lib, self.obj)).unlink()
-            Path(objlib_to_path(self.lib, self.obj)).rename(
-                objlib_to_path(self.tmp_lib, self.obj))
-
         obj_type = COMMAND_MAP[self.cmd]
+        obj_name = f"{self.obj}.{obj_type}"
+
+        if check_object_exists(self.obj, self.lib, obj_type):
+            print(f"Object ${self.lib}/${self.obj} already exists")
+            if check_object_exists(self.obj, self.tmp_lib, obj_type):
+                Path(objlib_to_path(self.tmp_lib, obj_name)).unlink()
+            Path(objlib_to_path(self.lib, obj_name)).rename(
+                objlib_to_path(self.tmp_lib, obj_name))
 
         cmd = f"{self.cmd} {obj_type}({self.lib}/{self.obj}) SRCFILE({self.tmp_lib}/{self.tmp_src}) SRCMBR({self.obj})"
         if self.parameters is not None:
@@ -78,10 +79,10 @@ class CrtFrmStmf():
             self.job.run_cl(cmd)
         except:
             print(f"Build not successful for {self.lib}/{self.obj}")
-            if check_object_exists(self.obj, self.tmp_lib):
+            if check_object_exists(self.obj, self.tmp_lib, obj_type):
                 print("restoring...")
-                Path(objlib_to_path(self.tmp_lib, self.obj)).rename(
-                    objlib_to_path(self.lib, self.obj))
+                Path(objlib_to_path(self.tmp_lib, obj_name)).rename(
+                    objlib_to_path(self.lib, obj_name))
                 print("Done")
 
             # Process the event file
@@ -206,8 +207,8 @@ def retreive_ccsid(srcstmf: str) -> str:
     return _get_attr(srcstmf)["CCSID"]
 
 
-def check_object_exists(obj: str, lib: str) -> bool:
-    obj_path = Path(f"/QSYS.LIB/{lib}.LIB/${obj}")
+def check_object_exists(obj: str, lib: str, obj_type: str) -> bool:
+    obj_path = Path(f"/QSYS.LIB/{lib}.LIB/{obj}.{obj_type}")
     return obj_path.exists()
 
 
