@@ -152,8 +152,13 @@ def cli():
         nargs='?'
     )
 
-    args = parser.parse_args()
+    parser.add_argument(
+        "--save-joblog",
+        help='Output the joblog to the specified json file.',
+        metavar='{path to joblog json file}',
+    )
 
+    args = parser.parse_args()
     srcstmf_absolute_path = str(Path(args.stream_file.strip()).resolve())
     handle = CrtFrmStmf(srcstmf_absolute_path, args.object.strip(
     ), args.library.strip(), args.command.strip(), args.parameters)
