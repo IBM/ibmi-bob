@@ -37,8 +37,7 @@ Here's what makes Bob different.
   parameters is trivial, and writing custom recipes for special objects is very
   straightforward. If you can code it, you can build it.
 - Ease of use. Invoking a build of an entire codebase is done with just a 
-  single command. Or, if the Rational Developer for i integration pieces are
-  installed, a single button click.
+  single command.
 
 
 %prep
