@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from makei.utils import format_datetime, objlib_to_path
+from makei.ibm_job import IBMJob, save_joblog_json
 import argparse
 from pathlib import Path
+import sys
 from typing import Optional
 from datetime import datetime
+sys.path.append(str(Path(__file__).resolve().parent.parent))
 
-from makei.ibm_job import IBMJob, save_joblog_json
-from makei.utils import format_datetime, objlib_to_path
 
 COMMAND_MAP = {'CRTCMD': 'CMD',
                'CRTBNDCL': 'PGM',
