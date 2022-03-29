@@ -4,7 +4,7 @@ import argparse
 import os
 from pathlib import Path
 import sys
-from typing import Dict, Optional
+from typing import Any, Dict, Optional
 from datetime import datetime
 sys.path.append(str(Path(__file__).resolve().parent.parent))  # nopep8
 from makei.ibm_job import IBMJob, save_joblog_json  # nopep8
@@ -47,7 +47,7 @@ class CrtFrmStmf():
         self.parameters = parameters
         self.env_settings = env_settings if env_settings is not None else {}
         self.joblog_path = joblog_path
-        self.job.run_cl("CHGJOB LOG(4 00 * SECLVL)", True)
+        self.job.run_cl("CHGJOB LOG(4 00 *SECLVL)", True)
         self.tmp_lib = tmp_lib
         self.tmp_src = tmp_src
         ccsid = retrieve_ccsid(srcstmf)
@@ -111,7 +111,7 @@ class CrtFrmStmf():
 
         if self.joblog_path is not None:
             save_joblog_json(cmd, format_datetime(
-                run_datetime), self.job.job_id, self.joblog_path)
+                run_datetime), self.job.job_id, self.joblog_path, filter_joblogs)
 
     def setupEnv(self):
         if "curlib" in self.env_settings and self.env_settings["curlib"]:
@@ -253,6 +253,19 @@ def check_object_exists(obj: str, lib: str, obj_type: str) -> bool:
     obj_path = Path(f"/QSYS.LIB/{lib}.LIB/{obj}.{obj_type}")
     return obj_path.exists()
 
+def filter_joblogs(record: Dict[str, Any]) -> bool:
+    msgid = record["MESSAGE_ID"]
+    if msgid is None:
+        return False
+    if msgid == "CPD0912":
+        return False
+    if msgid == "CPF1301":
+        return False
+    if "SQL" in msgid:
+        return False
+    if "Object QSOURCE in QTEMP type *FILE not found." in record["MESSAGE_TEXT"]:
+        return False
+    return True
 
 if __name__ == "__main__":
     cli()

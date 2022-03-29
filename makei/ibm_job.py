@@ -3,7 +3,7 @@
 
 import json
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Callable, Dict, List, Optional, Tuple
 import ibm_db_dbi
 from contextlib import closing
 from makei.utils import format_datetime
@@ -20,7 +20,8 @@ class IBMJob():
             self.conn.set_option({ibm_db_dbi.SQL_ATTR_TXN_ISOLATION:
                                   ibm_db_dbi.SQL_TXN_NO_COMMIT})
             self.job_id = self.run_sql("VALUES(QSYS2.JOB_NAME)")[0][0][0]
-        except Exception:
+        except Exception as e:
+            print(e)
             print("Cannot connect to the database")
             exit(1)
 
@@ -91,10 +92,12 @@ def get_joblog_for_job(id: str) -> List[Dict[str, Any]]:
     return joblog_dict
 
 
-def save_joblog_json(cmd: str, cmd_time: str, jobid: str, joblog_json: Optional[str]):
+def save_joblog_json(cmd: str, cmd_time: str, jobid: str, joblog_json: Optional[str], filter: Callable[[Dict[str, Any]], bool] = None):
     records = get_joblog_for_job(jobid)
     messages = []
     for record in records:
+        if filter is not None and not filter(record):
+            continue
         if "not safe for a multithreaded job" in record["MESSAGE_TEXT"]:
             continue
         messages.append({"msgid": record["MESSAGE_ID"],
