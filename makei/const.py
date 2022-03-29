@@ -5,7 +5,7 @@ DEFAULT_TGT_CCSID = "*JOB"
 DEFAULT_OBJLIB = "*CURLIB"
 DEFAULT_CURLIB = "*CRTDFT"
 
-BOB_PATH = Path(__file__).parent.parent.resolve()
+BOB_PATH = Path(__file__).resolve().parent.parent
 
 FILE_TARGET_MAPPING = {
     "PGM.RPGLE": "PGM",
