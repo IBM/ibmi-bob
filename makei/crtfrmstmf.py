@@ -50,7 +50,7 @@ class CrtFrmStmf():
         self.job.run_cl("CHGJOB LOG(4 00 * SECLVL)", True)
         self.tmp_lib = tmp_lib
         self.tmp_src = tmp_src
-        ccsid = retreive_ccsid(srcstmf)
+        ccsid = retrieve_ccsid(srcstmf)
         if ccsid == "1208" or ccsid == "819":
             self.ccsid_c = '*JOB'
         else:
@@ -245,7 +245,7 @@ def _get_attr(srcstmf: str):
     return attrs
 
 
-def retreive_ccsid(srcstmf: str) -> str:
+def retrieve_ccsid(srcstmf: str) -> str:
     return _get_attr(srcstmf)["CCSID"]
 
 
