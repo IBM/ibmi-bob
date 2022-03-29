@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import argparse
+import os
 from pathlib import Path
 import sys
-from typing import Optional
+from typing import Dict, Optional
 from datetime import datetime
-sys.path.append(str(Path(__file__).resolve().parent.parent))
-from makei.utils import format_datetime
-from makei.ibm_job import IBMJob, save_joblog_json
+sys.path.append(str(Path(__file__).resolve().parent.parent))  # nopep8
+from makei.ibm_job import IBMJob, save_joblog_json  # nopep8
+from makei.utils import format_datetime  # nopep8
 
 
 COMMAND_MAP = {'CRTCMD': 'CMD',
@@ -33,16 +34,18 @@ class CrtFrmStmf():
     lib: str
     cmd: str
     parameters: Optional[str]
+    env_settings: Dict[str, str]
     ccsid_c: str
     joblog_path: Optional[str]
 
-    def __init__(self, srcstmf: str, obj: str, lib: str, cmd: str, parameters: Optional[str] = None, joblog_path: Optional[str] = None, tmp_lib="QTEMP", tmp_src="QSOURCE") -> None:
+    def __init__(self, srcstmf: str, obj: str, lib: str, cmd: str, parameters: Optional[str] = None, env_settings: Optional[Dict[str, str]] = None, joblog_path: Optional[str] = None, tmp_lib="QTEMP", tmp_src="QSOURCE") -> None:
         self.job = IBMJob()
         self.srcstmf = srcstmf
         self.obj = obj
         self.lib = lib
         self.cmd = cmd
         self.parameters = parameters
+        self.env_settings = env_settings if env_settings is not None else {}
         self.joblog_path = joblog_path
         self.job.run_cl("CHGJOB LOG(4 00 * SECLVL)", True)
         self.tmp_lib = tmp_lib
@@ -54,6 +57,8 @@ class CrtFrmStmf():
             self.ccsid_c = str(ccsid)
 
     def run(self):
+        self.setupEnv()
+
         run_datetime = datetime.now()
         # Delete the temp source file
         self.job.run_cl(f'DLTF FILE({self.tmp_lib}/{self.tmp_src})', True)
@@ -72,7 +77,7 @@ class CrtFrmStmf():
         back_up_job.run_cl(
             f"SAVOBJ OBJ({self.obj}) LIB({self.lib}) DEV(*SAVF) OBJTYPE(*{obj_type}) SAVF({self.tmp_lib}/SAVEFILE)", True)
         back_up_job.run_cl(
-            f"DLTOBJ OBJ({self.lib}/{self.obj}) OBJTYPE(*{obj_type})")
+            f"DLTOBJ OBJ({self.lib}/{self.obj}) OBJTYPE(*{obj_type})", True)
 
         # if check_object_exists(self.obj, self.lib, obj_type):
         #     print(f"Object ${self.lib}/${self.obj} already exists")
@@ -107,6 +112,22 @@ class CrtFrmStmf():
         if self.joblog_path is not None:
             save_joblog_json(self.cmd, format_datetime(
                 run_datetime), self.job.job_id, self.joblog_path)
+
+    def setupEnv(self):
+        if "curlib" in self.env_settings and self.env_settings["curlib"]:
+            self.job.run_cl(f"CHGCURLIB CURLIB({self.env_settings['curlib']})")
+
+        if "preUsrlibl" in self.env_settings and self.env_settings["preUsrlibl"]:
+            for libl in self.env_settings["preUsrlibl"].split():
+                self.job.run_cl(f"ADDLIBLE LIB({libl}) POSITION(*FIRST)")
+
+        if "postUsrlibl" in self.env_settings and self.env_settings["postUsrlibl"]:
+            for libl in self.env_settings["postUsrlibl"].split():
+                self.job.run_cl(f"ADDLIBLE LIB({libl}) POSITION(*LAST)")
+
+        if "IBMiEnvCmd" in self.env_settings and self.env_settings["IBMiEnvCmd"]:
+            for cmd in self.env_settings["IBMiEnvCmd"].split("\\n"):
+                self.job.run_cl(cmd)
 
     def _retrieve_current_library(self):
         records, _ = self.job.run_sql(
@@ -196,8 +217,18 @@ def cli():
 
     args = parser.parse_args()
     srcstmf_absolute_path = str(Path(args.stream_file.strip()).resolve())
+    env_settings = {}
+    if "curlib" in os.environ:
+        env_settings["curlib"] = os.environ["curlib"]
+    if "preUsrlibl" in os.environ:
+        env_settings["preUsrlibl"] = os.environ["preUsrlibl"]
+    if "postUsrlibl" in os.environ:
+        env_settings["postUsrlibl"] = os.environ["postUsrlibl"]
+    if "IBMiEnvCmd" in os.environ:
+        env_settings["IBMiEnvCmd"] = os.environ["IBMiEnvCmd"]
+
     handle = CrtFrmStmf(srcstmf_absolute_path, args.object.strip(
-    ), args.library.strip(), args.command.strip(), args.parameters, args.save_joblog)
+    ), args.library.strip(), args.command.strip(), args.parameters, env_settings, args.save_joblog)
     handle.run()
 
 # Helper functions
