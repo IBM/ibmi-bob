@@ -46,17 +46,11 @@ class BuildEnv():
         self.iproj_json = read_iproj_json(self.iproj_json_path)
         self.color = support_color()
 
-        if "setIBMiEnvCmd" in self.iproj_json.keys():
+        if "setIBMiEnvCmd" in self.iproj_json:
             cmd_list = self.iproj_json["setIBMiEnvCmd"]
-            if len(cmd_list) > 0:
-                cmd = ' '.join(
-                    map(lambda cmd: f'cl "{cmd} >/dev/null 2>&1 &&', cmd_list))
-                cmd = cmd[:-2]
-            else:
-                cmd = ":"
-            self.ibmi_env_cmds = cmd
+            self.ibmi_env_cmds = "\n".join(cmd_list)
         else:
-            self.ibmi_env_cmds = ":"
+            self.ibmi_env_cmds = ""
 
         self._create_build_vars()
 
