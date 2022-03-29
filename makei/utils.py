@@ -161,15 +161,18 @@ def read_iproj_json(iproj_json_path: Path) -> Dict:
         sys.exit(1)
 
 
-def objlib_to_path(objlib):
+def objlib_to_path(lib, object=None):
     """Returns the path for the given objlib in IFS
 
     >>> objlib_to_path("TONGKUN")
     '/QSYS.LIB/TONGKUN.LIB'
     """
-    if not objlib:
+    if not lib:
         raise ValueError()
-    return f"/QSYS.LIB/{objlib}.LIB"
+    if object is not None:
+        return f"/QSYS.LIB/{lib}.LIB/{object}"
+    else:
+        return f"/QSYS.LIB/{lib}.LIB"
 
 
 def run_command(cmd: str):

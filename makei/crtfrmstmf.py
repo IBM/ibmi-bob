@@ -6,7 +6,7 @@ from typing import Optional
 from datetime import datetime
 
 from makei.ibm_job import IBMJob, save_joblog_json
-from makei.utils import format_datetime
+from makei.utils import format_datetime, objlib_to_path
 
 COMMAND_MAP = {'CRTCMD': 'CMD',
                'CRTBNDCL': 'PGM',
@@ -62,14 +62,29 @@ class CrtFrmStmf():
         self.job.run_cl(
             f'CPYFRMSTMF FROMSTMF("{self.srcstmf}") TOMBR("/QSYS.LIB/{self.tmp_lib}.LIB/{self.tmp_src}.FILE/{self.obj}.MBR") MBROPT(*REPLACE)')
 
+        if check_object_exists(self.obj, self.lib):
+            print(f"Object ${self.lib}/${self.obj} already exists")
+            if check_object_exists(self.obj, self.tmp_lib):
+                Path(objlib_to_path(self.tmp_lib, self.obj)).unlink()
+            Path(objlib_to_path(self.lib, self.obj)).rename(
+                objlib_to_path(self.tmp_lib, self.obj))
+
         obj_type = COMMAND_MAP[self.cmd]
 
         cmd = f"{self.cmd} {obj_type}({self.lib}/{self.obj}) SRCFILE({self.tmp_lib}/{self.tmp_src}) SRCMBR({self.obj})"
         if self.parameters is not None:
             cmd = cmd + ' ' + self.parameters
-        self.job.run_cl(cmd)
+        try:
+            self.job.run_cl(cmd)
+        except:
+            print(f"Build not successful for {self.lib}/{self.obj}")
+            if check_object_exists(self.obj, self.tmp_lib):
+                print("restoring...")
+                Path(objlib_to_path(self.tmp_lib, self.obj)).rename(
+                    objlib_to_path(self.lib, self.obj))
+                print("Done")
 
-        # Process the event file
+            # Process the event file
         if "*EVENTF" in cmd or "*SRCDBG" in cmd or "*LSTDBG" in cmd:
             if self.lib == "*CURLIB":
                 self.lib = self._retrieve_current_library()
@@ -189,6 +204,11 @@ def _get_attr(srcstmf: str):
 
 def retreive_ccsid(srcstmf: str) -> str:
     return _get_attr(srcstmf)["CCSID"]
+
+
+def check_object_exists(obj: str, lib: str) -> bool:
+    obj_path = Path(f"/QSYS.LIB/{lib}.LIB/${obj}")
+    return obj_path.exists()
 
 
 if __name__ == "__main__":
