@@ -4,7 +4,7 @@ import argparse
 from pathlib import Path
 from typing import Optional
 
-from .ibm_job import IBMJob
+from makei.ibm_job import IBMJob
 
 COMMAND_MAP = {'CRTCMD': 'CMD',
                'CRTBNDCL': 'PGM',

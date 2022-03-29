@@ -9,9 +9,9 @@ import argparse
 import os
 import sys
 
-from scripts import init_project
-from scripts.build import BuildEnv
-from scripts.utils import Colors, colored, get_compile_targets_from_filenames
+from makei import init_project
+from makei.build import BuildEnv
+from makei.utils import Colors, colored, get_compile_targets_from_filenames
 
 __version__ = "2.2.9"
 

@@ -14,7 +14,7 @@ import subprocess
 import sys
 from typing import Dict, List, Tuple
 
-from scripts.const import DEFAULT_CURLIB, DEFAULT_OBJLIB, FILE_MAX_EXT_LENGTH, FILE_TARGET_MAPPING
+from makei.const import DEFAULT_CURLIB, DEFAULT_OBJLIB, FILE_MAX_EXT_LENGTH, FILE_TARGET_MAPPING
 
 
 class Colors(str, Enum):

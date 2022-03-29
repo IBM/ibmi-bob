@@ -7,8 +7,8 @@
 from pathlib import Path
 from tempfile import mkstemp
 from typing import Any, Dict, List, Optional
-from scripts.const import BOB_PATH
-from scripts.utils import objlib_to_path, read_ibmi_json, read_iproj_json, \
+from makei.const import BOB_PATH
+from makei.utils import objlib_to_path, read_ibmi_json, read_iproj_json, \
     run_command, support_color
 
 
@@ -39,7 +39,7 @@ class BuildEnv():
         self.make_options = make_options if make_options else ""
         self.bob_path = Path(
             overrides["bob_path"]) if "bob_path" in overrides else BOB_PATH
-        self.bob_makefile = self.bob_path / 'Makefile'
+        self.bob_makefile = self.bob_path / 'mk' / 'Makefile'
         self.build_vars_handle, path = mkstemp()
         self.build_vars_path = Path(path)
         self.iproj_json_path = self.src_dir / "iproj.json"
