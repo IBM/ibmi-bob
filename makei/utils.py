@@ -134,27 +134,36 @@ def read_iproj_json(iproj_json_path: Path) -> Dict:
     If `objlib` or `curlib` is not defined, the default value for those
     will be used.
     """
+    def with_default_value(key, default_value, dict):
+        if key in dict:
+            return dict[key]
+        else:
+            return default_value
+
     try:
         with iproj_json_path.open() as file:
             iproj_json = json.load(file)
-            objlib = parse_all_variables(
-                iproj_json["objlib"]) if "objlib" in iproj_json else DEFAULT_OBJLIB
-            curlib = parse_all_variables(
-                iproj_json["curlib"]) if "curlib" in iproj_json else DEFAULT_CURLIB
+            objlib = parse_all_variables(with_default_value(
+                "objlib", DEFAULT_OBJLIB, iproj_json))
+            curlib = parse_all_variables(with_default_value(
+                "curlib", DEFAULT_CURLIB, iproj_json))
             if objlib == "*CURLIB":
                 if curlib == "*CRTDFT":
                     objlib = "QGPL"
                 else:
                     objlib = curlib
+
             iproj_json["preUsrlibl"] = " ".join(
-                map(parse_all_variables, iproj_json["preUsrlibl"]))
+                map(parse_all_variables, with_default_value("preUsrlibl", [], iproj_json)))
+
             iproj_json["postUsrlibl"] = " ".join(
                 map(parse_all_variables, iproj_json["postUsrlibl"]))
             iproj_json["includePath"] = " ".join(
                 map(parse_all_variables, iproj_json["includePath"]))
             iproj_json["objlib"] = objlib
             iproj_json["curlib"] = curlib
-            iproj_json["tgtCcsid"] = iproj_json["tgtCcsid"] if "tgtCcsid" in iproj_json else "*JOB"
+            iproj_json["tgtCcsid"] = with_default_value(
+                "tgtCcsid", "*JOB", iproj_json)
             return iproj_json
     except FileNotFoundError:
         print(colored("iproj.json not found!", Colors.FAIL))
