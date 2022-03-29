@@ -4,6 +4,7 @@
 # 57XX-XXX
 # (c) Copyright IBM Corp. 2021
 """ The module used to build a project"""
+from os import unlink
 from pathlib import Path
 from tempfile import mkstemp
 from typing import Any, Dict, List, Optional
@@ -48,7 +49,7 @@ class BuildEnv():
 
         if "setIBMiEnvCmd" in self.iproj_json:
             cmd_list = self.iproj_json["setIBMiEnvCmd"]
-            self.ibmi_env_cmds = "\n".join(cmd_list)
+            self.ibmi_env_cmds = "\\n".join(cmd_list)
         else:
             self.ibmi_env_cmds = ""
 
@@ -115,6 +116,11 @@ class BuildEnv():
 
     def make(self):
         """ Generate and execute the make command."""
+        if (self.src_dir / ".logs" / "joblog.json").exists():
+            (self.src_dir / ".logs" / "joblog.json").unlink()
+        if (self.src_dir / ".logs" / "output.log").exists():
+            (self.src_dir / ".logs" / "output.log").unlink()
+
         run_command(self.generate_make_cmd())
         self._post_make()
 
