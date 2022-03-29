@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 import ibm_db_dbi
 from contextlib import closing
+from makei.utils import format_datetime
 
 
 class IBMJob():
@@ -99,8 +100,7 @@ def save_joblog_json(cmd: str, cmd_time: str, jobid: str, joblog_json: Optional[
         messages.append({"msgid": record["MESSAGE_ID"],
                          "type": record["MESSAGE_TYPE"],
                          "severity": record["SEVERITY"],
-                         # 2022-03-25-09.33.34.064676
-                         "message_time": record["MESSAGE_TIMESTAMP"].strftime("%Y-%m-%d-%H.%M.%S.%f"),
+                         "message_time": format_datetime(record["MESSAGE_TIMESTAMP"]),
                          "message_text": record["MESSAGE_TEXT"],
                          "second_level": record["MESSAGE_SECOND_LEVEL_TEXT"],
                          "from_program": record["FROM_PROGRAM"],

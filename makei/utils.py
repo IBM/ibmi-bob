@@ -6,6 +6,7 @@
 
 """ The utility module"""
 
+from datetime import datetime
 from enum import Enum
 import json
 import os
@@ -212,6 +213,11 @@ def get_compile_targets_from_filenames(filenames: List[str]) -> List[str]:
                 break
             ext_len -= 1
     return result
+
+
+def format_datetime(d: datetime) -> str:
+    # 2022-03-25-09.33.34.064676
+    return d.strftime("%Y-%m-%d-%H.%M.%S.%f"),
 
 
 if __name__ == "__main__":
