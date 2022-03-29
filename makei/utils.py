@@ -211,6 +211,8 @@ def get_compile_targets_from_filenames(filenames: List[str]) -> List[str]:
     ['test.MODULE']
     >>> get_compile_targets_from_filenames(["functionsVAT/VAT300.RPGLE", "test.RPGLE"])
     ['VAT300.MODULE', 'test.MODULE']
+    >>> get_compile_targets_from_filenames(["ART200-Work_with_article.PGM.SQLRPGLE"])
+    ['ART200.PGM']
     """
     result = []
     for filename in filenames:
@@ -221,7 +223,9 @@ def get_compile_targets_from_filenames(filenames: List[str]) -> List[str]:
             base, ext = '.'.join(
                 parts[:-ext_len]), '.'.join(parts[-ext_len:]).upper()
             if ext in FILE_TARGET_MAPPING:
-                result.append(f'{base}.{FILE_TARGET_MAPPING[ext]}')
+                # Split the object name and text attributes
+                object_name = base.split("-")[0]
+                result.append(f'{object_name}.{FILE_TARGET_MAPPING[ext]}')
                 break
             ext_len -= 1
     return result

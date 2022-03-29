@@ -8,6 +8,7 @@ DEFAULT_CURLIB = "*CRTDFT"
 BOB_PATH = Path(__file__).resolve().parent.parent
 
 FILE_TARGET_MAPPING = {
+    "PGM.SQLRPGLE": "PGM",
     "PGM.RPGLE": "PGM",
     "PGM.CLLE": "PGM",
     "PGM.C": "PGM",
