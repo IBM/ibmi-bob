@@ -110,7 +110,7 @@ class CrtFrmStmf():
             self._update_event_file('37')
 
         if self.joblog_path is not None:
-            save_joblog_json(self.cmd, format_datetime(
+            save_joblog_json(cmd, format_datetime(
                 run_datetime), self.job.job_id, self.joblog_path)
 
     def setupEnv(self):
