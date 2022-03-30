@@ -255,16 +255,19 @@ def check_object_exists(obj: str, lib: str, obj_type: str) -> bool:
 
 def filter_joblogs(record: Dict[str, Any]) -> bool:
     msgid = record["MESSAGE_ID"]
-    msg_text = record["MESSAGE_TEXT"]
     if msgid is None:
         return False
     if msgid == "CPD0912":
+        # Printer device errors
         return False
     if msgid == "CPF1301":
+        # Journaling errors
         return False
     if msgid == "CPF9898":
+        # https://techchannel.com/SMB/02/2019/qsqsrvr-job-considerations
         return False
     if "SQL" in msgid:
+        # Ignore all SQL errors
         return False
     return True
 
