@@ -8,7 +8,7 @@ from typing import Any, Dict, Optional
 from datetime import datetime
 sys.path.append(str(Path(__file__).resolve().parent.parent))  # nopep8
 from makei.ibm_job import IBMJob, save_joblog_json  # nopep8
-from makei.utils import format_datetime  # nopep8
+from makei.utils import format_datetime, objlib_to_path  # nopep8
 
 
 COMMAND_MAP = {'CRTCMD': 'CMD',
@@ -255,6 +255,35 @@ def retrieve_ccsid(srcstmf: str) -> str:
 def check_object_exists(obj: str, lib: str, obj_type: str) -> bool:
     obj_path = Path(f"/QSYS.LIB/{lib}.LIB/{obj}.{obj_type}")
     return obj_path.exists()
+
+def delete_physical_dependencies(obj: str, lib: str, delete_pf: bool, verbose: bool=False):
+    lib_path = Path(f'/QSYS.LIB/{lib}.lib')
+    pf_path = lib_path / f"{obj}.file"
+    if not pf_path.exists():
+        if verbose:
+            print(f"delete_physical_dependencies: {pf_path} does not exist.")
+        return
+    
+    job = IBMJob()
+    dep_files, _ = job.run_sql(f"Select DBFFDP, DBFLDP From QSYS.QADBFDEP Where DBFLIB='{lib}' and DBFFIL='{obj}' and DBFLDP='{lib}'")
+    for dep_file in dep_files:
+        dep_obj, dep_lib = dep_file
+        dep_path = Path(objlib_to_path(dep_lib, f"{dep_obj}.FILE"))
+        if verbose:
+            print(f"delete_physical_dependencies: attempt to delete {dep_path}.")
+        if dep_path.exists():
+            dep_path.unlink()
+            print(f"delete_physical_dependencies: {dep_path} deleted.")
+    
+    if delete_pf and pf_path.exists():
+        if verbose:
+            print(f"delete_physical_dependencies: attempt to delete {pf_path}.")
+        pf_path.unlink()
+        if verbose and pf_path.exists():
+            print(f"delete_physical_dependencies: {pf_path} deleted.")
+        else:
+            print(f"delete_physical_dependencies: {pf_path} not deleted.")
+
 
 def filter_joblogs(record: Dict[str, Any]) -> bool:
     msgid = record["MESSAGE_ID"]
