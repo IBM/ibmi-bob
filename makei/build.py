@@ -126,17 +126,17 @@ class BuildEnv():
 
     def _post_make(self):
         pass
-        event_files = list(Path(".evfevent").rglob("*.evfevent"))
+        # event_files = list(Path(".evfevent").rglob("*.evfevent"))
 
-        def replace_abs_path(line: str) -> str:
-            if str(Path.cwd()) in line:
-                line = line.replace(f'{Path.cwd()}/', '')
-                new_len = len(line.split()[5])
-                # Replace length
-                line = line[:24] + f"{new_len:03d}" + line[27:]
-                return line
-            else:
-                return line
+        # def replace_abs_path(line: str) -> str:
+        #     if str(Path.cwd()) in line:
+        #         line = line.replace(f'{Path.cwd()}/', '')
+        #         new_len = len(line.split()[5])
+        #         # Replace length
+        #         line = line[:24] + f"{new_len:03d}" + line[27:]
+        #         return line
+        #     else:
+        #         return line
 
-        for filepath in event_files:
-            replace_file_content(filepath, replace_abs_path)
+        # for filepath in event_files:
+        #     replace_file_content(filepath, replace_abs_path)
