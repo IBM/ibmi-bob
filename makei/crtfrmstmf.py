@@ -160,7 +160,7 @@ class CrtFrmStmf():
         _, lib_list, _ = list(zip(*obj_list))
         obj_list_by_lib = {lib: [(obj_tuple[0], obj_tuple[2]) for obj_tuple in obj_list if lib == obj_tuple[1]] for lib in set(lib_list)}
 
-        for lib, obj_tuples in obj_list_by_lib:
+        for lib, obj_tuples in obj_list_by_lib.items():
             obj_name_list, obj_type_list = list(zip(*obj_tuples))
             self.setup_job.run_cl(f"CRTSAVF FILE({self.tmp_lib}/{lib})")
             self.setup_job.run_cl(
@@ -178,7 +178,7 @@ class CrtFrmStmf():
         _, lib_list, _ = list(zip(*obj_list))
         obj_list_by_lib = {lib: [(obj_tuple[0], obj_tuple[2]) for obj_tuple in obj_list if lib == obj_tuple[1]] for lib in set(lib_list)}
 
-        for lib, obj_tuples in obj_list_by_lib:
+        for lib, obj_tuples in obj_list_by_lib.items():
             obj_name_list, obj_type_list = list(zip(*obj_tuples))
             self.setup_job.run_cl(f"CRTSAVF FILE({self.tmp_lib}/{lib})")
             self.setup_job.run_cl(
