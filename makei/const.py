@@ -40,7 +40,7 @@ FILE_TARGET_MAPPING = {
     "SQLSEQ": "DTAARA",
     "SQLUDF": "SRVPGM",
     "SQLTRG": "SQL",
-    "MSGF": "MSG",
+    "MSGF": "MSGF",
     "WSCSTSRC": "WSCST",
 }
 # This is the maximum number of dot seperated parts in the file extensions defined above.
