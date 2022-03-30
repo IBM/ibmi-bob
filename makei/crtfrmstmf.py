@@ -168,7 +168,7 @@ class CrtFrmStmf():
         
         for obj_tuple in obj_list:
             self.setup_job.run_cl(
-                f"DLTOBJ OBJ({obj_tuple[1]}/{obj_tuple[0]}) OBJTYPE(*{obj_tuple[3]})")
+                f"DLTOBJ OBJ({obj_tuple[1]}/{obj_tuple[0]}) OBJTYPE(*{obj_tuple[2]})")
 
 
     def _restore_objs(self):
