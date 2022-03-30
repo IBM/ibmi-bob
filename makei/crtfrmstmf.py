@@ -3,6 +3,7 @@
 import argparse
 import os
 from pathlib import Path
+import shutil
 import sys
 from typing import Any, Dict, Optional
 from datetime import datetime
@@ -272,13 +273,13 @@ def delete_physical_dependencies(obj: str, lib: str, delete_pf: bool, verbose: b
         if verbose:
             print(f"delete_physical_dependencies: attempt to delete {dep_path}.")
         if dep_path.exists():
-            dep_path.unlink()
+            shutil.rmtree(dep_path)
             print(f"delete_physical_dependencies: {dep_path} deleted.")
     
     if delete_pf and pf_path.exists():
         if verbose:
             print(f"delete_physical_dependencies: attempt to delete {pf_path}.")
-        pf_path.unlink()
+        shutil.rmtree(pf_path)
         if verbose and pf_path.exists():
             print(f"delete_physical_dependencies: {pf_path} deleted.")
         else:
