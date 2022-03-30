@@ -255,15 +255,16 @@ def check_object_exists(obj: str, lib: str, obj_type: str) -> bool:
 
 def filter_joblogs(record: Dict[str, Any]) -> bool:
     msgid = record["MESSAGE_ID"]
+    msg_text = record["MESSAGE_TEXT"]
     if msgid is None:
         return False
     if msgid == "CPD0912":
         return False
     if msgid == "CPF1301":
         return False
-    if "SQL" in msgid:
+    if msgid == "CPF9898":
         return False
-    if "Object QSOURCE in QTEMP type *FILE not found." in record["MESSAGE_TEXT"]:
+    if "SQL" in msgid:
         return False
     return True
 
