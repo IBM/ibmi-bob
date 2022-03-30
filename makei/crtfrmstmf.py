@@ -161,6 +161,8 @@ class CrtFrmStmf():
         if not len(obj_list) > 0:
             return
 
+        print(f"Backing up {len(obj_list)} object(s)...")
+
         _, lib_list, _ = list(zip(*obj_list))
         obj_list_by_lib = {lib: [(obj_tuple[0], obj_tuple[2]) for obj_tuple in obj_list if lib == obj_tuple[1]] for lib in set(lib_list)}
 
@@ -187,7 +189,7 @@ class CrtFrmStmf():
         for lib, obj_tuples in obj_list_by_lib.items():
             obj_name_list, obj_type_list = list(zip(*obj_tuples))
             self.setup_job.run_cl(
-                f"RSTOBJ OBJ({' '.join(set(obj_name_list))}) LIB({self.lib}) DEV(*SAVF) OBJTYPE({' '.join(map(lambda obj_type: f'*{obj_type}', set(obj_type_list)))}) SAVF({self.tmp_lib}/{lib})")
+                f"RSTOBJ OBJ({' '.join(set(obj_name_list))}) SAVLIB({self.lib}) DEV(*SAVF) OBJTYPE({' '.join(map(lambda obj_type: f'*{obj_type}', set(obj_type_list)))}) SAVF({self.tmp_lib}/{lib})")
         print("done.")
 
 
