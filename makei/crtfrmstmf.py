@@ -141,8 +141,10 @@ class CrtFrmStmf():
                                         f"FROM {self.tmp_lib}.{self.obj}",
                                         f"WHERE Cast(evfevent As Varchar(300) Ccsid {ccsid}) LIKE 'FILEID%{self.tmp_lib}/{self.tmp_src}({self.obj})%'",
                                         ]))[0]
-
-        parts = results[0][0].split()
+        if results:
+            parts = results[0][0].split()
+        else:
+            return
         self.setup_job.run_sql(" ".join([f"Update {self.tmp_lib}.{self.obj}",
                               "Set evfevent =",
                               "(",
