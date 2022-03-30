@@ -5,7 +5,7 @@ import os
 from pathlib import Path
 import shutil
 import sys
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional, Tuple
 from datetime import datetime
 sys.path.append(str(Path(__file__).resolve().parent.parent))  # nopep8
 from makei.ibm_job import IBMJob, save_joblog_json  # nopep8
@@ -39,6 +39,8 @@ class CrtFrmStmf():
     env_settings: Dict[str, str]
     ccsid_c: str
     joblog_path: Optional[str]
+    back_up_obj_list: List[Tuple[str, str, str]] # List of (obj, lib, obj_type) tuples
+    obj_type: str
 
     def __init__(self, srcstmf: str, obj: str, lib: str, cmd: str, parameters: Optional[str] = None, env_settings: Optional[Dict[str, str]] = None, joblog_path: Optional[str] = None, tmp_lib="QTEMP", tmp_src="QSOURCE") -> None:
         self.job = IBMJob()
@@ -53,11 +55,21 @@ class CrtFrmStmf():
         self.job.run_cl("CHGJOB LOG(4 00 *SECLVL)", log=False)
         self.tmp_lib = tmp_lib
         self.tmp_src = tmp_src
+        self.obj_type = COMMAND_MAP[self.cmd]
         ccsid = retrieve_ccsid(srcstmf)
         if ccsid == "1208" or ccsid == "819":
             self.ccsid_c = '*JOB'
         else:
             self.ccsid_c = str(ccsid)
+
+        if check_object_exists(self.obj, self.lib, self.obj_type):
+            if self.cmd == "CRTPF":
+                # For physical files, delete all its logical file dependencies
+                self.back_up_obj_list = get_physical_dependencies(self.obj, self.lib, True, self.setup_job)
+            else:
+                self.back_up_obj_list = [(self.obj, self.lib, self.obj_type)]
+        else:
+            self.back_up_obj_list = []
 
     def run(self):
         self.setupEnv()
@@ -72,37 +84,17 @@ class CrtFrmStmf():
         self.job.run_cl(
             f'CPYFRMSTMF FROMSTMF("{self.srcstmf}") TOMBR("/QSYS.LIB/{self.tmp_lib}.LIB/{self.tmp_src}.FILE/{self.obj}.MBR") MBROPT(*REPLACE)')
 
-        obj_type = COMMAND_MAP[self.cmd]
-        # obj_name = f"{self.obj}.{obj_type}"
+        self._backup_and_delete_objs()
 
-        back_up_job = IBMJob()
-        back_up_job.run_cl(f"CRTSAVF FILE({self.tmp_lib}/SAVEFILE)")
-        back_up_job.run_cl(
-            f"SAVOBJ OBJ({self.obj}) LIB({self.lib}) DEV(*SAVF) OBJTYPE(*{obj_type}) SAVF({self.tmp_lib}/SAVEFILE)", True)
-        back_up_job.run_cl(
-            f"DLTOBJ OBJ({self.lib}/{self.obj}) OBJTYPE(*{obj_type})", True)
-
-        # if check_object_exists(self.obj, self.lib, obj_type):
-        #     print(f"Object ${self.lib}/${self.obj} already exists")
-        #     if check_object_exists(self.obj, self.tmp_lib, obj_type):
-        #         Path(objlib_to_path(self.tmp_lib, obj_name)).unlink()
-        #     Path(objlib_to_path(self.lib, obj_name)).rename(
-        #         objlib_to_path(self.tmp_lib, obj_name))
-
-        cmd = f"{self.cmd} {obj_type}({self.lib}/{self.obj}) SRCFILE({self.tmp_lib}/{self.tmp_src}) SRCMBR({self.obj})"
+        cmd = f"{self.cmd} {self.obj_type}({self.lib}/{self.obj}) SRCFILE({self.tmp_lib}/{self.tmp_src}) SRCMBR({self.obj})"
         if self.parameters is not None:
             cmd = cmd + ' ' + self.parameters
         try:
             self.job.run_cl(cmd, False, True)
         except:
             print(f"Build not successful for {self.lib}/{self.obj}")
-            back_up_job.run_cl(
-                f"RSTOBJ OBJ({self.obj}) SAVLIB({self.lib}) DEV(*SAVF) OBJTYPE(*{obj_type}) SAVF({self.tmp_lib}/SAVEFILE)", True)
-            # if check_object_exists(self.obj, self.tmp_lib, obj_type):
-            # print("restoring...")
-            # Path(objlib_to_path(self.tmp_lib, obj_name)).rename(
-            #     objlib_to_path(self.lib, obj_name))
-            # print("Done")
+            if len(self.back_up_obj_list) > 0:
+                self._restore_objs()
 
             # Process the event file
         if "*EVENTF" in cmd or "*SRCDBG" in cmd or "*LSTDBG" in cmd:
@@ -125,7 +117,7 @@ class CrtFrmStmf():
                 self.job.run_cl(f"ADDLIBLE LIB({libl}) POSITION(*FIRST)", log=True)
 
         if "postUsrlibl" in self.env_settings and self.env_settings["postUsrlibl"]:
-            for libl in self.env_settings["postUsrlibl"].split().reverse():
+            for libl in self.env_settings["postUsrlibl"].split():
                 self.job.run_cl(f"ADDLIBLE LIB({libl}) POSITION(*LAST)", log=True)
 
         if "IBMiEnvCmd" in self.env_settings and self.env_settings["IBMiEnvCmd"]:
@@ -161,6 +153,37 @@ class CrtFrmStmf():
                               f"WHERE Cast(evfevent As Varchar(300) Ccsid {ccsid}) LIKE 'FILEID%{self.tmp_lib}/{self.tmp_src}({self.obj})%'"]))
 
         self.setup_job.run_sql(f"DROP ALIAS {self.tmp_lib}.{self.obj}")
+
+    def _backup_and_delete_objs(self):
+        obj_list = self.back_up_obj_list
+
+        _, lib_list, _ = list(zip(*obj_list))
+        obj_list_by_lib = {lib: [(obj_tuple[0], obj_tuple[2]) for obj_tuple in obj_list if lib == obj_tuple[1]] for lib in set(lib_list)}
+
+        for lib, obj_tuples in obj_list_by_lib:
+            obj_name_list, obj_type_list = list(zip(*obj_tuples))
+            self.setup_job.run_cl(f"CRTSAVF FILE({self.tmp_lib}/{lib})")
+            self.setup_job.run_cl(
+                f"SAVOBJ OBJ({' '.join(set(obj_name_list))}) LIB({self.lib}) DEV(*SAVF) OBJTYPE({' '.join(map(lambda obj_type: f'*{obj_type}', set(obj_type_list)))}) SAVF({self.tmp_lib}/{lib}) SPLFDTA(*ALL) ACCPATH(*YES) QDTA(*DTAQ)")
+        
+        for obj_tuple in obj_list:
+            self.setup_job.run_cl(
+                f"DLTOBJ OBJ({obj_tuple[1]}/{obj_tuple[0]}) OBJTYPE(*{obj_tuple[3]})")
+
+
+    def _restore_objs(self):
+        obj_list = self.back_up_obj_list
+        print(f"Restoring {len(obj_list)} object(s)...")
+
+        _, lib_list, _ = list(zip(*obj_list))
+        obj_list_by_lib = {lib: [(obj_tuple[0], obj_tuple[2]) for obj_tuple in obj_list if lib == obj_tuple[1]] for lib in set(lib_list)}
+
+        for lib, obj_tuples in obj_list_by_lib:
+            obj_name_list, obj_type_list = list(zip(*obj_tuples))
+            self.setup_job.run_cl(f"CRTSAVF FILE({self.tmp_lib}/{lib})")
+            self.setup_job.run_cl(
+                f"RSTOBJ OBJ({' '.join(set(obj_name_list))}) LIB({self.lib}) DEV(*SAVF) OBJTYPE({' '.join(map(lambda obj_type: f'*{obj_type}', set(obj_type_list)))}) SAVF({self.tmp_lib}/{lib})")
+        print("done.")
 
 
 def cli():
@@ -258,7 +281,21 @@ def check_object_exists(obj: str, lib: str, obj_type: str) -> bool:
     obj_path = Path(f"/QSYS.LIB/{lib}.LIB/{obj}.{obj_type}")
     return obj_path.exists()
 
-def delete_physical_dependencies(obj: str, lib: str, delete_pf: bool, verbose: bool=False):
+
+def get_physical_dependencies(obj: str, lib: str, include_self: bool, job: Optional[IBMJob]=None, verbose: bool=False) -> List[Tuple[str, str, str]]:
+    """Get the dependencies for a given physical file object
+
+    Args:
+        obj (str): Object name of the physical file
+        lib (str): Library name of the physical file
+        include_self (bool): whether to include the physical file itself in the result
+        job (IBMJob, optional): Job used to run the commands. If none is set, a new job will be created. Defaults to None.
+        verbose (bool, optional): Defaults to False.
+
+    Returns:
+        List[Tuple[str, str, str]]: List of (obj, lib, obj_type) tuples
+    """
+
     lib_path = Path(f'/QSYS.LIB/{lib}.LIB')
     pf_path = lib_path / f"{obj}.FILE"
     if not pf_path.exists():
@@ -266,26 +303,28 @@ def delete_physical_dependencies(obj: str, lib: str, delete_pf: bool, verbose: b
             print(f"delete_physical_dependencies: {pf_path} does not exist.")
         return
     
-    job = IBMJob()
-    dep_files, _ = job.run_sql(f"Select DBFFDP, DBFLDP From QSYS.QADBFDEP Where DBFLIB='{lib}' and DBFFIL='{obj}' and DBFLDP='{lib}'")
-    for dep_file in dep_files:
-        dep_obj, dep_lib = dep_file
-        dep_path = Path(objlib_to_path(dep_lib.strip(), f"{dep_obj.strip()}.FILE"))
+    if job is None:
+        job = IBMJob()
+
+    dep_files, _ = job.run_sql(f"Select DBFFDP, DBFLDP From QSYS.QADBFDEP Where DBFLIB='{lib}' and DBFFIL='{obj}'")
+    result = list(map(lambda dep_file: (dep_file[0].strip(), dep_file[1].strip(), "FILE"), dep_files))
+    if include_self:
+        result.append((obj, lib, "FILE"))
+    return result
+
+def delete_objects(obj_list:List(Tuple(str, str, str)), job: IBMJob=None, verbose: bool=False):
+    for obj_tuple in obj_list:
+        obj, lib, obj_type = obj_tuple
+        obj_path = Path(objlib_to_path(lib, f"{obj}.{obj_type}"))
         if verbose:
-            print(f"delete_physical_dependencies: attempt to delete {dep_path}.")
-        if dep_path.exists():
-            shutil.rmtree(dep_path)
-            print(f"delete_physical_dependencies: {dep_path} deleted.")
-    
-    if delete_pf and pf_path.exists():
-        if verbose:
-            print(f"delete_physical_dependencies: attempt to delete {pf_path}.")
-        shutil.rmtree(pf_path)
-        if verbose:
-            if pf_path.exists():
-                print(f"delete_physical_dependencies: {pf_path} deleted.")
-            else:
-                print(f"delete_physical_dependencies: {pf_path} not deleted.")
+            print(f"attempt to delete {obj_path}.")
+        if obj_path.exists():
+            shutil.rmtree(obj_path)
+            if verbose:
+                if obj_path.exists():
+                    print(f"{obj_path} not deleted.")
+                else:
+                    print(f"{obj_path} not deleted.")
 
 
 def filter_joblogs(record: Dict[str, Any]) -> bool:
