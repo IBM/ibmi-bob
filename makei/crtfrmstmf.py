@@ -156,6 +156,8 @@ class CrtFrmStmf():
 
     def _backup_and_delete_objs(self):
         obj_list = self.back_up_obj_list
+        if not len(obj_list) > 0:
+            return
 
         _, lib_list, _ = list(zip(*obj_list))
         obj_list_by_lib = {lib: [(obj_tuple[0], obj_tuple[2]) for obj_tuple in obj_list if lib == obj_tuple[1]] for lib in set(lib_list)}
@@ -173,6 +175,8 @@ class CrtFrmStmf():
 
     def _restore_objs(self):
         obj_list = self.back_up_obj_list
+        if not len(obj_list) > 0:
+            return
         print(f"Restoring {len(obj_list)} object(s)...")
 
         _, lib_list, _ = list(zip(*obj_list))
