@@ -164,7 +164,7 @@ class CrtFrmStmf():
             obj_name_list, obj_type_list = list(zip(*obj_tuples))
             self.setup_job.run_cl(f"CRTSAVF FILE({self.tmp_lib}/{lib})")
             self.setup_job.run_cl(
-                f"SAVOBJ OBJ({' '.join(set(obj_name_list))}) LIB({self.lib}) DEV(*SAVF) OBJTYPE({' '.join(map(lambda obj_type: f'*{obj_type}', set(obj_type_list)))}) SAVF({self.tmp_lib}/{lib}) SPLFDTA(*ALL) ACCPATH(*YES) QDTA(*DTAQ)")
+                f"SAVOBJ OBJ({' '.join(set(obj_name_list))}) LIB({self.lib}) DEV(*SAVF) OBJTYPE({' '.join(map(lambda obj_type: f'*{obj_type}', set(obj_type_list)))}) SAVF({self.tmp_lib}/{lib}) SPLFDTA(*ALL) ACCPTH(*YES) QDTA(*DTAQ)")
         
         for obj_tuple in obj_list:
             self.setup_job.run_cl(
