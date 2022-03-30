@@ -312,7 +312,7 @@ def get_physical_dependencies(obj: str, lib: str, include_self: bool, job: Optio
         result.append((obj, lib, "FILE"))
     return result
 
-def delete_objects(obj_list:List(Tuple(str, str, str)), job: IBMJob=None, verbose: bool=False):
+def delete_objects(obj_list:List[Tuple[str, str, str]], job: IBMJob=None, verbose: bool=False):
     for obj_tuple in obj_list:
         obj, lib, obj_type = obj_tuple
         obj_path = Path(objlib_to_path(lib, f"{obj}.{obj_type}"))
