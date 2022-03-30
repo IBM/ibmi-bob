@@ -30,6 +30,7 @@ COMMAND_MAP = {'CRTCMD': 'CMD',
 
 class CrtFrmStmf():
     job: IBMJob
+    setup_job: IBMJob
     srcstmf: str
     obj: str
     lib: str
@@ -41,6 +42,7 @@ class CrtFrmStmf():
 
     def __init__(self, srcstmf: str, obj: str, lib: str, cmd: str, parameters: Optional[str] = None, env_settings: Optional[Dict[str, str]] = None, joblog_path: Optional[str] = None, tmp_lib="QTEMP", tmp_src="QSOURCE") -> None:
         self.job = IBMJob()
+        self.setup_job = IBMJob()
         self.srcstmf = srcstmf
         self.obj = obj
         self.lib = lib
@@ -140,17 +142,16 @@ class CrtFrmStmf():
             return "*NONE"
 
     def _update_event_file(self, ccsid):
-        job = IBMJob()
-        job.run_sql(
+        self.setup_job.run_sql(
             f"CREATE OR REPLACE ALIAS {self.tmp_lib}.{self.obj} FOR {self.lib}.EVFEVENT ({self.obj});")
-        results = job.run_sql(" ".join(["SELECT",
+        results = self.setup_job.run_sql(" ".join(["SELECT",
                                         f"CAST(EVFEVENT AS VARCHAR(300) CCSID {ccsid}) AS FULL",
                                         f"FROM {self.tmp_lib}.{self.obj}",
                                         f"WHERE Cast(evfevent As Varchar(300) Ccsid {ccsid}) LIKE 'FILEID%{self.tmp_lib}/{self.tmp_src}({self.obj})%'",
                                         ]))[0]
 
         parts = results[0][0].split()
-        job.run_sql(" ".join([f"Update {self.tmp_lib}.{self.obj}",
+        self.setup_job.run_sql(" ".join([f"Update {self.tmp_lib}.{self.obj}",
                               "Set evfevent =",
                               "(",
                               f"SELECT Cast(evfevent As Varchar(24) Ccsid {ccsid}) CONCAT '{len(self.srcstmf):03} {self.srcstmf} {parts[-2]} {parts[-1]}'",
@@ -159,7 +160,7 @@ class CrtFrmStmf():
                               "FETCH First 1 Row Only)",
                               f"WHERE Cast(evfevent As Varchar(300) Ccsid {ccsid}) LIKE 'FILEID%{self.tmp_lib}/{self.tmp_src}({self.obj})%'"]))
 
-        job.run_sql(f"DROP ALIAS {self.tmp_lib}.{self.obj}")
+        self.setup_job.run_sql(f"DROP ALIAS {self.tmp_lib}.{self.obj}")
 
 
 def cli():
@@ -258,8 +259,8 @@ def check_object_exists(obj: str, lib: str, obj_type: str) -> bool:
     return obj_path.exists()
 
 def delete_physical_dependencies(obj: str, lib: str, delete_pf: bool, verbose: bool=False):
-    lib_path = Path(f'/QSYS.LIB/{lib}.lib')
-    pf_path = lib_path / f"{obj}.file"
+    lib_path = Path(f'/QSYS.LIB/{lib}.LIB')
+    pf_path = lib_path / f"{obj}.FILE"
     if not pf_path.exists():
         if verbose:
             print(f"delete_physical_dependencies: {pf_path} does not exist.")
@@ -280,10 +281,11 @@ def delete_physical_dependencies(obj: str, lib: str, delete_pf: bool, verbose: b
         if verbose:
             print(f"delete_physical_dependencies: attempt to delete {pf_path}.")
         shutil.rmtree(pf_path)
-        if verbose and pf_path.exists():
-            print(f"delete_physical_dependencies: {pf_path} deleted.")
-        else:
-            print(f"delete_physical_dependencies: {pf_path} not deleted.")
+        if verbose:
+            if pf_path.exists():
+                print(f"delete_physical_dependencies: {pf_path} deleted.")
+            else:
+                print(f"delete_physical_dependencies: {pf_path} not deleted.")
 
 
 def filter_joblogs(record: Dict[str, Any]) -> bool:
