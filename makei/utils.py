@@ -211,8 +211,8 @@ def get_compile_targets_from_filenames(filenames: List[str]) -> List[str]:
     ['test.MODULE']
     >>> get_compile_targets_from_filenames(["functionsVAT/VAT300.RPGLE", "test.RPGLE"])
     ['VAT300.MODULE', 'test.MODULE']
-    >>> get_compile_targets_from_filenames(["ART200-Work_with_article.PGM.SQLRPGLE"])
-    ['ART200.PGM']
+    >>> get_compile_targets_from_filenames(["ART200-Work_with_article.PGM.SQLRPGLE", "SGSMSGF.MSGF"])
+    ['ART200.PGM', 'SGSMSGF.MSGF']
     """
     result = []
     for filename in filenames:
@@ -228,6 +228,8 @@ def get_compile_targets_from_filenames(filenames: List[str]) -> List[str]:
                 result.append(f'{object_name}.{FILE_TARGET_MAPPING[ext]}')
                 break
             ext_len -= 1
+        if ext_len == 0:
+            raise ValueError(f"Cannot get the target for {filename}")
     return result
 
 
