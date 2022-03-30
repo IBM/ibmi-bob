@@ -8,12 +8,14 @@
 
 from datetime import datetime
 from enum import Enum
+from tempfile import mkstemp
 import json
 import os
 from pathlib import Path
+from shutil import move, copymode
 import subprocess
 import sys
-from typing import Dict, List, Tuple
+from typing import Callable, Dict, List, Tuple
 
 from makei.const import DEFAULT_CURLIB, DEFAULT_OBJLIB, FILE_MAX_EXT_LENGTH, FILE_TARGET_MAPPING
 
@@ -238,6 +240,20 @@ def get_compile_targets_from_filenames(filenames: List[str]) -> List[str]:
 def format_datetime(d: datetime) -> str:
     # 2022-03-25-09.33.34.064676
     return d.strftime("%Y-%m-%d-%H.%M.%S.%f")
+
+def replace_file_content(file_path: Path, replace: Callable[[str], str]):
+    #Create temp file
+    fh, abs_path = mkstemp()
+    with os.fdopen(fh,'w') as new_file:
+        with open(file_path) as old_file:
+            for line in old_file:
+                new_file.write(replace(line))
+    #Copy the file permissions from the old file to the new file
+    copymode(file_path, abs_path)
+    #Remove original file
+    os.remove(file_path)
+    #Move new file
+    move(abs_path, file_path)
 
 
 if __name__ == "__main__":
