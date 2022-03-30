@@ -268,7 +268,7 @@ def delete_physical_dependencies(obj: str, lib: str, delete_pf: bool, verbose: b
     dep_files, _ = job.run_sql(f"Select DBFFDP, DBFLDP From QSYS.QADBFDEP Where DBFLIB='{lib}' and DBFFIL='{obj}' and DBFLDP='{lib}'")
     for dep_file in dep_files:
         dep_obj, dep_lib = dep_file
-        dep_path = Path(objlib_to_path(dep_lib, f"{dep_obj}.FILE"))
+        dep_path = Path(objlib_to_path(dep_lib.strip(), f"{dep_obj.strip()}.FILE"))
         if verbose:
             print(f"delete_physical_dependencies: attempt to delete {dep_path}.")
         if dep_path.exists():
