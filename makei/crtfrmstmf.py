@@ -266,6 +266,9 @@ def filter_joblogs(record: Dict[str, Any]) -> bool:
     if msgid == "CPF9898":
         # https://techchannel.com/SMB/02/2019/qsqsrvr-job-considerations
         return False
+    if msgid == "CPF2105":
+        # DLTF errors: no object found
+        return False
     if "SQL" in msgid:
         # Ignore all SQL errors
         return False
