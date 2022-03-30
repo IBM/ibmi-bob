@@ -47,7 +47,7 @@ class CrtFrmStmf():
         self.parameters = parameters
         self.env_settings = env_settings if env_settings is not None else {}
         self.joblog_path = joblog_path
-        self.job.run_cl("CHGJOB LOG(4 00 *SECLVL)", True)
+        self.job.run_cl("CHGJOB LOG(4 00 *SECLVL)", log=False)
         self.tmp_lib = tmp_lib
         self.tmp_src = tmp_src
         ccsid = retrieve_ccsid(srcstmf)
@@ -90,7 +90,7 @@ class CrtFrmStmf():
         if self.parameters is not None:
             cmd = cmd + ' ' + self.parameters
         try:
-            self.job.run_cl(cmd)
+            self.job.run_cl(cmd, False, True)
         except:
             print(f"Build not successful for {self.lib}/{self.obj}")
             back_up_job.run_cl(
@@ -115,19 +115,19 @@ class CrtFrmStmf():
 
     def setupEnv(self):
         if "curlib" in self.env_settings and self.env_settings["curlib"]:
-            self.job.run_cl(f"CHGCURLIB CURLIB({self.env_settings['curlib']})")
+            self.job.run_cl(f"CHGCURLIB CURLIB({self.env_settings['curlib']})", log=True)
 
         if "preUsrlibl" in self.env_settings and self.env_settings["preUsrlibl"]:
             for libl in self.env_settings["preUsrlibl"].split():
-                self.job.run_cl(f"ADDLIBLE LIB({libl}) POSITION(*FIRST)")
+                self.job.run_cl(f"ADDLIBLE LIB({libl}) POSITION(*FIRST)", log=True)
 
         if "postUsrlibl" in self.env_settings and self.env_settings["postUsrlibl"]:
             for libl in self.env_settings["postUsrlibl"].split():
-                self.job.run_cl(f"ADDLIBLE LIB({libl}) POSITION(*LAST)")
+                self.job.run_cl(f"ADDLIBLE LIB({libl}) POSITION(*LAST)", log=True)
 
         if "IBMiEnvCmd" in self.env_settings and self.env_settings["IBMiEnvCmd"]:
             for cmd in self.env_settings["IBMiEnvCmd"].split("\\n"):
-                self.job.run_cl(cmd)
+                self.job.run_cl(cmd, log=True)
 
     def _retrieve_current_library(self):
         records, _ = self.job.run_sql(
@@ -229,7 +229,10 @@ def cli():
 
     handle = CrtFrmStmf(srcstmf_absolute_path, args.object.strip(
     ), args.library.strip(), args.command.strip(), args.parameters, env_settings, args.save_joblog)
+
+    print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
     handle.run()
+    print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
 
 # Helper functions
 
@@ -268,6 +271,9 @@ def filter_joblogs(record: Dict[str, Any]) -> bool:
         return False
     if msgid == "CPF2105":
         # DLTF errors: no object found
+        return False
+    if msgid == "CPF1336":
+        # TODO: Errors on CHGJOB command
         return False
     if "SQL" in msgid:
         # Ignore all SQL errors

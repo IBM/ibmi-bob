@@ -21,8 +21,7 @@ while read -r line; do
   cmd+=$line
   if [ -n "$cmd" ]; then
     result+=$(echo "$cmd" | sed "s/&O/$objlib/g" | sed "s/&N/$objname/g")
-    result+="
-    "
+    result+="\n"
     cmd=""
   fi
 done < <(grep "" "$pseudoSrcFile")

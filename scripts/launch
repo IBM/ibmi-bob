@@ -20,11 +20,10 @@ fi
 
 tmppipe=$(mktemp)
 
-echo ">> Adding user libraries to liblist"
+echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
 [[ ! -z "$curlib" ]] && liblist -c "$curlib"
 [[ ! -z "$preUsrlibl" ]] && liblist -af "$preUsrlibl"
 [[ ! -z "$postUsrlibl" ]] && liblist -al "$postUsrlibl"
-echo ">> Setup IBM i Environment"
 IFS=$'\\n'
 echo "$IBMiEnvCmd"
 if [ ! -z "$IBMiEnvCmd" ]; then
@@ -38,7 +37,6 @@ jobid=$(cat <"$tmppipe")
 rm -rf "$tmppipe"
 cl "CHGJOB LOG(4 00 *SECLVL)"
 
-echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
 echo ">> executing command: ${cmd}"
 echo ">> liblist: $(liblist | awk '{print $1}' | sed ':a;N;$!ba;s/\n/ /g')"
 timestamp=$(date +"%Y-%m-%d-%H.%M.%S.%N")
