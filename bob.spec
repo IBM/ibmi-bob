@@ -64,9 +64,12 @@ ln -sf %{_libdir}/bob/scripts/crtfrmstmf %{buildroot}%{_bindir}/crtfrmstmf
 * Tue Mar 29 2022 Tongkun Zhang <tongkun.zhang@ibm.com> - 2.2.9
 - Update to 2.2.9
 - Rewrite CRTFRMSTMF using Python
+- Expose CRTFRMSTMF as a CLI program
 - Refactored makei interface
 - Fix the issue that includePath is not respected by CRTBNDRPG
 - Set the OBJLIB for RUNSQLSTM by temporarily changing the CURLIB
+- Refactored code structure
+- No longer expose launch program
 * Thu Feb 10 2022 Tongkun Zhang <tongkun.zhang@ibm.com> - 2.2.8
 - Update to 2.2.8
 - Install CRTFRMSTMF by restoring from SAVF instead of compiling
