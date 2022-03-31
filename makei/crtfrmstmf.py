@@ -336,6 +336,7 @@ def delete_objects(obj_list:List[Tuple[str, str, str]], job: IBMJob=None, verbos
 
 def filter_joblogs(record: Dict[str, Any]) -> bool:
     msgid = record["MESSAGE_ID"]
+    msgtext = record["MESSAGE_TEXT"]
     if msgid is None:
         return False
     if msgid == "CPD0912":
@@ -352,6 +353,9 @@ def filter_joblogs(record: Dict[str, Any]) -> bool:
         return False
     if msgid == "CPF1336":
         # TODO: Errors on CHGJOB command
+        return False
+    if "Job changed successfully; however errors occurred." in msgtext:
+        # TODO: Figure out why?
         return False
     if "SQL" in msgid:
         # Ignore all SQL errors
