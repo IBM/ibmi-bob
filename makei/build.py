@@ -4,12 +4,13 @@
 # 57XX-XXX
 # (c) Copyright IBM Corp. 2021
 """ The module used to build a project"""
+from os import unlink
 from pathlib import Path
 from tempfile import mkstemp
 from typing import Any, Dict, List, Optional
-from scripts.const import BOB_PATH
-from scripts.utils import objlib_to_path, read_ibmi_json, read_iproj_json, \
-    run_command, support_color
+from makei.const import BOB_PATH
+from makei.utils import objlib_to_path, read_ibmi_json, read_iproj_json, \
+    run_command, support_color, replace_file_content
 
 
 class BuildEnv():
@@ -39,24 +40,18 @@ class BuildEnv():
         self.make_options = make_options if make_options else ""
         self.bob_path = Path(
             overrides["bob_path"]) if "bob_path" in overrides else BOB_PATH
-        self.bob_makefile = self.bob_path / 'Makefile'
+        self.bob_makefile = self.bob_path / 'mk' / 'Makefile'
         self.build_vars_handle, path = mkstemp()
         self.build_vars_path = Path(path)
         self.iproj_json_path = self.src_dir / "iproj.json"
         self.iproj_json = read_iproj_json(self.iproj_json_path)
         self.color = support_color()
 
-        if "setIBMiEnvCmd" in self.iproj_json.keys():
+        if "setIBMiEnvCmd" in self.iproj_json:
             cmd_list = self.iproj_json["setIBMiEnvCmd"]
-            if len(cmd_list) > 0:
-                cmd = ' '.join(
-                    map(lambda cmd: f'cl "{cmd} >/dev/null 2>&1 &&', cmd_list))
-                cmd = cmd[:-2]
-            else:
-                cmd = ":"
-            self.ibmi_env_cmds = cmd
+            self.ibmi_env_cmds = "\\n".join(cmd_list)
         else:
-            self.ibmi_env_cmds = ":"
+            self.ibmi_env_cmds = ""
 
         self._create_build_vars()
 
@@ -121,15 +116,27 @@ class BuildEnv():
 
     def make(self):
         """ Generate and execute the make command."""
+        if (self.src_dir / ".logs" / "joblog.json").exists():
+            (self.src_dir / ".logs" / "joblog.json").unlink()
+        if (self.src_dir / ".logs" / "output.log").exists():
+            (self.src_dir / ".logs" / "output.log").unlink()
+
         run_command(self.generate_make_cmd())
         self._post_make()
 
     def _post_make(self):
-        event_files = list(Path(".evfevent").rglob("*.evfevent"))
+        pass
+        # event_files = list(Path(".evfevent").rglob("*.evfevent"))
 
-        for filepath in event_files:
-            with filepath.open() as file:
-                line = file.read()
-            line = line.replace(f'{Path.cwd()}/', '')
-            with filepath.open("w") as file:
-                file.write(line)
+        # def replace_abs_path(line: str) -> str:
+        #     if str(Path.cwd()) in line:
+        #         line = line.replace(f'{Path.cwd()}/', '')
+        #         new_len = len(line.split()[5])
+        #         # Replace length
+        #         line = line[:24] + f"{new_len:03d}" + line[27:]
+        #         return line
+        #     else:
+        #         return line
+
+        # for filepath in event_files:
+        #     replace_file_content(filepath, replace_abs_path)

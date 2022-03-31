@@ -7,11 +7,15 @@
 
 import argparse
 import os
-import sys
+from pathlib import Path
 
-from scripts import init_project
-from scripts.build import BuildEnv
-from scripts.utils import Colors, colored, get_compile_targets_from_filenames
+import sys  # nopep8
+sys.path.append(str(Path(__file__).resolve().parent.parent))  # nopep8
+
+from makei import init_project  # nopep8
+from makei.build import BuildEnv  # nopep8
+from makei.utils import Colors, colored, get_compile_targets_from_filenames  # nopep8
+
 
 __version__ = "2.2.9"
 

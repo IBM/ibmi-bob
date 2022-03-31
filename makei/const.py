@@ -5,9 +5,10 @@ DEFAULT_TGT_CCSID = "*JOB"
 DEFAULT_OBJLIB = "*CURLIB"
 DEFAULT_CURLIB = "*CRTDFT"
 
-BOB_PATH = Path(__file__).parent.parent.resolve()
+BOB_PATH = Path(__file__).resolve().parent.parent
 
 FILE_TARGET_MAPPING = {
+    "PGM.SQLRPGLE": "PGM",
     "PGM.RPGLE": "PGM",
     "PGM.CLLE": "PGM",
     "PGM.C": "PGM",
@@ -39,7 +40,7 @@ FILE_TARGET_MAPPING = {
     "SQLSEQ": "DTAARA",
     "SQLUDF": "SRVPGM",
     "SQLTRG": "SQL",
-    "MSGF": "MSG",
+    "MSGF": "MSGF",
     "WSCSTSRC": "WSCST",
 }
 # This is the maximum number of dot seperated parts in the file extensions defined above.

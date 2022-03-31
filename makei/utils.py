@@ -6,15 +6,18 @@
 
 """ The utility module"""
 
+from datetime import datetime
 from enum import Enum
+from tempfile import mkstemp
 import json
 import os
 from pathlib import Path
+from shutil import move, copymode
 import subprocess
 import sys
-from typing import Dict, List, Tuple
+from typing import Callable, Dict, List, Tuple
 
-from scripts.const import DEFAULT_CURLIB, DEFAULT_OBJLIB, FILE_MAX_EXT_LENGTH, FILE_TARGET_MAPPING
+from makei.const import DEFAULT_CURLIB, DEFAULT_OBJLIB, FILE_MAX_EXT_LENGTH, FILE_TARGET_MAPPING
 
 
 class Colors(str, Enum):
@@ -133,42 +136,56 @@ def read_iproj_json(iproj_json_path: Path) -> Dict:
     If `objlib` or `curlib` is not defined, the default value for those
     will be used.
     """
+    def with_default_value(key, default_value, dict):
+        if key in dict:
+            return dict[key]
+        else:
+            return default_value
+
     try:
         with iproj_json_path.open() as file:
             iproj_json = json.load(file)
-            objlib = parse_all_variables(
-                iproj_json["objlib"]) if "objlib" in iproj_json else DEFAULT_OBJLIB
-            curlib = parse_all_variables(
-                iproj_json["curlib"]) if "curlib" in iproj_json else DEFAULT_CURLIB
+            objlib = parse_all_variables(with_default_value(
+                "objlib", DEFAULT_OBJLIB, iproj_json))
+            curlib = parse_all_variables(with_default_value(
+                "curlib", DEFAULT_CURLIB, iproj_json))
             if objlib == "*CURLIB":
                 if curlib == "*CRTDFT":
                     objlib = "QGPL"
                 else:
                     objlib = curlib
+
             iproj_json["preUsrlibl"] = " ".join(
-                map(parse_all_variables, iproj_json["preUsrlibl"]))
+                map(parse_all_variables, with_default_value("preUsrlibl", [], iproj_json)))
+
             iproj_json["postUsrlibl"] = " ".join(
                 map(parse_all_variables, iproj_json["postUsrlibl"]))
             iproj_json["includePath"] = " ".join(
                 map(parse_all_variables, iproj_json["includePath"]))
             iproj_json["objlib"] = objlib
             iproj_json["curlib"] = curlib
-            iproj_json["tgtCcsid"] = iproj_json["tgtCcsid"] if "tgtCcsid" in iproj_json else "*JOB"
+            iproj_json["tgtCcsid"] = with_default_value(
+                "tgtCcsid", "*JOB", iproj_json)
             return iproj_json
     except FileNotFoundError:
         print(colored("iproj.json not found!", Colors.FAIL))
         sys.exit(1)
 
 
-def objlib_to_path(objlib):
+def objlib_to_path(lib, object=None) -> str:
     """Returns the path for the given objlib in IFS
 
     >>> objlib_to_path("TONGKUN")
     '/QSYS.LIB/TONGKUN.LIB'
+    >>> objlib_to_path("TONGKUN", "SAMREF.FILE")
+    '/QSYS.LIB/TONGKUN.LIB/SAMREF.FILE'
     """
-    if not objlib:
+    if not lib:
         raise ValueError()
-    return f"/QSYS.LIB/{objlib}.LIB"
+    if object is not None:
+        return f"/QSYS.LIB/{lib}.LIB/{object}"
+    else:
+        return f"/QSYS.LIB/{lib}.LIB"
 
 
 def run_command(cmd: str):
@@ -198,6 +215,8 @@ def get_compile_targets_from_filenames(filenames: List[str]) -> List[str]:
     ['test.MODULE']
     >>> get_compile_targets_from_filenames(["functionsVAT/VAT300.RPGLE", "test.RPGLE"])
     ['VAT300.MODULE', 'test.MODULE']
+    >>> get_compile_targets_from_filenames(["ART200-Work_with_article.PGM.SQLRPGLE", "SGSMSGF.MSGF"])
+    ['ART200.PGM', 'SGSMSGF.MSGF']
     """
     result = []
     for filename in filenames:
@@ -208,10 +227,33 @@ def get_compile_targets_from_filenames(filenames: List[str]) -> List[str]:
             base, ext = '.'.join(
                 parts[:-ext_len]), '.'.join(parts[-ext_len:]).upper()
             if ext in FILE_TARGET_MAPPING:
-                result.append(f'{base}.{FILE_TARGET_MAPPING[ext]}')
+                # Split the object name and text attributes
+                object_name = base.split("-")[0]
+                result.append(f'{object_name}.{FILE_TARGET_MAPPING[ext]}')
                 break
             ext_len -= 1
+        if ext_len == 0:
+            raise ValueError(f"Cannot get the target for {filename}")
     return result
+
+
+def format_datetime(d: datetime) -> str:
+    # 2022-03-25-09.33.34.064676
+    return d.strftime("%Y-%m-%d-%H.%M.%S.%f")
+
+def replace_file_content(file_path: Path, replace: Callable[[str], str]):
+    #Create temp file
+    fh, abs_path = mkstemp()
+    with os.fdopen(fh,'w') as new_file:
+        with open(file_path) as old_file:
+            for line in old_file:
+                new_file.write(replace(line))
+    #Copy the file permissions from the old file to the new file
+    copymode(file_path, abs_path)
+    #Remove original file
+    os.remove(file_path)
+    #Move new file
+    move(abs_path, file_path)
 
 
 if __name__ == "__main__":

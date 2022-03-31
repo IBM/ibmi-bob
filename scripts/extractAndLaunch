@@ -1,0 +1,29 @@
+#! /QOpenSys/pkgs/bin/bash
+SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
+
+joblog_json=$1
+pseudoSrcFile=$2
+objlib=$3
+objname=$4
+
+cmd=""
+
+while read -r line; do
+  line=$(echo "$line" | sed 's/\r//')
+  if [[ $line = '/*'* ]]; then continue; fi
+  if [[ $line = '' ]]; then continue; fi
+  if [[ $line =~ .*\+\S* ]]; then
+    linetmp=$(echo "$line" | sed 's/\+\S*$//')
+    cmd="${cmd} ${linetmp}"
+    continue
+
+  fi
+
+  cmd+=$line
+  if [ -n "$cmd" ]; then
+    cmd=$(echo "$cmd" | sed "s/&O/$objlib/g" | sed "s/&N/$objname/g")
+    "$SCRIPT_DIR"/launch "$joblog_json" "$cmd" </dev/null
+    # echo "Running $cmd"
+    cmd=""
+  fi
+done < <(grep "" $pseudoSrcFile)

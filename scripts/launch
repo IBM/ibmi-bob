@@ -1,0 +1,48 @@
+#! /QOpenSys/pkgs/bin/bash
+SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
+
+if [ $# -lt 2 ]; then
+  echo 1>&2 "$0: not enough arguments"
+  echo 1>&2 "Usage: launch path_to_joblog_json command"
+  exit 2
+elif [ $# -gt 2 ]; then
+  echo 1>&2 "$0: too many arguments"
+  echo 1>&2 "Usage: launch path_to_joblog_json command"
+  exit 2
+fi
+
+joblog_json=$1
+cmd=$2
+
+if [ ! -f "$joblog_json" ]; then
+  echo "[]" >"$joblog_json"
+fi
+
+tmppipe=$(mktemp)
+
+echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+[[ ! -z "$curlib" ]] && liblist -c "$curlib"
+[[ ! -z "$preUsrlibl" ]] && liblist -af "$preUsrlibl"
+[[ ! -z "$postUsrlibl" ]] && liblist -al "$postUsrlibl"
+IFS=$'\\n'
+echo "$IBMiEnvCmd"
+if [ ! -z "$IBMiEnvCmd" ]; then
+  for envcmd in $IBMiEnvCmd; do
+    [[ ! -z "$envcmd" ]] && cl "$envcmd"
+  done
+fi
+
+getjobid -s >"$tmppipe"
+jobid=$(cat <"$tmppipe")
+rm -rf "$tmppipe"
+cl "CHGJOB LOG(4 00 *SECLVL)"
+
+echo ">> executing command: ${cmd}"
+echo ">> liblist: $(liblist | awk '{print $1}' | sed ':a;N;$!ba;s/\n/ /g')"
+timestamp=$(date +"%Y-%m-%d-%H.%M.%S.%N")
+echo ">> executing time: ${timestamp}"
+echo
+cl "$cmd"
+echo "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+echo
+"$SCRIPT_DIR"/getJobLog "$cmd" "$timestamp" "$jobid" -f "$joblog_json"

@@ -13,8 +13,8 @@ import signal
 import sys
 from typing import List, Optional
 
-from scripts.const import DEFAULT_CURLIB, DEFAULT_TGT_CCSID, DEFAULT_OBJLIB
-from scripts.utils import colored, Colors
+from makei.const import DEFAULT_CURLIB, DEFAULT_TGT_CCSID, DEFAULT_OBJLIB
+from makei.utils import colored, Colors
 
 
 class ProjSpec():

@@ -30,7 +30,7 @@ TOP := $(shell \
 endif
 
 MK := $(BOB)/mk
-
+SCRIPTSPATH := $(BOB)/scripts
 .PHONY: dir tree all clean clean_all clean_tree dist_clean
 
 # Default target when nothing is given on the command line.  Reasonable
