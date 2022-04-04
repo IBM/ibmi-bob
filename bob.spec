@@ -16,7 +16,7 @@ Requires: sed-gnu >= 4.4-1
 Requires: grep-gnu >= 3.0-2
 Requires: gawk >= 4.1.4-2
 Requires: make-gnu >= 4.2-2
-Requires: python3 >= 3.6
+Requires: python39 >= 3.9.11-1
 Requires: python3-ibm_db >= 2.0.5.12
 
 Source0: https://github.com/IBM/ibmi-bob/archive/refs/tags/v%{version}.tar.gz
@@ -45,9 +45,6 @@ Here's what makes Bob different.
 %setup -n ibmi-bob-%{version}
 
 
-%build
-echo "Skip build"
-
 %install
 mkdir -p %{buildroot}%{_libdir}/bob
 mkdir -p %{buildroot}%{_bindir}/
@@ -62,6 +59,9 @@ ln -sf %{_libdir}/bob/scripts/crtfrmstmf %{buildroot}%{_bindir}/crtfrmstmf
 %{_bindir}/crtfrmstmf
 
 %changelog
+* Tue Apr 4 2022 Tongkun Zhang <tongkun.zhang@ibm.com> - 2.3.0
+- Update to 2.3.0
+- Upgrades to Python 3.9 since 3.6 is out of support
 * Tue Mar 29 2022 Tongkun Zhang <tongkun.zhang@ibm.com> - 2.2.9
 - Update to 2.2.9
 - Rewrite CRTFRMSTMF using Python
