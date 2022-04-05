@@ -1,6 +1,6 @@
 %undefine _disable_source_fetch
 Name: bob
-Version: 2.2.9
+Version: 2.3.0
 Release: 0
 License: Apache-2.0
 Summary: Better Object Builder for IBM i
@@ -16,7 +16,7 @@ Requires: sed-gnu >= 4.4-1
 Requires: grep-gnu >= 3.0-2
 Requires: gawk >= 4.1.4-2
 Requires: make-gnu >= 4.2-2
-Requires: python39 >= 3.9.11-1
+Requires: python39 >= 3.9.11
 Requires: python3-ibm_db >= 2.0.5.12
 
 Source0: https://github.com/IBM/ibmi-bob/archive/refs/tags/v%{version}.tar.gz
