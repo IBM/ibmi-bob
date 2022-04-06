@@ -59,7 +59,7 @@ ln -sf %{_libdir}/bob/scripts/crtfrmstmf %{buildroot}%{_bindir}/crtfrmstmf
 %{_bindir}/crtfrmstmf
 
 %changelog
-* Tue Apr 4 2022 Tongkun Zhang <tongkun.zhang@ibm.com> - 2.3.0
+* Tue Apr 04 2022 Tongkun Zhang <tongkun.zhang@ibm.com> - 2.3.0
 - Update to 2.3.0
 - Upgrades to Python 3.9 since 3.6 is out of support
 * Tue Mar 29 2022 Tongkun Zhang <tongkun.zhang@ibm.com> - 2.2.9
