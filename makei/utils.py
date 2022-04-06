@@ -159,9 +159,9 @@ def read_iproj_json(iproj_json_path: Path) -> Dict:
                 map(parse_all_variables, with_default_value("preUsrlibl", [], iproj_json)))
 
             iproj_json["postUsrlibl"] = " ".join(
-                map(parse_all_variables, iproj_json["postUsrlibl"]))
+                map(parse_all_variables, with_default_value("postUsrlibl", [], iproj_json))
             iproj_json["includePath"] = " ".join(
-                map(parse_all_variables, iproj_json["includePath"]))
+                map(parse_all_variables, with_default_value("includePath",[], iproj_json))
             iproj_json["objlib"] = objlib
             iproj_json["curlib"] = curlib
             iproj_json["tgtCcsid"] = with_default_value(
