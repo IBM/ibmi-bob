@@ -1,6 +1,6 @@
 %undefine _disable_source_fetch
 Name: bob
-Version: 2.3.1
+Version: 2.3.2
 Release: 0
 License: Apache-2.0
 Summary: Better Object Builder for IBM i
@@ -59,11 +59,12 @@ ln -sf %{_libdir}/bob/scripts/crtfrmstmf %{buildroot}%{_bindir}/crtfrmstmf
 %{_bindir}/crtfrmstmf
 
 %changelog
-* Tue Apr 06 2022 Tongkun Zhang <tongkun.zhang@ibm.com> - 2.3.1
-- Update to 2.3.1
+* Tue Apr 07 2022 Tongkun Zhang <tongkun.zhang@ibm.com> - 2.3.2
+- Update to 2.3.2
 - Allow undefined values for includePath and postUsrLibl in
   iproj.json
 - Use python39-ibm_db instead python3-ibm_db
+- Fix missing execute permission on getJobLog
 * Tue Apr 04 2022 Tongkun Zhang <tongkun.zhang@ibm.com> - 2.3.0
 - Update to 2.3.0
 - Upgrades to Python 3.9 since 3.6 is out of support
