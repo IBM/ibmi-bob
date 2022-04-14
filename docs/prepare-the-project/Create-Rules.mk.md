@@ -40,7 +40,7 @@ This line at the project root directory will tell Bob to build all the subdirect
 
 The object list section is where you list out each object Bob should build, grouped by object type and separated by spaces.  Object names should be specified as they appear in the Integrated File System (IFS), so program names end in `.PGM`, files end in `.FILE`, etc.  All object names should be in upper case.  For ease of maintenance, it is recommended that the objects are listed alphabetically.  Here's an example of part of an object list section:
 
-```make
+```makefile
 PFs := VATDEF.FILE
 
 MODULEs := VAT300.MODULE
@@ -58,7 +58,7 @@ The rules section specifies dependency information and custom compile settings. 
 
 To create a rule, first write the object name (with the IFS suffix), followed by a colon and a space.  Then write the name of the object's source file:
 
-```make
+```makefile
 VATDEF.FILE: $(d)/VATDEF.PF SAMREF.FILE
 ```
 
@@ -84,7 +84,7 @@ The generic bob makefile establishes what are hopefully sensible defaults for co
 
 On the other hand, let's say you have an object that needs to be specially compiled at `V7R1M0`.  This directive is implemented by use of [target-specific variables](https://www.gnu.org/software/make/manual/make.html#Target_002dspecific), which is added as a separate line in the object's rule:
 
-```make
+```makefile
 JB110.MODULE: private TGTRLS := V7R1M0
 JB110.MODULE: JB110.RPGLE
 ```

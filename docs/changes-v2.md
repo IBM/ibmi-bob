@@ -1,0 +1,107 @@
+## Changes in Bob v2
+
+The Bob v2 ([IBM/ibmi-bob](https://github.com/IBM/ibmi-bob)) improves many aspects over the Bob v1 ([s4isystems/Bob](https://github.com/s4isystems/Bob)).
+
+If you previously used Bob v1, the following changes should be noted.
+
+***
+
+## Dependencies
+
+Since Bob v2, we require additional packages to be installed on the IBM i as the following:
+
+- `coreutils-gnu`
+- `jq`
+- `db2util`
+- `python3` 3.4 or above
+- `bash` 4.4-6 or above
+
+[More on the Prerequisites for IBM i](https://github.com/IBM/ibmi-bob/wiki/Installing-IBM-i-prerequisites#install-ibm-i-open-source-technologies)
+
+## Installment
+
+In Bob v1, we install `Bob` by putting all the `Bob` files under `/Build/Bob` and point to it in the makefiles we create for the project.
+
+In Bob v2, we provide the `RPM` package to specify the dependencies and install `Bob` into the system path automatically. 
+
+[More on the install instructions](https://github.com/IBM/ibmi-bob/wiki/Installing-Bob)
+
+## Project Structure
+
+In Bob V1, every directory is treated as a project and we need to create the `Makefile` for every directory.
+
+Since Bob v2, we don't create the `Makefile` anymore and we can define a project with multiple directories and specify the dependencies around them. Now the project is defined using the new metadata files.
+
+### Metadata Files
+
+- `iproj.json`: we will define a project using `iproj.json`, `Bob` will treat the directory containing this file as the root of the project. [More on the Project Level iproj.json](https://github.com/IBM/ibmi-bob/wiki/Project-Metadata#example-iprojjson)
+
+- `Rules.mk`: in this file, we specifies the structure of the project (i.e. subdirectories) and the object to be created as well as their dependencies. `Bob` will load those files dynamically and create a single `Makefile` for the `make` program to deal with the dependency relations. [More on creating Rule.mk](https://github.com/IBM/ibmi-bob/wiki/%5BWIP%5D-Create-Rules.mk)
+
+- `.ibmi.json`: in this file, we allow developer to override configurations such as target CCSID and object library for the containing directory and its subdirectories.  [More on the directory level metadata .ibmi.json](https://github.com/IBM/ibmi-bob/wiki/Project-Metadata#directory-level-metadata)
+
+A sample project for Bob v2 can be found at [edmundreinhardt/bob-recursive-example](https://github.com/edmundreinhardt/bob-recursive-example).
+
+### Logs
+
+In Bob v1, after running a build, we get all the compiler output in `stdout` or in the `makelog.log` file if run from the `makelog` script and we have the event files in the `.evfevent` directory.
+
+In Bob v2, we have the following logs:
+
+- all the make output goes to the `stdout`
+
+- all of the compiler output is stored in `.logs/output.log`
+- all of the job logs are gathered in `.logs/joblog.json` and can be viewed with any JSON viewer
+- the event files for all compiles are gathered under the `.evfevent` directory
+
+
+
+## Bob Changes
+
+In Bob v1, we define all the build rules in the `IBMiMakefile
+
+
+
+## Client Tools
+
+In Bob v1, we use the build settings file `.buildsettings` to setup the client tools including the ``
+
+
+
+## Single File Compile
+
+Since Bob v2, we support compiling a single file using `makei -z {filename}`.
+
+## Building the contents of single directory
+
+Since Bob v2, we support building everything within a directory using  `makei dir_{directoryname}`.
+
+## New Object Types
+
+The following object types are supported as pseudo-source.  
+The CL command to create the object is stored in a file with the given extension.  
+
+| Object Type | File Extension | CL Command        |
+| :---------- | :------------- | :---------------- |
+| *MSGF       | .MSGF          | CRTMSGF + ADDMSGD |
+| *BNDDIR     | .BNDDIR        | CRTBNDDIR         |
+| *SRVPGM     | .ILESRVPGM     | CRTSRVPGM         |
+
+## Support SQL pseudo-source
+
+The following SQL types are supported as pseudo-source.  
+The set of SQL commands to create the object is stored in a file
+with the given extension.  Typically it is just the CREATE OR REPLACE command, but for example 
+for TABLE, you would also want to include any ALTER TABLE commands as well.  Other ancillary 
+commands needed to complete creation like LABEL ON should also be in the same source file. 
+
+| SQL Type  | QSYS Object | File Extension | SQL COMMAND                 |
+| :-------- | :---------- | :------------- | :-------------------------- |
+| TABLE     | *FILE       | .TABLE         | CREATE OR REPLACE TABLE     |
+| VIEW      | *FILE       | .VIEW          | CREATE OR REPLACE VIEW      |
+| PROCEDURE | *PGM        | .SQLPRC        | CREATE OR REPLACE PROCEDURE |
+| FUNCTION  | *SRVPGM     | .SQLUDF        | CREATE OR REPLACE FUNCTION  |
+| FUNCTION  | *SRVPGM     | .SQLUDT        | CREATE OR REPLACE FUNCTION  |
+| TRIGGER   | *PGM        | .SQLTRG        | CREATE OR REPLACE TRIGGER   |
+| ALIAS     | *FILE       | .SQLALIAS      | CREATE OR REPLACE ALIAS     |
+| SEQUENCE  | *DTAARA     | .SQLSEQ        | CREATE OR REPLACE SEQUENCE  |
