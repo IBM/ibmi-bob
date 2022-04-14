@@ -31,6 +31,7 @@
 
 - Contributing
 
+  - [Source Structure](contributing/source-structure.md)
   - [Guidelines](contributing/guidelines)
   - [Build RPM](contributing/build-rpm)
 
