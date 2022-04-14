@@ -1,5 +1,8 @@
 <p align="center">
-  <img alt="bob" src="./assets/wordmark-logo.png">
+    
+    ![Bob logo](./docs/assets/wordmark-logo-dark.png#gh-dark-mode-only)
+    ![Bob logo](./docs/assets/wordmark-logo.png#gh-light-mode-only)
+
 </p>
 
 
