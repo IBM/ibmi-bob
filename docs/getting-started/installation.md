@@ -1,6 +1,6 @@
 # Installation
 
-?> Some software needs to be installed on the IBM i before Bob can be installed.
+?> ⚠️ Some software needs to be installed on the IBM i before Bob can be installed.
 Please follow the [instructions to install prerequisites](getting-started/prerequisites.md) before continuing here.
 
 ## Install via yum package manager
