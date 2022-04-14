@@ -1,10 +1,19 @@
-![Bob logo](./docs/assets/wordmark-logo-dark.png#gh-dark-mode-only)
-![Bob logo](./docs/assets/wordmark-logo.png#gh-light-mode-only)
+<p align="center">
+  <img alt="bob" src="docs/assets/wordmark-logo-dark.png#gh-dark-mode-only">
+  <img alt="bob" src="docs/assets/wordmark-logo.png#gh-light-mode-only">
+</p>
 
-A build system for the native QSYS objects
 
-<a href="https://github.com/IBM/ibmi-bob/releases/latest"><img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/ibm/ibmi-bob"></a>
-<a href="https://www.apache.org/licenses/LICENSE-2.0"><img alt="GitHub" src="https://img.shields.io/github/license/ibm/ibmi-bob"></a>
+
+<p align="center">
+  A build system for the native QSYS objects
+</p>
+
+
+<p align="center">
+  <a href="https://github.com/IBM/ibmi-bob/releases/latest"><img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/ibm/ibmi-bob"></a>
+  <a href="https://www.apache.org/licenses/LICENSE-2.0"><img alt="GitHub" src="https://img.shields.io/github/license/ibm/ibmi-bob"></a>
+</p>
 
 
 ---
