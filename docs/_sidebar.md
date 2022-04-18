@@ -9,6 +9,7 @@
   - [Prerequisties](getting-started/prerequisites.md)
   - [Installation](getting-started/installation)
   - [Example](getting-started/example.md) 
+  - [FAQ](getting-started/faq.md) 
 
 - Prepare the project
 
@@ -28,14 +29,18 @@
 
   -  [Client Tools](integration/client-tools.md) 
   - [RDi](integration/rdi.md)
+  - [Code for IBM i](integration/code-for-ibm-i.md) 
+
+- References
+
+  -  [joblog.json](reference/joblog-json.md) 
 
 - Contributing
 
   - [Source Structure](contributing/source-structure.md)
   - [Guidelines](contributing/guidelines)
   - [Build RPM](contributing/build-rpm)
-
-- [FAQ](faq.md) 
+  - [Documentation](contributing/documentation.md) 
 
 - Changelogs
 
@@ -43,5 +48,3 @@
   - [Changes in bob v2](changes-v2.md) 
 
 - [Support](Support.md)
-
-  
