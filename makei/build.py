@@ -4,8 +4,6 @@
 # 57XX-XXX
 # (c) Copyright IBM Corp. 2021
 """ The module used to build a project"""
-from itertools import accumulate
-from os import unlink
 from pathlib import Path
 from tempfile import mkstemp
 from typing import Any, Dict, List, Optional
