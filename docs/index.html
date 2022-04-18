@@ -29,9 +29,16 @@
       auto2top: true,
       maxLevel: 4,
       themeColor: '#0869ff',
+      alias: {
+        '/.*/_sidebar.md': '/_sidebar.md',
+      },
       toc: {
         tocMaxLevel: 5,
         target: 'h2, h3, h4, h5, h6'
+      },
+      timeUpdater: {
+        text: ">Last Modify: {docsify-updated}",
+        formatUpdated: "{YYYY}/{MM}/{DD}",
       },
       plugins: [
         EditOnGithubPlugin.create("https://github.com/IBM/ibmi-bob/blob/master/docs/")
@@ -41,13 +48,15 @@
   <!-- Docsify v4 -->
   <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
   <script src="//unpkg.com/docsify/lib/plugins/search.min.js"></script>
+  <script src="//unpkg.com/docsify-pagination/dist/docsify-pagination.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify-tabs@1"></script>
+  <script src="//unpkg.com/docsify-plugin-toc"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify-updated/src/time-updater.min.js"></script>
+  <script src="//unpkg.com/docsify-copy-code"></script>
   <script src="//unpkg.com/prismjs/components/prism-makefile.min.js"></script>
   <script src="//unpkg.com/prismjs/components/prism-bash.min.js"></script>
   <script src="//unpkg.com/prismjs/components/prism-sql.min.js"></script>
   <script src="//unpkg.com/prismjs/components/prism-json.min.js"></script>
-  <script src="//unpkg.com/docsify-pagination/dist/docsify-pagination.min.js"></script>
-  <script src="//unpkg.com/docsify-copy-code"></script>
-  <script src="//unpkg.com/docsify-plugin-toc"></script>
 </body>
 
 </html>
