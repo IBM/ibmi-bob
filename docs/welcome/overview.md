@@ -1,17 +1,6 @@
 # Philosophy and Technical Overview
 This page discusses, at a high level, what Bob brings to the development process, what factors led to its development, and what the Bob development model looks like.  Source control is a key player, so it is discussed, too.
 
-<!-- TOC depthFrom:2 -->
-
-- [The classic IBM i development model](#the-classic-ibm-i-development-model)
-- [What problems does Bob solve?](#what-problems-does-bob-solve)
-- [Git and the modern distributed development model](#git-and-the-modern-distributed-development-model)
-- [Modern source control with IBM i code](#modern-source-control-with-ibm-i-code)
-- [Building with Make](#building-with-make)
-- [Putting it all together](#putting-it-all-together)
-
-<!-- /TOC -->
-
 ## The classic IBM i development model
 Historically, development on the IBM i looked a lot like this:  source code was stored in one or more source physical files in one or more libraries, edited in place with SEU or RDi, and manually compiled.  If a change management package was used, it handled the checking in and out of source code among a hierarchical set of libraries, ranging in purpose from development to QA to production.  Code was compiled manually on a per-object basis, unless a custom CL program was written to compile an entire project, or unless the change management software handled things.
 
