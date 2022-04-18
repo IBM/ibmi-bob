@@ -76,11 +76,8 @@ Note:
 
 ## Support SQL pseudo-source
 
-The following SQL types are supported as pseudo-source.  
-The set of SQL commands to create the object is stored in a file
-with the given extension.  Typically it is just the CREATE OR REPLACE command, but for example 
-for TABLE, you would also want to include any ALTER TABLE commands as well.  Other ancillary 
-commands needed to complete creation like LABEL ON should also be in the same source file. 
+The following SQL types are supported as pseudo-source.
+The set of SQL commands to create the object is stored in a file with the given extension. Typically it is just the CREATE OR REPLACE command, but for example for TABLE, you would also want to include any ALTER TABLE commands as well.  Other ancillary commands needed to complete creation like LABEL ON should also be in the same source file. 
 
 | SQL Type  | QSYS Object | File Extension | SQL COMMAND                 |
 | :-------- | :---------- | :------------- | :-------------------------- |
