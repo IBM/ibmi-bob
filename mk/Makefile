@@ -2,6 +2,8 @@ SHELL:=/QOpenSys/pkgs/bin/bash
 BOB:=/QOpenSys/pkgs/lib/bob
 MAKEFLAGS += --no-builtin-rules
 MAKEFLAGS += --no-builtin-variables
+MK := $(BOB)/mk
+SCRIPTSPATH := $(BOB)/scripts
 COLOR_TTY :=
 BUILDVARSMKPATH :=
 
@@ -29,8 +31,7 @@ TOP := $(shell \
        echo $$top)
 endif
 
-MK := $(BOB)/mk
-SCRIPTSPATH := $(BOB)/scripts
+
 .PHONY: dir tree all clean clean_all clean_tree dist_clean
 
 # Default target when nothing is given on the command line.  Reasonable
@@ -66,7 +67,6 @@ include $(TOP)/Rules.mk
 $(eval $(value FOOTER))
 
 # Optional final makefile where you can specify additional targets
--include $(TOP)/final.mk
 
 # Include all auto-generated source dependency files. Since we don't have a
 # hard-coded list of source files, we will grab everything in the `$DEPDIR`
