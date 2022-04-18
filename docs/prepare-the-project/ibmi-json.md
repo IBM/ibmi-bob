@@ -1,6 +1,6 @@
 # .ibmi.json
 
-?> Directory level metadata
+?> Specifics of directory level metadata
 
 * The attributes specified in iproj.json hold true for all subdirectories by default
 * If a subdirectory wants to override the object library or target CCSID, they can use the .ibmi.json  file in that subdirectory
@@ -14,11 +14,13 @@
 
 ## Configuration Options
 
-### objlib
+### build
+
+#### build.objlib
 
 specifies the name of the environment variable containing the name of the target library in which to build objects.  This is optional and if not specified, the value of parent directory .ibmi.json are used. If none of those are specified, the iproj.json objlib attribute is used.  If no objlib is specified in the parent directories then the *CURLIB of the job is used.  If the *CURLIB is desired, then an explicity value of `*CURLIB` should be used.
 
-### tgtCcsid
+#### build.tgtCcsid
 
 specifies the target EBCDIC CCSID for compilers to use as TGTCCSID
 

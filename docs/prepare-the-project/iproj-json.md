@@ -1,6 +1,6 @@
 # iproj.json
 
-?> Specifics of bob's project level metadata
+?> Specifics of project level metadata
 
 * The project will be referred to by its relative path
 * This metadata is specified in a iproj.json file in the root directory of the project
