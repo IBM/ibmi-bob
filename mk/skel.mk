@@ -7,29 +7,6 @@
 # $? - the names of all dependencies that are newer then the target
 # $^ - the names of all dependencies
 
-########################################################################
-#                        User defined variables                        #
-########################################################################
-
-# VERB_VARS is a list of variables that you'd like to record on per
-# directory level.  So if you set it to say AUTOTEST then each each
-# directory will have it's own AUTOTEST_$(dir) variable with value taken
-# from appropriate Rules.mk
-VERB_VARS :=
-
-# OBJ_VARS - like VERB_VARS but all values taken from Rules.mk have
-# $(OBJPATH) prepended so instead of saying:
-#   INSTALL_$d := $(OBJPATH)/some_target
-# you can say simply
-#   INSTALL := some_target
-OBJ_VARS := 
-
-# DIR_VARS - like VERB_VARS but all values taken from Rules.mk have $(d)
-# prepended (unless value is an absolute path) so you can say:
-#   INSTALL_DOC := Readme.txt
-# instead of:
-#   INSTALL_DOC_$d := $(d)/Readme.txt
-DIR_VARS :=
 
 # Kept for backward compatibility - you should stop using these since
 # I'm now not dependent on $(OBJDIR)/.fake_file any more
@@ -91,16 +68,6 @@ d := $$(firstword $$(dir_stack))
 dir_stack := $$(wordlist 2,$$(words $$(dir_stack)),$$(dir_stack))
 endef
 
-define save_vars
-DEPS_$(1)$(2) = $(value $(2)_DEPS)
-LIBS_$(1)$(2) = $(value $(2)_LIBS)
-LDFLAGS_$(1)$(2) = $(value $(2)_LDFLAGS)
-CMD_$(1)$(2) = $(value $(2)_CMD)
-$(2)_DEPS =
-$(2)_LIBS =
-$(2)_LDFLAGS =
-$(2)_CMD =
-endef
 
 define tgt_rule
 abs_deps := $$(foreach dep,$$(DEPS_$(1)),$$(if $$(or $$(filter /%,$$(dep)),$$(filter $$$$%,$$(dep))),$$(dep),$$(addprefix $(OBJPATH)/,$$(dep))))
