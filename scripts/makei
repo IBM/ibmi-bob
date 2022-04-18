@@ -174,8 +174,10 @@ def handle_compile(args):
         filenames = map(os.path.basename, args.files.split(':'))
     targets = get_compile_targets_from_filenames(filenames)
     build_env = BuildEnv(targets, args.make_options, get_override_vars(args))
-    build_env.make()
-
+    if build_env.make():
+        exit(0)
+    else:
+        exit(1)
 
 def handle_build(args):
     """
@@ -189,7 +191,10 @@ def handle_build(args):
     else:
         target = "all"
     build_env = BuildEnv([target], args.make_options, get_override_vars(args))
-    build_env.make()
+    if build_env.make():
+        exit(0)
+    else:
+        exit(1)
 
 
 def get_override_vars(args):

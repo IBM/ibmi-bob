@@ -19,7 +19,7 @@ if [ ! -f "$joblog_json" ]; then
 fi
 
 tmppipe=$(mktemp)
-
+exitCode=0
 echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
 [[ ! -z "$curlib" ]] && liblist -c "$curlib"
 [[ ! -z "$preUsrlibl" ]] && liblist -af "$preUsrlibl"
@@ -36,13 +36,14 @@ getjobid -s >"$tmppipe"
 jobid=$(cat <"$tmppipe")
 rm -rf "$tmppipe"
 cl "CHGJOB LOG(4 00 *SECLVL)"
-
 echo ">> executing command: ${cmd}"
 echo ">> liblist: $(liblist | awk '{print $1}' | sed ':a;N;$!ba;s/\n/ /g')"
 timestamp=$(date +"%Y-%m-%d-%H.%M.%S.%N")
 echo ">> executing time: ${timestamp}"
 echo
 cl "$cmd"
+exitCode=$?
 echo "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
 echo
 "$SCRIPT_DIR"/getJobLog "$cmd" "$timestamp" "$jobid" -f "$joblog_json"
+exit $exitCode
