@@ -34,10 +34,12 @@ class IBMJob():
         with closing(self.conn.cursor()) as cursor:
             try:
                 cursor.callproc("qsys2.qcmdexc", [cmd])
+                return True
             except Exception as e:
                 if not ignore_errors:
                     print(f"❌  {cmd}")
                     raise
+                return False
 
     def run_sql(self, sql, ignore_errors=False, log: bool = False):
         with closing(self.conn.cursor()) as cursor:
