@@ -22,7 +22,7 @@ from makei.const import DEFAULT_CURLIB, DEFAULT_OBJLIB, FILE_MAX_EXT_LENGTH, FIL
 
 class Colors(str, Enum):
     """ An enum of colors to be used for output"""
-    HEADER = '\033[95m'
+    BOLD = '\033[1m'
     OKBLUE = '\033[94m'
     OKGREEN = '\033[92m'
     WARNING = '\033[93m'
@@ -188,7 +188,13 @@ def objlib_to_path(lib, object=None) -> str:
         return f"/QSYS.LIB/{lib}.LIB"
 
 
-def run_command(cmd: str):
+def print_to_stdout(line: str):
+    """Default stdoutHandler for run_command defined below to write the bytes to the stdout
+    """
+    print(line, end="")
+    sys.stdout.flush()
+
+def run_command(cmd: str, stdoutHandler: Callable[[bytes], None]=print_to_stdout):
     """ Run a command in a shell environment and redirect its stdout and stderr
 
     Args:
@@ -199,9 +205,8 @@ def run_command(cmd: str):
     try:
         process = subprocess.Popen(
             ["bash", "-c", cmd], stdout=subprocess.PIPE, )
-        for char in iter(process.stdout.readline, b''):
-            sys.stdout.buffer.write(char)
-            sys.stdout.flush()
+        for line in iter(process.stdout.readline, b''):
+            stdoutHandler(line.decode('utf-8'))
     except FileNotFoundError as error:
         print(colored(f'Cannot find command {error.filename}!', Colors.FAIL))
 

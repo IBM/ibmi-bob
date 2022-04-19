@@ -1,6 +1,6 @@
 %undefine _disable_source_fetch
 Name: bob
-Version: 2.3.2
+Version: 2.3.3
 Release: 0
 License: Apache-2.0
 Summary: Better Object Builder for IBM i
@@ -59,6 +59,8 @@ ln -sf %{_libdir}/bob/scripts/crtfrmstmf %{buildroot}%{_bindir}/crtfrmstmf
 %{_bindir}/crtfrmstmf
 
 %changelog
+* Wed Apr 13 2022 Tongkun Zhang <tongkun.zhang@ibm.com> - 2.3.3
+- Fix the error when running makei build
 * Tue Apr 07 2022 Tongkun Zhang <tongkun.zhang@ibm.com> - 2.3.2
 - Update to 2.3.2
 - Allow undefined values for includePath and postUsrLibl in

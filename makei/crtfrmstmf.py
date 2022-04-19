@@ -72,6 +72,7 @@ class CrtFrmStmf():
             self.back_up_obj_list = []
 
     def run(self):
+        success = False
         self.setupEnv()
 
         run_datetime = datetime.now()
@@ -91,6 +92,7 @@ class CrtFrmStmf():
             cmd = cmd + ' ' + self.parameters
         try:
             self.job.run_cl(cmd, False, True)
+            success = True
         except:
             print(f"Build not successful for {self.lib}/{self.obj}")
             if len(self.back_up_obj_list) > 0:
@@ -107,6 +109,7 @@ class CrtFrmStmf():
         if self.joblog_path is not None:
             save_joblog_json(cmd, format_datetime(
                 run_datetime), self.job.job_id, self.joblog_path, filter_joblogs)
+        return success
 
     def setupEnv(self):
         if "curlib" in self.env_settings and self.env_settings["curlib"]:
@@ -263,9 +266,9 @@ def cli():
     ), args.library.strip(), args.command.strip(), args.parameters, env_settings, args.save_joblog)
 
     print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-    handle.run()
+    success = handle.run()
     print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
-
+    exit(0 if success else 1)
 # Helper functions
 
 
