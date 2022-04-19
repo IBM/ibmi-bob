@@ -8,7 +8,7 @@
 
   - [Prerequisties](getting-started/prerequisites.md)
   - [Installation](getting-started/installation)
-  - [Example](getting-started/example.md) 
+  - [Sample Build](getting-started/sample-build.md) 
   - [FAQ](getting-started/faq.md) 
 
 - Prepare the project
@@ -27,13 +27,13 @@
 
 - Integration
 
-  -  [Client Tools](integration/client-tools.md) 
+  - [Client Tools](integration/client-tools.md) 
   - [RDi](integration/rdi.md)
   - [Code for IBM i](integration/code-for-ibm-i.md) 
 
 - References
-
-  -  [joblog.json](reference/joblog-json.md) 
+  - [Build Recipes](reference/recipes.md)
+  - [joblog.json](reference/joblog-json.md) 
 
 - Contributing
 
