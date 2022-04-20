@@ -24,6 +24,13 @@ echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 [[ ! -z "$curlib" ]] && liblist -c "$curlib"
 [[ ! -z "$preUsrlibl" ]] && liblist -af "$preUsrlibl"
 [[ ! -z "$postUsrlibl" ]] && liblist -al "$postUsrlibl"
+
+if [ ! -z "$tmpCurlib" ]; then
+  echo ">> Temporarily set curlib to $tmpCurlib"
+  liblist -c "$tmpCurlib"
+  liblist -af "$curlib" || true
+fi
+
 IFS=$'\\n'
 echo "$IBMiEnvCmd"
 if [ ! -z "$IBMiEnvCmd" ]; then
