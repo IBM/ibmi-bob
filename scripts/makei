@@ -164,7 +164,7 @@ def add_cvtsrcpf_parser(subparsers: argparse.ArgumentParser):
 
     cvtsrcpf_parser.add_argument(
         "-c",
-        help='Output the joblog to the specified json file.',
+        help='override the ccsid value',
         metavar='<CCSID>',
         type=int,
     )
