@@ -194,11 +194,13 @@ def print_to_stdout(line: str):
     print(line, end="")
     sys.stdout.flush()
 
-def run_command(cmd: str, stdoutHandler: Callable[[bytes], None]=print_to_stdout):
+def run_command(cmd: str, stdoutHandler: Callable[[bytes], None]=print_to_stdout) -> int:
     """ Run a command in a shell environment and redirect its stdout and stderr
+        and returns the exit code
 
     Args:
         cmd (str): The command to run
+        stdoutHandler (Callable[[bytes], None]]): the handle function to process the stdout
     """
     print(colored(f"> {cmd}", Colors.OKGREEN))
     sys.stdout.flush()
@@ -207,6 +209,7 @@ def run_command(cmd: str, stdoutHandler: Callable[[bytes], None]=print_to_stdout
             ["bash", "-c", cmd], stdout=subprocess.PIPE, )
         for line in iter(process.stdout.readline, b''):
             stdoutHandler(line.decode('utf-8'))
+        return process.wait()
     except FileNotFoundError as error:
         print(colored(f'Cannot find command {error.filename}!', Colors.FAIL))
 
