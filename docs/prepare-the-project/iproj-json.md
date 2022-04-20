@@ -1,6 +1,8 @@
 # iproj.json
 
-?> Specifics of project level metadata
+> [!NOTE]
+>
+> Specifics of project level metadata
 
 * The project will be referred to by its relative path
 * This metadata is specified in a iproj.json file in the root directory of the project
@@ -49,7 +51,8 @@ array of CL to run when the Rest Portal or Build job begins.  This can include A
 
 ### buildCommand
 
-!> Not yet in use
+> [!ATTENTION]
+> Not yet in use
 
 PASE command line used to build this entire project.  The following substitution variables are supported:
 
@@ -61,7 +64,8 @@ PASE command line used to build this entire project.  The following substitution
 
 ### compileCommand
 
-!> Not yet in use
+> [!ATTENTION]
+> Not yet in use
 
 PASE command line used to compile a specific source file in this project. The same substitution parameters as in the buildCommand are supported.
 
@@ -79,7 +83,8 @@ any software vendor can extend the metadata with attributes that are useful to t
 
 ### uses
 
-!> Not yet in use
+> [!ATTENTION]
+> Not yet in use
 
 prerequisite projects (note that 2 projects might use each other and infinite loops need to be avoided)
 
@@ -91,7 +96,8 @@ prerequisite projects (note that 2 projects might use each other and infinite lo
 
 ### installProjectScript
 
-!> Not yet in use
+> [!ATTENTION]
+> Not yet in use
 
 shell script that will be run in synchronized buildDir to do one-time setup of the IBM i.  This could include creating libraries and compiling CL programs for setup and build.
 

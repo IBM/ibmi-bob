@@ -72,9 +72,11 @@ In summary, for the rules section, simply specify each object, followed by its s
 
 ---
 
-:zap: **Tip**
 
-The Bob developers like to add a comment before each object rule that specifies the object name and intended compile command.  We find the syntax coloring helps the eye quickly locate object rules, and the compile command helps clarify what Make should do.  Makefile comments begin with a `#`.
+
+> [!TIP]
+>
+> The Bob developers like to add a comment before each object rule that specifies the object name and intended compile command.  We find the syntax coloring helps the eye quickly locate object rules, and the compile command helps clarify what Make should do.  Makefile comments begin with a `#`.
 
 ---
 

@@ -36,7 +36,8 @@ yum install bash
 
 ### Configure the .bash_profile
 
-?> Since we assume bash is used in this documentation, we use **.bash_profile** instead of [*Envrionment Setup Using /QOpenSys/etc/profile and $HOME/.profile*](https://www.ibm.com/support/pages/portable-application-solutions-environment-pase-envrionment-setup-using-qopensysetcprofile-and-homeprofile)
+> [!NOTE]
+> Since we assume bash is used in this documentation, we use **.bash_profile** instead of [*Envrionment Setup Using /QOpenSys/etc/profile and $HOME/.profile*](https://www.ibm.com/support/pages/portable-application-solutions-environment-pase-envrionment-setup-using-qopensysetcprofile-and-homeprofile)
 
 It is important that the directory `/QOpenSys/pkgs/bin` directory is on your path.
 
@@ -71,7 +72,9 @@ CALL QSYS2.SET_PASE_SHELL_INFO('*CURRENT', '/QOpenSys/pkgs/bin/bash')
 
 
 
-!> If you did not add `/QOpenSys/pkgs/bin` to the PATH variable, you may not be able to invok *yum* or *chsh* directly. Try specifing the full path using `/QOpenSys/pkgs/bin/yum` or `/QOpenSys/pkgs/bin/chsh`.
+
+> [!WARNING]
+> If you did not add `/QOpenSys/pkgs/bin` to the PATH variable, you may not be able to invok *yum* or *chsh* directly. Try specifing the full path using `/QOpenSys/pkgs/bin/yum` or `/QOpenSys/pkgs/bin/chsh`.
 
 ## Ensure the SSH daemon is running
 

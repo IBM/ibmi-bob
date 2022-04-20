@@ -32,8 +32,10 @@ Now that everything is installed and configured, let's build a [sample project](
    makei build
    ```
 
-?> **Alternatively**, you may combine the above two commands using makei's shortcut:<br>
-`makei b -e lib1=BOBTEST`
+> [!TIP]
+>
+> Alternatively, you may combine the above two commands using makei's shortcut:<br>
+> `makei b -e lib1=BOBTEST`
 
 5. **You should see output similar to this.**
 
@@ -60,8 +62,8 @@ Now that everything is installed and configured, let's build a [sample project](
 ![Sample Build Demo](sample-build.assets/sample-build.gif)
 
 
-
-?> A few other options can be used:<br>
-   `makei c -f functionsVAT/VAT300.RPGLE` to compile the `VAT300.RPGLE` into `VAT300.MODULE`<br>
-   `makei b -d functionsVAT` to build the `functionsVAT` subdirectory<br>
-   Check out the [usage of makei](cli/makei.md)
+> [!TIP]
+> A few other options can be used:<br>
+>   `makei c -f functionsVAT/VAT300.RPGLE` to compile the `VAT300.RPGLE` into `VAT300.MODULE`<br>
+>   `makei b -d functionsVAT` to build the `functionsVAT` subdirectory<br>
+>   Check out the [usage of makei](cli/makei.md)

@@ -1,6 +1,8 @@
 # .ibmi.json
 
-?> Specifics of directory level metadata
+> [!NOTE]
+>
+> Specifics of directory level metadata
 
 * The attributes specified in iproj.json hold true for all subdirectories by default
 * If a subdirectory wants to override the object library or target CCSID, they can use the .ibmi.json  file in that subdirectory

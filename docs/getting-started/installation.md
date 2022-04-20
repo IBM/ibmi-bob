@@ -1,19 +1,18 @@
 # Installation
-
-?> ⚠️ Some software needs to be installed on the IBM i before Bob can be installed.
-Please follow the [instructions to install prerequisites](getting-started/prerequisites.md) before continuing here.
+> [!WARNING]
+> Some software needs to be installed on the IBM i before Bob can be installed.
+> Please follow the [instructions to install prerequisites](getting-started/prerequisites.md) before continuing here.
 
 ## Install via yum package manager
 
 ***YUM*** is a package management utility for RPM-based distributions. We recommend using *yum* to install *Bob* and its dependencies.
 
-!> Make sure you have installed the IBM i package repositories `ibmi-repos`.
-<br>
-If not, run `yum install ibmi-repos` before installing `bob`.
-
-
+> [!TIP]
+> Make sure you have installed the IBM i package repositories `ibmi-repos`.
+>
+> If not, run `yum install ibmi-repos` before installing `bob`.
 ```bash
-# Install bob
+ # Install bob
 yum install bob
 ```
 
