@@ -111,12 +111,16 @@ makei build [-h] [-t <target> | -d <subdir>] [-o <options>] [--bob-path <path>]
 makei cvtsrcpf [-h] [-c <CCSID>] <file> <library>
 ```
 
-Converts all members in a source physical file to properly-named (Bob-compatible), ASCII-ish, LF-terminated source files in the current directory in the IFS.  Generally speaking, the source member type will become the filename extension.
+Converts all members in a source physical file to properly-named (Bob-compatible), ASCII-ish, LF-terminated source files in the current directory in the IFS. Generally speaking, the source member type will become the filename extension.
 
-For example, RPGLE source member `AB1001` will become IFS source file `AB1001.RPGLE`.  Four exceptions exist, however: source member types CMD, MENU, and PNLGRP result in filename extensions .CMDSRC, .MENUSRC, and .PNLGRPSRC, respectively, and source member type C residing in source physical file H results in filename extension .H.
+For example, RPGLE source member `AB1001` will become IFS source file `AB1001.RPGLE`. Four exceptions exist, however: source member types CMD, MENU, and PNLGRP result in filename extensions .CMDSRC, .MENUSRC, and .PNLGRPSRC, respectively, and source member type C residing in source physical file H results in filename extension .H.
 
 By default, source files will be encoded in UTF-8; this can be overridden by using the `-c` option and supplying a CCSID value.
 It is likely that the same destination directory will contain converted members from many source physical files.  Therefore, name collisions are possible.  In the event of a duplicate member name and type, the source file name will be adjusted from `member.type` to `member (n).type`, with `n` incremented until a unique name is achieved.
+
+If the source physical file was created successfully, a `.ibmi.json` file with the same CCSID value will be created in the same directory. Note that It will not override an existing `.ibmi.json` file.
+
+
 
 #### Arguments
 
