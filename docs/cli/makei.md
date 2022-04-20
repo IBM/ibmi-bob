@@ -16,13 +16,13 @@ usage: makei [-h] [-v] command ...
 
 - **command**
 
-  Possible choices: init, compile, c, build, b
+  Possible choices: init, compile, c, build, b, cvtsrcpf
 
 ## Sub-commands:
 
 ### init
 
-set up a new or existing project
+?> set up a new or existing project
 
 ```
 makei init [-h] [-f]
@@ -38,7 +38,7 @@ makei init [-h] [-f]
 
 ### compile (c)
 
-compile a single file
+?> compile a single file
 
 ```
 makei compile [-h] (-f <filename> | --files <filepaths>) [-o <options>]
@@ -71,7 +71,7 @@ makei compile [-h] (-f <filename> | --files <filepaths>) [-o <options>]
 
 ### build (b)
 
-build the whole project
+?> build the whole project
 
 ```
 makei build [-h] [-t <target> | -d <subdir>] [-o <options>] [--bob-path <path>]
@@ -99,3 +99,51 @@ makei build [-h] [-t <target> | -d <subdir>] [-o <options>] [--bob-path <path>]
 - **-e, --env**
 
   override environment variables
+  
+  ---
+
+### cvtsrcpf
+
+?> convert source physical file members to ASCII IFS files
+
+
+```
+makei cvtsrcpf [-h] [-c <CCSID>] <file> <library>
+```
+
+Converts all members in a source physical file to properly-named (Bob-compatible), ASCII-ish, LF-terminated source files in the current directory in the IFS.  Generally speaking, the source member type will become the filename extension.
+
+For example, RPGLE source member `AB1001` will become IFS source file `AB1001.RPGLE`.  Four exceptions exist, however: source member types CMD, MENU, and PNLGRP result in filename extensions .CMDSRC, .MENUSRC, and .PNLGRPSRC, respectively, and source member type C residing in source physical file H results in filename extension .H.
+
+By default, source files will be encoded in UTF-8; this can be overridden by using the `-c` option and supplying a CCSID value.
+It is likely that the same destination directory will contain converted members from many source physical files.  Therefore, name collisions are possible.  In the event of a duplicate member name and type, the source file name will be adjusted from `member.type` to `member (n).type`, with `n` incremented until a unique name is achieved.
+
+#### Arguments
+
+- **file**
+
+  the name of the source file
+
+- **library**
+
+  the name of the library
+
+#### Options
+
+- **-c**
+
+  ccsid to override
+
+#### Example
+
+- Convert source members for file MYLIB/MYSRCFILE into directory `newdir` using the default (UTF-8).'
+  ```bash
+  cd newdir
+  makei cvtsrcpf mysrcfile mylib
+  ```
+
+- Convert source members for file MYLIB/MYSRCFILE into directory `newdir` using Windows Latin-1.
+  ```bash
+  cd newdir
+  makei cvtsrcpf -c 1252 mysrcfile mylib
+  ```
