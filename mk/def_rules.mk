@@ -751,11 +751,12 @@ programTGTRLS = $(strip \
 %.PGM: private STGMDL = $(programSTGMDL)
 %.PGM: private TGTRLS = $(programTGTRLS)
 %.PGM: private BNDSRVPGMPATH = $(basename $(filter %.SRVPGM,$(notdir $^)) $(externalsrvpgms))
+%.PGM: private BNDDIRPATH = $(basename $(filter %.BNDDIR,$(notdir $^)))
 
 %.PGM: $$(call genDep,$$@,$$*,PGM.RPGLE)
 	$(eval d = $($@_d))
-	@$(call echo_cmd,"=== Create Bound RPG Program [$(notdir $*)]")
-	$(eval crtcmd := CRTBNDRPG srcstmf('$<') PGM($(OBJLIB)/$(basename $(@F))) $(CRTBNDRPGFLAGS))
+	@$(call echo_cmd,"=== Create Bound RPG Program [$(notdir $*)] with bnddir [$(basename $(filter %.BNDDIR,$(notdir $^)))]")
+	$(eval crtcmd := CRTBNDRPG srcstmf('$<') PGM($(OBJLIB)/$(basename $(@F))) $(if $(BNDDIRPATH),BNDDIR($(BNDDIRPATH)) DFTACTGRP(*NO)) $(CRTBNDRPGFLAGS))
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
 	@$(call EVFEVENT_DOWNLOAD,$*.PGM.RPGLE.evfevent)
