@@ -164,7 +164,7 @@ def add_cvtsrcpf_parser(subparsers: argparse.ArgumentParser):
 
     cvtsrcpf_parser.add_argument(
         "-c",
-        help='override the ccsid value',
+        help='ccsid to override',
         metavar='<CCSID>',
         type=int,
     )
