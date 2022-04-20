@@ -164,7 +164,7 @@ def add_cvtsrcpf_parser(subparsers: argparse.ArgumentParser):
 
     cvtsrcpf_parser.add_argument(
         "-c",
-        help='CCSID used to compile the source in this directory. If not specified, then the CCSID of the JOB running the build will be used.',
+        help='the EBCDIC CCSID that the source in this directory should be compiled with. CCSID used to compile the source in this directory. If not specified, then the CCSID of the JOB running the build will be used.',
         metavar='<CCSID>',
         type=int,
     )
