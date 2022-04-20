@@ -39,7 +39,7 @@ FILE_TARGET_MAPPING = {
     "VIEW": "FILE",
     "SQLSEQ": "DTAARA",
     "SQLUDF": "SRVPGM",
-    "SQLTRG": "SQL",
+    "SQLTRG": "PGM",
     "MSGF": "MSGF",
     "WSCSTSRC": "WSCST",
 }
