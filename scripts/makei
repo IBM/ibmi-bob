@@ -164,7 +164,7 @@ def add_cvtsrcpf_parser(subparsers: argparse.ArgumentParser):
 
     cvtsrcpf_parser.add_argument(
         "-c",
-        help='ccsid to override',
+        help='the EBCDIC CCSID that the source in this directory should be compiled with',
         metavar='<CCSID>',
         type=int,
     )
