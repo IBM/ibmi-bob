@@ -232,12 +232,12 @@ def handle_cvtsrcpf(args):
         ccsid = args.c
         ccsid_flag = f" -c {args.c}"
     else:
-        ccsid = 1208
+        ccsid = None
         ccsid_flag = ""
     exit_code = run_command(f"{str(BOB_PATH / 'scripts' / 'cvtsrcpf')} {args.file} {args.library}{ccsid_flag}")
     if exit_code == 0:
         ibmi_json_path = Path() / ".ibmi.json"
-        if not ibmi_json_path.exists():
+        if not ibmi_json_path.exists() and ccsid:
             data = {
                 "build" : {
                     "tgtCcsid" : str(ccsid)
