@@ -42,6 +42,8 @@
   - [Build RPM](contributing/build-rpm)
   - [Documentation](contributing/documentation.md) 
 
+  - [To Do List](contributing/to-do.md)
+
 - Changelogs
 
   - [Version History](changelogs.md)
