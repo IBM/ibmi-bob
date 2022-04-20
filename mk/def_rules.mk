@@ -582,7 +582,7 @@ programTGTRLS = $(strip \
 	@$(call echo_cmd,"=== Creating SQL TABLE from Sql statement [$(notdir $<)]")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
 	@$(PRESETUP) \
-	$(SETCURLIBTOOBJLIB); \
+	$(SETCURLIBTOOBJLIB) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
 
 # @$(TOOLSPATH)/checkObjectAlreadyExists $@ $(OBJLIB)
@@ -593,7 +593,7 @@ programTGTRLS = $(strip \
 	@$(call echo_cmd,"=== Creating SQL VIEW from Sql statement [$(notdir $<)]")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
 	@$(PRESETUP) \
-	$(SETCURLIBTOOBJLIB); \
+	$(SETCURLIBTOOBJLIB) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
 
 .SECONDEXPANSION:
@@ -602,7 +602,7 @@ programTGTRLS = $(strip \
 	@$(call echo_cmd,"=== Creating SQL UDT from Sql statement [$(notdir $<)]")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
 	@$(PRESETUP) \
-	$(SETCURLIBTOOBJLIB); \
+	$(SETCURLIBTOOBJLIB) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
 
 .SECONDEXPANSION:
@@ -611,7 +611,7 @@ programTGTRLS = $(strip \
 	@$(call echo_cmd,"=== Creating SQL UDF from Sql statement [$(notdir $<)]")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
 	@$(PRESETUP) \
-	$(SETCURLIBTOOBJLIB); \
+	$(SETCURLIBTOOBJLIB) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
 
 .SECONDEXPANSION:
@@ -620,7 +620,7 @@ programTGTRLS = $(strip \
 	@$(call echo_cmd,"=== Creating SQL PROCEDURE from Sql statement [$(notdir $<)]")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
 	@$(PRESETUP) \
-	$(SETCURLIBTOOBJLIB); \
+	$(SETCURLIBTOOBJLIB) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
 
 .SECONDEXPANSION:
@@ -629,7 +629,7 @@ programTGTRLS = $(strip \
 	@$(call echo_cmd,"=== Creating SQL TRIGGER from Sql statement [$(notdir $<)]")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
 	@$(PRESETUP) \
-	$(SETCURLIBTOOBJLIB); \
+	$(SETCURLIBTOOBJLIB) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
 	
 .SECONDEXPANSION:
@@ -638,7 +638,7 @@ programTGTRLS = $(strip \
 	@$(call echo_cmd,"=== Creating SQL SEQUENCE from Sql statement [$(notdir $<)]")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
 	@$(PRESETUP) \
-	$(SETCURLIBTOOBJLIB); \
+	$(SETCURLIBTOOBJLIB) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
 
 .SECONDEXPANSION:
@@ -647,7 +647,7 @@ programTGTRLS = $(strip \
 	@$(call echo_cmd,"=== Creating SQL ALIAS from Sql statement [$(notdir $<)]")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
 	@$(PRESETUP) \
-	$(SETCURLIBTOOBJLIB); \
+	$(SETCURLIBTOOBJLIB) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
 
 
@@ -887,7 +887,7 @@ programTGTRLS = $(strip \
 	@$(call echo_cmd,"=== Running SQL Statement from [$(notdir $<)]")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<'))
 	@$(PRESETUP) \
-	$(SETCURLIBTOOBJLIB); \
+	$(SETCURLIBTOOBJLIB) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
 
 %.MSGF:
