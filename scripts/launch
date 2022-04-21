@@ -27,8 +27,8 @@ echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 if [ ! -z "$tmpCurlib" ]; then
   echo ">> Temporarily set curlib to $tmpCurlib"
+  (liblist -d "$curlib" && liblist -af "$curlib") || true
   liblist -c "$tmpCurlib"
-  liblist -af "$curlib" || true
 fi
 
 IFS=$'\\n'

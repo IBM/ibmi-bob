@@ -300,7 +300,7 @@ IBMiEnvCmd="$(IBMiEnvCmd)"
 endef
 
 define SETCURLIBTOOBJLIB = 
-tmpCurllib=$(OBJLIB)
+tmpCurlib=$(OBJLIB)
 endef
 
 # cleanCDeps removes from the CRTCMOD-generated dependency file any header files located in /QIBM/, plus the
