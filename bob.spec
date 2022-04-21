@@ -1,6 +1,6 @@
 %undefine _disable_source_fetch
 Name: bob
-Version: 2.3.4-2
+Version: 2.3.5
 Release: 0
 License: Apache-2.0
 Summary: Better Object Builder for IBM i
@@ -59,6 +59,8 @@ ln -sf %{_libdir}/bob/scripts/crtfrmstmf %{buildroot}%{_bindir}/crtfrmstmf
 %{_bindir}/crtfrmstmf
 
 %changelog
+* Wed Apr 21 2022 Tongkun Zhang <tongkun.zhang@ibm.com> - 2.3.5
+- Replace all the python3.9 shebang to python3.6
 * Wed Apr 21 2022 Tongkun Zhang <tongkun.zhang@ibm.com> - 2.3.4
 - Temporarily downgrade the Python version to 3.6 due to Ansible issues
 - Simplify Makefiles
