@@ -1,4 +1,4 @@
-#!/QOpenSys/pkgs/bin/python3.9
+#!/QOpenSys/pkgs/bin/python3
 # -*- coding: utf-8 -*-
 import argparse
 import os
