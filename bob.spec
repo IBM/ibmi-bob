@@ -1,6 +1,6 @@
 %undefine _disable_source_fetch
 Name: bob
-Version: 2.3.3
+Version: 2.3.5
 Release: 0
 License: Apache-2.0
 Summary: Better Object Builder for IBM i
@@ -16,8 +16,8 @@ Requires: sed-gnu >= 4.4-1
 Requires: grep-gnu >= 3.0-2
 Requires: gawk >= 4.1.4-2
 Requires: make-gnu >= 4.2-2
-Requires: python39 >= 3.9.11
-Requires: python39-ibm_db >= 2.0.5.12
+Requires: python3 >= 3.6
+Requires: python3-ibm_db >= 2.0.5.12
 
 Source0: https://github.com/IBM/ibmi-bob/archive/refs/tags/v%{version}.tar.gz
 
@@ -59,6 +59,15 @@ ln -sf %{_libdir}/bob/scripts/crtfrmstmf %{buildroot}%{_bindir}/crtfrmstmf
 %{_bindir}/crtfrmstmf
 
 %changelog
+* Wed Apr 21 2022 Tongkun Zhang <tongkun.zhang@ibm.com> - 2.3.5
+- Replace all the python3.9 shebang to python3.6
+* Wed Apr 21 2022 Tongkun Zhang <tongkun.zhang@ibm.com> - 2.3.4
+- Temporarily downgrade the Python version to 3.6 due to Ansible issues
+- Simplify Makefiles
+- Optimize outputs
+- Wrap and expose crtsrcpf command in makei
+- Fix wrong object mapping for sqltrg file type
+- Fix not setting the curlib for RUNSQLSTM commands
 * Wed Apr 13 2022 Tongkun Zhang <tongkun.zhang@ibm.com> - 2.3.3
 - Fix the error when running makei build
 * Tue Apr 07 2022 Tongkun Zhang <tongkun.zhang@ibm.com> - 2.3.2

@@ -1,4 +1,4 @@
-#!/QOpenSys/pkgs/bin/python3.9
+#!/QOpenSys/pkgs/bin/python3.6
 
 # Licensed Materials - Property of IBM
 # 57XX-XXX
@@ -6,18 +6,19 @@
 """ The CLI entry for BOB"""
 
 import argparse
+import json
 import os
 from pathlib import Path
 
 import sys  # nopep8
 sys.path.append(str(Path(__file__).resolve().parent.parent))  # nopep8
-
+from makei.const import BOB_PATH  # nopep8
 from makei import init_project  # nopep8
 from makei.build import BuildEnv  # nopep8
-from makei.utils import Colors, colored, get_compile_targets_from_filenames  # nopep8
+from makei.utils import Colors, colored, get_compile_targets_from_filenames, run_command  # nopep8
 
 
-__version__ = "2.3.3"
+__version__ = "2.3.5"
 
 
 def cli():
@@ -33,6 +34,7 @@ def cli():
     add_info_parser(subparsers)
     add_compile_parser(subparsers)
     add_build_parser(subparsers)
+    add_cvtsrcpf_parser(subparsers)
 
     parser.add_argument(
         '-v', '--version',
@@ -49,7 +51,7 @@ def cli():
         parser.print_help()
 
 
-def add_build_parser(subparsers):
+def add_build_parser(subparsers: argparse.ArgumentParser):
     """Add subparsers for build commands"""
     build_parser = subparsers.add_parser(
         'build',
@@ -90,7 +92,7 @@ def add_build_parser(subparsers):
     build_parser.set_defaults(handle=handle_build)
 
 
-def add_compile_parser(subparsers):
+def add_compile_parser(subparsers: argparse.ArgumentParser):
     """Add subparsers for compile commands"""
     compile_parser = subparsers.add_parser(
         'compile',
@@ -128,7 +130,7 @@ def add_compile_parser(subparsers):
     compile_parser.set_defaults(handle=handle_compile)
 
 
-def add_init_parser(subparsers):
+def add_init_parser(subparsers: argparse.ArgumentParser):
     """Add subparsers for init commands"""
     init_parser = subparsers.add_parser(
         'init',
@@ -139,8 +141,37 @@ def add_init_parser(subparsers):
                              action='store_true')
     init_parser.set_defaults(handle=handle_init)
 
+def add_cvtsrcpf_parser(subparsers: argparse.ArgumentParser):
+    cvtsrcpf_parser = subparsers.add_parser(
+        'cvtsrcpf',
+        help='convert source physical file members to ASCII IFS files',
+        description='Converts all members in a source physical file to properly-named \
+                        (Better Object Builder-compatible), ASCII-ish, LF-terminated source files \
+                        in the current directory in the IFS. An .ibmi.json will also be created at the same directory.'
+    )
 
-def add_info_parser(subparsers):
+    cvtsrcpf_parser.add_argument(
+        "file",
+        help='the name of the source file',
+        metavar='<file>',
+    )
+
+    cvtsrcpf_parser.add_argument(
+        "library",
+        help='the name of the library',
+        metavar='<library>',
+    )
+
+    cvtsrcpf_parser.add_argument(
+        "-c",
+        help='the EBCDIC CCSID that the source in this directory should be compiled with. CCSID used to compile the source in this directory. If not specified, then the CCSID of the JOB running the build will be used.',
+        metavar='<CCSID>',
+        type=int,
+    )
+    cvtsrcpf_parser.set_defaults(handle=handle_cvtsrcpf)
+
+
+def add_info_parser(subparsers: argparse.ArgumentParser):
     """Add subparsers for info commands"""
     info_parser = subparsers.add_parser(
         'info',
@@ -196,6 +227,25 @@ def handle_build(args):
     else:
         exit(1)
 
+def handle_cvtsrcpf(args):
+    if args.c:
+        ccsid = args.c
+        ccsid_flag = f" -c {args.c}"
+    else:
+        ccsid = None
+        ccsid_flag = ""
+    exit_code = run_command(f"{str(BOB_PATH / 'scripts' / 'cvtsrcpf')} {args.file} {args.library}{ccsid_flag}")
+    if exit_code == 0:
+        ibmi_json_path = Path() / ".ibmi.json"
+        if not ibmi_json_path.exists() and ccsid:
+            data = {
+                "build" : {
+                    "tgtCcsid" : str(ccsid)
+                }
+            }
+            with ibmi_json_path.open('w') as json_file:
+                json.dump(data, json_file, indent=4)
+                print(colored("Created .ibmi.json at the current directory.", Colors.OKBLUE))
 
 def get_override_vars(args):
     """ Get the override variables from the arguments"""
