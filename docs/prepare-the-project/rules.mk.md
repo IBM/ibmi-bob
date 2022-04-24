@@ -1,10 +1,12 @@
-# How to create the Rules.mk
+# Defining Targets using Rules.mk
 
-This page documents how to create a `rules.mk`, which is a text file that tells Bob how your project structured and what the objects are.
+> [!NOTE]
+>
+> This page documents how to create a `Rules.mk`, which is a text file that tells Bob how your project structured and what the objects are.
 
 ## Overview
 
-Better Object Builder uses GNU Make to determine what code needs to be compiled. Make takes as input a _makefile_, which tells it what objects should be compiled, what source code they need, and what other objects they are dependent on. In Bob v2, we will reuse a common Makefile in the Bob directory which reads the `Rules.mk` files dynamatically in the project.
+Better Object Builder uses GNU Make to determine what code needs to be compiled. Make takes as input a _makefile_, which tells it what objects should be compiled, what source code they need, and what other objects they are dependent on. In Bob, we will reuse a common Makefile in the Bob directory which reads the `Rules.mk` files dynamatically in the project.
 
 By itself, Make has no concept of ILE objects, and doesn't know how to compile an RPG module or bind together a service program.  Better Object Builder provides that functionality in the makefile `def_rules.mk`,  which contains all the special instructions for building various types of IBM i objects. That way, when your `Rules.mk` says "build module XY1001 from source file XY1001.RPGLE", Make will know how to do that.
 
@@ -20,9 +22,11 @@ The `Rules.mk` consists of three sections:
 
 ## Creating the Rules.mk
 
-You are about to create a `Rules.mk` to describe the objects Bob should build.  If a project directory doesn't yet exist, [create one](prepare-project) now.
+> [!TIP]
+>
+> You are about to create a `Rules.mk` to describe the objects Bob should build.  If a project directory doesn't yet exist, [create one](prepare-the-project/create-a-new-project) now.
 
-Start a new `Rules.mk` for your project by copying `Rules.mk.sample` from the Bob folder into your project directory, then rename it `Rules.mk`.  Open it in any text editor.
+Create a new `Rules.mk` in your project directory.  Open it in any text editor.
 
 ### Subdir declaration
 
@@ -62,7 +66,11 @@ To create a rule, first write the object name (with the IFS suffix), followed by
 VATDEF.FILE: $(d)/VATDEF.PF SAMREF.FILE
 ```
 
-The example above is physical file `VATDEF.FILE`.  It is compiled from source code `VATDEF.PF` under the same directory of the `Rules.mk` file. Note we specify the directory using the special `$(d)` variable. 
+The example above is physical file `VATDEF.FILE`.  It is compiled from source code `VATDEF.PF` under the same directory of the `Rules.mk` file.
+
+> [!WARNING]
+>
+> Note that we have to specify the the source file using the special `$(d)` variable. This is to indicate that the source file is within the current directory. We may remove the need for the `$(d)` variable in future versions.
 
 If the object depends on other objects, add them to the end, separated by spaces:
 
