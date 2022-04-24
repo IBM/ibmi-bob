@@ -1,5 +1,10 @@
 # Integrating Bob and RDi
 
+> [!ATTENTION]
+> The RDi integration is currently outdated. We will provide the updated integrations in the future versions.
+
+
+
 This page documents how to configure the [Rational Developer for i](http://www-03.ibm.com/software/products/en/dev-ibm-i) IDE (RDi) to work with Bob.  When configured, an entire software product can be built by pressing one button in RDi.
 Note that this support is still actively being redesigned to take advantage of the new support added and so these instructions may be out of date.
 
@@ -7,7 +12,7 @@ Note that this support is still actively being redesigned to take advantage of t
 
 ## Overview
 
-By itself, the Bob build system runs on the IBM i as a PASE command line tool, to build standard QSYS objects from source code residing in an IFS directory.  [Client tools](Client-tools) are provided, however, to allow source code to be edited on a local PC and pushed to the i for building.
+By itself, the Bob build system runs on the IBM i as a PASE command line tool, to build standard QSYS objects from source code residing in an IFS directory.  [Client tools](integration/client-tools) are provided, however, to allow source code to be edited on a local PC and pushed to the i for building.
 
 These instructions are detailed, but completing these steps is not terribly difficult and only needs to be done one time.
 
