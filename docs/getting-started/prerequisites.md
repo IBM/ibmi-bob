@@ -12,8 +12,8 @@ The build system uses Unix and GNU tools, which run inside of PASE, so PASE must
 > To install PASE for i on your system, follow these steps:
 >
 > 1. On an IBM i command line, enter `GO LICPGM`.
-> 2. Select `11` (Install licensed program).
-> 3. Select Option '33 (5770-SS1 - Portable Application Solutions Environment)`.
+> 2. Select `11 (Install licensed program)`.
+> 3. Select Option `33 (5770-SS1 - Portable Application Solutions Environment)`.
 > 4. Optional: Install additional locales.
 
 ## Install IBM i Open Source Technologies
