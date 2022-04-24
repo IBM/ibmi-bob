@@ -10,10 +10,13 @@ Copy your code to a directory on your computer in whatever fashion you'd like, a
 * has had trailing blanks removed
 * has filenames ending with appropriate file extensions (`.PF`, `.CLLE`, `.RPGLE`, etc.)
 
-## Convert to a Bob project
-Bob expects a special file called `iproj.json` at the root of the set of files you want to build.  This is fully described in [Project metadata](project-metadata)
-All you need is the presence of this file with 
-## Converting with the `makei cvtsrcpf` command
+
+
+---
+
+<!-- tabs:start -->
+
+#### **Converting with the `makei cvtsrcpf` command**
 
 The `makei` program comes with a `cvtsrcpf` subcommand, a source code conversion tool. It will convert all members in a given source physical file to properly encoded, terminated, and named source files in an IFS directory.
 
@@ -23,6 +26,14 @@ Before running this tool, verify that the CCSID of the source physical file is s
 
 [How to use `makei svtsrcpf` command](cli/makei?id=cvtsrcpf)
 
-## Converting with RDi
+#### **Converting with RDi**
 
-RDi is no longer recommended as a way to convert source members to PC source files. We have seen cases where conversion errors occur, likely due to CCSID issues, both when converting to an IFS directory and when converting directly to a PC/Mac file system. For now, Better Object Builder's CVTSRCF command is the recommended conversion tool.
+> [!WARNING]
+>
+> RDi is no longer recommended as a way to convert source members to PC source files. We have seen cases where conversion errors occur, likely due to CCSID issues, both when converting to an IFS directory and when converting directly to a PC/Mac file system. For now, Better Object Builder's `cvtsrcpf` utility is the recommended conversion tool.
+
+<!-- tabs:end -->
+
+---
+
+Now you have converted the source files into an IFS directory. Make sure put them in a Bob project after conversion. You will need some special files to enable Bob. This is fully described in [Project metadata](project-metadata) and [Create a New Project](prepare-the-project/create-a-new-project).
