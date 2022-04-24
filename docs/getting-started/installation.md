@@ -63,6 +63,7 @@ These are common makei commands:
     info         get information about the current project
     compile (c)  compile a single file
     build (b)    build the whole project
+    cvtsrcpf     convert source physical file members to ASCII IFS files
 ```
 
 If you see something like `makei: A file or directory in the path name does not exist.` Ensure that there is no error in the installation step and that you have [setup the environment](getting-started/prerequisites?id=configure-the-bash_profile) correctly.
