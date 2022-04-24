@@ -10,21 +10,17 @@ If you previously used Bob v1, the following changes should be noted.
 
 Since Bob v2, we require additional packages to be installed on the IBM i as the following:
 
-- `coreutils-gnu`
-- `jq`
-- `db2util`
-- `python3` 3.4 or above
-- `bash` 4.4-6 or above
-
-[More on the Prerequisites for IBM i](https://github.com/IBM/ibmi-bob/wiki/Installing-IBM-i-prerequisites#install-ibm-i-open-source-technologies)
+[More on the Prerequisites for IBM i](getting-started/prerequisites.md) 
 
 ## Installment
 
 In Bob v1, we install `Bob` by putting all the `Bob` files under `/Build/Bob` and point to it in the makefiles we create for the project.
 
-In Bob v2, we provide the `RPM` package to specify the dependencies and install `Bob` into the system path automatically. 
+In Bob v2, we provide the `RPM` package to specify the dependencies and install `Bob` into the system path automatically.
 
-[More on the install instructions](https://github.com/IBM/ibmi-bob/wiki/Installing-Bob)
+Since Bob v2.3.5, you may install Bob using the `yum` package manager
+
+[More on the install instructions](getting-started/installation.md)
 
 ## Project Structure
 
@@ -34,11 +30,11 @@ Since Bob v2, we don't create the `Makefile` anymore and we can define a project
 
 ### Metadata Files
 
-- `iproj.json`: we will define a project using `iproj.json`, `Bob` will treat the directory containing this file as the root of the project. [More on the Project Level iproj.json](https://github.com/IBM/ibmi-bob/wiki/Project-Metadata#example-iprojjson)
+- `iproj.json`: we will define a project using `iproj.json`, `Bob` will treat the directory containing this file as the root of the project. [More on the Project Level iproj.json](prepare-the-project/iproj-json.md) 
 
-- `Rules.mk`: in this file, we specifies the structure of the project (i.e. subdirectories) and the object to be created as well as their dependencies. `Bob` will load those files dynamically and create a single `Makefile` for the `make` program to deal with the dependency relations. [More on creating Rule.mk](https://github.com/IBM/ibmi-bob/wiki/%5BWIP%5D-Create-Rules.mk)
+- `Rules.mk`: in this file, we specifies the structure of the project (i.e. subdirectories) and the object to be created as well as their dependencies. `Bob` will load those files dynamically and create a single `Makefile` for the `make` program to deal with the dependency relations. [More on creating Rule.mk](prepare-the-project/rules.mk.md) 
 
-- `.ibmi.json`: in this file, we allow developer to override configurations such as target CCSID and object library for the containing directory and its subdirectories.  [More on the directory level metadata .ibmi.json](https://github.com/IBM/ibmi-bob/wiki/Project-Metadata#directory-level-metadata)
+- `.ibmi.json`: in this file, we allow developer to override configurations such as target CCSID and object library for the containing directory and its subdirectories.  [More on the directory level metadata .ibmi.json](prepare-the-project/ibmi-json.md) 
 
 A sample project for Bob v2 can be found at [edmundreinhardt/bob-recursive-example](https://github.com/edmundreinhardt/bob-recursive-example).
 
@@ -58,23 +54,25 @@ In Bob v2, we have the following logs:
 
 ## Bob Changes
 
-In Bob v1, we define all the build rules in the `IBMiMakefile
+In Bob v1, we define all the build rules in the `IBMiMakefile`.
 
 
 
 ## Client Tools
 
-In Bob v1, we use the build settings file `.buildsettings` to setup the client tools including the ``
+In Bob v1, we use the build settings file `.buildsettings` to setup the client tools including the user/project metadata.
 
+## CLI Updates
 
+In Bob v2, we provide a new CLI tool `makei` to interact with Bob.
 
 ## Single File Compile
 
-Since Bob v2, we support compiling a single file using `makei -z {filename}`.
+Since Bob v2, we support compiling a single file using `makei compile -f {filename}`.
 
 ## Building the contents of single directory
 
-Since Bob v2, we support building everything within a directory using  `makei dir_{directoryname}`.
+Since Bob v2, we support building everything within a directory using  `makei build -d {directoryname}`.
 
 ## New Object Types
 
