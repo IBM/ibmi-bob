@@ -76,7 +76,7 @@ class ProjSpec():
             return ""
 
     def _input_str_to_list(self, input_str: str) -> List[str]:
-        return list(map(lambda s: s.strip(), input_str.split(",")))
+        return list(filter(len, map(lambda s: s.strip(), input_str.split(","))))
 
     def generate_iproj_json(self) -> str:
         """ Returns a string representation of the iproj.json file of current project"""
