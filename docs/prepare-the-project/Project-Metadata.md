@@ -2,7 +2,8 @@
 
 ## Vision
 
-The IBM i projects will self-describe how to build themselves as much as possible.  The Project needs to know how to get source from stream files in a directory hierarchy in a project presumably managed by git, into the IBM i and compiled with all attributes intact.  The final goal is that a Git project can contain all the information to build a working application.  I.e. a git hook can trigger the cloning, building, and deploying of a project without any additional dependencies on a target IBM i.
+The IBM i projects will self-describe how to build themselves as much as possible.  The project could be git cloned directly into an IFS directory or onto a client that is more convenient for editing and synchronized to the IFS directory it is built from. The project metadata needs to have sufficient information to specify the environment for both editing and compiling. The ultimate goal is that a Git project can contain all the information to build a working application. I.e. a git hook can trigger the cloning, building, and deploying of a project without any additional dependencies on a target IBM i.
+The project needs to know how to get source from stream files in a directory hierarchy in a project presumably managed by git, into the IBM i and compiled with all attributes intact.  The final goal is that a Git project can contain all the information to build a working application.  I.e. a git hook can trigger the cloning, building, and deploying of a project without any additional dependencies on a target IBM i.
 
 ## Technical Assumptions
 
