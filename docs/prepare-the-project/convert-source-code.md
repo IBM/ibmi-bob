@@ -24,7 +24,7 @@ Before running this tool, verify that the CCSID of the source physical file is s
 
 [How to use `makei svtsrcpf` command](cli/makei?id=cvtsrcpf)
 
-
+Once the conversion is done, remember to rename any `.RPGLE` include files to `.RPGLEINC`. If you want to compile using CRTBNDRPG, rename it to `.PGM.RPGLE`. Same for `.PGM.CBLLE` and `.PGM.CLLE`
 ---
 
 Now you have converted the source files into an IFS directory. Make sure put them in a Bob project after conversion. You will need some special files to enable Bob. This is fully described in [Project metadata](project-metadata) and [Create a New Project](prepare-the-project/create-a-new-project).
