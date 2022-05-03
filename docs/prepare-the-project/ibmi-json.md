@@ -12,7 +12,7 @@
   * Target object type can be derived from the extension prefix if it is not the default.  I.e. the default for RPGLE members is to be compiled to MODULES but if they are compiled to PGM then the name becomes name.pgm.rpgle
     Or name.srvpgm.sqlrpgle
   * Member text can be specified on the IFS files as OBJATR – however they cannot be specified in the linux or Windows files systems nor can it be stored in git.  It can be specified in long names of the form `<objname>-<descriptive text>.<membertype>`  i.e. `MYMOD-Module_containing_cool_stuff.rpgle`
-  * However this long name will affect include references in source and some customers may object to the name being changed, so it can be stored in a special comment beginning with %TEXT in the first 20 lines of the source
+  * However this long name will affect include references in source and some developers may object to the name being changed, so it can be stored in a special comment beginning with %TEXT in the first 20 lines of the source
 
 ## Configuration Options
 
