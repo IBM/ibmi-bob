@@ -13,6 +13,8 @@
 <p align="center">
   <a href="https://github.com/IBM/ibmi-bob/releases/latest"><img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/ibm/ibmi-bob"></a>
   <a href="https://www.apache.org/licenses/LICENSE-2.0"><img alt="GitHub" src="https://img.shields.io/github/license/ibm/ibmi-bob"></a>
+  |
+  <a href="https://ibm.github.io/ibmi-bob/">Documentation</a>
 </p>
 
 
@@ -36,5 +38,5 @@ Here's what makes Bob different.
 
 * 🌟 **Ease of use.**  Invoking a build of an entire codebase is done with just a single command.  Or, if the Rational Developer for i integration pieces are installed, a single button click.
 
-Learn more about installing and using Bob in the [documentation]().
+Learn more about installing and using Bob in the [documentation](https://ibm.github.io/ibmi-bob/).
 
