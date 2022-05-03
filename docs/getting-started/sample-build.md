@@ -20,7 +20,7 @@ Now that everything is installed and configured, let's build a [sample project](
 
    If you didn't have git, simply do a `yum install git` to get it.
 
-3. **Set an environment variable to point to the library you create**
+3. **Set an environment variable to point to the library you created**
 
    ```shell
    export lib1=BOBTEST
@@ -59,7 +59,7 @@ Now that everything is installed and configured, let's build a [sample project](
 
 ## The sample build process in action (quadruple speed)
 
-![Sample Build Demo](sample-build.assets/sample-build.gif)
+<!-- ![Sample Build Demo](sample-build.assets/sample-build.gif) -->
 
 
 > [!TIP]
