@@ -42,7 +42,7 @@ This line at the project root directory will tell Bob to build all the subdirect
 
 ### Object List section
 
-The object list section is where you list out each object Bob should build, grouped by object type and separated by spaces. Object names should be specified as the unqualified IFS file name. For example program names would be MYPGM.PGM and files would be 'MYFILE.FILE', etc. Object names should be specified as they appear in the Integrated File System (IFS), so program names end in `.PGM`, files end in `.FILE`, etc.  All object names should be in upper case.  For ease of maintenance, it is recommended that the objects are listed alphabetically.  Here's an example of part of an object list section:
+The object list section is where you list out each object Bob should build, grouped by object type and separated by spaces. Object names should be specified as the unqualified IFS file name. For example program names would be `MYPGM.PGM` and files would be `MYFILE.FILE`, etc. Object names should be specified as they appear in the Integrated File System (IFS), so program names end in `.PGM`, files end in `.FILE`, etc.  All object names should be in upper case.  For ease of maintenance, it is recommended that the objects are listed alphabetically.  Here's an example of part of an object list section:
 
 ```makefile
 PFs := VATDEF.FILE
