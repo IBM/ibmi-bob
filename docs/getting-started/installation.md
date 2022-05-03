@@ -3,7 +3,9 @@
 > Some software needs to be installed on the IBM i before Bob can be installed.
 > Please follow the [instructions to install prerequisites](getting-started/prerequisites.md) before continuing here.
 
-## Install via yum package manager
+<!-- tabs:start -->
+
+## **Install via yum package manager**
 
 ***YUM*** is a package management utility for RPM-based distributions. We recommend using *yum* to install *Bob* and its dependencies.
 
@@ -18,7 +20,7 @@ yum install bob
 
 
 
-## Install via prebuilt RPM packages
+## **Install via prebuilt RPM packages**
 
 1. Bob depends on many open source packages. You need to install the dependencies first before continuing.
 
@@ -43,7 +45,7 @@ or upgrade from a previous version
 rpm -U bob.ppc64.rpm
 ```
 
-
+<!-- tabs:end -->
 
 ## Verify Bob is installed correctly
 
