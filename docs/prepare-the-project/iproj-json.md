@@ -51,8 +51,6 @@ array of CL to run when the Rest Portal or Build job begins.  This can include A
 
 ### buildCommand
 
-> [!ATTENTION]
-> Not yet in use
 
 PASE command line used to build this entire project.  The following substitution variables are supported:
 
@@ -62,13 +60,15 @@ PASE command line used to build this entire project.  The following substitution
 * {usrprf} the user profile that the command will be executed under.
 * {branch} resolves to the name of the current git branch if this project is managed by git.
 
+The value for buildCommand for Bob should be `makei build`
+
 ### compileCommand
 
-> [!ATTENTION]
-> Not yet in use
-
 PASE command line used to compile a specific source file in this project. The same substitution parameters as in the buildCommand are supported.
+The value for compileCommand for Bob should be `makei compile -f {filename}`
 
+> [!NOTE]
+> This project definition is not exclusively for Bob.  A project can specify its own compile and build commands.  The IDE should then invoke those respect commands when compile or build is invoked in the tool.  In order to have the Merlin build and compile invoked, you should set the buildCommand and compileCommand as indicated above.
 ### repository
 
 git repository
