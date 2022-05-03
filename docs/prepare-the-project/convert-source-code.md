@@ -14,8 +14,6 @@ Copy your code to a directory on your computer in whatever fashion you'd like, a
 
 ---
 
-<!-- tabs:start -->
-
 #### **Converting with the `makei cvtsrcpf` command**
 
 The `makei` program comes with a `cvtsrcpf` subcommand, a source code conversion tool. It will convert all members in a given source physical file to properly encoded, terminated, and named source files in an IFS directory.
@@ -26,13 +24,6 @@ Before running this tool, verify that the CCSID of the source physical file is s
 
 [How to use `makei svtsrcpf` command](cli/makei?id=cvtsrcpf)
 
-#### **Converting with RDi**
-
-> [!WARNING]
->
-> RDi is no longer recommended as a way to convert source members to PC source files. We have seen cases where conversion errors occur, likely due to CCSID issues, both when converting to an IFS directory and when converting directly to a PC/Mac file system. For now, Better Object Builder's `cvtsrcpf` utility is the recommended conversion tool.
-
-<!-- tabs:end -->
 
 ---
 
