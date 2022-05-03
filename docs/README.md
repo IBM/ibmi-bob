@@ -15,7 +15,7 @@
 ---
 
 # Better Object Builder
-Better Object Builder, or _Bob_, is a free and open source build system for the IBM i platform that is used to build native "QSYS" objects.  It was developed by [S4i Systems](http://www.s4isystems.com), a leader in Electronic Document Management, to build their own software, and is under active development.  It is released under the [Apache 2.0 license](https://github.com/IBM/ibmi-bob/blob/master/LICENSE) to the open source community so that others can contribute and benefit.
+Better Object Builder, or _Bob_, is a free and open source build system for the IBM i platform that is used to build native "QSYS" objects. It was developed by [S4i Systems](http://www.s4isystems.com/), a leader in Electronic Document Management, to build their own software. In 2021, IBM began to make major investments in making Bob span multiple directories and handle pseudo-source and a buildable project definition. Bob is now hosted in IBM's public gihub and is under active development. It is released under the [Apache 2.0](https://github.com/IBM/ibmi-bob/pull/LICENSE) license to the open source community so that others can contribute and benefit.
 
 # Why Better Object Builder?
 Here's what makes Bob different.

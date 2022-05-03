@@ -18,7 +18,7 @@ The build system uses Unix and GNU tools, which run inside of PASE, so PASE must
 
 ## Install IBM i Open Source Technologies
 
-IBM provides many open source technologies ported to work on IBM i. Bob depends on a few of them, namely Bash, awk and (optionally) curl.  
+IBM provides many open source technologies ported to work on IBM i. Bob depends on a few of them, namely bash, make-gnu, python3, gawk, grep-gnu, sed-gnu, coreutils-gnu, python3-ibm_db.
 
 One of the easier ways to manage the open-source tools is through ACS. Here are some instructions on [how to install and manage the open-source packages](https://www.ibm.com/support/pages/getting-started-open-source-package-management-ibm-i-acs)
 
@@ -37,7 +37,7 @@ yum install bash
 ### Configure the .bash_profile
 
 > [!NOTE]
-> Since we assume bash is used in this documentation, we use **.bash_profile** instead of [*Envrionment Setup Using /QOpenSys/etc/profile and $HOME/.profile*](https://www.ibm.com/support/pages/portable-application-solutions-environment-pase-envrionment-setup-using-qopensysetcprofile-and-homeprofile)
+> Since we assume bash is used in this documentation, we use **.bash_profile** instead of [*Environment Setup Using /QOpenSys/etc/profile and $HOME/.profile*](https://www.ibm.com/support/pages/portable-application-solutions-environment-pase-envrionment-setup-using-qopensysetcprofile-and-homeprofile)
 
 It is important that the directory `/QOpenSys/pkgs/bin` directory is on your path.
 

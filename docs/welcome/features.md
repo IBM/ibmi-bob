@@ -10,7 +10,6 @@ Some of the major benefits of using a Better Object Builder / Git / RDi developm
 * Git and Make are ubiquitous; volumes of documentation and help exist
 * Automated builds are possible
 * Speedy delta builds -- only new and changed code (and code dependent on the changed code) is compiled
-* Many dependencies are [automatically detected and maintained](https://github.com/IBM/ibmi-bob/wiki/create-makefile#a-note-about-dependencies)
 * Fast transfer of source files from PC to IBM i
 * One-button builds
 * Open source.  Free to use and free to modify.
