@@ -24,7 +24,10 @@ Before running this tool, verify that the CCSID of the source physical file is s
 
 [How to use `makei svtsrcpf` command](cli/makei?id=cvtsrcpf)
 
-Once the conversion is done, remember to rename any `.RPGLE` include files to `.RPGLEINC`. If you want to compile using CRTBNDRPG, rename it to `.PGM.RPGLE`. Same for `.PGM.CBLLE` and `.PGM.CLLE`
+There are a couple of other file extension changes that need to be made after converting to stream files.  Any `.RPGLE`  files that are included should be renamed to `.RPGLEINC` so that Bob knows not to compile them.  It is ambiguous for Bob to know whether an ILE source is intended to be compiled into a MODULE, PGM or SRVPGM.  Bob will assume that a MODULE is the default.  If a PGM object is the target using CRTBNDxxx then the file extension should be `PGM.xxx` i.e. PGM.RPGLE for ILE RPG.  If a SRVPGM object is the target then the file extension should be SRVPGM.RPGLE .  See [Supported object types](welcome/features.md?id=supported-object-types) for more discussion of this.
+
+Finally if there are any objects that are not compiled, they can be represented in the project as CL or SQL scripts.  See [Support CL pseudo-source](welcome/features.md?id=supported-object-types?id=support-cl-pseudo-source) for more details.
+
 ---
 
 Now you have converted the source files into an IFS directory. Make sure put them in a Bob project after conversion. You will need some special files to enable Bob. This is fully described in [Project metadata](project-metadata) and [Create a New Project](prepare-the-project/create-a-new-project).
