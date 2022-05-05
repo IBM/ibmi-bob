@@ -2,9 +2,25 @@ COLOR := \033[33;40m
 ERROR_COLOR := \033[31;49;1m
 SUCCESS_COLOR := \033[32;49;1m
 NOCOLOR := \033[0m
-
 ifndef COLOR_TTY
 COLOR_TTY := $(shell [ `tput colors` -gt 2 ] && echo true)
+endif
+
+LC_ALL := $(shell echo ${LC_ALL})
+ifndef UTF8_SUPPORT
+	ifneq (,$(findstring UTF-8,$(LC_ALL)))
+		UTF8_SUPPORT := true
+	else
+		UTF8_SUPPORT := false
+	endif
+endif
+
+ifeq ($(UTF8_SUPPORT),true)
+SUCCESSMARKER = ✓
+FAILMARKER = ✕
+else
+SUCCESSMARKER = [SUCCESS]
+FAILMARKER = [FAIL]
 endif
 
 ifneq ($(VERBOSE),true)
@@ -16,12 +32,12 @@ endif
 ifeq ($(COLOR_TTY),true)
 echo_prog := $(shell if echo -e | grep -q -- -e; then echo echo; else echo echo -e; fi)
 echo_cmd = $(echo_prog) "$(COLOR)$(call strip_top,$(1))$(NOCOLOR)";
-echo_success_cmd = ($(echo_prog) "$(SUCCESS_COLOR)✓ $(call strip_top,$(1))$(NOCOLOR)" && echo)
-echo_error_cmd = ($(echo_prog) "$(ERROR_COLOR)✕ $(call strip_top,$(1))$(NOCOLOR)" && echo)
+echo_success_cmd = ($(echo_prog) "$(SUCCESS_COLOR)$(SUCCESSMARKER) $(call strip_top,$(1))$(NOCOLOR)" && echo)
+echo_error_cmd = ($(echo_prog) "$(ERROR_COLOR)$(FAILMARKER) $(call strip_top,$(1))$(NOCOLOR)" && echo)
 else
 echo_cmd = @echo "$(call strip_top,$(1))";
-echo_success_cmd = (echo "✓ $(call strip_top,$(1))" && echo)
-echo_error_cmd = (echo "✕ $(call strip_top,$(1))" && echo)
+echo_success_cmd = (echo "$(SUCCESSMARKER) $(call strip_top,$(1))" && echo)
+echo_error_cmd = (echo "$(FAILMARKER) $(call strip_top,$(1))" && echo)
 endif
 else # Verbose output
 echo_cmd =
