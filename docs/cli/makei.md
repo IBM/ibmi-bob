@@ -118,8 +118,6 @@ For example, RPGLE source member `AB1001` will become IFS source file `AB1001.RP
 By default, source files will be encoded in UTF-8; this can be overridden by using the `-c` option and supplying a CCSID value.
 It is likely that the same destination directory will contain converted members from many source physical files.  Therefore, name collisions are possible.  In the event of a duplicate member name and type, the source file name will be adjusted from `member.type` to `member (n).type`, with `n` incremented until a unique name is achieved.
 
-If the source physical file was created successfully, a `.ibmi.json` file with the same CCSID value will be created in the same directory. Note that It will not override an existing `.ibmi.json` file. 
-Just a note that the target ccsid in the .ibmi.json is NOT the encoding of the stream file but rather the EBCDIC encoding used by the compiler. So it is misleading to generate the .ibmi.json with that encoding as it will not be EBCDIC.
 
 #### Arguments
 
