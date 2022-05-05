@@ -142,7 +142,7 @@ class BuildEnv():
     def _post_make(self):
         print(colored(f"Objects:            ", Colors.BOLD), colored(f"{len(self.failed_targets)} failed", Colors.FAIL), colored(f"{len(self.success_targets)} succeed", Colors.OKGREEN), f"{len(self.success_targets)+len(self.failed_targets)} total")
         if self.failed_targets:
-            print(f"└ Failed objects:   ", " ".join(self.failed_targets))
+            print(f" > Failed objects:   ", " ".join(self.failed_targets))
         print(colored(f"Build Completed!", Colors.BOLD))
         # event_files = list(Path(".evfevent").rglob("*.evfevent"))
 
