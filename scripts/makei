@@ -147,7 +147,7 @@ def add_cvtsrcpf_parser(subparsers: argparse.ArgumentParser):
         help='convert source physical file members to ASCII IFS files',
         description='Converts all members in a source physical file to properly-named \
                         (Better Object Builder-compatible), ASCII-ish, LF-terminated source files \
-                        in the current directory in the IFS. An .ibmi.json will also be created at the same directory.'
+                        in the current directory in the IFS.'
     )
 
     cvtsrcpf_parser.add_argument(
