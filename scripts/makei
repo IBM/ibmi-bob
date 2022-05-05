@@ -147,7 +147,7 @@ def add_cvtsrcpf_parser(subparsers: argparse.ArgumentParser):
         help='convert source physical file members to ASCII IFS files',
         description='Converts all members in a source physical file to properly-named \
                         (Better Object Builder-compatible), ASCII-ish, LF-terminated source files \
-                        in the current directory in the IFS.'
+                        in the current directory in the IFS. An .ibmi.json will also be created at the same directory.'
     )
 
     cvtsrcpf_parser.add_argument(
@@ -235,17 +235,17 @@ def handle_cvtsrcpf(args):
         ccsid = None
         ccsid_flag = ""
     exit_code = run_command(f"{str(BOB_PATH / 'scripts' / 'cvtsrcpf')} {args.file} {args.library}{ccsid_flag}")
-    # if exit_code == 0:
-        # ibmi_json_path = Path() / ".ibmi.json"
-        # if not ibmi_json_path.exists() and ccsid:
-        #     data = {
-        #         "build" : {
-        #             "tgtCcsid" : str(ccsid)
-        #         }
-        #     }
-        #     with ibmi_json_path.open('w') as json_file:
-        #         json.dump(data, json_file, indent=4)
-        #         print(colored("Created .ibmi.json at the current directory.", Colors.OKBLUE))
+    if exit_code == 0:
+        ibmi_json_path = Path() / ".ibmi.json"
+        if not ibmi_json_path.exists() and ccsid:
+            data = {
+                "build" : {
+                    "tgtCcsid" : str(ccsid)
+                }
+            }
+            with ibmi_json_path.open('w') as json_file:
+                json.dump(data, json_file, indent=4)
+                print(colored("Created .ibmi.json at the current directory.", Colors.OKBLUE))
 
 def get_override_vars(args):
     """ Get the override variables from the arguments"""
