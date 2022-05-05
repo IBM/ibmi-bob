@@ -270,3 +270,4 @@ def set_environment_vars(args):
 
 if __name__ == '__main__':
     cli()
+    
