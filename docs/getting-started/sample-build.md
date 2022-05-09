@@ -4,29 +4,37 @@ Now that everything is installed and configured, let's build a [sample project](
 
 ## Perform a build
 
-1. **First create a library to build to.**
-
-   ```cl
-   CRTLIB LIB(BOBTEST) TEXT('Better Object Builder test project')
-   ```
+1. **Sign in to ssh**
    
-2. **Sign in to ssh and get the source from a sample git project**
-
+   For instance:
    ```shell
    ssh ibmi01
+   ```
+
+   If you didn't have git, simply do a `yum install git` to get it.
+
+1. **Create a library to build to.**
+
+   ```cl
+   system "CRTLIB LIB(BOBTEST) TEXT('Better Object Builder test project')"
+   ```
+   
+1. **Get the source from a sample git project**
+
+   ```shell
    git clone https://github.com/edmundreinhardt/bob-recursive-example
    cd bob-recursive-example
    ```
 
    If you didn't have git, simply do a `yum install git` to get it.
 
-3. **Set an environment variable to point to the library you created**
+1. **Set an environment variable to point to the library you created**
 
    ```shell
    export lib1=BOBTEST
    ```
 
-4. **Run the build using:**
+1. **Run the build using:**
 
    ```shell
    makei build
@@ -37,7 +45,7 @@ Now that everything is installed and configured, let's build a [sample project](
 > Alternatively, you may combine the above two commands using makei's shortcut:<br>
 > `makei b -e lib1=BOBTEST`
 
-5. **You should see output similar to this.**
+1. **You should see output similar to this.**
 
   ```
    $ makei b -e lib1=BOBTEST
