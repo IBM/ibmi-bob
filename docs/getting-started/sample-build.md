@@ -11,8 +11,6 @@ Now that everything is installed and configured, let's build a [sample project](
    ssh ibmi01
    ```
 
-   If you didn't have git, simply do a `yum install git` to get it.
-
 1. **Create a library to build to.**
 
    ```cl
