@@ -15,7 +15,7 @@ from pathlib import Path
 from shutil import move, copymode
 import subprocess
 import sys
-from typing import Callable, Dict, List, Tuple
+from typing import Callable, Dict, List, Tuple, Union
 
 from makei.const import DEFAULT_CURLIB, DEFAULT_OBJLIB, FILE_MAX_EXT_LENGTH, FILE_TARGET_MAPPING
 
@@ -188,7 +188,7 @@ def objlib_to_path(lib, object=None) -> str:
         return f"/QSYS.LIB/{lib}.LIB"
 
 
-def print_to_stdout(line: bytes):
+def print_to_stdout(line: Union[str, bytes]):
     """Default stdoutHandler for run_command defined below to write the bytes to the stdout
     """
     if type(line) == str:
