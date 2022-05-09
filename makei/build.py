@@ -4,6 +4,7 @@
 # 57XX-XXX
 # (c) Copyright IBM Corp. 2021
 """ The module used to build a project"""
+import sys
 from pathlib import Path
 from tempfile import mkstemp
 from typing import Any, Dict, List, Optional
@@ -127,7 +128,9 @@ class BuildEnv():
             (self.src_dir / ".logs" / "output.log").unlink()
 
 
-        def handle_make_output(line: str):
+        def handle_make_output(lineBytes: bytes):
+            if type(lineBytes) == bytes:
+                line = lineBytes.decode(sys.getdefaultencoding())
             if "Failed to create" in line:
                 self.failed_targets.append(line.split()[-1].split("!")[0])
             if "was created successfully!" in line:

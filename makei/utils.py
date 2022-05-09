@@ -188,11 +188,13 @@ def objlib_to_path(lib, object=None) -> str:
         return f"/QSYS.LIB/{lib}.LIB"
 
 
-def print_to_stdout(line: str):
+def print_to_stdout(line: bytes):
     """Default stdoutHandler for run_command defined below to write the bytes to the stdout
     """
-    print(line, end="")
-    sys.stdout.flush()
+    if type(line) == str:
+        line = line.encode(sys.getdefaultencoding())
+    sys.stdout.buffer.write(line)
+    sys.stdout.buffer.flush()
 
 def run_command(cmd: str, stdoutHandler: Callable[[bytes], None]=print_to_stdout) -> int:
     """ Run a command in a shell environment and redirect its stdout and stderr
@@ -208,10 +210,12 @@ def run_command(cmd: str, stdoutHandler: Callable[[bytes], None]=print_to_stdout
         process = subprocess.Popen(
             ["bash", "-c", cmd], stdout=subprocess.PIPE, )
         for line in iter(process.stdout.readline, b''):
-            stdoutHandler(line.decode('utf-8'))
+            stdoutHandler(line)
         return process.wait()
     except FileNotFoundError as error:
         print(colored(f'Cannot find command {error.filename}!', Colors.FAIL))
+    finally:
+        process.kill()
 
 
 def get_compile_targets_from_filenames(filenames: List[str]) -> List[str]:
