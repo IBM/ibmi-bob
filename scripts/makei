@@ -18,7 +18,7 @@ from makei.build import BuildEnv  # nopep8
 from makei.utils import Colors, colored, get_compile_targets_from_filenames, run_command  # nopep8
 
 
-__version__ = "2.3.5"
+__version__ = "2.3.6"
 
 
 def cli():
