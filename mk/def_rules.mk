@@ -6,9 +6,9 @@ ifndef COLOR_TTY
 COLOR_TTY := $(shell [ `tput colors` -gt 2 ] && echo true)
 endif
 
-LC_ALL := $(shell echo ${LC_ALL})
+LC_ALL := $(shell  /QOpenSys/pkgs/bin/python3.6  -c "import sys;print(sys.getdefaultencoding())")
 ifndef UTF8_SUPPORT
-	ifneq (,$(findstring UTF-8,$(LC_ALL)))
+	ifneq (,$(findstring utf-8,$(LC_ALL)))
 		UTF8_SUPPORT := true
 	else
 		UTF8_SUPPORT := false
