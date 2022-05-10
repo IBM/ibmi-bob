@@ -1,6 +1,6 @@
 %undefine _disable_source_fetch
 Name: bob
-Version: 2.3.6
+Version: 2.3.7
 Release: 0
 License: Apache-2.0
 Summary: Better Object Builder for IBM i
@@ -60,6 +60,8 @@ ln -sf %{_libdir}/bob/scripts/crtfrmstmf %{buildroot}%{_bindir}/crtfrmstmf
 
 %changelog
 
+* Wed May 09 2022 Tongkun Zhang <tongkun.zhang@ibm.com> - 2.3.7
+- Fix UTF-8 handling
 * Wed May 09 2022 Tongkun Zhang <tongkun.zhang@ibm.com> - 2.3.6
 - New documentation site is availabe at https://ibm.github.io/ibmi-bob/
 - Do not generate .ibmi.json when invoking makei cvtsrcpf to avoid misleading
