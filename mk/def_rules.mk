@@ -3,7 +3,7 @@ ERROR_COLOR := \033[31;49;1m
 SUCCESS_COLOR := \033[32;49;1m
 NOCOLOR := \033[0m
 ifndef COLOR_TTY
-COLOR_TTY := $(shell [ `tput colors` -gt 2 ] && echo true)
+COLOR_TTY := $(shell [ -t 1 ] && echo true)
 endif
 
 SYS_ENCODING := $(shell  /QOpenSys/pkgs/bin/python3.6  -c "import sys;print(sys.getdefaultencoding())")

@@ -41,7 +41,7 @@ def colored(message: str, color: Colors) -> str:
 
 def support_color():
     """ Detects if the terminal supports color."""
-    return True
+    return sys.stdout.isatty()
 
 
 def read_ibmi_json(path: Path, parent_value: Tuple[str, str]) -> Tuple[str, str]:
