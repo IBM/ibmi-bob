@@ -76,6 +76,10 @@ CALL QSYS2.SET_PASE_SHELL_INFO('*CURRENT', '/QOpenSys/pkgs/bin/bash')
 > [!WARNING]
 > If you did not add `/QOpenSys/pkgs/bin` to the PATH variable, you may not be able to invok *yum* or *chsh* directly. Try specifing the full path using `/QOpenSys/pkgs/bin/yum` or `/QOpenSys/pkgs/bin/chsh`.
 
+## TGTCCSID support on the ILE RPG compilers
+
+For TGTCCSID support on the ILE RPG compilers please make sure that PTF `5770WDS  SI74590` is loaded
+
 ## Ensure the SSH daemon is running
 
 Here is some good [background](https://www.seidengroup.com/2020/11/16/getting-started-with-ssh-for-ibm-i/) on ensuring SSH is available on IBM i and why.
