@@ -78,7 +78,7 @@ CALL QSYS2.SET_PASE_SHELL_INFO('*CURRENT', '/QOpenSys/pkgs/bin/bash')
 
 ## TGTCCSID support on the ILE RPG compilers
 
-For TGTCCSID support on the ILE RPG compilers please make sure that `PTF 5770WDS  SI74590` is loaded
+For TGTCCSID support on the ILE RPG compilers please make sure that PTF `5770WDS  SI74590` is loaded
 
 ## Ensure the SSH daemon is running
 
