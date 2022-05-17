@@ -1,6 +1,6 @@
 %undefine _disable_source_fetch
 Name: bob
-Version: 2.3.7
+Version: 2.3.8
 Release: 0
 License: Apache-2.0
 Summary: Better Object Builder for IBM i
@@ -59,7 +59,8 @@ ln -sf %{_libdir}/bob/scripts/crtfrmstmf %{buildroot}%{_bindir}/crtfrmstmf
 %{_bindir}/crtfrmstmf
 
 %changelog
-
+* Wed May 17 2022 Tongkun Zhang <tongkun.zhang@ibm.com> - 2.3.8
+- Fix terminal color-support by Jesse Gorzinski
 * Wed May 09 2022 Tongkun Zhang <tongkun.zhang@ibm.com> - 2.3.7
 - Fix UTF-8 handling
 * Wed May 09 2022 Tongkun Zhang <tongkun.zhang@ibm.com> - 2.3.6
