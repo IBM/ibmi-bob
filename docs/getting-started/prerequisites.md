@@ -78,7 +78,7 @@ CALL QSYS2.SET_PASE_SHELL_INFO('*CURRENT', '/QOpenSys/pkgs/bin/bash')
 
 ## TGTCCSID support on the ILE RPG compilers
 
-For TGTCCSID support on the ILE RPG compilers please make sure that PTF `5770WDS  SI74590` is loaded
+BOB supports specifying the EBCDIC CCSID to compile the source in. This requires the TGTCCSID parameter on the RPG compiler commands. This is in the base for IBM i 7.4 and following but for IBM i 7.3 please make sure the the PTF `SI74590` in product `5770WDS` is applied.
 
 ## Ensure the SSH daemon is running
 
