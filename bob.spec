@@ -1,6 +1,6 @@
 %undefine _disable_source_fetch
 Name: bob
-Version: 2.3.8
+Version: 2.3.9
 Release: 0
 License: Apache-2.0
 Summary: Better Object Builder for IBM i
@@ -59,13 +59,16 @@ ln -sf %{_libdir}/bob/scripts/crtfrmstmf %{buildroot}%{_bindir}/crtfrmstmf
 %{_bindir}/crtfrmstmf
 
 %changelog
+* Wed May 19 2022 Tongkun Zhang <tongkun.zhang@ibm.com> - 2.3.9
+- Fix no authority to read QADBFDEP when getting PF dependencies
 * Wed May 17 2022 Tongkun Zhang <tongkun.zhang@ibm.com> - 2.3.8
 - Fix terminal color-support by Jesse Gorzinski
 * Wed May 09 2022 Tongkun Zhang <tongkun.zhang@ibm.com> - 2.3.7
 - Fix UTF-8 handling
 * Wed May 09 2022 Tongkun Zhang <tongkun.zhang@ibm.com> - 2.3.6
 - New documentation site is availabe at https://ibm.github.io/ibmi-bob/
-- Do not generate .ibmi.json when invoking makei cvtsrcpf to avoid misleading
+- Do not generate .ibmi.json when invoking makei cvtsrcpf to avoid
+  misleading as to when target CCSID is required
 - Fix the encoding issue(#86) on machines without Utf-8 support
 * Wed Apr 21 2022 Tongkun Zhang <tongkun.zhang@ibm.com> - 2.3.5
 - Replace all the python3.9 shebang to python3.6
