@@ -316,7 +316,12 @@ def get_physical_dependencies(obj: str, lib: str, include_self: bool, job: Optio
     if job is None:
         job = IBMJob()
 
-    dep_files, _ = job.run_sql(f"Select DBFFDP, DBFLDP From QSYS.QADBFDEP Where DBFLIB='{lib}' and DBFFIL='{obj}'")
+    # Run DSPDBR command and save the result into a file
+    job.run_cl(f"DSPDBR FILE({lib}/{obj}) OUTPUT(*OUTFILE) OUTFILE(QTEMP/DEPOUT)")
+    # Query from the file to get the dependencies
+    dep_files, _ = job.run_sql(f"SELECT WHREFI, WHRELI from QTEMP.DEPOUT")
+    # For PF without deps, the result will be [('          ', '          ')], so filter it
+    dep_files = list(filter(lambda t: t[0].strip() and t[1].strip(), dep_files))
     result = list(map(lambda dep_file: (dep_file[0].strip(), dep_file[1].strip(), "FILE"), dep_files))
     if include_self:
         result.append((obj, lib, "FILE"))
