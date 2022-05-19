@@ -30,14 +30,14 @@ class IBMJob():
 
     def run_cl(self, cmd: str, ignore_errors: bool = False, log: bool = False):
         if log:
-            print(f"▶️  {cmd}")
+            print(f">  {cmd}")
         with closing(self.conn.cursor()) as cursor:
             try:
                 cursor.callproc("qsys2.qcmdexc", [cmd])
                 return True
             except Exception as e:
                 if not ignore_errors:
-                    print(f"❌  {cmd}")
+                    print(f"[FAILED]  {cmd}")
                     raise
                 return False
 
@@ -45,7 +45,7 @@ class IBMJob():
         with closing(self.conn.cursor()) as cursor:
             try:
                 if log:
-                    print(f"🔎 {sql}")
+                    print(f"[QUERY] {sql}")
                 cursor.execute(sql)
                 try:
                     column_names = [column[0] for column in cursor.description]
@@ -55,7 +55,7 @@ class IBMJob():
                 return (rows, column_names)
             except Exception as e:
                 if not ignore_errors:
-                    print(f"❌  {sql}")
+                    print(f"[FAILED]  {sql}")
                     raise
 
     def _dump_results_to_dict(self, results: Tuple[List[str], List[List[Any]]]):
