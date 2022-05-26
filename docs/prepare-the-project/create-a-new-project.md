@@ -11,25 +11,36 @@ makei init
 At the end you will see:
 
 ```diff
+-bash-5.1$ makei init
+This utility will walk you through creating a project.
+It only covers some common items.
+
+Press ^C at any time to quit.
+descriptive application name: (yourName)
+git repository: http://github.com/youruser/yourName
+include path, separated by commas:
+What library should objects be compiled into (objlib): (*CURLIB) &pgmlib
+What EBCDIC CCSID should the source be compiled in: (*JOB)
+curlib: (*CRTDFT) &pgmlib
+Pre user libraries, separated by commas:
+Post user libraries, separated by commas:
+Set up commands to be executed, separated by commas:
+license:
+
 The following files will be added to the project
-+ /home/tongkun/init-test/iproj.json
-+ /home/tongkun/init-test/.ibmi.json
-+ /home/tongkun/init-test/Rules.mk
++ /home/REINHARD/git/yourName/iproj.json
++ /home/REINHARD/git/yourName/Rules.mk
 Continue? (yes)
 ```
 
 Simply press enter to confirm the changes and you have created a minimal bob project.
-
-> [!NOTE]
->
-> You may notice that the `.ibmi.json` will be created only if you have specified a different `EBCDIC CCSID`. This is because the `EBCDIC CCSID` is part of the directory level metadata.
 
 ## Manually Setup
 
 You may choose to manually setup the project by creating 
 
 - [x] `iproj.json` at the project root
-- [x] `.ibmi.json` at the directories you want to overide build variables
+- [x] `.ibmi.json` at the directories you want to overide build variables to target a different object library, or use a different EBCDIC CCSID for the compile.
 - [x] `Rules.mk` at each level of the project defining the targets
 
 
