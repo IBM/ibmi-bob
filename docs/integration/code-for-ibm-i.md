@@ -20,7 +20,7 @@
 
 > [!ATTENTION]
 >
-> `makei build` will try to build all changes objects, or all objects on the first time it's run. Consider creating an Action for `OPT=*EVENTF /QOpenSys/pkgs/bin/makei compile &BASENAME` to compile specific objects.
+> `makei build` will try to build all changes objects, or all objects on the first time it's run. Consider creating an Action for `OPT=*EVENTF BUILDLIB=&CURLIB /QOpenSys/pkgs/bin/makei compile &BASENAME` to compile specific objects.
 
 ## Developing on the local machine with ibmi-bob
 
@@ -36,6 +36,8 @@ You may use Bob as the deploy backend for Code for IBM i by providing a customiz
 6. In your workspace, create a new file: `./.vscode/actions.json`. 
    * This is where Actions specific to this project belong.
    * This file should be checked into the repo so all developers share the same actions.
+
+---
 
 7. Inside of `actions.json`, place this JSON:
 
@@ -58,8 +60,10 @@ Actions defined in your `actions.json` will show up with the other Actions when 
    * Upload files to chosen deploy location (which was done in step 5)
    * Run the provided command (`makei build`)
 
-6. Open the source code up that you want to compile
-7. Use the Action, which will upload files & run the defined command
+---
+
+8. Open the source code up that you want to compile
+9. Use the Action, which will upload files & run the defined command
    * Shortcut to run an Action is Control / Command + E
    * You will see the Output in the IBM i Output channel.
    * If your current library and build library match, the errors (if any) should appear.
