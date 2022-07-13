@@ -66,7 +66,7 @@ class BuildEnv():
 
     def generate_make_cmd(self):
         """ Returns the make command used to build the project."""
-        cmd = f'make -k BUILDVARSMKPATH="{self.build_vars_path}"' + \
+        cmd = f'/QOpenSys/pkgs/bin/make -k BUILDVARSMKPATH="{self.build_vars_path}"' + \
             f' -k BOB="{self.bob_path}" -f "{self.bob_makefile}"'
         if self.make_options:
             cmd = f"{cmd} {self.make_options}"
