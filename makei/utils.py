@@ -8,7 +8,7 @@
 
 from datetime import datetime
 from enum import Enum
-from tempfile import mkstemp
+from tempfile import mkstemp, gettempdir
 import json
 import os
 from pathlib import Path
@@ -182,10 +182,59 @@ def objlib_to_path(lib, object=None) -> str:
     """
     if not lib:
         raise ValueError()
+    if lib == "QSYS":
+        return f"/QSYS.LIB/{object}"
     if object is not None:
         return f"/QSYS.LIB/{lib}.LIB/{object}"
     else:
         return f"/QSYS.LIB/{lib}.LIB"
+
+def create_temp_file(file_name: str) -> Path:
+    """ Creates a temporary file with the given name and returns the path to it.
+    """
+    temp_file = Path(gettempdir()) / file_name
+    temp_file.touch()
+    return temp_file
+
+def validate_ccsid(ccsid: str):
+    """Returns if the ccsid is a valid value
+    """
+    if ccsid == "*JOB":
+        # *JOB is a valid ccsid
+        return True
+    if ccsid.startswith("*"):
+        return False
+    try:
+        int(ccsid)
+        temp_file = create_temp_file(f"ccsid_{ccsid}")
+        if run_command(f"attr {temp_file} CCSID={ccsid}", echo_cmd=False) != 0:
+            # If the ccsid is invalid, the command will fail.
+            return False
+        return True
+    except Error:
+        return False
+
+def create_ibmi_json(ibmi_json_path: Path, tgt_ccsid: str = None, version: str = None, objlib: str = None):
+    """ Creates the .ibmi.json file with the given parameters.
+    """
+    if not ibmi_json_path.exists():
+        ibmi_json_path.touch()
+    with ibmi_json_path.open() as file:
+        try:
+            ibmi_json = json.load(file)
+        except json.decoder.JSONDecodeError:
+            ibmi_json = {}
+
+        build = ibmi_json["build"] if "build" in ibmi_json else {}
+        if tgt_ccsid is not None:
+            build["tgtCcsid"] = tgt_ccsid
+        if objlib is not None:
+            build["objlib"] = objlib
+        if version is not None:
+            ibmi_json["version"] = version
+        ibmi_json["build"] = build
+        with ibmi_json_path.open("w") as file:
+            json.dump(ibmi_json, file, indent=4)
 
 
 def print_to_stdout(line: Union[str, bytes]):
@@ -196,7 +245,7 @@ def print_to_stdout(line: Union[str, bytes]):
     sys.stdout.buffer.write(line)
     sys.stdout.buffer.flush()
 
-def run_command(cmd: str, stdoutHandler: Callable[[bytes], None]=print_to_stdout) -> int:
+def run_command(cmd: str, stdoutHandler: Callable[[bytes], None]=print_to_stdout, echo_cmd: bool = True) -> int:
     """ Run a command in a shell environment and redirect its stdout and stderr
         and returns the exit code
 
@@ -204,7 +253,8 @@ def run_command(cmd: str, stdoutHandler: Callable[[bytes], None]=print_to_stdout
         cmd (str): The command to run
         stdoutHandler (Callable[[bytes], None]]): the handle function to process the stdout
     """
-    print(colored(f"> {cmd}", Colors.OKGREEN))
+    if echo_cmd:
+        print(colored(f"> {cmd}", Colors.OKGREEN))
     sys.stdout.flush()
     try:
         process = subprocess.Popen(
