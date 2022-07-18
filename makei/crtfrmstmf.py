@@ -29,6 +29,9 @@ COMMAND_MAP = {'CRTCMD': 'CMD',
 
 
 class CrtFrmStmf():
+    """create from stream file
+    """
+    
     job: IBMJob
     setup_job: IBMJob
     srcstmf: str
