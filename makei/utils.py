@@ -204,6 +204,8 @@ def validate_ccsid(ccsid: str):
         return True
     if ccsid.startswith("*"):
         return False
+    if ccsid == "65535":
+        return False
     try:
         int(ccsid)
         temp_file = create_temp_file(f"ccsid_{ccsid}")

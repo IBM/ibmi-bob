@@ -23,39 +23,42 @@ class CvtSrcPf():
     lib: str
     srcfile: str
     save_path: Path
-    stmf_ccsid: str
-    tgt_ccsid: str
+    defaultCcsid: Optional[str]
     ibmi_json_path: Optional[Path]
 
 
-    def __init__(self, srcfile: str, lib: str, stmf_ccsid: str = "1208", should_create_ibmi_json: bool = True, tgtccsid: str = "*JOB", save_path: Path = Path.cwd()) -> None:
+    def __init__(self, srcfile: str, lib: str, defaultCcsid: str = None, save_path: Path = Path.cwd()) -> None:
         self.job = IBMJob()
 
         self.lib = lib
         self.srcfile = srcfile
         self.save_path = save_path
-        if validate_ccsid(stmf_ccsid):
-            self.stmf_ccsid = stmf_ccsid
+        if defaultCcsid is not None and validate_ccsid(defaultCcsid):
+            self.defaultCcsid = defaultCcsid
         else:
-            raise Exception(f"Invalid ccsid {stmf_ccsid}")
-        if validate_ccsid(tgtccsid):
-            self.tgt_ccsid = tgtccsid
-        else:
-            raise Exception(f"Invalid ccsid {tgtccsid}")
-        self.ibmi_json_path = save_path / ".ibmi.json" if should_create_ibmi_json else None
+            raise Exception(f"Invalid ccsid {defaultCcsid}")
+
+        self.ibmi_json_path = save_path / ".ibmi.json"
 
     def run(self) -> int:
         srcpath = Path(objlib_to_path(self.lib, f"{self.srcfile}.FILE"))
         if not srcpath.exists():
             raise Exception(f"Source file '{srcpath}' does not exist")
         src_mbrs = self._get_src_mbrs(srcpath)
+        src_ccsid = self.job.get_src_ccsid(srcpath)
+        if self.defaultCcsid is None:
+            if validate_ccsid(src_ccsid):
+                self.defaultCcsid = src_ccsid
+            else:
+                self.defaultCcsid = "*JOB"
+
         print(f"{len(src_mbrs)} source members found.")
         cvt_count = 0
         for src_mbr in src_mbrs:
             if self._cvr_src_mbr(src_mbr, srcpath):
                 cvt_count += 1
         if self.ibmi_json_path:
-            create_ibmi_json(self.ibmi_json_path, tgt_ccsid = self.tgt_ccsid)
+            create_ibmi_json(self.ibmi_json_path, tgt_ccsid = self.defaultCcsid)
         return cvt_count
 
     def _cvr_src_mbr(self, src_mbr, srcpath) -> bool:
@@ -75,7 +78,7 @@ class CvtSrcPf():
             dst_mbr_path = self.save_path / dst_mbr_name
 
         print(f"Converting {src_mbr_name} to {dst_mbr_name}")
-        return self.job.run_cl(f"CPYTOSTMF FROMMBR('{srcpath}/{src_mbr_name}.MBR') TOSTMF('{dst_mbr_path}') ENDLINFMT(*LF) STMFCCSID({self.stmf_ccsid}) STMFOPT(*REPLACE)", ignore_errors=True, log=True)
+        return self.job.run_cl(f"CPYTOSTMF FROMMBR('{srcpath}/{src_mbr_name}.MBR') TOSTMF('{dst_mbr_path}') ENDLINFMT(*LF) STMFCCSID(1208) STMFOPT(*REPLACE)", ignore_errors=True, log=True)
 
 
     def _get_src_mbrs(self, srcpath: Path) -> List[Tuple[str, str]]:
