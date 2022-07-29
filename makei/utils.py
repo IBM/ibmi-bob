@@ -144,7 +144,7 @@ def validate_ccsid(ccsid: str):
             # If the ccsid is invalid, the command will fail.
             return False
         return True
-    except Error:
+    except Exception:
         return False
 
 def create_ibmi_json(ibmi_json_path: Path, tgt_ccsid: str = None, version: str = None, objlib: str = None):
