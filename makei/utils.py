@@ -15,7 +15,7 @@ from pathlib import Path
 from shutil import move, copymode
 import subprocess
 import sys
-from typing import Callable, Dict, List, Tuple, Union
+from typing import Callable, Dict, List, Optional, Tuple, Union
 
 from makei.const import DEFAULT_CURLIB, DEFAULT_OBJLIB, FILE_MAX_EXT_LENGTH, FILE_TARGET_MAPPING
 
@@ -217,6 +217,31 @@ def run_command(cmd: str, stdoutHandler: Callable[[bytes], None]=print_to_stdout
     finally:
         process.kill()
 
+def decoposite_filename(filename: str) -> Tuple[str, Optional[str], str]:
+    """Returns the (name, text-attribute, extension) of the file name
+    """
+    parts = os.path.basename(filename).split(".")
+
+    ext_len = FILE_MAX_EXT_LENGTH
+    while ext_len > 0:
+        base, ext = '.'.join(parts[:-ext_len]), '.'.join(parts[-ext_len:]).upper()
+        if ext in FILE_TARGET_MAPPING:
+            # Split the object name and text attributes
+            if len(base.split("-")) == 2:
+                name, text_attribute = base.split("-")
+            else:
+                name = base
+                text_attribute = None
+            return (name, text_attribute, ext)
+        ext_len -= 1
+    if ext_len == 0:
+        raise ValueError(f"Cannot decomposite filename: {filename}")
+
+def get_target_from_filename(filename: str) -> str:
+    """Returns the target from the filename
+    """
+    name, text_attribute, ext = decoposite_filename(filename)
+    return f'{name}.{FILE_TARGET_MAPPING[ext]}'
 
 def get_compile_targets_from_filenames(filenames: List[str]) -> List[str]:
     """ Returns the possible target name for the given filename
@@ -232,20 +257,7 @@ def get_compile_targets_from_filenames(filenames: List[str]) -> List[str]:
     """
     result = []
     for filename in filenames:
-        parts = os.path.basename(filename).split(".")
-
-        ext_len = FILE_MAX_EXT_LENGTH
-        while ext_len > 0:
-            base, ext = '.'.join(
-                parts[:-ext_len]), '.'.join(parts[-ext_len:]).upper()
-            if ext in FILE_TARGET_MAPPING:
-                # Split the object name and text attributes
-                object_name = base.split("-")[0]
-                result.append(f'{object_name}.{FILE_TARGET_MAPPING[ext]}')
-                break
-            ext_len -= 1
-        if ext_len == 0:
-            raise ValueError(f"Cannot get the target for {filename}")
+        result.append(get_target_from_filename(filename))
     return result
 
 

@@ -78,23 +78,6 @@ class ProjSpec():
     def _input_str_to_list(self, input_str: str) -> List[str]:
         return list(filter(len, map(lambda s: s.strip(), input_str.split(","))))
 
-    def generate_iproj_json(self) -> str:
-        """ Returns a string representation of the iproj.json file of current project"""
-
-        iproj = {
-            "description": self.description,
-            "version": self.version,
-            "license": self.license,
-            "repository": self.repository,
-            "includePath": self.include_path,
-            "objlib": self.objlib,
-            "curlib": self.curlib,
-            "preUsrLibl": self.pre_usr_libl,
-            "postUsrLibl": self.post_usr_libl,
-            "setIBMiEnvCmd": self.set_ibm_i_env_cmd
-        }
-        return json.dumps(iproj, indent=4)
-
     def generate_ibmi_json(self) -> Optional[str]:
         """ Returns a string representation of the .ibmi.json file of current project"""
 
