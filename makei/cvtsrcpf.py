@@ -35,8 +35,6 @@ class CvtSrcPf():
         self.save_path = save_path
         if defaultCcsid is not None and validate_ccsid(defaultCcsid):
             self.defaultCcsid = defaultCcsid
-        else:
-            raise Exception(f"Invalid ccsid {defaultCcsid}")
 
         self.ibmi_json_path = save_path / ".ibmi.json"
 
