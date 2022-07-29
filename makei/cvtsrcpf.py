@@ -43,7 +43,7 @@ class CvtSrcPf():
         if not srcpath.exists():
             raise Exception(f"Source file '{srcpath}' does not exist")
         src_mbrs = self._get_src_mbrs(srcpath)
-        src_ccsid = self.job.get_src_ccsid(srcpath)
+        src_ccsid = retrieve_ccsid(srcpath)
         if self.defaultCcsid is None:
             if validate_ccsid(src_ccsid):
                 self.defaultCcsid = src_ccsid
