@@ -724,10 +724,10 @@ programTGTRLS = $(strip \
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating CL module [$(notdir $<)]")
 	@$(set_STMF_CCSID)
-	@$(eval crtcmd := crtclmod module($(OBJLIB)/$(basename $(@F))) srcstmf('$<') $(CRTCLMODFLAGS))
+	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "crtclmod" -p '"$(CRTCLMODFLAGS)"'")
 	@$(PRESETUP) \
-	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
-	@$(call EVFEVENT_DOWNLOAD,$*.evfevent)
+ 	$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "crtclmod" -p "$(CRTCLMODFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
+	@$(call EVFEVENT_DOWNLOAD,$*.evfevent))
 
 # Temp: Convert UTF-8 to temporary Windows Latin-1, because SQLC pre-compiler doesn't understand UTF-8
 .SECONDEXPANSION:
