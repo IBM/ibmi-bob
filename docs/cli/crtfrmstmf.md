@@ -3,7 +3,7 @@
 ## Synopsis
 
 ```
-usage: crtfrmstmf [-h] -f <srcstmf> -o <object> [-l <library>] -c <cmd> [-p [<parms>]]
+usage: crtfrmstmf [-h] -f <srcstmf> -o <object> [-l <library>] -c <cmd> [-p [<parms>]] [--ccsid [<ccsid>]]
                   [--save-joblog <path to joblog json file>]
 ```
 
@@ -32,6 +32,11 @@ usage: crtfrmstmf [-h] -f <srcstmf> -o <object> [-l <library>] -c <cmd> [-p [<pa
 - **-p, --parameters**
 
   Specifies the parameters added to the compile command.
+
+- **--ccsid**
+
+  The CCSID used to create the SRC-PF in QTEMP
+
 
 - **--save-joblog**
 
