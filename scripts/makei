@@ -163,28 +163,15 @@ def add_cvtsrcpf_parser(subparsers: argparse.ArgumentParser):
         help='the name of the library',
         metavar='<library>',
     )
-    cvtsrcpf_parser.add_argument(
-        "--stmfccsid",
-        help='the ccsid of the source file being created, default is 1208',
-        metavar='<stmfccsid>',
-        type=str,
-        default="1208"
-    )
 
     cvtsrcpf_parser.add_argument(
-        "--tgtccsid",
-        help='the EBCDIC CCSID that the source in this directory should be compiled with. CCSID used to compile the source in this directory. If not specified, then the CCSID of the JOB running the build will be used.',
-        metavar='<tgtccsid>',
-        type=str,
-        default="*JOB"
-    )
-    cvtsrcpf_parser.add_argument(
         "-c",
-        "--create-ibmi-json",
-        type=bool,
-        default=True,
-        help="create an ibmi.json file in the same directory if specified",
+        "--defaultCcsid",
+        help='The TGTCCSID for the build. If not specified, then the CCSID of the SRC-PF will be used.',
+        metavar='<defaultCcsid>',
+        type=str
     )
+
     cvtsrcpf_parser.set_defaults(handle=handle_cvtsrcpf)
 
 
@@ -248,7 +235,7 @@ def handle_cvtsrcpf(args):
     """
     Processing the cvtsrcpf command
     """
-    CvtSrcPf(args.file, args.library, args.stmfccsid, args.create_ibmi_json, args.tgtccsid).run()
+    CvtSrcPf(args.file, args.library, args.stmfccsid).run()
 
 def get_override_vars(args):
     """ Get the override variables from the arguments"""
