@@ -167,9 +167,9 @@ def add_cvtsrcpf_parser(subparsers: argparse.ArgumentParser):
 
     cvtsrcpf_parser.add_argument(
         "-c",
-        "--defaultCcsid",
+        "--ccsid",
         help='The TGTCCSID for the build. If not specified, then the CCSID of the SRC-PF will be used.',
-        metavar='<defaultCcsid>',
+        metavar='<ccsid>',
         type=str
     )
 
@@ -236,7 +236,7 @@ def handle_cvtsrcpf(args):
     """
     Processing the cvtsrcpf command
     """
-    CvtSrcPf(args.file, args.library, args.stmfccsid).run()
+    CvtSrcPf(args.file, args.library, args.ccsid).run()
 
 def get_override_vars(args):
     """ Get the override variables from the arguments"""
