@@ -273,8 +273,8 @@ def cli():
     if "IBMiEnvCmd" in os.environ:
         env_settings["IBMiEnvCmd"] = os.environ["IBMiEnvCmd"]
 
-    handle = CrtFrmStmf(srcstmf_absolute_path, args.object.strip(
-    ), args.library.strip(), args.command.strip(), args.parameters, env_settings, args.save_joblog)
+    handle = CrtFrmStmf(srcstmf_absolute_path, args.object.strip(),
+    args.library.strip(), args.command.strip(), args.ccsid, args.parameters, env_settings, args.save_joblog)
 
     print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
     success = handle.run()
