@@ -87,6 +87,25 @@ define get_subtree
 $($(1)_$(2)) $(foreach sd,$(SUBDIRS_$(2)),$(call get_subtree,$(1),$(sd)))
 endef
 
+define get_target_type
+$(subst .,,$(suffix $1))
+endef
+
+define get_file_type
+$(subst $(basename $1).,,$1)
+endef
+
+define get_recipe_name
+$(call get_file_type,$1)_TO_$(call get_target_type,$2)_RECIPE
+endef
+
+# target_name := $1
+# source_name := $2
+# dependencies := $3
+define generate_rule
+${1}: ${2} ${3} ; $$(eval @=$1)$$(eval <=$2)$$(eval *=$(basename $1))$$(eval ^=$2 $3)$${$(call get_recipe_name,$(2),$(1))}
+endef
+
 # if we are using out of project build tree then there is no need to
 # have dist_clean on per directory level and the one below is enough
 ifneq ($(strip $(TOP_BUILD_DIR)),)
