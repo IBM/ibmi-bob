@@ -973,7 +973,7 @@ endef
 #                                                  |_|              
 
 
-define BNDDIR_TO_BNDD_RECIPE =
+define BNDDIR_TO_BNDDIR_RECIPE =
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating BND from [$(notdir $<)]")
 	$(eval crtcmd := $(shell $(SCRIPTSPATH)/extractPseudoSrc $< $(OBJLIB) $(basename $(@F))))
