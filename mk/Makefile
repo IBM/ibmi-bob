@@ -76,3 +76,7 @@ $(eval $(value FOOTER))
 # This is just a convenience - to let you know when make has stopped
 # interpreting make files and started their execution.
 # $(info Rules generated $(if $(BUILD_MODE),for "$(BUILD_MODE)" mode,)...)
+
+# $(eval $(call generate-rule,common/SamRef2-asdf.PF))
+# SAMREF.FILE: /home/tongkun/git/bob-recursive-example/common/SamRef2-asdf.pf ; ${PF_TO_FILE_RECIPE}
+# VAT300.MODULE: /home/tongkun/git/bob-recursive-example/functionsVAT/VAT300.RPGLE  ; ${RPGLE_TO_MODULE_RECIPE}

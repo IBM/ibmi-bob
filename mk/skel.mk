@@ -62,7 +62,7 @@ define include_subdir_rules
 dir_stack := $(d) $(dir_stack)
 d := $(d)/$(1)
 $$(eval $$(value HEADER))
-include $(addsuffix /Rules.mk,$$(d))
+include $(addsuffix /.Rules.mk.build,$$(d))
 $$(eval $$(value FOOTER))
 d := $$(firstword $$(dir_stack))
 dir_stack := $$(wordlist 2,$$(words $$(dir_stack)),$$(dir_stack))
@@ -86,6 +86,28 @@ endef
 define get_subtree
 $($(1)_$(2)) $(foreach sd,$(SUBDIRS_$(2)),$(call get_subtree,$(1),$(sd)))
 endef
+
+define get_target_type
+$(subst .,,$(suffix $1))
+endef
+
+define get_file_type
+$(subst $(basename $1).,,$1)
+endef
+
+define get_recipe_name
+$(if $(filter %.SQL %.MSGF,$(1)),$(call get_target_type,$2)_RECIPE,$(call get_file_type,$1)_TO_$(call get_target_type,$2)_RECIPE)
+endef
+
+# target_name := $1
+# source_name := $2
+# dependencies := $3
+define generate_rule
+ifndef ${1}_CUSTOM_RECIPE
+${1}: ${2} ${3} ; $$(eval @=$1)$$(eval <=$2)$$(eval tgt=$(basename $1))$$(eval ^=$2 $3)$${$(call get_recipe_name,$(2),$(1))}
+endif
+endef
+
 
 # if we are using out of project build tree then there is no need to
 # have dist_clean on per directory level and the one below is enough

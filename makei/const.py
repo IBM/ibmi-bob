@@ -46,6 +46,7 @@ FILE_TARGETGROUPS_MAPPING = {
     "SQLRPGLE": "MODULE",
     "MODULE": "PGM",
     "CBL": "PGM",
+    "CBLLE": "PGM",
     "RPG": "PGM",
     "ILEPGM": "PGM",
     "PNLGRPSRC": "PNLGRP",
@@ -54,7 +55,7 @@ FILE_TARGETGROUPS_MAPPING = {
     "ILESRVPGM": "SRVPGM",
     "BNDDIR": "BNDD",
     "DTA": "DTA",
-    "DTAARA": "SQL",
+    "DTAARA": "DTA",
     "SYSTRG": "TRG",
     "SQLPRC": "SQL",
     "TABLE": "SQL",
@@ -64,6 +65,24 @@ FILE_TARGETGROUPS_MAPPING = {
     "SQLTRG": "SQL",
     "MSGF": "MSG",
     "WSCSTSRC": "WSCST",
+}
+
+TARGET_TARGETGROUPS_MAPPING = {
+    "CMD": "CMD",
+    "FILE": "PF",
+    "MENU": "MENU",
+    "MODULE": "MODULE",
+    "PGM": "PGM",
+    "PNLGRP": "PNLGRP",
+    "QMQRY": "QMQRY",
+    "BNDD": "BNDD",
+    "DTA": "DTA",
+    "PGM": "PGM",
+    "DTAARA": "SQL",
+    "SRVPGM": "SRVPGM",
+    "MSGF": "MSG",
+    "WSCST": "WSCST",
+    "TRG": "TRG",
 }
 
 FILE_TARGET_MAPPING = {
@@ -84,6 +103,7 @@ FILE_TARGET_MAPPING = {
     "SQLRPGLE": "MODULE",
     "MODULE": "PGM",
     "CBL": "PGM",
+    "CBLLE": "PGM",
     "RPG": "PGM",
     "ILEPGM": "PGM",
     "PNLGRPSRC": "PNLGRP",
