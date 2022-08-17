@@ -139,9 +139,9 @@ BNDRPG_OPTION := $(OPTION)
 BNDRPG_TGTRLS := $(TGTRLS)
 
 CMD_AUT := $(AUT)
-CMD_HLPID = $(notdir $*)
-CMD_HLPPNLGRP = $(notdir $*)
-CMD_PGM = $(notdir $*)
+CMD_HLPID = $(basename $@)
+CMD_HLPPNLGRP = $(basename $@)
+CMD_PGM = $(basename $@)
 CMD_PMTFILE := *NONE
 CMD_VLDCKR := *NONE
 
@@ -341,7 +341,7 @@ cleanRPGDeps = awk '$$1 == "FILEID" && $$6 !~ /^QTEMP/ && toupper($$6) !~ /QSYS/
 # convert everything to upper case, format in makefile dependency format, and output all these dependencies
 # to a file that will be included by Make.
 define EVFEVENT_DOWNLOAD =
-system "CPYTOSTMF FROMMBR('$(OBJPATH)/EVFEVENT.FILE/$*.MBR') TOSTMF('$(EVTDIR)/$1') STMFCCSID(*STDASCII) ENDLINFMT(*LF) CVTDTA(*AUTO) STMFOPT(*REPLACE)" >/dev/null
+system "CPYTOSTMF FROMMBR('$(OBJPATH)/EVFEVENT.FILE/$(basename $@).MBR') TOSTMF('$(EVTDIR)/$1') STMFCCSID(*STDASCII) ENDLINFMT(*LF) CVTDTA(*AUTO) STMFOPT(*REPLACE)" >/dev/null
 endef
 # define POSTRPGCOMPILE =
 # $(call EVFEVENT_DOWNLOAD,$*.evfevent.evfevent);
@@ -349,8 +349,8 @@ endef
 
 # Deletes .d dependency file if it's empty.
 define removeEmptyDep =
-if [ ! -s $(DEPDIR)/$(notdir $*).d ]; then \
-  rm $(DEPDIR)/$(notdir $*).d; \
+if [ ! -s $(DEPDIR)/$(basename $@).d ]; then \
+  rm $(DEPDIR)/$(basename $@).d; \
 fi
 endef
 
@@ -362,7 +362,7 @@ if [ "$(suffix $<)" = '.PRTF' ]; then SLTFLD='*OUTPUT'; else SLTFLD='*BOTH *KEY'
 rm $<.TH
 if [ -f "$<.H" ]; then sed -e '/^\/\//d' $<.H >$<.H-old; fi
 sed -e '/^\/\//d' $<.H1 >$<.H-new
-if ! cmp $<.H-new $<.H-old >/dev/null 2>&1; then mv -f $<.H1 $<.H; echo "*** Created new typedef file $<.H for file [$*]"; fi
+if ! cmp $<.H-new $<.H-old >/dev/null 2>&1; then mv -f $<.H1 $<.H; echo "*** Created new typedef file $<.H for file [$(tgt)]"; fi
 if [ -f "$<.H-old" ]; then rm "$<.H-old"; fi
 if [ -f "$<.H-new" ]; then rm "$<.H-new"; fi
 if [ -f "$<.H1" ]; then rm "$<.H1"; fi
@@ -520,35 +520,52 @@ programTGTRLS = $(strip \
 	$(if $(filter %.MODULE,$<),$(PGM_TGTRLS), \
 	UNKNOWN_FILE_TYPE))))))
 
-### Implicit rules
-%.CMD: private AUT = $(CMD_AUT)
-%.CMD: private HLPID = $(CMD_HLPID)
-%.CMD: private HLPPNLGRP = $(CMD_HLPPNLGRP)
-%.CMD: private PGM = $(CMD_PGM)
-%.CMD: private PMTFILE = $(CMD_PMTFILE)
-%.CMD: private VLDCKR = $(CMD_VLDCKR)
 
-.SECONDEXPANSION:
-%.CMD: $$(call genDep,$$@,$$*,CMDSRC)
+#    ____ __  __ ____    ____           _                 
+#   / ___|  \/  |  _ \  |  _ \ ___  ___(_)_ __   ___  ___ 
+#  | |   | |\/| | | | | | |_) / _ \/ __| | '_ \ / _ \/ __|
+#  | |___| |  | | |_| | |  _ <  __/ (__| | |_) |  __/\__ \
+#   \____|_|  |_|____/  |_| \_\___|\___|_| .__/ \___||___/
+#                                        |_|              
+
+define CMDSRC_TO_CMD_RECIPT = 
+	$(eval AUT = $(CMD_AUT))
+	$(eval HLPID = $(CMD_HLPID))
+	$(eval HLPPNLGRP = $(CMD_HLPPNLGRP)
+	$(eval PGM = $(CMD_PGM))
+	$(eval PMTFILE = $(CMD_PMTFILE))
+	$(eval VLDCKR = $(CMD_VLDCKR))
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating command [$(notdir $<)]")
 	@$(set_STMF_CCSID)
 	$(eval crtcmd := CRTCMD CMD($(OBJLIB)/$(basename $(@F))) srcstmf('$<') $(CRTCMDFLAGS))
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@);
+endef
 
 
-%.FILE: private AUT = $(fileAUT)
-%.FILE: private DLTPCT = $(fileDLTPCT)
-%.FILE: private OPTION = $(fileOPTION)
-%.FILE: private PAGESIZE = $(filePAGESIZE)
-%.FILE: private REUSEDLT = $(fileREUSEDLT)
-%.FILE: private RSTDSP = $(fileRSTDSP)
-%.FILE: private SIZE = $(fileSIZE)
-%.FILE: private TYPEDEF = $(if $(filter YES,$(CREATE_TYPEDEF)),$(TYPEDEF_SCRIPT),)
 
-.SECONDEXPANSION:
-%.FILE:$$(call genDep,$$@,$$*,DSPF)
+
+#   _____ ___ _     _____   ____           _                 
+#  |  ___|_ _| |   | ____| |  _ \ ___  ___(_)_ __   ___  ___ 
+#  | |_   | || |   |  _|   | |_) / _ \/ __| | '_ \ / _ \/ __|
+#  |  _|  | || |___| |___  |  _ <  __/ (__| | |_) |  __/\__ \
+#  |_|   |___|_____|_____| |_| \_\___|\___|_| .__/ \___||___/
+#                                           |_|              
+                                            
+define FILE_VARIABLES = 
+	$(eval AUT = $(fileAUT))\
+	$(eval DLTPCT = $(fileDLTPCT))\
+	$(eval OPTION = $(fileOPTION))\
+	$(eval PAGESIZE = $(filePAGESIZE))\
+	$(eval REUSEDLT = $(fileREUSEDLT))\
+	$(eval RSTDSP = $(fileRSTDSP))\
+	$(eval SIZE = $(fileSIZE))\
+	$(eval TYPEDEF = $(if $(filter YES,$(CREATE_TYPEDEF)),$(TYPEDEF_SCRIPT),))
+endef
+
+define DSPF_TO_FILE_RECIPE =
+	$(FILE_VARIABLES)
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating DSPF [$(notdir $<)]")
 	@$(set_STMF_CCSID)
@@ -556,9 +573,10 @@ programTGTRLS = $(strip \
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/crtfrmstmf -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTDSPF" -p "$(CRTDSPFFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
 	@$(call EVFEVENT_DOWNLOAD,$*.evfevent)
+endef
 
-.SECONDEXPANSION:
-%.FILE: $$(call genDep,$$@,$$*,LF)
+define LF_TO_FILE_RECIPE =
+	$(FILE_VARIABLES)
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating LF [$(notdir $<)]")
 	@$(set_STMF_CCSID)
@@ -567,20 +585,20 @@ programTGTRLS = $(strip \
 	$(SCRIPTSPATH)/crtfrmstmf -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTLF" -p "$(CRTLFFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
 	@$(call EVFEVENT_DOWNLOAD,$*.evfevent)
 	@$(TYPEDEF)
+endef
 
-.SECONDEXPANSION:
-%.FILE: $$(call genDep,$$@,$$*,PF)
-	$(eval d = $($@_d))
+define PF_TO_FILE_RECIPE =
+	$(FILE_VARIABLES)
 	@$(call echo_cmd,"=== Creating PF [$(notdir $<)]")
-	@$(set_STMF_CCSID)
 	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTPF" -p '"$(CRTPFFLAGS)"'")
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/crtfrmstmf -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTPF" -p "$(CRTPFFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
-	@$(call EVFEVENT_DOWNLOAD,$*.evfevent)
+	@$(call EVFEVENT_DOWNLOAD,$(basename $@).evfevent)
 	@$(TYPEDEF)
+endef
 
-.SECONDEXPANSION:
-%.FILE: $$(call genDep,$$@,$$*,PRTF)
+define PRTF_TO_FILE_RECIPE = 
+	$(FILE_VARIABLES)
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating PRTF [$(notdir $<)]")
 	@$(set_STMF_CCSID)
@@ -589,92 +607,85 @@ programTGTRLS = $(strip \
 	$(SCRIPTSPATH)/crtfrmstmf -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTPRTF" -p "$(CRTPRTFFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
 	@$(call EVFEVENT_DOWNLOAD,$*.evfevent)
 	@$(TYPEDEF)
+endef
 
 # @$(TOOLSPATH)/checkObjectAlreadyExists $@ $(OBJLIB)
 # @$(TOOLSPATH)/checkIfBuilt $@ $(OBJLIB)
-.SECONDEXPANSION:
-%.FILE: $$(call genDep,$$@,$$*,TABLE)
+define TABLE_TO_FILE_RECIPE = 
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating SQL TABLE from Sql statement [$(notdir $<)]")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
 	@$(PRESETUP) \
 	$(SETCURLIBTOOBJLIB) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
+endef
 
 # @$(TOOLSPATH)/checkObjectAlreadyExists $@ $(OBJLIB)
 # @$(TOOLSPATH)/checkIfBuilt $@ $(OBJLIB)
-.SECONDEXPANSION:
-%.FILE: $$(call genDep,$$@,$$*,VIEW)
+define VIEW_TO_FILE_RECIPE = 
+	$(FILE_VARIABLES)
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating SQL VIEW from Sql statement [$(notdir $<)]")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
 	@$(PRESETUP) \
 	$(SETCURLIBTOOBJLIB) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
+endef
 
-.SECONDEXPANSION:
-%.FILE: $$(call genDep,$$@,$$*,SQLUDT)
+define SQLUDT_TO_FILE_RECIPE = 
+	$(FILE_VARIABLES)
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating SQL UDT from Sql statement [$(notdir $<)]")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
 	@$(PRESETUP) \
 	$(SETCURLIBTOOBJLIB) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
+endef
 
-.SECONDEXPANSION:
-%.SRVPGM: $$(call genDep,$$@,$$*,SQLUDF)
-	$(eval d = $($@_d))
-	@$(call echo_cmd,"=== Creating SQL UDF from Sql statement [$(notdir $<)]")
-	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
-	@$(PRESETUP) \
-	$(SETCURLIBTOOBJLIB) \
-	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
-
-.SECONDEXPANSION:
-%.PGM: $$(call genDep,$$@,$$*,SQLPRC)
-	$(eval d = $($@_d))
-	@$(call echo_cmd,"=== Creating SQL PROCEDURE from Sql statement [$(notdir $<)]")
-	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
-	@$(PRESETUP) \
-	$(SETCURLIBTOOBJLIB) \
-	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
-
-.SECONDEXPANSION:
-%.PGM: $$(call genDep,$$@,$$*,SQLTRG)
-	$(eval d = $($@_d))
-	@$(call echo_cmd,"=== Creating SQL TRIGGER from Sql statement [$(notdir $<)]")
-	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
-	@$(PRESETUP) \
-	$(SETCURLIBTOOBJLIB) \
-	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
-	
-.SECONDEXPANSION:
-%.DTAARA: $$(call genDep,$$@,$$*,SQLSEQ)
-	$(eval d = $($@_d))
-	@$(call echo_cmd,"=== Creating SQL SEQUENCE from Sql statement [$(notdir $<)]")
-	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
-	@$(PRESETUP) \
-	$(SETCURLIBTOOBJLIB) \
-	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
-
-.SECONDEXPANSION:
-%.FILE: $$(call genDep,$$@,$$*,SQLALIAS)
+define SQLALIAS_TO_FILE_RECIPE =
+	$(FILE_VARIABLES)
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating SQL ALIAS from Sql statement [$(notdir $<)]")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
 	@$(PRESETUP) \
 	$(SETCURLIBTOOBJLIB) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
+endef
 
 
-%.MENU: private AUT = $(MNU_AUT)
-%.MENU: private OPTION = $(MNU_OPTION)
-%.MENU: private CURLIB = $(MNU_CURLIB)
-%.MENU: private PRDLIB = $(MNU_PRDLIB)
-%.MENU: private TYPE = $(MNU_TYPE)
+#   ____ _____  _        _    ____      _      ____           _                 
+#  |  _ \_   _|/ \      / \  |  _ \    / \    |  _ \ ___  ___(_)_ __   ___  ___ 
+#  | | | || | / _ \    / _ \ | |_) |  / _ \   | |_) / _ \/ __| | '_ \ / _ \/ __|
+#  | |_| || |/ ___ \  / ___ \|  _ <  / ___ \  |  _ <  __/ (__| | |_) |  __/\__ \
+#  |____/ |_/_/   \_\/_/   \_\_| \_\/_/   \_\ |_| \_\___|\___|_| .__/ \___||___/
+#                                                              |_|              
 
-.SECONDEXPANSION:
-%.MENU: $$(call genDep,$$@,$$*,MENU)
+define SQLSEQ_TO_DTARRA_RECIPE =
+	$(eval d = $($@_d))
+	@$(call echo_cmd,"=== Creating SQL SEQUENCE from Sql statement [$(notdir $<)]")
+	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
+	@$(PRESETUP) \
+	$(SETCURLIBTOOBJLIB) \
+	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
+endef
+
+#   __  __ _____ _   _ _   _   ____           _                 
+#  |  \/  | ____| \ | | | | | |  _ \ ___  ___(_)_ __   ___  ___ 
+#  | |\/| |  _| |  \| | | | | | |_) / _ \/ __| | '_ \ / _ \/ __|
+#  | |  | | |___| |\  | |_| | |  _ <  __/ (__| | |_) |  __/\__ \
+#  |_|  |_|_____|_| \_|\___/  |_| \_\___|\___|_| .__/ \___||___/
+#                                              |_|              
+
+define MENU_VARIABLES =
+	$(eval AUT = $(MNU_AUT))
+	$(eval OPTION = $(MNU_OPTION))
+	$(eval CURLIB = $(MNU_CURLIB))
+	$(eval PRDLIB = $(MNU_PRDLIB))
+	$(eval TYPE = $(MNU_TYPE))
+endef
+
+define MENUSRC_TO_MENU_RECIPT =
+	$(MENU_VARIABLES)
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating menu [$(notdir $<)]")
 	@$(set_STMF_CCSID)
@@ -682,22 +693,30 @@ programTGTRLS = $(strip \
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/crtfrmstmf -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTMNU" -p "$(CRTMNUFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
 	@$(call EVFEVENT_DOWNLOAD,$*.evfevent)
+endef
 
+#   __  __  ___  ____  _   _ _     _____   ____           _                 
+#  |  \/  |/ _ \|  _ \| | | | |   | ____| |  _ \ ___  ___(_)_ __   ___  ___ 
+#  | |\/| | | | | | | | | | | |   |  _|   | |_) / _ \/ __| | '_ \ / _ \/ __|
+#  | |  | | |_| | |_| | |_| | |___| |___  |  _ <  __/ (__| | |_) |  __/\__ \
+#  |_|  |_|\___/|____/ \___/|_____|_____| |_| \_\___|\___|_| .__/ \___||___/
+#                                                          |_|              
 
-%.MODULE: private AUT = $(moduleAUT)
-%.MODULE: private DBGVIEW = $(moduleDBGVIEW)
-%.MODULE: private OBJTYPE = $(moduleOBJTYPE)
-%.MODULE: private OPTION = $(moduleOPTION)
-%.MODULE: private INCDIR = $(moduleINCDIR)
-%.MODULE: private RPGPPOPT = $(moduleRPGPPOPT)
-%.MODULE: private STGMDL = $(moduleSTGMDL)
-%.MODULE: private SYSIFCOPT = $(moduleSYSIFCOPT)
-%.MODULE: private TERASPACE = $(moduleTERASPACE)
-%.MODULE: private TGTRLS = $(moduleTGTRLS)
+define MODULE_VARIABLES
+	$(eval AUT = $(moduleAUT))\
+	$(eval DBGVIEW = $(moduleDBGVIEW))\
+	$(eval OBJTYPE = $(moduleOBJTYPE))\
+	$(eval OPTION = $(moduleOPTION))\
+	$(eval INCDIR = $(moduleINCDIR))\
+	$(eval RPGPPOPT = $(moduleRPGPPOPT))\
+	$(eval STGMDL = $(moduleSTGMDL))\
+	$(eval SYSIFCOPT = $(moduleSYSIFCOPT))\
+	$(eval TERASPACE = $(moduleTERASPACE))\
+	$(eval TGTRLS = $(moduleTGTRLS))
+endef
 
-
-.SECONDEXPANSION:
-%.MODULE: $$(call genDep,$$@,$$*,C)
+define C_TO_MODULE_RECIPE = 
+	$(MODULE_VARIABLES)
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating C module [$(notdir $<)]")
 	@$(set_STMF_CCSID)
@@ -706,10 +725,10 @@ programTGTRLS = $(strip \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
 	@($(call EVFEVENT_DOWNLOAD,$*.evfevent); ret=$$?; rm $(DEPDIR)/$*.Td 2>/dev/null; exit $$ret)
 	@$(POSTCCOMPILE)
+endef
 
-
-.SECONDEXPANSION:
-%.MODULE: $$(call genDep,$$@,$$*,RPGLE)
+define RPGLE_TO_MODULE_RECIPE = 
+	$(MODULE_VARIABLES)\
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating RPG module [$(notdir $<)]")
 	@$(set_STMF_CCSID)
@@ -717,10 +736,10 @@ programTGTRLS = $(strip \
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
 	@$(call EVFEVENT_DOWNLOAD,$*.evfevent)
+endef
 
-
-.SECONDEXPANSION:
-%.MODULE: $$(call genDep,$$@,$$*,CLLE)
+define CLLE_TO_MODULE_RECIPE = 
+	$(MODULE_VARIABLES)
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating CL module [$(notdir $<)]")
 	@$(set_STMF_CCSID)
@@ -728,11 +747,11 @@ programTGTRLS = $(strip \
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
 	@$(call EVFEVENT_DOWNLOAD,$*.evfevent)
+endef
 
 # Temp: Convert UTF-8 to temporary Windows Latin-1, because SQLC pre-compiler doesn't understand UTF-8
-.SECONDEXPANSION:
-%.MODULE: $$(call genDep,$$@,$$*,SQLC)
-	$(eval d = $($@_d))
+define SQLC_TO_MODULE_RECIPE = 
+	$(MODULE_VARIABLES)
 	@$(call echo_cmd,"=== Creating SQLC module [$(notdir $<)]")
 	@$(set_STMF_CCSID)
 	@qsh_out -c "touch -C 1252 $<-1252 && cat $< >$<-1252"
@@ -741,10 +760,10 @@ programTGTRLS = $(strip \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
 	@($(call EVFEVENT_DOWNLOAD,$*.evfevent); ret=$$?; rm $(DEPDIR)/$*.Td 2>/dev/null; rm "$<-1252" 2>/dev/null; exit $$ret)
 	@rm "$<-1252"
+endef
 
-
-.SECONDEXPANSION:
-%.MODULE: $$(call genDep,$$@,$$*,SQLRPGLE)
+define SQLRPGLE_TO_MODULE_RECIPE = 
+	$(MODULE_VARIABLES)
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating SQLRPGLE module [$(notdir $<)]")
 	@$(set_STMF_CCSID)
@@ -752,177 +771,275 @@ programTGTRLS = $(strip \
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
 	@$(call EVFEVENT_DOWNLOAD,$*.evfevent)
+endef
 
-%.PGM: private ACTGRP = $(programACTGRP)
-%.PGM: private AUT = $(programAUT)
-%.PGM: private DBGVIEW = $(programDBGVIEW)
-%.PGM: private DETAIL = $(programDETAIL)
-%.PGM: private DFTACTGRP = $(programDFTACTGRP)
-%.PGM: private OBJTYPE = $(programOBJTYPE)
-%.PGM: private OPTION = $(programOPTION)
-%.PGM: private RPGPPOPT = $(programRPGPPOPT)
-###%.PGM: private PGM = $*
-%.PGM: private STGMDL = $(programSTGMDL)
-%.PGM: private TGTRLS = $(programTGTRLS)
-%.PGM: private BNDSRVPGMPATH = $(basename $(filter %.SRVPGM,$(notdir $^)) $(externalsrvpgms))
+#   ____   ____ __  __   ____           _                 
+#  |  _ \ / ___|  \/  | |  _ \ ___  ___(_)_ __   ___  ___ 
+#  | |_) | |  _| |\/| | | |_) / _ \/ __| | '_ \ / _ \/ __|
+#  |  __/| |_| | |  | | |  _ <  __/ (__| | |_) |  __/\__ \
+#  |_|    \____|_|  |_| |_| \_\___|\___|_| .__/ \___||___/
+#                                        |_|              
 
-%.PGM: $$(call genDep,$$@,$$*,PGM.RPGLE)
+define PGM_VARIABLES = 
+$(eval ACTGRP = $(programACTGRP))
+$(eval AUT = $(programAUT))
+$(eval DBGVIEW = $(programDBGVIEW))
+$(eval DETAIL = $(programDETAIL))
+$(eval DFTACTGRP = $(programDFTACTGRP))
+$(eval OBJTYPE = $(programOBJTYPE))
+$(eval OPTION = $(programOPTION))
+$(eval RPGPPOPT = $(programRPGPPOPT))
+$(eval STGMDL = $(programSTGMDL))
+$(eval TGTRLS = $(programTGTRLS))
+$(eval BNDSRVPGMPATH = $(basename $(filter %.SRVPGM,$(notdir $^)) $(externalsrvpgms)))
+endef
+
+define SQLPRC_TO_PGM_RECIPE =
+	$(PGM_VARIABLES)
 	$(eval d = $($@_d))
-	@$(call echo_cmd,"=== Create Bound RPG Program [$(notdir $*)]")
+	@$(call echo_cmd,"=== Creating SQL PROCEDURE from Sql statement [$(notdir $<)]")
+	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
+	@$(PRESETUP) \
+	$(SETCURLIBTOOBJLIB) \
+	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
+endef
+
+define SQLTRG_TO_PGM_RECIPE =
+	$(PGM_VARIABLES)
+	$(eval d = $($@_d))
+	@$(call echo_cmd,"=== Creating SQL TRIGGER from Sql statement [$(notdir $<)]")
+	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
+	@$(PRESETUP) \
+	$(SETCURLIBTOOBJLIB) \
+	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
+endef
+
+
+define PGM.RPGLE_TO_PGM_RECIPE =
+	$(PGM_VARIABLES)
+	$(eval d = $($@_d))
+	@$(call echo_cmd,"=== Create Bound RPG Program [$(basename $@)]")
 	$(eval crtcmd := CRTBNDRPG srcstmf('$<') PGM($(OBJLIB)/$(basename $(@F))) $(CRTBNDRPGFLAGS))
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
 	@$(call EVFEVENT_DOWNLOAD,$*.PGM.RPGLE.evfevent)
+endef
 
-%.PGM: $$(call genDep,$$@,$$*,PGM.SQLRPGLE)
+define PGM.SQLRPGLE_TO_PGM_RECIPE =
+	$(PGM_VARIABLES)
 	$(eval d = $($@_d))
-	@$(call echo_cmd,"=== Create Bound SQLRPGLE Program [$(notdir $*)]")
+	@$(call echo_cmd,"=== Create Bound SQLRPGLE Program [$(basename $@)]")
 	$(eval crtcmd := CRTSQLRPGI srcstmf('$<') OBJ($(OBJLIB)/$(basename $(@F))) $(CRTSQLRPGIFLAGS))
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
 	@$(call EVFEVENT_DOWNLOAD,$*.PGM.SQLRPGLE.evfevent)
+endef
 
-%.PGM: $$(call genDep,$$@,$$*,PGM.C)
+define PGM.C_TO_PGM_RECIPE =
+	$(PGM_VARIABLES)
 	$(eval d = $($@_d))
-	@$(call echo_cmd,"=== Create Bound RPG Program [$(notdir $*)]")
+	@$(call echo_cmd,"=== Create Bound RPG Program [$(basename $@)]")
 	$(eval crtcmd := CRTBNDC srcstmf('$<') PGM($(OBJLIB)/$(basename $(@F))) $(CRTBNDCFLAGS))
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
 	@$(call EVFEVENT_DOWNLOAD,$*.PGM.C.evfevent)
+endef
 
-%.PGM: $$(call genDep,$$@,$$*,CBL)
+define CBL_TO_PGM_RECIPE =
+	$(PGM_VARIABLES)
 	$(eval d = $($@_d))
-	@$(call echo_cmd,"=== Create COBOL Program [$(notdir $*)]")
+	@$(call echo_cmd,"=== Create COBOL Program [$(basename $@)]")
 	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTPRTF" -p '"$(CRTPRTFFLAGS)"'")
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/crtfrmstmf -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTPRTF" -p "$(CRTPRTFFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
 	@$(call EVFEVENT_DOWNLOAD,$*.evfevent)
-	
-%.PGM: $$(call genDep,$$@,$$*,PGM.CLLE)
+endef
+
+define PGM.CLLE_TO_PGM_RECIPE =
+	$(PGM_VARIABLES)
 	$(eval d = $($@_d))
-	@$(call echo_cmd,"=== Create ILE CL Program [$(notdir $*)]")
+	@$(call echo_cmd,"=== Create ILE CL Program [$(basename $@)]")
 	$(eval crtcmd := CRTBNDCL srcstmf('$<') PGM($(OBJLIB)/$(basename $(@F))) $(CRTCLMODFLAGS))
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
 	@$(call EVFEVENT_DOWNLOAD,$*.evfevent)
+endef
 
-%.PGM: $$(call genDep,$$@,$$*,RPG)
+define RPG_TO_PGM_RECIPE =
+	$(PGM_VARIABLES)
 	$(eval d = $($@_d))
-	@$(call echo_cmd,"=== Create RPG Program [$(notdir $*)]")
+	@$(call echo_cmd,"=== Create RPG Program [$(basename $@)]")
 	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTRPGPGM" -p '"$(CRTCBLPGMFLAGS)"'")
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/crtfrmstmf -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTRPGPGM" -p "$(CRTCBLPGMFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
 	@$(call EVFEVENT_DOWNLOAD,$*.evfevent)
+endef
 
-%.PGM: $$(call genDep,$$@,$$*,ILEPGM)
+define ILEPGM_TO_PGM_RECIPE =
+	$(PGM_VARIABLES)
 	$(eval d = $($@_d))
-	@$(call echo_cmd,"=== Creating program [$*] from Pseudo Source [$(basename $(notdir $<))]")
+	@$(call echo_cmd,"=== Creating program [$(tgt)] from Pseudo Source [$(basename $(notdir $<))]")
 	$(eval crtcmd := $(shell $(SCRIPTSPATH)/extractPseudoSrc $< $(OBJLIB) $(basename $(@F))))
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/extractAndLaunch "$(JOBLOGFILE)" "$<" $(OBJLIB) $(basename $(@F)) >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
+endef
 
-%.PGM: %.MODULE
+define MODULE_TO_PGM_RECIPE =
+	$(PGM_VARIABLES)
 	$(eval d = $($@_d))
-	@$(call echo_cmd,"=== Creating program [$*] from modules [$(basename $(filter %.MODULE,$(notdir $^)))] and service programs [$(basename $(filter %.SRVPGM,$(notdir $^$|)))]")
+	@$(call echo_cmd,"=== Creating program [$(tgt)] from modules [$(basename $(filter %.MODULE,$(notdir $^)))] and service programs [$(basename $(filter %.SRVPGM,$(notdir $^$|)))]")
 	$(eval externalsrvpgms := $(filter %.SRVPGM,$(subst .LIB,,$(subst /QSYS.LIB/,,$|))))
 	$(eval crtcmd := crtpgm pgm($(OBJLIB)/$(basename $(@F))) module($(basename $(filter %.MODULE,$(notdir $^)))) bndsrvpgm($(if $(BNDSRVPGMPATH),$(BNDSRVPGMPATH),*NONE)) $(CRTPGMFLAGS))
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
 	@$(call EVFEVENT_DOWNLOAD,$*.PGM.evfevent)
+endef
 
-%.PNLGRP: private AUT = $(PNLGRP_AUT)
-%.PNLGRP: private OPTION = $(PNLGRP_OPTION)
+#   ____  _   _ _     ____ ____  ____    ____           _                 
+#  |  _ \| \ | | |   / ___|  _ \|  _ \  |  _ \ ___  ___(_)_ __   ___  ___ 
+#  | |_) |  \| | |  | |  _| |_) | |_) | | |_) / _ \/ __| | '_ \ / _ \/ __|
+#  |  __/| |\  | |__| |_| |  _ <|  __/  |  _ <  __/ (__| | |_) |  __/\__ \
+#  |_|   |_| \_|_____\____|_| \_\_|     |_| \_\___|\___|_| .__/ \___||___/
+#                                                        |_|              
 
-.SECONDEXPANSION:
-%.PNLGRP: $$(call genDep,$$@,$$*,PNLGRP)
+define PNLGRP_VARIABLES = 
+	$(eval AUT = $(PNLGRP_AUT))
+	$(eval OPTION = $(PNLGRP_OPTION))
+endef
+
+define PNLGRPSRC_TO_PNLGRP_RECIPE =
+	$(PNLGRP_VARIABLES)
 	$(eval d = $($@_d))
-	@$(call echo_cmd,"=== Create panel group [$(notdir $*)]")
+	@$(call echo_cmd,"=== Create panel group [$(basename $@)]")
 	@$(set_STMF_CCSID)
 	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTPNLGRP" -p '"$(CRTPNLGRPFLAGS)"'")
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/crtfrmstmf -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTPNLGRP" -p "$(CRTPNLGRPFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
+endef
 
-%.QMQRY: private AUT = $(QMQRY_AUT)
 
-.SECONDEXPANSION:
-%.QMQRY: $$(call genDep,$$@,$$*,SQL)
+
+#   ____  ______     ______   ____ __  __   ____           _                 
+#  / ___||  _ \ \   / /  _ \ / ___|  \/  | |  _ \ ___  ___(_)_ __   ___  ___ 
+#  \___ \| |_) \ \ / /| |_) | |  _| |\/| | | |_) / _ \/ __| | '_ \ / _ \/ __|
+#   ___) |  _ < \ V / |  __/| |_| | |  | | |  _ <  __/ (__| | |_) |  __/\__ \
+#  |____/|_| \_\ \_/  |_|    \____|_|  |_| |_| \_\___|\___|_| .__/ \___||___/
+#                                                           |_|              
+
+define SRVPGM_VARIABLES = 
+	$(eval ACTGRP = $(SRVPGM_ACTGRP))\
+	$(eval AUT = $(SRVPGM_AUT))\
+	$(eval DETAIL = $(SRVPGM_DETAIL))\
+	$(eval STGMDL = $(SRVPGM_STGMDL))\
+	$(eval TGTRLS = $(SRVPGM_TGTRLS))\
+	$(eval BNDSRVPGMPATH = $(basename $(filter %.SRVPGM,$(notdir $^)) $(externalsrvpgms)))
+endef
+
+define SQLUDF_TO_SRVPGM_RECIPE = 
+	$(SRVPGM_VARIABLES)
 	$(eval d = $($@_d))
-	@$(call echo_cmd,"=== Create QM query [$(notdir $*)]")
-	@$(set_STMF_CCSID)
-	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTQMQRY" -p '"$(CRTQMQRYFLAGS)"'")
-	$(PRESETUP) \
-	$(SCRIPTSPATH)/crtfrmstmf -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTQMQRY" -p "$(CRTQMQRYFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
+	@$(call echo_cmd,"=== Creating SQL UDF from Sql statement [$(notdir $<)]")
+	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
+	@$(PRESETUP) \
+	$(SETCURLIBTOOBJLIB) \
+	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
+endef
 
-
-%.SRVPGM: private ACTGRP = $(SRVPGM_ACTGRP)
-%.SRVPGM: private AUT = $(SRVPGM_AUT)
-%.SRVPGM: private DETAIL = $(SRVPGM_DETAIL)
-%.SRVPGM: private STGMDL = $(SRVPGM_STGMDL)
-%.SRVPGM: private TGTRLS = $(SRVPGM_TGTRLS)
-%.SRVPGM: private BNDSRVPGMPATH = $(basename $(filter %.SRVPGM,$(notdir $^)) $(externalsrvpgms))
-
-%.SRVPGM: $$(call genDep,$$@,$$*,BND)
+define BND_TO_SRVPGM_RECIPE =
+	$(SRVPGM_VARIABLES)
 	$(eval d = $($@_d))
-	@$(call echo_cmd,"=== Creating service program [$*] from modules [$(basename $(filter %.MODULE,$(notdir $^)))] and service programs [$(basename $(filter %.SRVPGM,$(notdir $^$|)))]")
+	@$(call echo_cmd,"=== Creating service program [$(tgt)] from modules [$(basename $(filter %.MODULE,$(notdir $^)))] and service programs [$(basename $(filter %.SRVPGM,$(notdir $^$|)))]")
 	@$(set_STMF_CCSID)
 	$(eval externalsrvpgms := $(filter %.SRVPGM,$(subst .LIB,,$(subst /QSYS.LIB/,,$|))))
 	$(eval crtcmd := CRTSRVPGM srcstmf('$<') SRVPGM($(OBJLIB)/$(basename $(@F))) MODULE($(basename $(filter %.MODULE,$(notdir $^)))) BNDSRVPGM($(if $(BNDSRVPGMPATH),$(BNDSRVPGMPATH),*NONE)) $(CRTSRVPGMFLAGS))
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
+endef
 
-%.SRVPGM: $$(call genDep,$$@,$$*,ILESRVPGM)
+define ILESRVPGM_TO_SRVPGM_RECIPE =
+	$(SRVPGM_VARIABLES)
 	$(eval d = $($@_d))
-	@$(call echo_cmd,"=== Creating service program [$*] from [$(notdir $<)]")
+	@$(call echo_cmd,"=== Creating service program [$(tgt)] from [$(notdir $<)]")
 	$(eval crtcmd := $(shell $(SCRIPTSPATH)/extractPseudoSrc $< $(OBJLIB) $(basename $(@F))))
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/extractAndLaunch "$(JOBLOGFILE)" "$<" $(OBJLIB) $(basename $(@F)) >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
+endef
 
-%.BNDDIR: $$(call genDep,$$@,$$*,BNDDIR)
+#    ___ _____ _   _ _____ ____    ____           _                 
+#   / _ \_   _| | | | ____|  _ \  |  _ \ ___  ___(_)_ __   ___  ___ 
+#  | | | || | | |_| |  _| | |_) | | |_) / _ \/ __| | '_ \ / _ \/ __|
+#  | |_| || | |  _  | |___|  _ <  |  _ <  __/ (__| | |_) |  __/\__ \
+#   \___/ |_| |_| |_|_____|_| \_\ |_| \_\___|\___|_| .__/ \___||___/
+#                                                  |_|              
+
+
+define BNDDIR_TO_BNDD_RECIPE =
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating BND from [$(notdir $<)]")
 	$(eval crtcmd := $(shell $(SCRIPTSPATH)/extractPseudoSrc $< $(OBJLIB) $(basename $(@F))))
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/extractAndLaunch "$(JOBLOGFILE)" "$<" $(OBJLIB) $(basename $(@F)) >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
+endef
 
-%.DTA: $$(call genDep,$$@,$$*,DTA)
+define DTA_TO_DTA_RECIPE =
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating DTA from [$(notdir $<)]")
 	$(eval crtcmd := $(shell $(SCRIPTSPATH)/extractPseudoSrc $< $(OBJLIB) $(basename $(@F))))
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/extractAndLaunch "$(JOBLOGFILE)" "$<" $(OBJLIB) $(basename $(@F)) >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
+endef
 
-%.TRG: $$(call genDep,$$@,$$*,SYSTRG)
+define SYSTRG_TO_TRG_RECIPE =
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating System TRG from [$(notdir $<)]")
 	$(eval crtcmd := $(shell $(SCRIPTSPATH)/extractPseudoSrc $< $(OBJLIB) $(basename $(@F))))
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/extractAndLaunch "$(JOBLOGFILE)" "$<" $(OBJLIB) $(basename $(@F)) >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
+endef
 
-%.SQL:
+define SQL_RECIPE =
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Running SQL Statement from [$(notdir $<)]")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<'))
 	@$(PRESETUP) \
 	$(SETCURLIBTOOBJLIB) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
+endef
 
-%.MSGF:
+define MSGF_RECIPE =
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating Message from [$(notdir $<)]")
 	$(eval crtcmd := $(shell $(SCRIPTSPATH)/extractPseudoSrc $< $(OBJLIB) $(basename $(@F))))
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/extractAndLaunch "$(JOBLOGFILE)" "$<" $(OBJLIB) $(basename $(@F)) >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
+endef
 
-%.WSCST: private AUT = $(WSCST_AUT)
+define WSCST_VARIABLES =
+	$(eval AUT = $(WSCST_AUT))
+endef
 
-.SECONDEXPANSION:
-%.WSCST: $$(call genDep,$$@,$$*,WSCSTSRC)
+define WSCSTSRC_TO_WSCST_RECIPE =
 	$(eval d = $($@_d))
-	@$(call echo_cmd,"=== Creating work station customizing object [$*]")
+	@$(call echo_cmd,"=== Creating work station customizing object [$(tgt)]")
 	@$(set_STMF_CCSID)
 	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTWSCST" -p '"$(CRTWSCSTFLAGS)"'")
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/crtfrmstmf -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTWSCST" -p "$(CRTWSCSTFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
+endef
+
+define QMQRY_VARIABLES =
+	$(eval AUT = $(QMQRY_AUT))
+endef
+
+define SQL_TO_QMQRY_RECIPE =
+	$(QMQRY_VARIABLES)
+	$(eval d = $($@_d))
+	@$(call echo_cmd,"=== Create QM query [$(basename $@)]")
+	@$(set_STMF_CCSID)
+	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTQMQRY" -p '"$(CRTQMQRYFLAGS)"'")
+	$(PRESETUP) \
+	$(SCRIPTSPATH)/crtfrmstmf -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTQMQRY" -p "$(CRTQMQRYFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
+endef
 
 # $(DEPDIR)/%.d: ;
 # .PRECIOUS: $(DEPDIR)/%.d
