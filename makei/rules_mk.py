@@ -101,13 +101,6 @@ class MKRule:
         
         return MKRule(target, dependencies, commands, {}, containing_dir, include_dirs)
 
-    def get_src_file(self) -> Optional[Tuple[str,str,str]]:
-        # TODO: Note in the documentation that the src file is the first in the denpendencies list
-        if len(self.dependencies) > 0:
-            try:
-                return decompose_filename(self.dependencies[0])
-            except ValueError:
-                return None
 
 class RulesMk:
     """A Class representing the rules.mk structure
@@ -121,8 +114,8 @@ class RulesMk:
     def __init__(self, subdirs: List[str], rules: List[MKRule], containing_dir: Path) -> None:
         self.targets = { tgt_group + 's': [] for tgt_group in TARGET_GROUPS }
         for rule in rules:
-            if rule.get_src_file() is not None:
-                tgt_group = FILE_TARGETGROUPS_MAPPING[rule.get_src_file()[-2]]
+            if rule.source_file is not None:
+                tgt_group = FILE_TARGETGROUPS_MAPPING[decompose_filename(rule.source_file)[-2]]
                 self.targets[tgt_group + 's'].append(rule.target)
             else:
                 try:
