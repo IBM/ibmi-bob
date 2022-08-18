@@ -4,7 +4,7 @@
 import json
 from pathlib import Path
 from typing import Dict, Tuple
-from makei.utils import parse_all_variables, Colors, colored
+from makei.utils import parse_all_variables, DEFAULT_TGT_CCSID, DEFAULT_OBJLIB, Colors, colored
 
 class IBMiJson:
     """A class to represent the ibmi.json file"""
@@ -40,7 +40,7 @@ class IBMiJson:
                     else:
                         tgt_ccsid = parent_ibm_i_json.build["tgt_ccsid"]
                     if "objlib" in build:
-                        objlib = build["objlib"]
+                        objlib = parse_all_variables(build["objlib"])
                     else:
                         objlib = parent_ibm_i_json.build["objlib"]
 
@@ -49,10 +49,21 @@ class IBMiJson:
             return parent_ibm_i_json.copy()
 
     def __dict__(self):
-        return {
-            "version": self.version,
-            "build": self.build
-        }
+        build = {}
+
+        if self.build["tgt_ccsid"] != DEFAULT_TGT_CCSID:
+            build["tgtCcsid"] = self.build["tgt_ccsid"]
+        if self.build["objlib"] != DEFAULT_OBJLIB:
+            build["objlib"] = self.build["objlib"]
+
+        if len(build.keys()) > 0:
+            ibmi = {
+                "version": self.version,
+                "build": build
+            }
+            return json.dumps(ibmi, indent=4)
+        else:
+            return None
 
     def copy(self) -> "IBMiJson":
         """Returns a copy of the IBMiJson object"""
