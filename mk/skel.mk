@@ -58,6 +58,8 @@ SRCS_VPATH := src
 # add ons then: INCLUDES_$(d) := $(INCLUDES_$(parent_dir)) ...
 parent_dir = $(patsubst %/,%,$(dir $(d)))
 
+UC = $(shell echo '$*' | tr '[:lower:]' '[:upper:]')
+
 define include_subdir_rules
 dir_stack := $(d) $(dir_stack)
 d := $(d)/$(1)
@@ -88,11 +90,11 @@ $($(1)_$(2)) $(foreach sd,$(SUBDIRS_$(2)),$(call get_subtree,$(1),$(sd)))
 endef
 
 define get_target_type
-$(subst .,,$(suffix $1))
+$(call UC,$(subst .,,$(suffix $1)))
 endef
 
 define get_file_type
-$(shell export FILE="$1" && echo "$${FILE#*.}")
+$(shell export FILE="$1" && echo "$${FILE#*.}  | tr '[:lower:]' '[:upper:]")
 endef
 
 define get_recipe_name
