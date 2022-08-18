@@ -92,7 +92,7 @@ $(subst .,,$(suffix $1))
 endef
 
 define get_file_type
-$(subst $(basename $1).,,$1)
+$(shell export FILE="$1" && echo "$${FILE#*.}")
 endef
 
 define get_recipe_name
