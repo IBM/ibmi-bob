@@ -14,6 +14,8 @@ import sys
 from typing import List, Optional
 
 from makei.const import DEFAULT_CURLIB, DEFAULT_TGT_CCSID, DEFAULT_OBJLIB
+from .iproj_json import IProjJson
+from .ibmi_json import IBMiJson
 from makei.utils import colored, Colors
 
 
@@ -78,49 +80,35 @@ class ProjSpec():
     def _input_str_to_list(self, input_str: str) -> List[str]:
         return list(filter(len, map(lambda s: s.strip(), input_str.split(","))))
 
+    def generate_iproj_json(self) -> str:
+        """ Generates an iProj.json template"""
+        iprojJson = IProjJson(self.description,
+                                self.version,
+                                self.license,
+                                self.repository,
+                                self.include_path,
+                                self.objlib,
+                                self.curlib,
+                                self.pre_usr_libl,
+                                self.post_usr_libl,
+                                self.set_ibm_i_env_cmd,
+                                self.tgt_ccsid)
+        return json.dumps(iprojJson.__dict__, indent=4)
+
     def generate_ibmi_json(self) -> Optional[str]:
         """ Returns a string representation of the .ibmi.json file of current project"""
 
-        build = {}
-        # if self.objlib != DEFAULT_OBJLIB:
-        #     build["objlib"] = self.objlib
-
-        if self.tgt_ccsid != DEFAULT_TGT_CCSID:
-            build["tgtCcsid"] = self.tgt_ccsid
-
-        if len(build.keys()) > 0:
-            ibmi = {
-                "version": self.version,
-                "build": build
-            }
-            return json.dumps(ibmi, indent=4)
-        else:
-            return None
+        ibmijson = IBMiJson(self.version, {
+            "tgt_ccsid": self.tgt_ccsid,
+            "objlib": self.objlib,
+        })
+        return json.dumps(ibmijson.__dict__, indent=4)
 
     def generate_rules_mk(self) -> str:
         """ Generates a Rules.mk template"""
         return '\n'.join(['# Check out the documentation on creating the rules at ' +
                           'https://ibm.github.io/ibmi-bob/#/prepare-the-project/rules.mk',
                           "SUBDIRS :=",
-                          "",
-                          "TRGs :=",
-                          "DTAs :=",
-                          "SQLs :=",
-                          "BNDDs :=",
-                          "PFs :=",
-                          "LFs :=",
-                          "DSPFs :=",
-                          "PRTFs :=",
-                          "CMDs :=",
-                          "SQLs :=",
-                          "MODULEs :=",
-                          "SRVPGMs :=",
-                          "PGMs :=",
-                          "MENUs :=",
-                          "PNLGRPs :=",
-                          "QMQRYs :=",
-                          "WSCSTs :=",
-                          "MSGs :=",
                           ])
 
 
