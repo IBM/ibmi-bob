@@ -316,7 +316,7 @@ IBMiEnvCmd="$(IBMiEnvCmd)"
 endef
 
 define SETCURLIBTOOBJLIB = 
-tmpCurlib=$(OBJLIB)
+tmpCurlib="${OBJLIB}"
 endef
 
 # cleanCDeps removes from the CRTCMOD-generated dependency file any header files located in /QIBM/, plus the
@@ -612,6 +612,7 @@ endef
 # @$(TOOLSPATH)/checkObjectAlreadyExists $@ $(OBJLIB)
 # @$(TOOLSPATH)/checkIfBuilt $@ $(OBJLIB)
 define TABLE_TO_FILE_RECIPE = 
+	$(FILE_VARIABLES)
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating SQL TABLE from Sql statement [$(notdir $<)]")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
