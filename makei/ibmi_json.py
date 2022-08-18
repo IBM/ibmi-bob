@@ -4,7 +4,8 @@
 import json
 from pathlib import Path
 from typing import Dict, Tuple
-from makei.utils import parse_all_variables, DEFAULT_TGT_CCSID, DEFAULT_OBJLIB, Colors, colored
+from makei.const import DEFAULT_TGT_CCSID, DEFAULT_OBJLIB
+from makei.utils import parse_all_variables
 
 class IBMiJson:
     """A class to represent the ibmi.json file"""
