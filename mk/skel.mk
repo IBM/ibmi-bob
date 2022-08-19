@@ -88,14 +88,6 @@ define get_subtree
 $($(1)_$(2)) $(foreach sd,$(SUBDIRS_$(2)),$(call get_subtree,$(1),$(sd)))
 endef
 
-define get_target_type
-$(shell echo '$(subst .,,$(suffix $1))' | tr '[:lower:]' '[:upper:]')
-endef
-
-define get_file_type
-$(shell export FILE="$1" && echo "$${FILE#*.}" | tr '[:lower:]' '[:upper:]')
-endef
-
 define get_recipe_name
 $(if $(filter %.SQL %.MSGF,$(1)),$(call get_target_type,$2)_RECIPE,$(call get_file_type,$1)_TO_$(call get_target_type,$2)_RECIPE)
 endef
@@ -103,9 +95,10 @@ endef
 # target_name := $1
 # source_name := $2
 # dependencies := $3
+# recipe_name := $4
 define generate_rule
 ifndef ${1}_CUSTOM_RECIPE
-${1}: ${2} ${3} ; $$(eval @=$1)$$(eval <=$2)$$(eval tgt=$(basename $1))$$(eval ^=$2 $3)$${$(call get_recipe_name,$(2),$(1))}
+${1}: ${2} ${3} ; $$(eval @=$1)$$(eval <=$2)$$(eval tgt=$(basename $1))$$(eval ^=$2 $3)$${$4}
 endif
 endef
 
