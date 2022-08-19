@@ -58,11 +58,12 @@ SRCS_VPATH := src
 # add ons then: INCLUDES_$(d) := $(INCLUDES_$(parent_dir)) ...
 parent_dir = $(patsubst %/,%,$(dir $(d)))
 
+
 define include_subdir_rules
 dir_stack := $(d) $(dir_stack)
 d := $(d)/$(1)
 $$(eval $$(value HEADER))
-include $(addsuffix /Rules.mk,$$(d))
+include $(addsuffix /.Rules.mk.build,$$(d))
 $$(eval $$(value FOOTER))
 d := $$(firstword $$(dir_stack))
 dir_stack := $$(wordlist 2,$$(words $$(dir_stack)),$$(dir_stack))
@@ -86,6 +87,17 @@ endef
 define get_subtree
 $($(1)_$(2)) $(foreach sd,$(SUBDIRS_$(2)),$(call get_subtree,$(1),$(sd)))
 endef
+
+# target_name := $1
+# source_name := $2
+# dependencies := $3
+# recipe_name := $4
+define generate_rule
+ifndef ${1}_CUSTOM_RECIPE
+${1}: ${2} ${3} ; $$(eval @=$1)$$(eval <=$2)$$(eval tgt=$(basename $1))$$(eval ^=$2 $3)$${$4}
+endif
+endef
+
 
 # if we are using out of project build tree then there is no need to
 # have dist_clean on per directory level and the one below is enough

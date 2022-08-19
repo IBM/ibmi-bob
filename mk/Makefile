@@ -63,7 +63,7 @@ include $(MK)/skel.mk
 
 .SECONDEXPANSION:
 $(eval $(value HEADER))
-include $(TOP)/Rules.mk
+include $(TOP)/.Rules.mk.build
 $(eval $(value FOOTER))
 
 # Optional final makefile where you can specify additional targets

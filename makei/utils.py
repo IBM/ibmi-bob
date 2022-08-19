@@ -9,15 +9,14 @@
 from datetime import datetime
 from enum import Enum
 from tempfile import mkstemp
-import json
 import os
 from pathlib import Path
 from shutil import move, copymode
 import subprocess
 import sys
-from typing import Callable, Dict, List, Tuple, Union
+from typing import Callable, List, Optional, Tuple, Union
 
-from makei.const import DEFAULT_CURLIB, DEFAULT_OBJLIB, FILE_MAX_EXT_LENGTH, FILE_TARGET_MAPPING
+from makei.const import FILE_MAX_EXT_LENGTH, FILE_TARGET_MAPPING
 
 
 class Colors(str, Enum):
@@ -42,33 +41,6 @@ def colored(message: str, color: Colors) -> str:
 def support_color():
     """ Detects if the terminal supports color."""
     return sys.stdout.isatty()
-
-
-def read_ibmi_json(path: Path, parent_value: Tuple[str, str]) -> Tuple[str, str]:
-    """Read and return the value defined in the given .ibmi.json
-
-    Args:
-        path (Path): path to the ibmi.json
-        parent_value (Tuple[str, str]): (objlib, tgtCcsid) as defined the the parent directory
-
-    Returns:
-        Tuple[str, str]: (objlib, tgtCcsid)
-    """
-    if path.exists():
-        with path.open() as file:
-            data = json.load(file)
-            try:
-                objlib = parse_all_variables(data['build']['objlib'])
-            except KeyError:
-                objlib = parent_value[0]
-            try:
-                tgt_ccsid = data['build']['tgtCcsid']
-            except KeyError:
-                tgt_ccsid = parent_value[1]
-            return (objlib, tgt_ccsid)
-    else:
-        return parent_value
-
 
 def parse_variable(var_name: str):
     """ Returns the value of the given variable name in the system environment,
@@ -130,48 +102,6 @@ def parse_all_variables(input_str: str) -> str:
     result = result[:-1]
     return result
 
-
-def read_iproj_json(iproj_json_path: Path) -> Dict:
-    """ Returns a dictionary representing the iproj.json file content
-    If `objlib` or `curlib` is not defined, the default value for those
-    will be used.
-    """
-    def with_default_value(key, default_value, dict):
-        if key in dict:
-            return dict[key]
-        else:
-            return default_value
-
-    try:
-        with iproj_json_path.open() as file:
-            iproj_json = json.load(file)
-            objlib = parse_all_variables(with_default_value(
-                "objlib", DEFAULT_OBJLIB, iproj_json))
-            curlib = parse_all_variables(with_default_value(
-                "curlib", DEFAULT_CURLIB, iproj_json))
-            if objlib == "*CURLIB":
-                if curlib == "*CRTDFT":
-                    objlib = "QGPL"
-                else:
-                    objlib = curlib
-
-            iproj_json["preUsrlibl"] = " ".join(
-                map(parse_all_variables, with_default_value("preUsrlibl", [], iproj_json)))
-
-            iproj_json["postUsrlibl"] = " ".join(
-                map(parse_all_variables, with_default_value("postUsrlibl", [], iproj_json)))
-            iproj_json["includePath"] = " ".join(
-                map(parse_all_variables, with_default_value("includePath",[], iproj_json)))
-            iproj_json["objlib"] = objlib
-            iproj_json["curlib"] = curlib
-            iproj_json["tgtCcsid"] = with_default_value(
-                "tgtCcsid", "*JOB", iproj_json)
-            return iproj_json
-    except FileNotFoundError:
-        print(colored("iproj.json not found!", Colors.FAIL))
-        sys.exit(1)
-
-
 def objlib_to_path(lib, object=None) -> str:
     """Returns the path for the given objlib in IFS
 
@@ -217,6 +147,65 @@ def run_command(cmd: str, stdoutHandler: Callable[[bytes], None]=print_to_stdout
     finally:
         process.kill()
 
+def decompose_filename(filename: str) -> Tuple[str, Optional[str], str, str]:
+    """Returns the (name, text-attribute, extension, dirname) of the file name
+    >>> decompose_filename("SAMREF.PF")
+    ('SAMREF', None, 'PF', '')
+    >>> decompose_filename("/SAMREF.PF")
+    ('SAMREF', None, 'PF', '/')
+    >>> decompose_filename("SAMREF-TEXT.PF")
+    ('SAMREF', 'TEXT', 'PF', '')
+    >>> decompose_filename("test-Text.PGM.RPGLE")
+    ('test', 'Text', 'PGM.RPGLE', '')
+    >>> decompose_filename("../dir1/dir2/test-Text.PGM.RPGLE")
+    ('test', 'Text', 'PGM.RPGLE', '../dir1/dir2')
+    """
+    if not filename:
+        raise ValueError()
+
+    parts = os.path.basename(filename).split(".")
+
+    ext_len = FILE_MAX_EXT_LENGTH
+    while ext_len > 0:
+        base, ext = '.'.join(parts[:-ext_len]), '.'.join(parts[-ext_len:]).upper()
+        if ext in FILE_TARGET_MAPPING:
+            # Split the object name and text attributes
+            if len(base.split("-")) == 2:
+                name, text_attribute = base.split("-")
+            else:
+                name = base
+                text_attribute = None
+            return name, text_attribute, ext, os.path.dirname(filename)
+        ext_len -= 1
+    if ext_len == 0:
+        raise ValueError(f"Cannot decomposite filename: {filename}")
+
+def is_source_file(filename: str) -> bool:
+    """Returns true if the file is a source file
+    >>> is_source_file("SAMREF.PF")
+    True
+    >>> is_source_file("SAMREF-TEXT.PF")
+    True
+    >>> is_source_file("test-Text.PGM.RPGLE")
+    True
+    >>> is_source_file("../dir1/dir2/test-Text.PGM.RPGLE")
+    True
+    >>> is_source_file("Test.PGM.RPGLE")
+    True
+    >>> is_source_file("Test.PGM")
+    False
+    """
+    try:
+        _, _, ext, _ = decompose_filename(filename)
+        return ext in FILE_TARGET_MAPPING
+    except ValueError:
+        return False
+
+def get_target_from_filename(filename: str) -> str:
+    """Returns the target from the filename
+    """
+    name, _, ext, _ = decompose_filename(filename)
+    return f'{name}.{FILE_TARGET_MAPPING[ext]}'
 
 def get_compile_targets_from_filenames(filenames: List[str]) -> List[str]:
     """ Returns the possible target name for the given filename
@@ -232,20 +221,7 @@ def get_compile_targets_from_filenames(filenames: List[str]) -> List[str]:
     """
     result = []
     for filename in filenames:
-        parts = os.path.basename(filename).split(".")
-
-        ext_len = FILE_MAX_EXT_LENGTH
-        while ext_len > 0:
-            base, ext = '.'.join(
-                parts[:-ext_len]), '.'.join(parts[-ext_len:]).upper()
-            if ext in FILE_TARGET_MAPPING:
-                # Split the object name and text attributes
-                object_name = base.split("-")[0]
-                result.append(f'{object_name}.{FILE_TARGET_MAPPING[ext]}')
-                break
-            ext_len -= 1
-        if ext_len == 0:
-            raise ValueError(f"Cannot get the target for {filename}")
+        result.append(get_target_from_filename(filename))
     return result
 
 
