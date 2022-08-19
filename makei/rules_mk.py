@@ -50,7 +50,11 @@ class MKRule:
             return f"{self.target}_CUSTOM_RECIPE=true" + '\n' + f"{self.target} : {' '.join(self._parse_dependencies())}" + '\n' + ''.join(['\t' + cmd + '\n' for cmd in self.commands]) + variable_assignment
         else:
             try:
-                recipe_name = decompose_filename(self.source_file)[2].upper() + '_TO_' + self.target.split(".")[-1].upper() + '_RECIPE'
+                target_type = self.target.split(".")[-1].upper()
+                if target_type == "SQL" or target_type == "MSGF":
+                    recipe_name = f"{target_type}_RECIPE"
+                else:
+                    recipe_name = decompose_filename(self.source_file)[2].upper() + '_TO_' + self.target.split(".")[-1].upper() + '_RECIPE'
                 return f"{self.target}_SRC={self.source_file}" + '\n' + f"{self.target}_DEP={' '.join(self.dependencies)}" + '\n' + f"{self.target}_RECIPE={recipe_name}" + '\n' + variable_assignment
             except AttributeError:
                 print(f"No source file found for {self.target}")

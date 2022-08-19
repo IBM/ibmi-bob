@@ -88,10 +88,6 @@ define get_subtree
 $($(1)_$(2)) $(foreach sd,$(SUBDIRS_$(2)),$(call get_subtree,$(1),$(sd)))
 endef
 
-define get_recipe_name
-$(if $(filter %.SQL %.MSGF,$(1)),$(call get_target_type,$2)_RECIPE,$(call get_file_type,$1)_TO_$(call get_target_type,$2)_RECIPE)
-endef
-
 # target_name := $1
 # source_name := $2
 # dependencies := $3
