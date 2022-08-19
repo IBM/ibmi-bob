@@ -19,6 +19,8 @@ class MKRule:
     containing_dir: Path
     include_dirs: List[Path]
 
+    source_file: Optional[str] = None
+
     def __init__(self, target: str, dependencies: List[str], commands: List[str], variables: Dict[str, str], containing_dir: Path, include_dirs: List[Path]):
         self.target = target
         self.dependencies = dependencies
@@ -48,7 +50,8 @@ class MKRule:
             return f"{self.target}_CUSTOM_RECIPE=true" + '\n' + f"{self.target} : {' '.join(self._parse_dependencies())}" + '\n' + ''.join(['\t' + cmd + '\n' for cmd in self.commands]) + variable_assignment
         else:
             try:
-                return f"{self.target}_SRC={self.source_file}" + '\n' + f"{self.target}_DEP={' '.join(self.dependencies)}" + '\n' + variable_assignment
+                recipe_name = decompose_filename(self.source_file)[2].upper() + '_TO_' + self.target.split(".")[-1].upper() + '_RECIPE'
+                return f"{self.target}_SRC={self.source_file}" + '\n' + f"{self.target}_DEP={' '.join(self.dependencies)}" + '\n' + f"{self.target}_RECIPE={recipe_name}" + '\n' + variable_assignment
             except AttributeError:
                 print(f"No source file found for {self.target}")
                 exit(1)

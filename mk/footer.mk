@@ -6,7 +6,7 @@ CLEAN_$(d) := $(CLEAN_$(d)) $(filter /%,$(CLEAN) $(TARGETS)) $(addprefix $(d)/,$
 
 ifdef TARGETS
 TARGETS_$(d) := $(TARGETS)
-$(foreach tgt,$(TARGETS),$(eval vpath $(tgt) $(OBJPATH_$(d)))$(eval $(tgt)_d = $(d))$(eval $(call generate_rule,$(tgt),${$(tgt)_SRC},${$(tgt)_DEP})))
+$(foreach tgt,$(TARGETS),$(eval vpath $(tgt) $(OBJPATH_$(d)))$(eval $(tgt)_d = $(d))$(eval $(call generate_rule,$(tgt),${$(tgt)_SRC},${$(tgt)_DEP},${$(tgt)_RECIPE})))
 endif
 
 
