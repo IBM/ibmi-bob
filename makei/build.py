@@ -81,7 +81,6 @@ class BuildEnv():
         target_file_path = self.build_vars_path
 
         rules_mk_paths = list(Path(".").rglob("Rules.mk"))
-        rules_mks = [RulesMk.from_file(p) for p in rules_mk_paths]
         # Create Rules.mk.build for each Rules.mk
         for rules_mk_path in rules_mk_paths:
             rules_mk = RulesMk.from_file(rules_mk_path, map(Path, self.iproj_json.include_path))
