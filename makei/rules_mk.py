@@ -216,7 +216,7 @@ class RulesMk:
         """
         rules_str = ""
         if len(self.subdirs) > 0:
-            rules_str += "SUBDIRS = " + " ".join(self.subdirs) + "\n\n"
+            rules_str += "SUBDIRS := " + " ".join(self.subdirs) + "\n\n"
         
         for target_group, targets in self.targets.items():
             if len(targets) > 0:
