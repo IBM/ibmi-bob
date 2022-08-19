@@ -41,6 +41,9 @@ class MKRule:
                 self.dependencies.remove(self.source_file)
             except IndexError:
                 print(f"No source file found for {self.target} in {self.dependencies}")
+        else:
+            self.commands.insert(0, f"@$(call echo_cmd,=== Creating [{self.target}] from custom recipe)")
+            self.commands.append(f"@$(call echo_success_cmd,End of creating {self.target})")
 
 
 
