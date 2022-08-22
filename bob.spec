@@ -1,6 +1,6 @@
 %undefine _disable_source_fetch
 Name: bob
-Version: 2.3.10
+Version: 2.4.0
 Release: 0
 License: Apache-2.0
 Summary: Better Object Builder for IBM i
@@ -59,6 +59,15 @@ ln -sf %{_libdir}/bob/scripts/crtfrmstmf %{buildroot}%{_bindir}/crtfrmstmf
 %{_bindir}/crtfrmstmf
 
 %changelog
+* Mon Aug 22 2022 Tongkun Zhang <tongkun.zhang@ibm.com> - 2.4.0
+- Use a larger margin for runsqlstmt
+- Simplified Rules.mk syntax
+- Allow creating target from the source with a different name
+- Add indication for custom recipes
+- Fix failed to add multiple preUsrLibl/postUsrLibl
+- Fix not enabling the CompatibilityMode on IBM i 7.3
+- Update code for IBM i documentation
+- Set make path to QOpenSys
 * Wed May 19 2022 Tongkun Zhang <tongkun.zhang@ibm.com> - 2.3.9
 - Fix no authority to read QADBFDEP when getting PF dependencies
 * Wed May 17 2022 Tongkun Zhang <tongkun.zhang@ibm.com> - 2.3.8
