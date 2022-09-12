@@ -203,8 +203,7 @@ def handle_compile(args):
         filenames = [args.file]
     elif args.files:
         filenames = map(os.path.basename, args.files.split(':'))
-    targets = get_compile_targets_from_filenames(filenames)
-    build_env = BuildEnv(targets, args.make_options, get_override_vars(args))
+    build_env = BuildEnv([], filenames, args.make_options, get_override_vars(args))
     if build_env.make():
         exit(0)
     else:

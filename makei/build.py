@@ -35,15 +35,14 @@ class BuildEnv():
     ibmi_env_cmds: str
 
     tmp_files: List[Path] = []
-
+    target_maps: Dict[str, str]
     success_targets: List[str]
     failed_targets: List[str]
 
-    def __init__(self, targets: List[str] = None, make_options: Optional[str] = None,
+    def __init__(self, targets: List[str] = None, srcs: List[str] = None, make_options: Optional[str] = None,
                 overrides: Dict[str, Any] = None):
         overrides = overrides or {}
         self.src_dir = Path.cwd()
-        self.targets = targets if targets is not None else ["all"]
         self.make_options = make_options if make_options else ""
         self.bob_path = Path(
             overrides["bob_path"]) if "bob_path" in overrides else BOB_PATH
@@ -63,6 +62,14 @@ class BuildEnv():
         self.success_targets = []
         self.failed_targets = []
 
+        self.target_maps = self._read_rules_mks()
+        if targets:
+            self.targets = targets
+        elif srcs:
+            self.targets = [self.target_maps[src] for src in srcs]
+        else:
+            self.targets = ["all"]
+
         self._create_build_vars()
 
     def __del__(self):
@@ -76,6 +83,21 @@ class BuildEnv():
             cmd = f"{cmd} {self.make_options}"
         cmd = f"{cmd} {' '.join(self.targets)}"
         return cmd
+
+    def _read_rules_mks(self):
+        rules_mks = [self.src_dir / "Rules.mk"]
+        map_to_targets = {}
+        while (len(rules_mks) > 0):
+            rules_mk = rules_mks.pop()
+            if rules_mk.exists():
+                rules_mk = RulesMk.from_file(rules_mk)
+                for target, src_list in rules_mk.targets:
+                    for src in src_list:
+                        map_to_targets[src] = target
+                
+                map_to_targets[rules_mk.containing_dir.name] = "dir_" + rules_mk.containing_dir.name
+                rules_mks.extend([self.src_dir / subdir / "Rules.mk" for subdir in rules_mk.subdirs])
+        return map_to_targets
 
     def _create_build_vars(self):
         target_file_path = self.build_vars_path
