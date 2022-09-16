@@ -37,7 +37,7 @@ Target CCSID (if not specified defaults to JOB CCSID)
 
 Libraries to add before USRLIBL (can contain references to named libraries)
 
-### postUsrlib
+### postUsrlibl
 
 Libraries to add after USRLIBL (can contain references to named libraries)
 
