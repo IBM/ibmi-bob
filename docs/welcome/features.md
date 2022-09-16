@@ -48,7 +48,7 @@ These older IBM i source types are compiled directly from the IFS using the CRTF
 | *MENU       | .MENU                               |
 | *MODULE     | .C, .CLLE, .RPGLE, .SQLC, .SQLRPGLE |
 | *PGM        | .RPG                                |
-| *PNLGRP     | .PNLGRP                             |
+| *PNLGRP     | .PNLGRPSRC                          |
 | *QMQRY      | .SQL                                |
 | *SRVPGM     | .BND                                |
 | *WSCST      | .WSCST                              |
