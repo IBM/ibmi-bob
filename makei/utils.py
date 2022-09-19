@@ -159,6 +159,10 @@ def decompose_filename(filename: str) -> Tuple[str, Optional[str], str, str]:
     ('test', 'Text', 'PGM.RPGLE', '')
     >>> decompose_filename("../dir1/dir2/test-Text.PGM.RPGLE")
     ('test', 'Text', 'PGM.RPGLE', '../dir1/dir2')
+    >>> decompose_filename("SAMHELP-Help_Application_Sam.PNLGRP")
+    ('SAMHELP', 'Help_Application_Sam', 'PNLGRP', '')
+    >>> decompose_filename("SAMMNU-Main_menu_application_SAMPLE.MENUSRC")
+    ('SAMMNU', 'Main_menu_application_SAMPLE', 'MENUSRC', '')
     """
     if not filename:
         raise ValueError()
@@ -178,7 +182,7 @@ def decompose_filename(filename: str) -> Tuple[str, Optional[str], str, str]:
             return name, text_attribute, ext, os.path.dirname(filename)
         ext_len -= 1
     if ext_len == 0:
-        raise ValueError(f"Cannot decomposite filename: {filename}")
+        raise ValueError(f"Cannot decomposite filename: {filename} as {ext} is not a recognized file extension")
 
 def is_source_file(filename: str) -> bool:
     """Returns true if the file is a source file
