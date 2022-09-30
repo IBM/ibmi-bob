@@ -137,6 +137,7 @@ BNDRPG_DBGVIEW := $(DBGVIEW)
 BNDRPG_DFTACTGRP := $(DFTACTGRP)
 BNDRPG_OPTION := $(OPTION)
 BNDRPG_TGTRLS := $(TGTRLS)
+BNDRPG_INCDIR := $(INCDIR)
 
 CMD_AUT := $(AUT)
 CMD_HLPID = $(basename $@)
@@ -206,6 +207,7 @@ QMQRY_AUT := $(AUT)
 
 RPGMOD_AUT := $(AUT)
 RPGMOD_DBGVIEW := $(DBGVIEW)
+RPGMOD_INCDIR := $(INCDIR)
 RPGMOD_OPTION := $(OPTION)
 RPGMOD_TGTRLS := $(TGTRLS)
 
@@ -219,17 +221,20 @@ SQLCIMOD_TERASPACE := *YES *TSIFC
 SQLCIMOD_TGTRLS := $(TGTRLS)
 
 SQLCIPGM_DBGVIEW := *SOURCE
+SQLCIPGM_INCDIR := $(INCDIR)
 SQLCIPGM_OBJTYPE := *PGM
 SQLCIPGM_OPTION := $(OPTION)
 SQLCIPGM_TGTRLS := $(TGTRLS)
 
 SQLRPGIMOD_DBGVIEW := *SOURCE
+SQLRPGIMOD_INCDIR := $(INCDIR)
 SQLRPGIMOD_OBJTYPE := *MODULE
 SQLRPGIMOD_OPTION := $(RPGMOD_OPTION)
 SQLRPGIMOD_RPGPPOPT := *LVL2
 SQLRPGIMOD_TGTRLS := $(TGTRLS)
 
 SQLRPGIPGM_DBGVIEW := *SOURCE
+SQLRPGIPGM_INCDIR := $(INCDIR)
 SQLRPGIPGM_OBJTYPE := *PGM
 SQLRPGIPGM_OPTION := $(OPTION)
 SQLRPGIPGM_RPGPPOPT := *LVL2
@@ -245,10 +250,10 @@ SRVPGM_TGTRLS := $(TGTRLS)
 WSCST_AUT := $(AUT)
 
 # Creation command parameters with variables (the ones listed at the top) for the most common ones.
-CRTCLMODFLAGS = AUT($(AUT)) DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) TEXT('$(TEXT)') TGTRLS($(TGTRLS)) INCDIR($(INCDIR))
+CRTCLMODFLAGS = AUT($(AUT)) DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) TEXT('$(TEXT)') TGTRLS($(TGTRLS)) INCDIR('$(INCDIR)')
 CRTCMDFLAGS = PGM($(PGM)) VLDCKR($(VLDCKR)) PMTFILE($(PMTFILE)) HLPPNLGRP($(HLPPNLGRP)) HLPID($(HLPID)) AUT($(AUT)) TEXT('$(TEXT)')
 CRTCMODFLAGS = TERASPACE($(TERASPACE)) STGMDL($(STGMDL)) OUTPUT(*PRINT) OPTION($(OPTION)) DBGVIEW($(DBGVIEW)) \
-               SYSIFCOPT($(SYSIFCOPT)) AUT($(AUT)) TEXT('$(TEXT)') TGTCCSID($(TGTCCSID)) TGTRLS($(TGTRLS)) INCDIR($(INCDIR))
+               SYSIFCOPT($(SYSIFCOPT)) AUT($(AUT)) TEXT('$(TEXT)') TGTCCSID($(TGTCCSID)) TGTRLS($(TGTRLS)) INCDIR('$(INCDIR)')
 CRTDSPFFLAGS = ENHDSP(*YES) RSTDSP($(RSTDSP)) DFRWRT(*YES) AUT($(AUT)) OPTION($(OPTION)) TEXT('$(TEXT)')
 CRTLFFLAGS = AUT($(AUT)) OPTION($(OPTION)) TEXT('$(TEXT)')
 CRTMNUFLAGS = AUT($(AUT)) OPTION($(OPTION)) CURLIB($(CURLIB)) PRDLIB($(PRDLIB)) TEXT('$(TEXT)') TYPE($(TYPE))
@@ -258,18 +263,18 @@ CRTPNLGRPFLAGS = AUT($(AUT)) OPTION($(OPTION)) TEXT('$(TEXT)')
 CRTCBLPGMFLAGS = OPTION($(OPTION)) TEXT('$(TEXT)')
 CRTPRTFFLAGS = AUT($(AUT)) OPTION($(OPTION)) PAGESIZE($(PAGESIZE)) TEXT('$(TEXT)')
 CRTRPGMODFLAGS = AUT($(AUT)) DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) OUTPUT(*PRINT) TEXT('$(TEXT)') \
-                 TGTCCSID($(TGTCCSID)) TGTRLS($(TGTRLS))
+                 TGTCCSID($(TGTCCSID)) TGTRLS($(TGTRLS)) INCDIR('$(INCDIR)')
 CRTQMQRYFLAGS = AUT($(AUT)) TEXT('$(TEXT)')
 CRTSQLCIFLAGS = COMMIT($(COMMIT)) OBJTYPE($(OBJTYPE)) OUTPUT(*PRINT) TEXT('$(TEXT)') TGTRLS($(TGTRLS)) DBGVIEW($(DBGVIEW)) \
                 COMPILEOPT('INCDIR(''$(INCDIR)'') OPTION($(OPTION)) STGMDL($(STGMDL)) SYSIFCOPT($(SYSIFCOPT)) \
-                            TGTCCSID($(TGTCCSID)) TERASPACE($(TERASPACE)) INCDIR($(INCDIR))
+                            TGTCCSID($(TGTCCSID)) TERASPACE($(TERASPACE))
 CRTSQLRPGIFLAGS = COMMIT($(COMMIT)) OBJTYPE($(OBJTYPE)) OPTION($(OPTION)) OUTPUT(*PRINT) TEXT('$(TEXT)') \
                   TGTRLS($(TGTRLS)) DBGVIEW($(DBGVIEW)) RPGPPOPT($(RPGPPOPT)) \
-                  COMPILEOPT('TGTCCSID($(TGTCCSID))')
+                  COMPILEOPT('TGTCCSID($(TGTCCSID)) INCDIR(''$(INCDIR)'')')
 CRTSRVPGMFLAGS = ACTGRP($(ACTGRP)) TEXT('$(TEXT)') TGTRLS($(TGTRLS)) AUT($(AUT)) DETAIL($(DETAIL)) STGMDL($(STGMDL))
 CRTWSCSTFLAGS = AUT($(AUT)) TEXT('$(TEXT)')
-CRTBNDRPGFLAGS:= DBGVIEW($(DBGVIEW)) TGTCCSID($(TGTCCSID)) OPTION($(OPTION)) TEXT('$(TEXT)') INCDIR($(INCDIR))
-CRTBNDCFLAGS:=TGTCCSID($(TGTCCSID)) OPTION($(OPTION)) TEXT('$(TEXT)')
+CRTBNDRPGFLAGS:= DBGVIEW($(DBGVIEW)) TGTCCSID($(TGTCCSID)) OPTION($(OPTION)) TEXT('$(TEXT)') INCDIR('$(INCDIR)')
+CRTBNDCFLAGS:=TGTCCSID($(TGTCCSID)) OPTION($(OPTION)) TEXT('$(TEXT)') INCDIR('$(INCDIR)')
 RUNSQLFLAGS:= DBGVIEW(*SOURCE) TGTRLS($(TGTRLS)) OUTPUT(*PRINT) MARGINS(1024)
 
 # Extra command string for adhoc addition of extra parameters to a creation command.
@@ -390,135 +395,218 @@ endef
 # Determine default settings for the various source types that can make a file object.
 fileAUT = $(strip \
 	$(if $(filter %.DSPF,$<),$(DSPF_AUT), \
+	$(if $(filter %.dspf,$<),$(DSPF_AUT), \
 	$(if $(filter %.LF,$<),$(LF_AUT), \
+	$(if $(filter %.lf,$<),$(LF_AUT), \
 	$(if $(filter %.PF,$<),$(PF_AUT), \
+	$(if $(filter %.pf,$<),$(PF_AUT), \
 	$(if $(filter %.PRTF,$<),$(PRTF_AUT), \
-	UNKNOWN_FILE_TYPE)))))
+	$(if $(filter %.prtf,$<),$(PRTF_AUT), \
+	UNKNOWN_FILE_TYPE)))))))))
 fileDLTPCT = $(strip \
 	$(if $(filter %.PF,$<),$(PF_DLTPCT), \
-	UNKNOWN_FILE_TYPE))
+	$(if $(filter %.pf,$<),$(PF_DLTPCT), \
+	UNKNOWN_FILE_TYPE)))
 fileOPTION = $(strip \
 	$(if $(filter %.DSPF,$<),$(DSPF_OPTION), \
+	$(if $(filter %.dspf,$<),$(DSPF_OPTION), \
 	$(if $(filter %.LF,$<),$(LF_OPTION), \
+	$(if $(filter %.lf,$<),$(LF_OPTION), \
 	$(if $(filter %.PF,$<),$(PF_OPTION), \
+	$(if $(filter %.pf,$<),$(PF_OPTION), \
 	$(if $(filter %.PRTF,$<),$(PRTF_OPTION), \
-	UNKNOWN_FILE_TYPE)))))
+	$(if $(filter %.prtf,$<),$(PRTF_OPTION), \
+	UNKNOWN_FILE_TYPE)))))))))
 filePAGESIZE = $(strip \
 	$(if $(filter %.PRTF,$<),$(PRTF_PAGESIZE), \
-	UNKNOWN_FILE_TYPE))
+	$(if $(filter %.prtf,$<),$(PRTF_PAGESIZE), \
+	UNKNOWN_FILE_TYPE)))
 fileREUSEDLT = $(strip \
 	$(if $(filter %.PF,$<),$(PF_REUSEDLT), \
-	UNKNOWN_FILE_TYPE))
+	$(if $(filter %.pf,$<),$(PF_REUSEDLT), \
+	UNKNOWN_FILE_TYPE)))
 fileRSTDSP = $(strip \
 	$(if $(filter %.DSPF,$<),$(DSPF_RSTDSP), \
-	UNKNOWN_FILE_TYPE))
+	$(if $(filter %.dspf,$<),$(DSPF_RSTDSP), \
+	UNKNOWN_FILE_TYPE)))
 fileSIZE = $(strip \
 	$(if $(filter %.PF,$<),$(PF_SIZE), \
-	UNKNOWN_FILE_TYPE))
+	$(if $(filter %.pf,$<),$(PF_SIZE), \
+	UNKNOWN_FILE_TYPE)))
 
 # Determine default settings for the various source types that can make a module object.
 moduleAUT = $(strip \
 	$(if $(filter %.C,$<),$(CMOD_AUT), \
+	$(if $(filter %.c,$<),$(CMOD_AUT), \
 	$(if $(filter %.CLLE,$<),$(CLMOD_AUT), \
+	$(if $(filter %.clle,$<),$(CLMOD_AUT), \
 	$(if $(filter %.RPGLE,$<),$(RPGMOD_AUT), \
-	UNKNOWN_FILE_TYPE))))
+	$(if $(filter %.rpgle,$<),$(RPGMOD_AUT), \
+	UNKNOWN_FILE_TYPE)))))))
 moduleDBGVIEW = $(strip \
 	$(if $(filter %.C,$<),$(CMOD_DBGVIEW), \
+	$(if $(filter %.c,$<),$(CMOD_DBGVIEW), \
 	$(if $(filter %.CLLE,$<),$(CLMOD_DBGVIEW), \
+	$(if $(filter %.clle,$<),$(CLMOD_DBGVIEW), \
 	$(if $(filter %.RPGLE,$<),$(RPGMOD_DBGVIEW), \
+	$(if $(filter %.rpgle,$<),$(RPGMOD_DBGVIEW), \
 	$(if $(filter %.SQLC,$<),$(SQLCIMOD_DBGVIEW), \
+	$(if $(filter %.sqlc,$<),$(SQLCIMOD_DBGVIEW), \
 	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIMOD_DBGVIEW), \
-	UNKNOWN_FILE_TYPE))))))
+	$(if $(filter %.sqlrpgle,$<),$(SQLRPGIMOD_DBGVIEW), \
+	UNKNOWN_FILE_TYPE)))))))))))
 moduleOBJTYPE = $(strip \
 	$(if $(filter %.SQLC,$<),$(SQLCIMOD_OBJTYPE), \
+	$(if $(filter %.sqlc,$<),$(SQLCIMOD_OBJTYPE), \
 	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIMOD_OBJTYPE), \
-	UNKNOWN_FILE_TYPE)))
+	$(if $(filter %.sqlrpgle,$<),$(SQLRPGIMOD_OBJTYPE), \
+	UNKNOWN_FILE_TYPE)))))
 moduleOPTION = $(strip \
 	$(if $(filter %.C,$<),$(CMOD_OPTION), \
+	$(if $(filter %.c,$<),$(CMOD_OPTION), \
 	$(if $(filter %.CLLE,$<),$(CLMOD_OPTION), \
+	$(if $(filter %.clle,$<),$(CLMOD_OPTION), \
 	$(if $(filter %.RPGLE,$<),$(RPGMOD_OPTION), \
+	$(if $(filter %.rpgle,$<),$(RPGMOD_OPTION), \
 	$(if $(filter %.SQLC,$<),$(SQLCIMOD_OPTION), \
+	$(if $(filter %.sqlc,$<),$(SQLCIMOD_OPTION), \
 	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIMOD_OPTION), \
-	UNKNOWN_FILE_TYPE))))))
+	$(if $(filter %.sqlrpgle,$<),$(SQLRPGIMOD_OPTION), \
+	UNKNOWN_FILE_TYPE)))))))))))
 moduleINCDIR = $(strip \
 	$(if $(filter %.C,$<),$(CMOD_INCDIR), \
+	$(if $(filter %.c,$<),$(CMOD_INCDIR), \
 	$(if $(filter %.CLLE,$<),$(CLMOD_INCDIR), \
+	$(if $(filter %.clle,$<),$(CLMOD_INCDIR), \
 	$(if $(filter %.CBLLE,$<),$(CBLMOD_INCDIR), \
+	$(if $(filter %.cblle,$<),$(CBLMOD_INCDIR), \
 	$(if $(filter %.SQLC,$<),$(SQLCIMOD_INCDIR), \
-	UNKNOWN_FILE_TYPE)))))
+	$(if $(filter %.sqlc,$<),$(SQLCIMOD_INCDIR), \
+	UNKNOWN_FILE_TYPE)))))))))
 moduleRPGPPOPT = $(strip \
 	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIMOD_RPGPPOPT), \
-	UNKNOWN_FILE_TYPE))
+	$(if $(filter %.sqlrpgle,$<),$(SQLRPGIMOD_RPGPPOPT), \
+	UNKNOWN_FILE_TYPE)))
 moduleSTGMDL = $(strip \
 	$(if $(filter %.C,$<),$(CMOD_STGMDL), \
+	$(if $(filter %.c,$<),$(CMOD_STGMDL), \
 	$(if $(filter %.SQLC,$<),$(SQLCIMOD_STGMDL), \
-	UNKNOWN_FILE_TYPE)))
+	$(if $(filter %.sqlc,$<),$(SQLCIMOD_STGMDL), \
+	UNKNOWN_FILE_TYPE)))))
 moduleSYSIFCOPT = $(strip \
 	$(if $(filter %.C,$<),$(CMOD_SYSIFCOPT), \
+	$(if $(filter %.c,$<),$(CMOD_SYSIFCOPT), \
 	$(if $(filter %.SQLC,$<),$(SQLCIMOD_SYSIFCOPT), \
-	UNKNOWN_FILE_TYPE)))
+	$(if $(filter %.sqlc,$<),$(SQLCIMOD_SYSIFCOPT), \
+	UNKNOWN_FILE_TYPE)))))
 moduleTERASPACE = $(strip \
 	$(if $(filter %.C,$<),$(CMOD_TERASPACE), \
+	$(if $(filter %.c,$<),$(CMOD_TERASPACE), \
 	$(if $(filter %.SQLC,$<),$(SQLCIMOD_TERASPACE), \
-	UNKNOWN_FILE_TYPE)))
+	$(if $(filter %.sqlc,$<),$(SQLCIMOD_TERASPACE), \
+	UNKNOWN_FILE_TYPE)))))
 moduleTGTRLS = $(strip \
 	$(if $(filter %.C,$<),$(CMOD_TGTRLS), \
+	$(if $(filter %.c,$<),$(CMOD_TGTRLS), \
 	$(if $(filter %.CLLE,$<),$(CLMOD_TGTRLS), \
+	$(if $(filter %.clle,$<),$(CLMOD_TGTRLS), \
 	$(if $(filter %.RPGLE,$<),$(RPGMOD_TGTRLS), \
+	$(if $(filter %.rpgle,$<),$(RPGMOD_TGTRLS), \
 	$(if $(filter %.SQLC,$<),$(SQLCIMOD_TGTRLS), \
+	$(if $(filter %.sqlc,$<),$(SQLCIMOD_TGTRLS), \
 	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIMOD_TGTRLS), \
-	UNKNOWN_FILE_TYPE))))))
+	$(if $(filter %.sqlrpgle,$<),$(SQLRPGIMOD_TGTRLS), \
+	UNKNOWN_FILE_TYPE)))))))))))
 
 # Determine default settings for the various source types that can make a program object.
 programACTGRP = $(strip \
 	$(if $(filter %.CLLE,$<),$(BNDCL_ACTGRP), \
+	$(if $(filter %.clle,$<),$(BNDCL_ACTGRP), \
 	$(if $(filter %.RPGLE,$<),$(BNDRPG_ACTGRP), \
+	$(if $(filter %.rpgle,$<),$(BNDRPG_ACTGRP), \
 	$(if $(filter %.MODULE,$<),$(PGM_ACTGRP), \
-	UNKNOWN_FILE_TYPE))))
+	$(if $(filter %.module,$<),$(PGM_ACTGRP), \
+	UNKNOWN_FILE_TYPE)))))))
 programAUT = $(strip \
 	$(if $(filter %.CLLE,$<),$(BNDCL_AUT), \
+	$(if $(filter %.clle,$<),$(BNDCL_AUT), \
 	$(if $(filter %.RPGLE,$<),$(BNDRPG_AUT), \
+	$(if $(filter %.rpgle,$<),$(BNDRPG_AUT), \
 	$(if $(filter %.MODULE,$<),$(PGM_AUT), \
-	UNKNOWN_FILE_TYPE))))
+	$(if $(filter %.module,$<),$(PGM_AUT), \
+	UNKNOWN_FILE_TYPE)))))))
 programDBGVIEW = $(strip \
 	$(if $(filter %.CLLE,$<),$(BNDCL_DBGVIEW), \
+	$(if $(filter %.clle,$<),$(BNDCL_DBGVIEW), \
 	$(if $(filter %.RPGLE,$<),$(BNDRPG_DBGVIEW), \
+	$(if $(filter %.rpgle,$<),$(BNDRPG_DBGVIEW), \
 	$(if $(filter %.SQLC,$<),$(SQLCIPGM_DBGVIEW), \
+	$(if $(filter %.sqlc,$<),$(SQLCIPGM_DBGVIEW), \
 	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIPGM_DBGVIEW), \
-	UNKNOWN_FILE_TYPE)))))
+	$(if $(filter %.sqlrpgle,$<),$(SQLRPGIPGM_DBGVIEW), \
+	UNKNOWN_FILE_TYPE)))))))))
 programDETAIL = $(strip \
 	$(if $(filter %.MODULE,$<),$(PGM_DETAIL), \
-	UNKNOWN_FILE_TYPE))
+	$(if $(filter %.module,$<),$(PGM_DETAIL), \
+	UNKNOWN_FILE_TYPE)))
 programDFTACTGRP = $(strip \
 	$(if $(filter %.CLLE,$<),$(BNDCL_DFTACTGRP), \
+	$(if $(filter %.clle,$<),$(BNDCL_DFTACTGRP), \
 	$(if $(filter %.RPGLE,$<),$(BNDRPG_DFTACTGRP), \
-	UNKNOWN_FILE_TYPE)))
+	$(if $(filter %.rpgle,$<),$(BNDRPG_DFTACTGRP), \
+	UNKNOWN_FILE_TYPE)))))
 programOBJTYPE = $(strip \
 	$(if $(filter %.SQLC,$<),$(SQLCIPGM_OBJTYPE), \
+	$(if $(filter %.sqlc,$<),$(SQLCIPGM_OBJTYPE), \
 	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIPGM_OBJTYPE), \
-	UNKNOWN_FILE_TYPE)))
+	$(if $(filter %.sqlrpgle,$<),$(SQLRPGIPGM_OBJTYPE), \
+	UNKNOWN_FILE_TYPE)))))
 programOPTION = $(strip \
 	$(if $(filter %.CLLE,$<),$(BNDCL_OPTION), \
+	$(if $(filter %.clle,$<),$(BNDCL_OPTION), \
 	$(if $(filter %.RPGLE,$<),$(BNDRPG_OPTION), \
+	$(if $(filter %.rpgle,$<),$(BNDRPG_OPTION), \
 	$(if $(filter %.SQLC,$<),$(SQLCIPGM_OPTION), \
+	$(if $(filter %.sqlc,$<),$(SQLCIPGM_OPTION), \
 	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIPGM_OPTION), \
+	$(if $(filter %.sqlrpgle,$<),$(SQLRPGIPGM_OPTION), \
 	$(if $(filter %.MODULE,$<),$(PGM_OPTION), \
+	$(if $(filter %.module,$<),$(PGM_OPTION), \
 	$(if $(filter %.CBL,$<),$(CBL_OPTION), \
+	$(if $(filter %.cbl,$<),$(CBL_OPTION), \
 	$(if $(filter %.RPG,$<),$(RPG_OPTION), \
-	UNKNOWN_FILE_TYPE))))))))
+	$(if $(filter %.rpg,$<),$(RPG_OPTION), \
+	UNKNOWN_FILE_TYPE)))))))))))))))
 programRPGPPOPT = $(strip \
 	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIPGM_RPGPPOPT), \
-	UNKNOWN_FILE_TYPE))
+	$(if $(filter %.sqlrpgle,$<),$(SQLRPGIPGM_RPGPPOPT), \
+	UNKNOWN_FILE_TYPE)))
 programSTGMDL = $(strip \
 	$(if $(filter %.MODULE,$<),$(PGM_STGMDL), \
-	UNKNOWN_FILE_TYPE))
+	$(if $(filter %.module,$<),$(PGM_STGMDL), \
+	UNKNOWN_FILE_TYPE)))
 programTGTRLS = $(strip \
 	$(if $(filter %.CLLE,$<),$(BNDCL_TGTRLS), \
+	$(if $(filter %.clle,$<),$(BNDCL_TGTRLS), \
 	$(if $(filter %.RPGLE,$<),$(BNDRPG_TGTRLS), \
+	$(if $(filter %.rpgle,$<),$(BNDRPG_TGTRLS), \
 	$(if $(filter %.SQLC,$<),$(SQLCIPGM_TGTRLS), \
+	$(if $(filter %.sqlc,$<),$(SQLCIPGM_TGTRLS), \
 	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIPGM_TGTRLS), \
+	$(if $(filter %.sqlrpgle,$<),$(SQLRPGIPGM_TGTRLS), \
 	$(if $(filter %.MODULE,$<),$(PGM_TGTRLS), \
-	UNKNOWN_FILE_TYPE))))))
+	$(if $(filter %.module,$<),$(PGM_TGTRLS), \
+	UNKNOWN_FILE_TYPE)))))))))))
+programINCDIR = $(strip \
+	$(if $(filter %.CLLE,$<),$(BNDCL_INCDIR), \
+	$(if $(filter %.clle,$<),$(BNDCL_INCDIR), \
+	$(if $(filter %.RPGLE,$<),$(BNDRPG_INCDIR), \
+	$(if $(filter %.rpgle,$<),$(BNDRPG_INCDIR), \
+	$(if $(filter %.SQLC,$<),$(SQLCIPGM_INCDIR), \
+	$(if $(filter %.sqlc,$<),$(SQLCIPGM_INCDIR), \
+	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIPGM_INCDIR), \
+	$(if $(filter %.sqlrpgle,$<),$(SQLRPGIPGM_INCDIR), \
+	UNKNOWN_FILE_TYPE)))))))))
 
 
 #    ____ __  __ ____    ____           _                 
@@ -792,6 +880,7 @@ $(eval OPTION = $(programOPTION))
 $(eval RPGPPOPT = $(programRPGPPOPT))
 $(eval STGMDL = $(programSTGMDL))
 $(eval TGTRLS = $(programTGTRLS))
+$(eval INCDIR = $(programINCDIR))
 $(eval BNDSRVPGMPATH = $(basename $(filter %.SRVPGM,$(notdir $^)) $(externalsrvpgms)))
 endef
 
