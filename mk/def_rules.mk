@@ -528,10 +528,10 @@ programTGTRLS = $(strip \
 #   \____|_|  |_|____/  |_| \_\___|\___|_| .__/ \___||___/
 #                                        |_|              
 
-define CMDSRC_TO_CMD_RECIPT = 
+define CMDSRC_TO_CMD_RECIPE = 
 	$(eval AUT = $(CMD_AUT))
 	$(eval HLPID = $(CMD_HLPID))
-	$(eval HLPPNLGRP = $(CMD_HLPPNLGRP)
+	$(eval HLPPNLGRP = $(CMD_HLPPNLGRP))
 	$(eval PGM = $(CMD_PGM))
 	$(eval PMTFILE = $(CMD_PMTFILE))
 	$(eval VLDCKR = $(CMD_VLDCKR))
@@ -685,7 +685,7 @@ define MENU_VARIABLES =
 	$(eval TYPE = $(MNU_TYPE))
 endef
 
-define MENUSRC_TO_MENU_RECIPT =
+define MENUSRC_TO_MENU_RECIPE =
 	$(MENU_VARIABLES)
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating menu [$(notdir $<)]")
