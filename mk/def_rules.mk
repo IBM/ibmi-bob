@@ -593,8 +593,8 @@ define PF_TO_FILE_RECIPE =
 	@$(set_STMF_CCSID)
 	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTPF" -p '"$(CRTPFFLAGS)"'")
 	@$(PRESETUP) \
-	$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTPF" -p "$(CRTPFFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
-	@$(call EVFEVENT_DOWNLOAD,$*.evfevent)
+	$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID) -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTPF" -p "$(CRTPFFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
+	@$(call EVFEVENT_DOWNLOAD,$(basename $@).evfevent)
 	@$(TYPEDEF)
 endef
 
@@ -704,18 +704,16 @@ endef
 #  |_|  |_|\___/|____/ \___/|_____|_____| |_| \_\___|\___|_| .__/ \___||___/
 #                                                          |_|              
 
-define MODULE_VARIABLES
-	$(eval AUT = $(moduleAUT))\
-	$(eval DBGVIEW = $(moduleDBGVIEW))\
-	$(eval OBJTYPE = $(moduleOBJTYPE))\
-	$(eval OPTION = $(moduleOPTION))\
-	$(eval INCDIR = $(moduleINCDIR))\
-	$(eval RPGPPOPT = $(moduleRPGPPOPT))\
-	$(eval STGMDL = $(moduleSTGMDL))\
-	$(eval SYSIFCOPT = $(moduleSYSIFCOPT))\
-	$(eval TERASPACE = $(moduleTERASPACE))\
-	$(eval TGTRLS = $(moduleTGTRLS))
-endef
+%.MODULE: private AUT = $(moduleAUT)
+%.MODULE: private DBGVIEW = $(moduleDBGVIEW)
+%.MODULE: private OBJTYPE = $(moduleOBJTYPE)
+%.MODULE: private OPTION = $(moduleOPTION)
+%.MODULE: private INCDIR = $(moduleINCDIR)
+%.MODULE: private RPGPPOPT = $(moduleRPGPPOPT)
+%.MODULE: private STGMDL = $(moduleSTGMDL)
+%.MODULE: private SYSIFCOPT = $(moduleSYSIFCOPT)
+%.MODULE: private TERASPACE = $(moduleTERASPACE)
+%.MODULE: private TGTRLS = $(moduleTGTRLS)
 
 define C_TO_MODULE_RECIPE = 
 	$(MODULE_VARIABLES)
@@ -762,6 +760,7 @@ define SQLC_TO_MODULE_RECIPE =
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
 	@($(call EVFEVENT_DOWNLOAD,$*.evfevent); ret=$$?; rm $(DEPDIR)/$*.Td 2>/dev/null; rm "$<-1252" 2>/dev/null; exit $$ret)
 	@rm "$<-1252"
+endef
 
 define SQLRPGLE_TO_MODULE_RECIPE = 
 	$(MODULE_VARIABLES)
@@ -850,7 +849,7 @@ define CBL_TO_PGM_RECIPE =
 	$(PGM_VARIABLES)
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Create COBOL Program [$(basename $@)]")
-	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID) -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTPRTF" -p '"$(CRTPRTFFLAGS)"'")
+	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstm --ccsid $(TGTCCSID) -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTPRTF" -p '"$(CRTPRTFFLAGS)"'")
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTPRTF" -p "$(CRTPRTFFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
 	@$(call EVFEVENT_DOWNLOAD,$*.evfevent)
@@ -1025,7 +1024,7 @@ define WSCSTSRC_TO_WSCST_RECIPE =
 	@$(set_STMF_CCSID)
 	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTWSCST" -p '"$(CRTWSCSTFLAGS)"'")
 	@$(PRESETUP) \
-	$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID) -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTWSCST" -p "$(CRTWSCSTFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
+	$(SCRIPTSPATH)/crtfrmstmf  --ccsid $(TGTCCSID) -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTWSCST" -p "$(CRTWSCSTFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
 endef
 
 define QMQRY_VARIABLES =
@@ -1037,9 +1036,9 @@ define SQL_TO_QMQRY_RECIPE =
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Create QM query [$(basename $@)]")
 	@$(set_STMF_CCSID)
-	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTQMQRY" -p '"$(CRTQMQRYFLAGS)"'")
+	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID) -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTQMQRY" -p '"$(CRTQMQRYFLAGS)"'")
 	$(PRESETUP) \
-	$(SCRIPTSPATH)/crtfrmstmf -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTQMQRY" -p "$(CRTQMQRYFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
+	$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID) -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTQMQRY" -p "$(CRTQMQRYFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
 endef
 
 # $(DEPDIR)/%.d: ;
