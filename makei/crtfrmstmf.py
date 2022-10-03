@@ -9,7 +9,7 @@ from typing import Any, Dict, List, Optional, Tuple
 from datetime import datetime
 sys.path.append(str(Path(__file__).resolve().parent.parent))  # nopep8
 from makei.ibm_job import IBMJob, save_joblog_json  # nopep8
-from makei.utils import format_datetime, objlib_to_path  # nopep8
+from makei.utils import format_datetime, objlib_to_path, validate_ccsid  # nopep8
 
 
 COMMAND_MAP = {'CRTCMD': 'CMD',
@@ -29,6 +29,9 @@ COMMAND_MAP = {'CRTCMD': 'CMD',
 
 
 class CrtFrmStmf():
+    """create from stream file
+    """
+    
     job: IBMJob
     setup_job: IBMJob
     srcstmf: str
@@ -42,7 +45,7 @@ class CrtFrmStmf():
     back_up_obj_list: List[Tuple[str, str, str]] # List of (obj, lib, obj_type) tuples
     obj_type: str
 
-    def __init__(self, srcstmf: str, obj: str, lib: str, cmd: str, parameters: Optional[str] = None, env_settings: Optional[Dict[str, str]] = None, joblog_path: Optional[str] = None, tmp_lib="QTEMP", tmp_src="QSOURCE") -> None:
+    def __init__(self, srcstmf: str, obj: str, lib: str, cmd: str, tgtCcsid: Optional[str] = None, parameters: Optional[str] = None, env_settings: Optional[Dict[str, str]] = None, joblog_path: Optional[str] = None, tmp_lib="QTEMP", tmp_src="QSOURCE") -> None:
         self.job = IBMJob()
         self.setup_job = IBMJob()
         self.srcstmf = srcstmf
@@ -56,11 +59,14 @@ class CrtFrmStmf():
         self.tmp_lib = tmp_lib
         self.tmp_src = tmp_src
         self.obj_type = COMMAND_MAP[self.cmd]
-        ccsid = retrieve_ccsid(srcstmf)
-        if ccsid == "1208" or ccsid == "819":
-            self.ccsid_c = '*JOB'
+        if tgtCcsid is None or not validate_ccsid(tgtCcsid):
+            ccsid = retrieve_ccsid(srcstmf)
+            if ccsid == "1208" or ccsid == "819":
+                self.ccsid_c = '*JOB'
+            else:
+                self.ccsid_c = str(ccsid)
         else:
-            self.ccsid_c = str(ccsid)
+            self.ccsid_c = tgtCcsid
 
         if check_object_exists(self.obj, self.lib, self.obj_type):
             if self.cmd == "CRTPF":
@@ -249,6 +255,11 @@ def cli():
         help='Output the joblog to the specified json file.',
         metavar='<path to joblog json file>',
     )
+    parser.add_argument(
+        "--ccsid",
+        help='The CCSID of the source code.',
+        metavar='<ccsid>',
+    )
 
     args = parser.parse_args()
     srcstmf_absolute_path = str(Path(args.stream_file.strip()).resolve())
@@ -262,8 +273,8 @@ def cli():
     if "IBMiEnvCmd" in os.environ:
         env_settings["IBMiEnvCmd"] = os.environ["IBMiEnvCmd"]
 
-    handle = CrtFrmStmf(srcstmf_absolute_path, args.object.strip(
-    ), args.library.strip(), args.command.strip(), args.parameters, env_settings, args.save_joblog)
+    handle = CrtFrmStmf(srcstmf_absolute_path, args.object.strip(),
+    args.library.strip(), args.command.strip(), args.ccsid, args.parameters, env_settings, args.save_joblog)
 
     print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
     success = handle.run()

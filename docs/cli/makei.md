@@ -115,11 +115,14 @@ Converts all members in a source physical file to properly-named (Bob-compatible
 
 For example, RPGLE source member `AB1001` will become IFS source file `AB1001.RPGLE`. Four exceptions exist, however: source member types CMD, MENU, and PNLGRP result in filename extensions .CMDSRC, .MENUSRC, and .PNLGRPSRC, respectively, and source member type C residing in source physical file H results in filename extension .H.
 
-By default, source files will be encoded in UTF-8; this can be overridden by using the `-c` option and supplying a CCSID value.
-It is likely that the same destination directory will contain converted members from many source physical files.  Therefore, name collisions are possible.  In the event of a duplicate member name and type, the source file name will be adjusted from `member.type` to `member (n).type`, with `n` incremented until a unique name is achieved.
+All source files will be encoded in UTF-8. If the source physical file was created successfully, a `.ibmi.json` file with the CCSID value from the SRC-PF will be created in the same directory. Note that It will not override an existing `.ibmi.json` file. [Link to discussions](https://github.com/IBM/ibmi-bob/pull/115#issuecomment-1194661949)
 
-If the source physical file was created successfully, a `.ibmi.json` file with the same CCSID value will be created in the same directory. Note that It will not override an existing `.ibmi.json` file. 
-Just a note that the target ccsid in the .ibmi.json is NOT the encoding of the stream file but rather the EBCDIC encoding used by the compiler. So it is misleading to generate the .ibmi.json with that encoding as it will not be EBCDIC.
+If the SRC-PF is 65535, then the value of the `ccsid` parameter of the cvtsrcpf command will be used.
+
+If the parameter is not specified the `*JOB` CCSID should be used.
+
+It is likely that the same destination directory will contain converted members from many source physical files.  Therefore, name collisions are possible.  In the event of a duplicate member name and type, the source file name will be adjusted from `member.type` to `member (n).type`, with `n` incremented until a unique name is achieved.
+ 
 
 #### Arguments
 
@@ -133,9 +136,9 @@ Just a note that the target ccsid in the .ibmi.json is NOT the encoding of the s
 
 #### Options
 
-- **-c**
+- **-c, --ccsid**
 
-  ccsid to override
+  An optional CCSID for the SRC-PF. See the description above for more details.
 
 #### Example
 

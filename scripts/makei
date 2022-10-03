@@ -6,12 +6,15 @@
 """ The CLI entry for BOB"""
 
 import argparse
+from email.policy import default
 import json
 import os
 from pathlib import Path
 
-import sys  # nopep8
+import sys
+
 sys.path.append(str(Path(__file__).resolve().parent.parent))  # nopep8
+from makei.cvtsrcpf import CvtSrcPf  # nopep8
 from makei.const import BOB_PATH  # nopep8
 from makei import init_project  # nopep8
 from makei.build import BuildEnv  # nopep8
@@ -164,10 +167,12 @@ def add_cvtsrcpf_parser(subparsers: argparse.ArgumentParser):
 
     cvtsrcpf_parser.add_argument(
         "-c",
-        help='the EBCDIC CCSID that the source in this directory should be compiled with. CCSID used to compile the source in this directory. If not specified, then the CCSID of the JOB running the build will be used.',
-        metavar='<CCSID>',
-        type=int,
+        "--ccsid",
+        help='The TGTCCSID for the build. If not specified, then the CCSID of the SRC-PF will be used.',
+        metavar='<ccsid>',
+        type=str
     )
+
     cvtsrcpf_parser.set_defaults(handle=handle_cvtsrcpf)
 
 
@@ -228,24 +233,10 @@ def handle_build(args):
         exit(1)
 
 def handle_cvtsrcpf(args):
-    if args.c:
-        ccsid = args.c
-        ccsid_flag = f" -c {args.c}"
-    else:
-        ccsid = None
-        ccsid_flag = ""
-    exit_code = run_command(f"{str(BOB_PATH / 'scripts' / 'cvtsrcpf')} {args.file} {args.library}{ccsid_flag}")
-    if exit_code == 0:
-        ibmi_json_path = Path() / ".ibmi.json"
-        if not ibmi_json_path.exists() and ccsid:
-            data = {
-                "build" : {
-                    "tgtCcsid" : str(ccsid)
-                }
-            }
-            with ibmi_json_path.open('w') as json_file:
-                json.dump(data, json_file, indent=4)
-                print(colored("Created .ibmi.json at the current directory.", Colors.OKBLUE))
+    """
+    Processing the cvtsrcpf command
+    """
+    CvtSrcPf(args.file, args.library, args.ccsid).run()
 
 def get_override_vars(args):
     """ Get the override variables from the arguments"""
