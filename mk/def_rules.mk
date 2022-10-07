@@ -488,7 +488,7 @@ moduleINCDIR = $(strip \
 	$(if $(filter %.cblle,$<),$(CBLMOD_INCDIR), \
 	$(if $(filter %.SQLC,$<),$(SQLCIMOD_INCDIR), \
 	$(if $(filter %.sqlc,$<),$(SQLCIMOD_INCDIR), \
-	UNKNOWN_FILE_TYPE)))))))))
+	UNKNOWN_FILE_TYPE)))))))))))))
 moduleRPGPPOPT = $(strip \
 	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIMOD_RPGPPOPT), \
 	$(if $(filter %.sqlrpgle,$<),$(SQLRPGIMOD_RPGPPOPT), \
