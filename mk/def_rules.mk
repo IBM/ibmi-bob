@@ -268,11 +268,11 @@ CRTRPGMODFLAGS = AUT($(AUT)) DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) OUTPUT(*PRINT
                  TGTCCSID($(TGTCCSID)) TGTRLS($(TGTRLS)) INCDIR($(INCDIR))
 CRTQMQRYFLAGS = AUT($(AUT)) TEXT('$(TEXT)')
 CRTSQLCIFLAGS = COMMIT($(COMMIT)) OBJTYPE($(OBJTYPE)) OUTPUT(*PRINT) TEXT('$(TEXT)') TGTRLS($(TGTRLS)) DBGVIEW($(DBGVIEW)) \
-                COMPILEOPT('INCDIR($(INCDIR)) OPTION($(OPTION)) STGMDL($(STGMDL)) SYSIFCOPT($(SYSIFCOPT)) \
+                COMPILEOPT('INCDIR($(addprefix ',$(addsuffix ',$(INCDIR)))) OPTION($(OPTION)) STGMDL($(STGMDL)) SYSIFCOPT($(SYSIFCOPT)) \
                             TGTCCSID($(TGTCCSID)) TERASPACE($(TERASPACE))
 CRTSQLRPGIFLAGS = COMMIT($(COMMIT)) OBJTYPE($(OBJTYPE)) OPTION($(OPTION)) OUTPUT(*PRINT) TEXT('$(TEXT)') \
                   TGTRLS($(TGTRLS)) DBGVIEW($(DBGVIEW)) RPGPPOPT($(RPGPPOPT)) \
-                  COMPILEOPT('TGTCCSID($(TGTCCSID)) INCDIR($(INCDIR))')
+                  COMPILEOPT('TGTCCSID($(TGTCCSID)) INCDIR($(addprefix ',$(addsuffix ',$(INCDIR))))')
 CRTSRVPGMFLAGS = ACTGRP($(ACTGRP)) TEXT('$(TEXT)') TGTRLS($(TGTRLS)) AUT($(AUT)) DETAIL($(DETAIL)) STGMDL($(STGMDL))
 CRTWSCSTFLAGS = AUT($(AUT)) TEXT('$(TEXT)')
 CRTBNDRPGFLAGS:= DBGVIEW($(DBGVIEW)) TGTCCSID($(TGTCCSID)) OPTION($(OPTION)) TEXT('$(TEXT)') INCDIR($(INCDIR))
@@ -313,9 +313,12 @@ PREUSRLIBLPATH = $(call getLibPath,$(preUsrlibl))
 POSTUSRLIBLPATH = $(call getLibPath,$(postUsrlibl))
 CURLIBPATH = $(call getLibPath,$(curlib))
 
-VPATH = $(subst $(space),:,$(strip $(call uniq,$(INCDIR) $(PREUSRLIBLPATH) $(CURLIBPATH) $(POSTUSRLIBLPATH) $(OBJPATH) $(SRCPATH))))
+VPATH = $(subst $(space),:,$(strip $(call uniq,$(includePath) $(PREUSRLIBLPATH) $(CURLIBPATH) $(POSTUSRLIBLPATH) $(OBJPATH) $(SRCPATH))))
+
+
 define PRESETUP = 
 echo -e "$(crtcmd)"; \
+echo -e "VPATH=$(VPATH)"; \
 curlib="$(curlib)" \
 preUsrlibl="$(preUsrlibl)" \
 postUsrlibl="$(postUsrlibl)" \

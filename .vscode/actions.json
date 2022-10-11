@@ -1,0 +1,15 @@
+[
+    {
+        "name": "Build and deploy with bob 🔨",
+        "command": "/home/REINHARD/bob/makei build -e verlibcsy=&CURLIB",
+        "environment": "pase",
+        "deployFirst": true,
+        "extensions": [
+          "GLOBAL"
+        ],
+        "postDownload": [
+          ".logs/joblog.json",
+          ".logs/output.log"
+        ]
+      }
+]
