@@ -1,7 +1,7 @@
 [
     {
         "name": "Build and deploy with bob 🔨",
-        "command": "/home/REINHARD/bob/makei build -e verlibcsy=&CURLIB",
+        "command": "/QOpenSys/pkgs/bin/makei build -e verlibcsy=&CURLIB",
         "environment": "pase",
         "deployFirst": true,
         "extensions": [
