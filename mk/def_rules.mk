@@ -46,10 +46,8 @@ endif
 empty :=
 space :=$(empty) $(empty)
 uniq = $(if $1,$(firstword $1) $(call uniq,$(filter-out $(firstword $1),$1)))
-
-# The extractName and extractTextDescriptor are used to decompose the long filename into module name and
-# the text descriptor.
-# e.g. CUSTOME1-Customer_file.LF has `CUSTOME1` as the module name and `Customer file` as the text descriptor
+#map input string to lowercase (only handles A-Z)
+lc = $(subst A,a,$(subst B,b,$(subst C,c,$(subst D,d,$(subst E,e,$(subst F,f,$(subst G,g,$(subst H,h,$(subst I,i,$(subst J,j,$(subst K,k,$(subst L,l,$(subst M,m,$(subst N,n,$(subst O,o,$(subst P,p,$(subst Q,q,$(subst R,r,$(subst S,s,$(subst T,t,$(subst U,u,$(subst V,v,$(subst W,w,$(subst X,x,$(subst Y,y,$(subst Z,z,$1))))))))))))))))))))))))))
 
 
 # The following logs to stdout is parsed and used by the makei program. Check makei.BuildEnv.make before making changes!
@@ -60,6 +58,9 @@ define logFail =
 $(call echo_error_cmd,"Failed to create $1!")
 endef
 
+# The extractName and extractTextDescriptor are used to decompose the long filename into module name and
+# the text descriptor.
+# e.g. CUSTOME1-Customer_file.LF has `CUSTOME1` as the module name and `Customer file` as the text descriptor
 define extractName = 
 echo '$(notdir $<)' | awk -F- '{ print $$1 }'
 endef
@@ -277,6 +278,7 @@ CRTSRVPGMFLAGS = ACTGRP($(ACTGRP)) TEXT('$(TEXT)') TGTRLS($(TGTRLS)) AUT($(AUT))
 CRTWSCSTFLAGS = AUT($(AUT)) TEXT('$(TEXT)')
 CRTBNDRPGFLAGS:= DBGVIEW($(DBGVIEW)) TGTCCSID($(TGTCCSID)) OPTION($(OPTION)) TEXT('$(TEXT)') INCDIR($(INCDIR))
 CRTBNDCFLAGS:=TGTCCSID($(TGTCCSID)) OPTION($(OPTION)) TEXT('$(TEXT)') INCDIR($(INCDIR))
+CRTBNDCLFLAGS = AUT($(AUT)) DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) TEXT('$(TEXT)') TGTRLS($(TGTRLS)) INCDIR($(INCDIR))
 RUNSQLFLAGS:= DBGVIEW(*SOURCE) TGTRLS($(TGTRLS)) OUTPUT(*PRINT) MARGINS(1024)
 
 # Extra command string for adhoc addition of extra parameters to a creation command.
@@ -443,11 +445,9 @@ fileSIZE = $(strip \
 moduleAUT = $(strip \
 	$(if $(filter %.C,$<),$(CMOD_AUT), \
 	$(if $(filter %.c,$<),$(CMOD_AUT), \
-	$(if $(filter %.CLLE,$<),$(CLMOD_AUT), \
-	$(if $(filter %.clle,$<),$(CLMOD_AUT), \
-	$(if $(filter %.RPGLE,$<),$(RPGMOD_AUT), \
-	$(if $(filter %.rpgle,$<),$(RPGMOD_AUT), \
-	UNKNOWN_FILE_TYPE)))))))
+	$(if $(filter %.clle,$(lc,$<)),$(CLMOD_AUT), \
+	$(if $(filter %.rpgle,$(lc,$<)),$(RPGMOD_AUT), \
+	UNKNOWN_FILE_TYPE)))))
 moduleDBGVIEW = $(strip \
 	$(if $(filter %.C,$<),$(CMOD_DBGVIEW), \
 	$(if $(filter %.c,$<),$(CMOD_DBGVIEW), \
@@ -844,7 +844,7 @@ define CLLE_TO_MODULE_RECIPE =
 	@$(set_STMF_CCSID)
 	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTCLMOD" -p '"$(CRTCLMODFLAGS)"'")
 	@$(PRESETUP) \
-	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
+	$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTCLMOD" -p '"$(CRTCLMODFLAGS)"' --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
 	@$(call EVFEVENT_DOWNLOAD,$*.evfevent)
 endef
 
@@ -959,9 +959,9 @@ define PGM.CLLE_TO_PGM_RECIPE =
 	$(PGM_VARIABLES)
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Create ILE CL Program [$(basename $@)]")
-	$(eval crtcmd := CRTBNDCL srcstmf('$<') PGM($(OBJLIB)/$(basename $(@F))) $(CRTCLMODFLAGS))
+	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTBNDCL" -p '"$(CRTBNDCLFLAGS)"'")
 	@$(PRESETUP) \
-	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
+	$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTBNDCL" -p "$(CRTBNDCLFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
 	@$(call EVFEVENT_DOWNLOAD,$*.evfevent)
 endef
 
