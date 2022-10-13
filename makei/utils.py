@@ -300,6 +300,46 @@ def replace_file_content(file_path: Path, replace: Callable[[str], str]):
     #Move new file
     move(abs_path, file_path)
 
+def makeIncludeDirsAbsolute(jobLogPath: str, parameters: str ):
+    """
+    Return modified parameters if it includes INCDIR
+    joblog_path is the full qualified path to the joblog.json.
+    it is assumed that the joblog.json path is of the form
+    '</project path>/.logs/joblog.json'
+    parameters is the string containing all parameters to the compile command
+    it may contain a substring of the form INCDIR('dir' 'dir2')
+    if so we want to return the same parameters string with the INCDIR
+    of INCDIR('<project path>/dir' '<project path>/dir2')
+    Note it is possible to have INCDIR(''dir1'' ''dir2'')
+    """
+    try:
+        indexOfJobLogSubstr = jobLogPath.index('.logs/joblog.json')
+        curDir = jobLogPath[0:indexOfJobLogSubstr]
+    except: 
+        curDir = None
+    
+    includePath = []
+    incDirKeyWordIndex = parameters.index('INCDIR')
+    startOfIncDir = parameters.index('(', incDirKeyWordIndex)
+    endOfIncDir = parameters.index(')', startOfIncDir)
+    includePathStr = parameters[startOfIncDir + 1: endOfIncDir]
+    includePath = includePathStr.split()
+
+    for i in range(len(includePath)):
+        relativePath = includePath[i][1] != '/' and not (len(includePath[i]) > 3 and  includePath[i][1] == "'" and includePath[i][2] == "/")
+        enclosedByQuotes = includePath[i][1] == "'" and len(includePath[i]) > 2
+        
+        if relativePath and curDir:
+            if enclosedByQuotes:
+                includePathDir = includePath[i][2:-2]
+                includePath[i] = "''" + curDir + includePathDir + "''"
+            else:
+                includePathDir = includePath[i][1:-1]
+                includePath[i] = "'" + curDir + includePathDir + "'"
+
+    startOfParamString = parameters[0:startOfIncDir + 1]
+    endOfParamString = parameters[endOfIncDir:] 
+    return startOfParamString + " ".join(includePath) + endOfParamString
 
 if __name__ == "__main__":
     import doctest
