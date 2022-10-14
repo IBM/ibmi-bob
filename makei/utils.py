@@ -329,19 +329,30 @@ def makeIncludeDirsAbsolute(jobLogPath: str, parameters: str ):
     >>> makeIncludeDirsAbsolute('/.logs/joblog.json', " INCDIR('dir2')")
     " INCDIR('/dir2')"
     >>> makeIncludeDirsAbsolute('/a/b/cd/efg/hijklmnop/.logs/joblogs.json', " INCDIR( ''/a/b/dir1''  ''dir2'')")
-    " INCDIR(''/a/b/dir1'' ''dir2'')"
-
+    " INCDIR( ''/a/b/dir1''  ''dir2'')"
+    >>> makeIncludeDirsAbsolute('/a/b/.logs/joblogs.json', "no include path here")
+    'no include path here'
+    >>> makeIncludeDirsAbsolute('/joblogs.json', "no .logs")
+    'no .logs'
+    >>> makeIncludeDirsAbsolute('/.logs/joblogs.json', "INCDIR but no paren")
+    'INCDIR but no paren'
+    >>> makeIncludeDirsAbsolute('/.logs/joblogs.json', "INCDIR( but no close paren")
+    'INCDIR( but no close paren'
     """
     try:
         indexOfJobLogSubstr = jobLogPath.index('.logs/joblog.json')
         curDir = jobLogPath[0:indexOfJobLogSubstr]
     except: 
-        curDir = None
+        return parameters
+    
+    try:
+        incDirKeyWordIndex = parameters.index('INCDIR')
+        startOfIncDir = parameters.index('(', incDirKeyWordIndex)
+        endOfIncDir = parameters.index(')', startOfIncDir)
+    except:
+        return parameters
     
     includePath = []
-    incDirKeyWordIndex = parameters.index('INCDIR')
-    startOfIncDir = parameters.index('(', incDirKeyWordIndex)
-    endOfIncDir = parameters.index(')', startOfIncDir)
     includePathStr = parameters[startOfIncDir + 1: endOfIncDir]
     includePath = includePathStr.split()
 
