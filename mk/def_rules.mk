@@ -47,10 +47,6 @@ empty :=
 space :=$(empty) $(empty)
 uniq = $(if $1,$(firstword $1) $(call uniq,$(filter-out $(firstword $1),$1)))
 
-# The extractName and extractTextDescriptor are used to decompose the long filename into module name and
-# the text descriptor.
-# e.g. CUSTOME1-Customer_file.LF has `CUSTOME1` as the module name and `Customer file` as the text descriptor
-
 
 # The following logs to stdout is parsed and used by the makei program. Check makei.BuildEnv.make before making changes!
 define logSuccess =
@@ -60,6 +56,9 @@ define logFail =
 $(call echo_error_cmd,"Failed to create $1!")
 endef
 
+# The extractName and extractTextDescriptor are used to decompose the long filename into module name and
+# the text descriptor.
+# e.g. CUSTOME1-Customer_file.LF has `CUSTOME1` as the module name and `Customer file` as the text descriptor
 define extractName = 
 echo '$(notdir $<)' | awk -F- '{ print $$1 }'
 endef
@@ -90,8 +89,8 @@ endef
 # instead of a constant so that all settings are defined in one place, at the top.)
 # tl;dr: If you want to customize a compile setting for an object, change these variables
 # in your TARGET (not here).
-ACTGRP := 
-AUT := 
+ACTGRP :=
+AUT :=
 BNDDIR :=
 COMMIT := *NONE
 CURLIB :=
@@ -128,6 +127,7 @@ BNDCL_ACTGRP := $(ACTGRP)
 BNDCL_AUT := $(AUT)
 BNDCL_DBGVIEW := $(DBGVIEW)
 BNDCL_DFTACTGRP := $(DFTACTGRP)
+BNDCL_INCDIR := $(INCDIR)
 BNDCL_OPTION := $(OPTION)
 BNDCL_TGTRLS := $(TGTRLS)
 
@@ -135,9 +135,10 @@ BNDRPG_ACTGRP := $(ACTGRP)
 BNDRPG_AUT := $(AUT)
 BNDRPG_DBGVIEW := $(DBGVIEW)
 BNDRPG_DFTACTGRP := $(DFTACTGRP)
+BNDRPG_INCDIR := $(INCDIR)
 BNDRPG_OPTION := $(OPTION)
 BNDRPG_TGTRLS := $(TGTRLS)
-BNDRPG_INCDIR := $(INCDIR)
+
 
 CMD_AUT := $(AUT)
 CMD_HLPID = $(basename $@)
@@ -250,10 +251,10 @@ SRVPGM_TGTRLS := $(TGTRLS)
 WSCST_AUT := $(AUT)
 
 # Creation command parameters with variables (the ones listed at the top) for the most common ones.
-CRTCLMODFLAGS = AUT($(AUT)) DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) TEXT('$(TEXT)') TGTRLS($(TGTRLS)) INCDIR('$(INCDIR)')
+CRTCLMODFLAGS = AUT($(AUT)) DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) TEXT('$(TEXT)') TGTRLS($(TGTRLS)) INCDIR($(INCDIR))
 CRTCMDFLAGS = PGM($(PGM)) VLDCKR($(VLDCKR)) PMTFILE($(PMTFILE)) HLPPNLGRP($(HLPPNLGRP)) HLPID($(HLPID)) AUT($(AUT)) TEXT('$(TEXT)')
 CRTCMODFLAGS = TERASPACE($(TERASPACE)) STGMDL($(STGMDL)) OUTPUT(*PRINT) OPTION($(OPTION)) DBGVIEW($(DBGVIEW)) \
-               SYSIFCOPT($(SYSIFCOPT)) AUT($(AUT)) TEXT('$(TEXT)') TGTCCSID($(TGTCCSID)) TGTRLS($(TGTRLS)) INCDIR('$(INCDIR)')
+               SYSIFCOPT($(SYSIFCOPT)) AUT($(AUT)) TEXT('$(TEXT)') TGTCCSID($(TGTCCSID)) TGTRLS($(TGTRLS)) INCDIR($(INCDIR))
 CRTDSPFFLAGS = ENHDSP(*YES) RSTDSP($(RSTDSP)) DFRWRT(*YES) AUT($(AUT)) OPTION($(OPTION)) TEXT('$(TEXT)')
 CRTLFFLAGS = AUT($(AUT)) OPTION($(OPTION)) TEXT('$(TEXT)')
 CRTMNUFLAGS = AUT($(AUT)) OPTION($(OPTION)) CURLIB($(CURLIB)) PRDLIB($(PRDLIB)) TEXT('$(TEXT)') TYPE($(TYPE))
@@ -263,18 +264,19 @@ CRTPNLGRPFLAGS = AUT($(AUT)) OPTION($(OPTION)) TEXT('$(TEXT)')
 CRTCBLPGMFLAGS = OPTION($(OPTION)) TEXT('$(TEXT)')
 CRTPRTFFLAGS = AUT($(AUT)) OPTION($(OPTION)) PAGESIZE($(PAGESIZE)) TEXT('$(TEXT)')
 CRTRPGMODFLAGS = AUT($(AUT)) DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) OUTPUT(*PRINT) TEXT('$(TEXT)') \
-                 TGTCCSID($(TGTCCSID)) TGTRLS($(TGTRLS)) INCDIR('$(INCDIR)')
+                 TGTCCSID($(TGTCCSID)) TGTRLS($(TGTRLS)) INCDIR($(INCDIR))
 CRTQMQRYFLAGS = AUT($(AUT)) TEXT('$(TEXT)')
 CRTSQLCIFLAGS = COMMIT($(COMMIT)) OBJTYPE($(OBJTYPE)) OUTPUT(*PRINT) TEXT('$(TEXT)') TGTRLS($(TGTRLS)) DBGVIEW($(DBGVIEW)) \
-                COMPILEOPT('INCDIR(''$(INCDIR)'') OPTION($(OPTION)) STGMDL($(STGMDL)) SYSIFCOPT($(SYSIFCOPT)) \
+                COMPILEOPT('INCDIR($(addprefix ',$(addsuffix ',$(INCDIR)))) OPTION($(OPTION)) STGMDL($(STGMDL)) SYSIFCOPT($(SYSIFCOPT)) \
                             TGTCCSID($(TGTCCSID)) TERASPACE($(TERASPACE))
 CRTSQLRPGIFLAGS = COMMIT($(COMMIT)) OBJTYPE($(OBJTYPE)) OPTION($(OPTION)) OUTPUT(*PRINT) TEXT('$(TEXT)') \
                   TGTRLS($(TGTRLS)) DBGVIEW($(DBGVIEW)) RPGPPOPT($(RPGPPOPT)) \
-                  COMPILEOPT('TGTCCSID($(TGTCCSID)) INCDIR(''$(INCDIR)'')')
+                  COMPILEOPT('TGTCCSID($(TGTCCSID)) INCDIR($(addprefix ',$(addsuffix ',$(INCDIR))))')
 CRTSRVPGMFLAGS = ACTGRP($(ACTGRP)) TEXT('$(TEXT)') TGTRLS($(TGTRLS)) AUT($(AUT)) DETAIL($(DETAIL)) STGMDL($(STGMDL))
 CRTWSCSTFLAGS = AUT($(AUT)) TEXT('$(TEXT)')
-CRTBNDRPGFLAGS:= DBGVIEW($(DBGVIEW)) TGTCCSID($(TGTCCSID)) OPTION($(OPTION)) TEXT('$(TEXT)') INCDIR('$(INCDIR)')
-CRTBNDCFLAGS:=TGTCCSID($(TGTCCSID)) OPTION($(OPTION)) TEXT('$(TEXT)') INCDIR('$(INCDIR)')
+CRTBNDRPGFLAGS:= DBGVIEW($(DBGVIEW)) TGTCCSID($(TGTCCSID)) OPTION($(OPTION)) TEXT('$(TEXT)') INCDIR($(INCDIR))
+CRTBNDCFLAGS:=TGTCCSID($(TGTCCSID)) OPTION($(OPTION)) TEXT('$(TEXT)') INCDIR($(INCDIR))
+CRTBNDCLFLAGS = AUT($(AUT)) DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) TEXT('$(TEXT)') TGTRLS($(TGTRLS)) INCDIR($(INCDIR))
 RUNSQLFLAGS:= DBGVIEW(*SOURCE) TGTRLS($(TGTRLS)) OUTPUT(*PRINT) MARGINS(1024)
 
 # Extra command string for adhoc addition of extra parameters to a creation command.
@@ -311,7 +313,9 @@ PREUSRLIBLPATH = $(call getLibPath,$(preUsrlibl))
 POSTUSRLIBLPATH = $(call getLibPath,$(postUsrlibl))
 CURLIBPATH = $(call getLibPath,$(curlib))
 
-VPATH = $(subst $(space),:,$(strip $(call uniq,$(INCDIR) $(PREUSRLIBLPATH) $(CURLIBPATH) $(POSTUSRLIBLPATH) $(OBJPATH) $(SRCPATH))))
+VPATH = $(subst $(space),:,$(strip $(call uniq,$(strip $(unquotedINCDIR)) $(PREUSRLIBLPATH) $(CURLIBPATH) $(POSTUSRLIBLPATH) $(OBJPATH) $(SRCPATH))))
+
+
 define PRESETUP = 
 echo -e "$(crtcmd)"; \
 curlib="$(curlib)" \
@@ -436,10 +440,10 @@ fileSIZE = $(strip \
 
 # Determine default settings for the various source types that can make a module object.
 moduleAUT = $(strip \
-	$(if $(filter %.C,$<),$(CMOD_AUT), \
-	$(if $(filter %.c,$<),$(CMOD_AUT), \
-	$(if $(filter %.CLLE,$<),$(CLMOD_AUT), \
-	$(if $(filter %.clle,$<),$(CLMOD_AUT), \
+	$(if $(filter %.C,$<),    $(CMOD_AUT), \
+	$(if $(filter %.c,$<),    $(CMOD_AUT), \
+	$(if $(filter %.CLLE,$<), $(CLMOD_AUT), \
+	$(if $(filter %.clle,$<), $(CLMOD_AUT), \
 	$(if $(filter %.RPGLE,$<),$(RPGMOD_AUT), \
 	$(if $(filter %.rpgle,$<),$(RPGMOD_AUT), \
 	UNKNOWN_FILE_TYPE)))))))
@@ -478,11 +482,15 @@ moduleINCDIR = $(strip \
 	$(if $(filter %.c,$<),$(CMOD_INCDIR), \
 	$(if $(filter %.CLLE,$<),$(CLMOD_INCDIR), \
 	$(if $(filter %.clle,$<),$(CLMOD_INCDIR), \
+	$(if $(filter %.RPGLE,$<),$(RPGMOD_INCDIR), \
+	$(if $(filter %.rpgle,$<),$(RPGMOD_INCDIR), \
+	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIMOD_INCDIR), \
+	$(if $(filter %.sqlrpgle,$<),$(SQLRPGIMOD_INCDIR), \
 	$(if $(filter %.CBLLE,$<),$(CBLMOD_INCDIR), \
 	$(if $(filter %.cblle,$<),$(CBLMOD_INCDIR), \
 	$(if $(filter %.SQLC,$<),$(SQLCIMOD_INCDIR), \
 	$(if $(filter %.sqlc,$<),$(SQLCIMOD_INCDIR), \
-	UNKNOWN_FILE_TYPE)))))))))
+	UNKNOWN_FILE_TYPE)))))))))))))
 moduleRPGPPOPT = $(strip \
 	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIMOD_RPGPPOPT), \
 	$(if $(filter %.sqlrpgle,$<),$(SQLRPGIMOD_RPGPPOPT), \
@@ -792,7 +800,6 @@ endef
 #  |_|  |_|\___/|____/ \___/|_____|_____| |_| \_\___|\___|_| .__/ \___||___/
 #                                                          |_|              
 
-
 define MODULE_VARIABLES
 	$(eval AUT = $(moduleAUT))\
 	$(eval DBGVIEW = $(moduleDBGVIEW))\
@@ -836,7 +843,7 @@ define CLLE_TO_MODULE_RECIPE =
 	@$(set_STMF_CCSID)
 	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTCLMOD" -p '"$(CRTCLMODFLAGS)"'")
 	@$(PRESETUP) \
-	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
+	$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTCLMOD" -p "$(CRTCLMODFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
 	@$(call EVFEVENT_DOWNLOAD,$*.evfevent)
 endef
 
@@ -951,9 +958,10 @@ define PGM.CLLE_TO_PGM_RECIPE =
 	$(PGM_VARIABLES)
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Create ILE CL Program [$(basename $@)]")
-	$(eval crtcmd := CRTBNDCL srcstmf('$<') PGM($(OBJLIB)/$(basename $(@F))) $(CRTCLMODFLAGS))
+	@$(set_STMF_CCSID)
+	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTBNDCL" -p '"$(CRTBNDCLFLAGS)"'")
 	@$(PRESETUP) \
-	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
+	$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTBNDCL" -p "$(CRTBNDCLFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
 	@$(call EVFEVENT_DOWNLOAD,$*.evfevent)
 endef
 

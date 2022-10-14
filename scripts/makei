@@ -6,7 +6,6 @@
 """ The CLI entry for BOB"""
 
 import argparse
-from email.policy import default
 import json
 import os
 from pathlib import Path

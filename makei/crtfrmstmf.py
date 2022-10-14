@@ -9,7 +9,7 @@ from typing import Any, Dict, List, Optional, Tuple
 from datetime import datetime
 sys.path.append(str(Path(__file__).resolve().parent.parent))  # nopep8
 from makei.ibm_job import IBMJob, save_joblog_json  # nopep8
-from makei.utils import format_datetime, objlib_to_path, validate_ccsid  # nopep8
+from makei.utils import format_datetime, objlib_to_path, validate_ccsid, makeIncludeDirsAbsolute  # nopep8
 
 
 COMMAND_MAP = {'CRTCMD': 'CMD',
@@ -76,6 +76,11 @@ class CrtFrmStmf():
                 self.back_up_obj_list = [(self.obj, self.lib, self.obj_type)]
         else:
             self.back_up_obj_list = []
+        # Need project path for include resolution
+        # prepend project path to every directory in INCDIR in compile parameters
+        if (joblog_path and parameters):
+            parameters = makeIncludeDirsAbsolute(joblog_path, parameters)
+        self.parameters = parameters
 
     def run(self):
         success = False
