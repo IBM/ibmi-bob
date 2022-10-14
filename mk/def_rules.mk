@@ -46,8 +46,6 @@ endif
 empty :=
 space :=$(empty) $(empty)
 uniq = $(if $1,$(firstword $1) $(call uniq,$(filter-out $(firstword $1),$1)))
-#map input string to lowercase (only handles A-Z)
-lc = $(subst A,a,$(subst B,b,$(subst C,c,$(subst D,d,$(subst E,e,$(subst F,f,$(subst G,g,$(subst H,h,$(subst I,i,$(subst J,j,$(subst K,k,$(subst L,l,$(subst M,m,$(subst N,n,$(subst O,o,$(subst P,p,$(subst Q,q,$(subst R,r,$(subst S,s,$(subst T,t,$(subst U,u,$(subst V,v,$(subst W,w,$(subst X,x,$(subst Y,y,$(subst Z,z,$1))))))))))))))))))))))))))
 
 
 # The following logs to stdout is parsed and used by the makei program. Check makei.BuildEnv.make before making changes!
@@ -442,12 +440,13 @@ fileSIZE = $(strip \
 
 # Determine default settings for the various source types that can make a module object.
 moduleAUT = $(strip \
-	$(if $(filter %.C,$<),   $(CMOD_AUT), \
-	$(if $(filter %.c,$<),   $(CMOD_AUT), \
-	$(if $(filter %.CLLE,$<),$(CLMOD_AUT), \
-	$(if $(filter %.clle,$<),$(CLMOD_AUT), \
-	$(if $(filter %.rpgle,$(lc,$<)),$(RPGMOD_AUT), \
-	UNKNOWN_FILE_TYPE))))))
+	$(if $(filter %.C,$<),    $(CMOD_AUT), \
+	$(if $(filter %.c,$<),    $(CMOD_AUT), \
+	$(if $(filter %.CLLE,$<), $(CLMOD_AUT), \
+	$(if $(filter %.clle,$<), $(CLMOD_AUT), \
+	$(if $(filter %.RPGLE,$<),$(RPGMOD_AUT), \
+	$(if $(filter %.rpgle,$<),$(RPGMOD_AUT), \
+	UNKNOWN_FILE_TYPE)))))))
 moduleDBGVIEW = $(strip \
 	$(if $(filter %.C,$<),$(CMOD_DBGVIEW), \
 	$(if $(filter %.c,$<),$(CMOD_DBGVIEW), \
