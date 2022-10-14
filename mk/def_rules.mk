@@ -91,8 +91,8 @@ endef
 # instead of a constant so that all settings are defined in one place, at the top.)
 # tl;dr: If you want to customize a compile setting for an object, change these variables
 # in your TARGET (not here).
-ACTGRP := 
-AUT := 
+ACTGRP :=
+AUT :=
 BNDDIR :=
 COMMIT := *NONE
 CURLIB :=
@@ -315,7 +315,7 @@ PREUSRLIBLPATH = $(call getLibPath,$(preUsrlibl))
 POSTUSRLIBLPATH = $(call getLibPath,$(postUsrlibl))
 CURLIBPATH = $(call getLibPath,$(curlib))
 
-VPATH = $(subst $(space),:,$(strip $(call uniq,$(includePath) $(PREUSRLIBLPATH) $(CURLIBPATH) $(POSTUSRLIBLPATH) $(OBJPATH) $(SRCPATH))))
+VPATH = $(subst $(space),:,$(strip $(call uniq,$(strip $(unquotedINCDIR)) $(PREUSRLIBLPATH) $(CURLIBPATH) $(POSTUSRLIBLPATH) $(OBJPATH) $(SRCPATH))))
 
 
 define PRESETUP = 
@@ -959,6 +959,8 @@ define PGM.CLLE_TO_PGM_RECIPE =
 	$(PGM_VARIABLES)
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Create ILE CL Program [$(basename $@)]")
+	@$(call echo_cmd,"VPATH=$(VPATH) INCDIR=$(INCDIR)")
+	
 	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTBNDCL" -p '"$(CRTBNDCLFLAGS)"'")
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTBNDCL" -p "$(CRTBNDCLFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)

@@ -115,6 +115,7 @@ class BuildEnv():
                                 f"preUsrlibl := {' '.join(self.iproj_json.pre_usr_libl)}",
                                 f"postUsrlibl := {' '.join(self.iproj_json.post_usr_libl)}",
                                 f"INCDIR := {incdir}",
+                                f"unquotedINCDIR := {' '.join(includePath)}",
                                 f"IBMiEnvCmd := {self.ibmi_env_cmds}",
                                 f"COLOR_TTY := {'true' if self.color else 'false'}",
                                 "",
