@@ -320,7 +320,6 @@ VPATH = $(subst $(space),:,$(strip $(call uniq,$(strip $(unquotedINCDIR)) $(PREU
 
 define PRESETUP = 
 echo -e "$(crtcmd)"; \
-echo -e "VPATH=$(VPATH)"; \
 curlib="$(curlib)" \
 preUsrlibl="$(preUsrlibl)" \
 postUsrlibl="$(postUsrlibl)" \
@@ -443,11 +442,12 @@ fileSIZE = $(strip \
 
 # Determine default settings for the various source types that can make a module object.
 moduleAUT = $(strip \
-	$(if $(filter %.C,$<),$(CMOD_AUT), \
-	$(if $(filter %.c,$<),$(CMOD_AUT), \
-	$(if $(filter %.clle,$(lc,$<)),$(CLMOD_AUT), \
+	$(if $(filter %.C,$<),   $(CMOD_AUT), \
+	$(if $(filter %.c,$<),   $(CMOD_AUT), \
+	$(if $(filter %.CLLE,$<),$(CLMOD_AUT), \
+	$(if $(filter %.clle,$<),$(CLMOD_AUT), \
 	$(if $(filter %.rpgle,$(lc,$<)),$(RPGMOD_AUT), \
-	UNKNOWN_FILE_TYPE)))))
+	UNKNOWN_FILE_TYPE))))))
 moduleDBGVIEW = $(strip \
 	$(if $(filter %.C,$<),$(CMOD_DBGVIEW), \
 	$(if $(filter %.c,$<),$(CMOD_DBGVIEW), \
@@ -844,7 +844,7 @@ define CLLE_TO_MODULE_RECIPE =
 	@$(set_STMF_CCSID)
 	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTCLMOD" -p '"$(CRTCLMODFLAGS)"'")
 	@$(PRESETUP) \
-	$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTCLMOD" -p '"$(CRTCLMODFLAGS)"' --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
+	$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTCLMOD" -p "$(CRTCLMODFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
 	@$(call EVFEVENT_DOWNLOAD,$*.evfevent)
 endef
 
@@ -959,8 +959,7 @@ define PGM.CLLE_TO_PGM_RECIPE =
 	$(PGM_VARIABLES)
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Create ILE CL Program [$(basename $@)]")
-	@$(call echo_cmd,"VPATH=$(VPATH) INCDIR=$(INCDIR)")
-	
+	@$(set_STMF_CCSID)
 	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTBNDCL" -p '"$(CRTBNDCLFLAGS)"'")
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTBNDCL" -p "$(CRTBNDCLFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
