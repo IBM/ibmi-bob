@@ -262,17 +262,21 @@ def get_target_from_filename(filename: str) -> str:
     """Returns the target from the filename
     """
     name, _, ext, _ = decompose_filename(filename)
-    return f'{name}.{FILE_TARGET_MAPPING[ext]}'
+    return f'{name.upper()}.{FILE_TARGET_MAPPING[ext]}'
 
 def get_compile_targets_from_filenames(filenames: List[str]) -> List[str]:
     """ Returns the possible target name for the given filename
 
     >>> get_compile_targets_from_filenames(["test.PGM.RPGLE"])
-    ['test.PGM']
+    ['TEST.PGM']
+    >>> get_compile_targets_from_filenames(["test.pgm.rpgle"])
+    ['TEST.PGM']
     >>> get_compile_targets_from_filenames(["test.RPGLE"])
-    ['test.MODULE']
+    ['TEST.MODULE']
+    >>> get_compile_targets_from_filenames(["vat300.rpgle"])
+    ['VAT300.MODULE']
     >>> get_compile_targets_from_filenames(["functionsVAT/VAT300.RPGLE", "test.RPGLE"])
-    ['VAT300.MODULE', 'test.MODULE']
+    ['VAT300.MODULE', 'TEST.MODULE']
     >>> get_compile_targets_from_filenames(["ART200-Work_with_article.PGM.SQLRPGLE", "SGSMSGF.MSGF"])
     ['ART200.PGM', 'SGSMSGF.MSGF']
     """
@@ -302,15 +306,31 @@ def replace_file_content(file_path: Path, replace: Callable[[str], str]):
 
 def makeIncludeDirsAbsolute(jobLogPath: str, parameters: str ):
     """
-    Return modified parameters if it includes INCDIR
+    Return modified parameters with absolute dirs if it includes INCDIR
     joblog_path is the full qualified path to the joblog.json.
-    it is assumed that the joblog.json path is of the form
-    '</project path>/.logs/joblog.json'
-    parameters is the string containing all parameters to the compile command
-    it may contain a substring of the form INCDIR('dir' 'dir2')
-    if so we want to return the same parameters string with the INCDIR
-    of INCDIR('<project path>/dir' '<project path>/dir2')
+        Assumed that the joblog.json path is of the form
+        '</project path>/.logs/joblog.json'
+    parameters is a string containing all parameters to the compile command
+        may contain a substring of the form INCDIR('dir' 'dir2')
+    return: the same parameters string with the INCDIR replaced
+        to INCDIR('<project path>/dir' '<project path>/dir2')
     Note it is possible to have INCDIR(''dir1'' ''dir2'')
+
+    >>> makeIncludeDirsAbsolute('/a/b/.logs/joblog.json', " PARM1( beginning)INCDIR ('PARAM1'   'PARAM2' ''PARAM3'' 'PARAM4' )parm2( after )   ")
+    " PARM1( beginning)INCDIR ('/a/b/PARAM1' '/a/b/PARAM2' ''/a/b/PARAM3'' '/a/b/PARAM4')parm2( after )   "
+    >>> makeIncludeDirsAbsolute('/a/b/.logs/joblog.json', "INCDIR (''  '''')")
+    "INCDIR ('/a/b/' ''/a/b/'')"
+    >>> makeIncludeDirsAbsolute('/a/b/cd/efg/hijklmnop/.logs/joblog.json', " INCDIR( 'dir1'  ''dir2'')")
+    " INCDIR('/a/b/cd/efg/hijklmnop/dir1' ''/a/b/cd/efg/hijklmnop/dir2'')"
+    >>> makeIncludeDirsAbsolute('/a/b/cd/efg/hijklmnop/.logs/joblog.json', " INCDIR( '/a/b/dir1'  ''dir2'')")
+    " INCDIR('/a/b/dir1' ''/a/b/cd/efg/hijklmnop/dir2'')"
+    >>> makeIncludeDirsAbsolute('/a/b/cd/efg/hijklmnop/.logs/joblog.json', " INCDIR( ''/a/b/dir1''  ''dir2'')")
+    " INCDIR(''/a/b/dir1'' ''/a/b/cd/efg/hijklmnop/dir2'')"
+    >>> makeIncludeDirsAbsolute('/.logs/joblog.json', " INCDIR('dir2')")
+    " INCDIR('/dir2')"
+    >>> makeIncludeDirsAbsolute('/a/b/cd/efg/hijklmnop/.logs/joblogs.json', " INCDIR( ''/a/b/dir1''  ''dir2'')")
+    " INCDIR(''/a/b/dir1'' ''dir2'')"
+
     """
     try:
         indexOfJobLogSubstr = jobLogPath.index('.logs/joblog.json')
