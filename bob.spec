@@ -1,6 +1,6 @@
 %undefine _disable_source_fetch
 Name: bob
-Version: 2.4.1
+Version: 2.4.2
 Release: 0
 License: Apache-2.0
 Summary: Better Object Builder for IBM i
@@ -59,6 +59,11 @@ ln -sf %{_libdir}/bob/scripts/crtfrmstmf %{buildroot}%{_bindir}/crtfrmstmf
 %{_bindir}/crtfrmstmf
 
 %changelog
+* Fri Oct 15 2022 Edmund Reinhardt <edmund.reinhard@ca.ibm.com> - 2.4.2
+- lowercase file names and extensions supported
+- support for lowercase filenames mapping to uppercase targets when compiling
+- support of TGTCCSID specified by .ibmi.json for all source types
+- support for INCDIR for all types including CLLE, CRTSQLxxxI, CRTRPGMOD
 * Thu Sep 29 2022 Edmund Reinhardt <edmund.reinhard@ca.ibm.com> - 2.4.1
 - Fix regression in building CMD, MENU and BNDDIR objects
 * Mon Aug 22 2022 Tongkun Zhang <tongkun.zhang@ibm.com> - 2.4.0
