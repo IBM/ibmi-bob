@@ -948,9 +948,9 @@ define CBL_TO_PGM_RECIPE =
 	$(PGM_VARIABLES)
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Create COBOL Program [$(basename $@)]")
-	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID) -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTPRTF" -p '"$(CRTPRTFFLAGS)"'")
+	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID) -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTCBLPGM" -p '"$(CRTCBLPGMFLAGS)"'")
 	@$(PRESETUP) \
-	$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTPRTF" -p "$(CRTPRTFFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
+	$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTCBLPGM" -p "$(CRTCBLPGMFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
 	@$(call EVFEVENT_DOWNLOAD,$*.evfevent)
 endef
 
