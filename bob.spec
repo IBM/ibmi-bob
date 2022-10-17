@@ -59,7 +59,7 @@ ln -sf %{_libdir}/bob/scripts/crtfrmstmf %{buildroot}%{_bindir}/crtfrmstmf
 %{_bindir}/crtfrmstmf
 
 %changelog
-* Fri Oct 15 2022 Edmund Reinhardt <edmund.reinhard@ca.ibm.com> - 2.4.2
+* Fri Oct 14 2022 Edmund Reinhardt <edmund.reinhard@ca.ibm.com> - 2.4.2
 - lowercase file names and extensions supported
 - support for lowercase filenames mapping to uppercase targets when compiling
 - support of TGTCCSID specified by .ibmi.json for all source types
@@ -75,20 +75,20 @@ ln -sf %{_libdir}/bob/scripts/crtfrmstmf %{buildroot}%{_bindir}/crtfrmstmf
 - Fix not enabling the CompatibilityMode on IBM i 7.3
 - Update code for IBM i documentation
 - Set make path to QOpenSys
-* Wed May 19 2022 Tongkun Zhang <tongkun.zhang@ibm.com> - 2.3.9
+* Thu May 19 2022 Tongkun Zhang <tongkun.zhang@ibm.com> - 2.3.9
 - Fix no authority to read QADBFDEP when getting PF dependencies
-* Wed May 17 2022 Tongkun Zhang <tongkun.zhang@ibm.com> - 2.3.8
+* Tue May 17 2022 Tongkun Zhang <tongkun.zhang@ibm.com> - 2.3.8
 - Fix terminal color-support by Jesse Gorzinski
-* Wed May 09 2022 Tongkun Zhang <tongkun.zhang@ibm.com> - 2.3.7
+* Mon May 09 2022 Tongkun Zhang <tongkun.zhang@ibm.com> - 2.3.7
 - Fix UTF-8 handling
-* Wed May 09 2022 Tongkun Zhang <tongkun.zhang@ibm.com> - 2.3.6
+* Mon May 09 2022 Tongkun Zhang <tongkun.zhang@ibm.com> - 2.3.6
 - New documentation site is availabe at https://ibm.github.io/ibmi-bob/
 - Do not generate .ibmi.json when invoking makei cvtsrcpf to avoid
   misleading as to when target CCSID is required
 - Fix the encoding issue(#86) on machines without Utf-8 support
-* Wed Apr 21 2022 Tongkun Zhang <tongkun.zhang@ibm.com> - 2.3.5
+* Thu Apr 21 2022 Tongkun Zhang <tongkun.zhang@ibm.com> - 2.3.5
 - Replace all the python3.9 shebang to python3.6
-* Wed Apr 21 2022 Tongkun Zhang <tongkun.zhang@ibm.com> - 2.3.4
+* Thu Apr 21 2022 Tongkun Zhang <tongkun.zhang@ibm.com> - 2.3.4
 - Temporarily downgrade the Python version to 3.6 due to Ansible issues
 - Simplify Makefiles
 - Optimize outputs
@@ -97,13 +97,13 @@ ln -sf %{_libdir}/bob/scripts/crtfrmstmf %{buildroot}%{_bindir}/crtfrmstmf
 - Fix not setting the curlib for RUNSQLSTM commands
 * Wed Apr 13 2022 Tongkun Zhang <tongkun.zhang@ibm.com> - 2.3.3
 - Fix the error when running makei build
-* Tue Apr 07 2022 Tongkun Zhang <tongkun.zhang@ibm.com> - 2.3.2
+* Thu Apr 07 2022 Tongkun Zhang <tongkun.zhang@ibm.com> - 2.3.2
 - Update to 2.3.2
 - Allow undefined values for includePath and postUsrLibl in
   iproj.json
 - Use python39-ibm_db instead python3-ibm_db
 - Fix missing execute permission on getJobLog
-* Tue Apr 04 2022 Tongkun Zhang <tongkun.zhang@ibm.com> - 2.3.0
+* Mon Apr 04 2022 Tongkun Zhang <tongkun.zhang@ibm.com> - 2.3.0
 - Update to 2.3.0
 - Upgrades to Python 3.9 since 3.6 is out of support
 * Tue Mar 29 2022 Tongkun Zhang <tongkun.zhang@ibm.com> - 2.2.9
