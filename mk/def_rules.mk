@@ -350,10 +350,10 @@ cleanRPGDeps = awk '$$1 == "FILEID" && $$6 !~ /^QTEMP/ && toupper($$6) !~ /QSYS/
 # convert everything to upper case, format in makefile dependency format, and output all these dependencies
 # to a file that will be included by Make.
 define EVFEVENT_DOWNLOAD =
-system "CPYTOSTMF FROMMBR('$(OBJPATH)/EVFEVENT.FILE/$(basename $@).MBR') TOSTMF('$(EVTDIR)/$1') STMFCCSID(*STDASCII) ENDLINFMT(*LF) CVTDTA(*AUTO) STMFOPT(*REPLACE)" >/dev/null
+system "CPYTOSTMF FROMMBR('$(OBJPATH)/EVFEVENT.FILE/$(basename $@).MBR') TOSTMF('$(EVTDIR)/$1') STMFCCSID(1208) ENDLINFMT(*LF) CVTDTA(*AUTO) STMFOPT(*REPLACE)" >/dev/null
 endef
 # define POSTRPGCOMPILE =
-# $(call EVFEVENT_DOWNLOAD,$*.evfevent.evfevent);
+# $(call EVFEVENT_DOWNLOAD,$(basename $(@F)).evfevent.evfevent);
 # endef
 
 # Deletes .d dependency file if it's empty.
@@ -668,7 +668,7 @@ define DSPF_TO_FILE_RECIPE =
 	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTDSPF" -p '"$(CRTDSPFFLAGS)"'")
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTDSPF" -p "$(CRTDSPFFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
-	@$(call EVFEVENT_DOWNLOAD,$*.evfevent)
+	@$(call EVFEVENT_DOWNLOAD,$(basename $(@F)).evfevent)
 endef
 
 define LF_TO_FILE_RECIPE =
@@ -679,7 +679,7 @@ define LF_TO_FILE_RECIPE =
 	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTLF" -p '"$(CRTLFFLAGS)"'")
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTLF" -p "$(CRTLFFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
-	@$(call EVFEVENT_DOWNLOAD,$*.evfevent)
+	@$(call EVFEVENT_DOWNLOAD,$(basename $(@F)).evfevent)
 	@$(TYPEDEF)
 endef
 
@@ -690,7 +690,7 @@ define PF_TO_FILE_RECIPE =
 	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTPF" -p '"$(CRTPFFLAGS)"'")
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID) -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTPF" -p "$(CRTPFFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
-	@$(call EVFEVENT_DOWNLOAD,$*.evfevent)
+	@$(call EVFEVENT_DOWNLOAD,$(basename $(@F)).evfevent)
 	@$(TYPEDEF)
 endef
 
@@ -702,7 +702,7 @@ define PRTF_TO_FILE_RECIPE =
 	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTPRTF" -p '"$(CRTPRTFFLAGS)"'")
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTPRTF" -p "$(CRTPRTFFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
-	@$(call EVFEVENT_DOWNLOAD,$*.evfevent)
+	@$(call EVFEVENT_DOWNLOAD,$(basename $(@F)).evfevent)
 	@$(TYPEDEF)
 endef
 
@@ -790,7 +790,7 @@ define MENUSRC_TO_MENU_RECIPE =
 	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTMNU" -p '"$(CRTMNUFLAGS)"'")
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTMNU" -p "$(CRTMNUFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
-	@$(call EVFEVENT_DOWNLOAD,$*.evfevent)
+	@$(call EVFEVENT_DOWNLOAD,$(basename $(@F)).evfevent)
 endef
 
 #   __  __  ___  ____  _   _ _     _____   ____           _                 
@@ -821,7 +821,7 @@ define C_TO_MODULE_RECIPE =
 	$(eval crtcmd := crtcmod module($(OBJLIB)/$(basename $(@F))) srcstmf('$<') $(CRTCMODFLAGS) $(ADHOCCRTFLAGS))
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
-	@($(call EVFEVENT_DOWNLOAD,$*.evfevent); ret=$$?; rm $(DEPDIR)/$*.Td 2>/dev/null; exit $$ret)
+	@($(call EVFEVENT_DOWNLOAD,$(basename $(@F)).evfevent); ret=$$?; rm $(DEPDIR)/$*.Td 2>/dev/null; exit $$ret)
 	@$(POSTCCOMPILE)
 endef
 
@@ -833,7 +833,7 @@ define RPGLE_TO_MODULE_RECIPE =
 	$(eval crtcmd := crtrpgmod module($(OBJLIB)/$(basename $(@F))) srcstmf('$<') $(CRTRPGMODFLAGS))
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
-	@$(call EVFEVENT_DOWNLOAD,$*.evfevent)
+	@$(call EVFEVENT_DOWNLOAD,$(basename $(@F)).evfevent)
 endef
 
 define CLLE_TO_MODULE_RECIPE = 
@@ -844,7 +844,7 @@ define CLLE_TO_MODULE_RECIPE =
 	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTCLMOD" -p '"$(CRTCLMODFLAGS)"'")
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTCLMOD" -p "$(CRTCLMODFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
-	@$(call EVFEVENT_DOWNLOAD,$*.evfevent)
+	@$(call EVFEVENT_DOWNLOAD,$(basename $(@F)).evfevent)
 endef
 
 # Temp: Convert UTF-8 to temporary Windows Latin-1, because SQLC pre-compiler doesn't understand UTF-8
@@ -856,7 +856,7 @@ define SQLC_TO_MODULE_RECIPE =
 	$(eval crtcmd := crtsqlci obj($(OBJLIB)/$(basename $(@F))) srcstmf('$<-1252') $(CRTSQLCIFLAGS))
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
-	@($(call EVFEVENT_DOWNLOAD,$*.evfevent); ret=$$?; rm $(DEPDIR)/$*.Td 2>/dev/null; rm "$<-1252" 2>/dev/null; exit $$ret)
+	@($(call EVFEVENT_DOWNLOAD,$(basename $(@F)).evfevent); ret=$$?; rm $(DEPDIR)/$*.Td 2>/dev/null; rm "$<-1252" 2>/dev/null; exit $$ret)
 	@rm "$<-1252"
 endef
 
@@ -868,7 +868,7 @@ define SQLRPGLE_TO_MODULE_RECIPE =
 	$(eval crtcmd := crtsqlrpgi obj($(OBJLIB)/$(basename $(@F))) srcstmf('$<') $(CRTSQLRPGIFLAGS))
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
-	@$(call EVFEVENT_DOWNLOAD,$*.evfevent)
+	@$(call EVFEVENT_DOWNLOAD,$(basename $(@F)).evfevent)
 endef
 
 #   ____   ____ __  __   ____           _                 
@@ -951,7 +951,7 @@ define CBL_TO_PGM_RECIPE =
 	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID) -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTCBLPGM" -p '"$(CRTCBLPGMFLAGS)"'")
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTCBLPGM" -p "$(CRTCBLPGMFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
-	@$(call EVFEVENT_DOWNLOAD,$*.evfevent)
+	@$(call EVFEVENT_DOWNLOAD,$(basename $(@F)).evfevent)
 endef
 
 define PGM.CLLE_TO_PGM_RECIPE =
@@ -962,7 +962,7 @@ define PGM.CLLE_TO_PGM_RECIPE =
 	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTBNDCL" -p '"$(CRTBNDCLFLAGS)"'")
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTBNDCL" -p "$(CRTBNDCLFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
-	@$(call EVFEVENT_DOWNLOAD,$*.evfevent)
+	@$(call EVFEVENT_DOWNLOAD,$(basename $(@F)).evfevent)
 endef
 
 define RPG_TO_PGM_RECIPE =
@@ -972,7 +972,7 @@ define RPG_TO_PGM_RECIPE =
 	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID) -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTRPGPGM" -p '"$(CRTCBLPGMFLAGS)"'")
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTRPGPGM" -p "$(CRTCBLPGMFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
-	@$(call EVFEVENT_DOWNLOAD,$*.evfevent)
+	@$(call EVFEVENT_DOWNLOAD,$(basename $(@F)).evfevent)
 endef
 
 define ILEPGM_TO_PGM_RECIPE =

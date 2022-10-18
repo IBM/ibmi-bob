@@ -25,7 +25,7 @@ array of include directories to search (can contain references to named director
 
 * For build directories of other projects we could use some special syntax like ${project:payroll:buildDir} and ${project:payroll:includePath} which can also be included (Not yet in used)
 
-### objlib 
+### objlib
 
 Name of library for compiled object (if not specified defaults to *CURLIB)
 
@@ -50,7 +50,6 @@ connection will have that set as its CURLIB in the LIBL.  Note that if objlib is
 array of CL to run when the Rest Portal or Build job begins.  This can include ADDENVVAR, OVRxxx. SETASPGRP etc.
 
 ### buildCommand
-
 
 PASE command line used to build this entire project.  The following substitution variables are supported:
 
