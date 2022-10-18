@@ -1,6 +1,6 @@
 %undefine _disable_source_fetch
 Name: bob
-Version: 2.4.2
+Version: 2.4.3
 Release: 0
 License: Apache-2.0
 Summary: Better Object Builder for IBM i
@@ -59,6 +59,9 @@ ln -sf %{_libdir}/bob/scripts/crtfrmstmf %{buildroot}%{_bindir}/crtfrmstmf
 %{_bindir}/crtfrmstmf
 
 %changelog
+* Tue Oct 18 2022 Edmund Reinhardt <edmund.reinhard@ca.ibm.com> - 2.4.2
+- evfevent files were missing filenames
+- CCSID issues when downloading evfevent files
 * Fri Oct 14 2022 Edmund Reinhardt <edmund.reinhard@ca.ibm.com> - 2.4.2
 - lowercase file names and extensions supported
 - support for lowercase filenames mapping to uppercase targets when compiling
