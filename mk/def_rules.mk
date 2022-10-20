@@ -633,7 +633,6 @@ define CMDSRC_TO_CMD_RECIPE =
 	$(eval VLDCKR = $(CMD_VLDCKR))
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating command [$(notdir $<)]")
-	@$(set_STMF_CCSID)
 	$(eval crtcmd := CRTCMD CMD($(OBJLIB)/$(basename $(@F))) srcstmf('$<') $(CRTCMDFLAGS))
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@);
@@ -664,7 +663,6 @@ define DSPF_TO_FILE_RECIPE =
 	$(FILE_VARIABLES)
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating DSPF [$(notdir $<)]")
-	@$(set_STMF_CCSID)
 	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTDSPF" -p '"$(CRTDSPFFLAGS)"'")
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTDSPF" -p "$(CRTDSPFFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
@@ -675,7 +673,6 @@ define LF_TO_FILE_RECIPE =
 	$(FILE_VARIABLES)
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating LF [$(notdir $<)]")
-	@$(set_STMF_CCSID)
 	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTLF" -p '"$(CRTLFFLAGS)"'")
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTLF" -p "$(CRTLFFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
@@ -686,7 +683,6 @@ endef
 define PF_TO_FILE_RECIPE =
 	$(FILE_VARIABLES)
 	@$(call echo_cmd,"=== Creating PF [$(notdir $<)]")
-	@$(set_STMF_CCSID)
 	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTPF" -p '"$(CRTPFFLAGS)"'")
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID) -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTPF" -p "$(CRTPFFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
@@ -698,7 +694,6 @@ define PRTF_TO_FILE_RECIPE =
 	$(FILE_VARIABLES)
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating PRTF [$(notdir $<)]")
-	@$(set_STMF_CCSID)
 	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTPRTF" -p '"$(CRTPRTFFLAGS)"'")
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTPRTF" -p "$(CRTPRTFFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
@@ -786,7 +781,6 @@ define MENUSRC_TO_MENU_RECIPE =
 	$(MENU_VARIABLES)
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating menu [$(notdir $<)]")
-	@$(set_STMF_CCSID)
 	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTMNU" -p '"$(CRTMNUFLAGS)"'")
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTMNU" -p "$(CRTMNUFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
@@ -817,7 +811,6 @@ define C_TO_MODULE_RECIPE =
 	$(MODULE_VARIABLES)
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating C module [$(notdir $<)]")
-	@$(set_STMF_CCSID)
 	$(eval crtcmd := crtcmod module($(OBJLIB)/$(basename $(@F))) srcstmf('$<') $(CRTCMODFLAGS) $(ADHOCCRTFLAGS))
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
@@ -829,7 +822,6 @@ define RPGLE_TO_MODULE_RECIPE =
 	$(MODULE_VARIABLES)\
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating RPG module [$(notdir $<)]")
-	@$(set_STMF_CCSID)
 	$(eval crtcmd := crtrpgmod module($(OBJLIB)/$(basename $(@F))) srcstmf('$<') $(CRTRPGMODFLAGS))
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
@@ -840,7 +832,6 @@ define CLLE_TO_MODULE_RECIPE =
 	$(MODULE_VARIABLES)
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating CL module [$(notdir $<)]")
-	@$(set_STMF_CCSID)
 	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTCLMOD" -p '"$(CRTCLMODFLAGS)"'")
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTCLMOD" -p "$(CRTCLMODFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
@@ -851,7 +842,6 @@ endef
 define SQLC_TO_MODULE_RECIPE = 
 	$(MODULE_VARIABLES)
 	@$(call echo_cmd,"=== Creating SQLC module [$(notdir $<)]")
-	@$(set_STMF_CCSID)
 	@qsh_out -c "touch -C 1252 $<-1252 && cat $< >$<-1252"
 	$(eval crtcmd := crtsqlci obj($(OBJLIB)/$(basename $(@F))) srcstmf('$<-1252') $(CRTSQLCIFLAGS))
 	@$(PRESETUP) \
@@ -864,7 +854,6 @@ define SQLRPGLE_TO_MODULE_RECIPE =
 	$(MODULE_VARIABLES)
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating SQLRPGLE module [$(notdir $<)]")
-	@$(set_STMF_CCSID)
 	$(eval crtcmd := crtsqlrpgi obj($(OBJLIB)/$(basename $(@F))) srcstmf('$<') $(CRTSQLRPGIFLAGS))
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
@@ -958,7 +947,6 @@ define PGM.CLLE_TO_PGM_RECIPE =
 	$(PGM_VARIABLES)
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Create ILE CL Program [$(basename $@)]")
-	@$(set_STMF_CCSID)
 	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTBNDCL" -p '"$(CRTBNDCLFLAGS)"'")
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTBNDCL" -p "$(CRTBNDCLFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
@@ -1011,7 +999,6 @@ define PNLGRPSRC_TO_PNLGRP_RECIPE =
 	$(PNLGRP_VARIABLES)
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Create panel group [$(basename $@)]")
-	@$(set_STMF_CCSID)
 	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTPNLGRP" -p '"$(CRTPNLGRPFLAGS)"'")
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID) -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTPNLGRP" -p "$(CRTPNLGRPFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
@@ -1049,7 +1036,6 @@ define BND_TO_SRVPGM_RECIPE =
 	$(SRVPGM_VARIABLES)
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating service program [$(tgt)] from modules [$(basename $(filter %.MODULE,$(notdir $^)))] and service programs [$(basename $(filter %.SRVPGM,$(notdir $^$|)))]")
-	@$(set_STMF_CCSID)
 	$(eval externalsrvpgms := $(filter %.SRVPGM,$(subst .LIB,,$(subst /QSYS.LIB/,,$|))))
 	$(eval crtcmd := CRTSRVPGM srcstmf('$<') SRVPGM($(OBJLIB)/$(basename $(@F))) MODULE($(basename $(filter %.MODULE,$(notdir $^)))) BNDSRVPGM($(if $(BNDSRVPGMPATH),$(BNDSRVPGMPATH),*NONE)) $(CRTSRVPGMFLAGS))
 	@$(PRESETUP) \
@@ -1121,7 +1107,6 @@ endef
 define WSCSTSRC_TO_WSCST_RECIPE =
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating work station customizing object [$(tgt)]")
-	@$(set_STMF_CCSID)
 	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTWSCST" -p '"$(CRTWSCSTFLAGS)"'")
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID) -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTWSCST" -p "$(CRTWSCSTFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
@@ -1135,7 +1120,6 @@ define SQL_TO_QMQRY_RECIPE =
 	$(QMQRY_VARIABLES)
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Create QM query [$(basename $@)]")
-	@$(set_STMF_CCSID)
 	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID) -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTQMQRY" -p '"$(CRTQMQRYFLAGS)"'")
 	$(PRESETUP) \
 	$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID) -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTQMQRY" -p "$(CRTQMQRYFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
