@@ -76,6 +76,31 @@ git repository
 
 license for this project
 
+### iasp
+
+the Independent Auxillary Storage Pool that should be used when developing this project.  If not specified, it is assumed to be "*SYSBAS".  
+
+### sql
+
+  ##### defaultSchema
+  the default SQL schema is optional and the driver uses it to resolve unqualified names in SQL statements. The special value "*LIBL" is allowed. If no default SQL schema is set, then the driver resolves unqualified names based on the naming convention for the connection.
+  * SQL Naming
+    When you do not specify the default SQL schema on the connection URL:
+      - The first entry (unless it is *LIBL) becomes the default SQL schema
+      - When the first entry is *LIBL, the second entry becomes the default SQL schema
+      - When you do not set this property or when it contains only *LIBL, the user profile becomes the default SQL schema
+    System Naming
+      When you do not specify the default SQL schema on the connection URL:
+      - No default SQL schema is set, and the system uses the specified libraries to search for unqualified names
+      - When you do not set this property or when it contains only *LIBL, the system uses the current library list of the server job to search for unqualified names
+
+  ##### naming
+  this attribute can be assigned the value of  "sql" or "system".  If not specified the the default will be "sql".
+  This setting affects the behaviour of the default schema. It also determines the separator between schema and table name to be '.' if "sql" or '/' if "system".
+
+  ##### currentPath
+  the path is used to resolve unqualifed procedures 
+
 ### extensions
 
 any software vendor can extend the metadata with attributes that are useful to the functionality they provide 
