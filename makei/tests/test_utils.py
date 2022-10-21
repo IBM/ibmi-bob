@@ -38,6 +38,6 @@ def test_no_preceding_path_before_logs():
 
 def test_joblob_not_found():
     path = '/a/b/cd/efg/hijklmnop/.logs/joblogs.json'
-    parameters = " INCDIR( ''/a/b/dir1''  ''dir2'')"
-    expected = " INCDIR(''/a/b/dir1'' ''dir2'')"
+    parameters = " INCDIR( ''/a/b/dir1'' ''dir2'')"
+    expected = " INCDIR( ''/a/b/dir1'' ''dir2'')"
     assert makeIncludeDirsAbsolute(path, parameters) == expected
