@@ -165,12 +165,12 @@ In this example we have a project with the description of Payrollâ€¯applicationâ
         },
         "version": {
             "type": "string",
-            "description": "version of this file format, used for migration purposes "
+            "description": "Version of this file format, used for migration purposes"
         },
         "includePath": {
             "type": "array",
-            "description": "directories to be searched for includes/copy file (can contain variable references)",
-            "items": {    
+            "description": "Directories to be searched for includes/copy file (can contain variable references)",
+            "items": {
                 "type": "string"
             }
         },
@@ -180,34 +180,34 @@ In this example we have a project with the description of Payrollâ€¯applicationâ
         },
         "objlib": {
             "type": "string",
-            "description": "target library for compiled objects (if not specified defaults to *CURLIB)"
+            "description": "Target library for compiled objects (if not specified defaults to *CURLIB)"
         },
         "curlib": {
             "type": "string",
-            "description": "library that is CURLIB in the LIBL for project's connection.  Note that if objlib is not specified, then this will also serve as the objlib"
+            "description": "Library that is CURLIB in the LIBL for project's connection.  Note that if objlib is not specified, then this will also serve as the objlib"
         },
         "preUsrlibl": {
             "type": "array",
-            "description": "libraries to add at the beginning of the user portion of the LIBL (can contain references to named libraries)",
-            "items": {    
+            "description": "Libraries to add at the beginning of the user portion of the LIBL (can contain references to named libraries)",
+            "items": {
                 "type": "string"
             }
         },
         "postUsrlibl": {
             "type": "array",
-            "description": "libraries to add at the end of the user portion of the LIBL (can contain references to named libraries)",
-            "items": {    
+            "description": "Libraries to add at the end of the user portion of the LIBL (can contain references to named libraries)",
+            "items": {
                 "type": "string"
             }
         },
         "license": {
             "type": "string",
-            "description": "licensing terms for this project"
+            "description": "Licensing terms for this project"
         },
         "setIBMiEnvCmd": {
             "type": "array",
-            "description": "list of CL commands to be executed whenever this project connects to the IBM i.  Typically this involves LIBL, ENVVAR and iASP setup.",
-            "items": {    
+            "description": "List of CL commands to be executed whenever this project connects to the IBM i.  Typically this involves LIBL, ENVVAR and iASP setup.",
+            "items": {
                 "type": "string"
             }
         },
@@ -219,16 +219,44 @@ In this example we have a project with the description of Payrollâ€¯applicationâ
             "type": "string",
             "description": "PASE command line used to compile a specific source file in this project. The following substitution variables are supported:\n {filename} resolves to the base file name being edited.\n {path} resolves to the full IFS path corresponding to the source in the editor.\n {host} resolves to the IBM i hostname.\n {usrprf} the user profile that the command will be executed under.\n {branch} resolves to the name of the current git branch if this project is managed by git."
         },
-
+        "iasp": {
+            "type": "string",
+            "description": "Setting the current IASP allows this project access to a set of libraries and directories. IASP is a collection of disk units that can be brought on-line or taken off-line independently from the remaining storage on a system, including the system ASP, basic user ASPs, and other independent ASPs."
+        },
+        "sql": {
+            "type": "object",
+            "description": "The properties specified when connecting to DB2 for IBM i using JDBC",
+            "properties": {
+                "defaultSchema": {
+                    "type": "string",
+                    "description": "The system uses this SQL schema to resolve unqualified names in SQL statements"
+                },
+                "naming": {
+                    "type": "string",
+                    "description": "Specifies the naming convention used when referring to tables",
+                    "enum": [
+                        "sql",
+                        "system"
+                    ]
+                },
+                "currentPath": {
+                    "type": "array",
+                    "description": "The system uses this path to resolve the schema name for unqualified types, functions, variables, and procedures",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
         "extensions": {
             "type": "object",
-            "description": "attributes used by external software vendors to provide additional functionality",
+            "description": "Attributes used by external software vendors to provide additional functionality",
             "items": {
                 "type": "object"
             }
         }
     }
- }
+}
 ```
 
 ### 
