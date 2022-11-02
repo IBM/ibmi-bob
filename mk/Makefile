@@ -8,7 +8,7 @@ COLOR_TTY :=
 BUILDVARSMKPATH :=
 
 ifndef IBMiRelease
-IBMiRelease := $(shell cl 'dspdtaara qgpl/qss1MRI' | /QopenSys/pkgs/bin/grep 'V[[:digit:]]R[[:digit:]]M[[:digit:]]' -wo | /QopenSys/pkgs/bin/sed 's/[^0-9]$*//g')
+IBMiRelease := $(shell cl 'dspdtaara qgpl/qss1MRI' | /QOpenSys/pkgs/bin/grep 'V[[:digit:]]R[[:digit:]]M[[:digit:]]' -wo | /QOpenSys/pkgs/bin/sed 's/[^0-9]$*//g')
 endif
 
 COMPATIBILITYMODE := false
