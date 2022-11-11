@@ -279,6 +279,8 @@ def get_compile_targets_from_filenames(filenames: List[str]) -> List[str]:
     ['VAT300.MODULE', 'TEST.MODULE']
     >>> get_compile_targets_from_filenames(["ART200-Work_with_article.PGM.SQLRPGLE", "SGSMSGF.MSGF"])
     ['ART200.PGM', 'SGSMSGF.MSGF']
+    >>> get_compile_targets_from_filenames(["SAMPLE.BNDDIRSRC"])
+    ['SAMPLE.BNDDIR']
     """
     result = []
     for filename in filenames:
