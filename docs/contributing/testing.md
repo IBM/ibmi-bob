@@ -12,9 +12,10 @@ python makei/utils.py -v
 makei/tests contains tests that can be run through VS Code Test Explorer extension
 
 ## Running makei
-Use the https://github.com/edmundreinhardt/bob-recursive-example and do a `makei b -e <yourlib>` into an empty directory
-Use the https://github.com/worksofliam/company_system and do a `makei b -e <yourlib>` into an empty directory
+1. Use the https://github.com/edmundreinhardt/bob-recursive-example and do a `makei b -e <yourlib>` into an empty directory
+2. Use the https://github.com/worksofliam/company_system and do a `makei b -e <yourlib>` into an empty directory
 ( tests with an empty iproj.json includePath)
 
-Touch one file and do a makei again and see only those affected files build
-Touch one file and do a `makei c -f <sourcefile>` and see only the target built
+3. Touch one file and do a makei again and see only those affected files build
+4. Touch one file and do a `makei c -f <sourcefile>` and see only the target built
+5. Touch one file in a directory and do a `makei c -f <dirname>` to see only that file built
