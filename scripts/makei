@@ -217,7 +217,7 @@ def handle_compile(args):
     #print("source:"+' '.join(source_names))
     #print("compile targets:"+' '.join(get_compile_targets_from_filenames(source_names)))
     targets.extend(get_compile_targets_from_filenames(source_names))
-    print(colored("targets:"+' '.join(targets), Colors.OKBLUE))
+    print(colored("targets: "+' '.join(targets), Colors.OKBLUE))
     build_env = BuildEnv(targets, args.make_options, get_override_vars(args))
     if build_env.make():
         exit(0)
