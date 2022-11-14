@@ -59,7 +59,7 @@ ln -sf %{_libdir}/bob/scripts/crtfrmstmf %{buildroot}%{_bindir}/crtfrmstmf
 %{_bindir}/crtfrmstmf
 
 %changelog
-* Mon Nov 14 2022 Edmund Reinhardt <edmund.reinhard@ca.ibm.com> - 2.4.5
+* Mon Nov 14 2022 Edmund Reinhardt <edmund.reinhard@ca.ibm.com> - 2.4.6
 - Update bob.spec
 * Mon Nov 14 2022 Edmund Reinhardt <edmund.reinhard@ca.ibm.com> - 2.4.5
 - BINDDIR source now has the file extension BINDIRSRC to differentiate it from the target object type BINDDIR
