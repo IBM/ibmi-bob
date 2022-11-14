@@ -1,6 +1,6 @@
 %undefine _disable_source_fetch
 Name: bob
-Version: 2.4.4
+Version: 2.4.6
 Release: 0
 License: Apache-2.0
 Summary: Better Object Builder for IBM i
@@ -59,6 +59,13 @@ ln -sf %{_libdir}/bob/scripts/crtfrmstmf %{buildroot}%{_bindir}/crtfrmstmf
 %{_bindir}/crtfrmstmf
 
 %changelog
+* Mon Nov 14 2022 Edmund Reinhardt <edmund.reinhard@ca.ibm.com> - 2.4.6
+- Update bob.spec
+* Mon Nov 14 2022 Edmund Reinhardt <edmund.reinhard@ca.ibm.com> - 2.4.5
+- BINDDIR source now has the file extension BINDIRSRC to differentiate it from the target object type BINDDIR
+- That ability to build a directory or file via the makei compile -f <dir>:<file> to be able to build any arbitrary list of files and directories
+- The iproj.json has additional attributes for iasp and sql attributes like current schema, path and sql vs system naming. (These are not yet supported within BOB, but are present for future extensibility and other tooling that will support them.
+- Note for CL Pseudo source, make sure that you delete the target object before creating a new version to ensure the timestamps are accurate and the make processing works correctly
 * Tue Oct 18 2022 Edmund Reinhardt <edmund.reinhard@ca.ibm.com> - 2.4.4
 - evfevent files were missing filenames
 - CCSID issues when downloading evfevent files
