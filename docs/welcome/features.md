@@ -61,11 +61,12 @@ Note:
 
 The following object types are supported as pseudo-source.  
 The CL command to create the object is stored in a file with the given extension.  
+Note that for *MSGF and *BNDDIR, the CL commands should include the delete of the MSGF and BNDDIR before creating the new one in order to avoid the timestamp getting old and breaking the make processing.
 
 | Object Type | File Extension | CL Command        |
 | :---------- | :------------- | :---------------- |
 | *MSGF       | .MSGF          | CRTMSGF + ADDMSGD |
-| *BNDDIR     | .BNDDIR        | CRTBNDDIR         |
+| *BNDDIR     | .BNDDIRSRC     | CRTBNDDIR         |
 | *PGM        | .ILEPGM        | CRTPGM            |
 | *SRVPGM     | .ILESRVPGM     | CRTSRVPGM         |
 
