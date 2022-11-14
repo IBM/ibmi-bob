@@ -1,6 +1,6 @@
 %undefine _disable_source_fetch
 Name: bob
-Version: 2.4.5
+Version: 2.4.6
 Release: 0
 License: Apache-2.0
 Summary: Better Object Builder for IBM i
@@ -59,6 +59,8 @@ ln -sf %{_libdir}/bob/scripts/crtfrmstmf %{buildroot}%{_bindir}/crtfrmstmf
 %{_bindir}/crtfrmstmf
 
 %changelog
+* Mon Nov 14 2022 Edmund Reinhardt <edmund.reinhard@ca.ibm.com> - 2.4.5
+- Update bob.spec
 * Mon Nov 14 2022 Edmund Reinhardt <edmund.reinhard@ca.ibm.com> - 2.4.5
 - BINDDIR source now has the file extension BINDIRSRC to differentiate it from the target object type BINDDIR
 - That ability to build a directory or file via the makei compile -f <dir>:<file> to be able to build any arbitrary list of files and directories
