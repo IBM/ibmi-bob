@@ -26,6 +26,8 @@ mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
 ## Build bob RPM
 
 * Create a new draft version named `v{r.v.m}` where `{r.v.m}` is the new version number
+* make sure you update bob.spec to the new release level
+* publish the release so the curl commmand below will find it
 * Execute the following commands
 
 ```bash
@@ -36,4 +38,16 @@ rpmbuild -ba SPECS/bob.SPEC
 ```
 
 * The rpm is now created under `~/rpmbuild/RPMS/PPC64` directory.
-* upload to the draft version and publish it
+* upload to the version and republish it
+
+## Test bob RPM
+
+* Run the follow to install bob from the RPM
+
+```bash
+export BOB_VERSION=r.v.m 
+rpm -e `rpm -qa | grep -i bob`
+rpm -i ~/rpmbuild/RPMS/PPC64/bob-${BOB_VERSION}-0.ibmi7.3.ppc64.rpm
+```
+
+Then test according to the [Testing instructions](testing.md)
