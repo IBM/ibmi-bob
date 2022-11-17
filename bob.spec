@@ -1,4 +1,3 @@
-%undefine _disable_source_fetch
 Name: bob
 Version: 2.4.6
 Release: 0
