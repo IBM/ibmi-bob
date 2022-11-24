@@ -53,7 +53,7 @@ makei compile [-h] (-f <filename> | --files <filepaths>) [-o <options>]
 
 - **--files**
 
-  files to compile, separated by colon (:)
+  files and/or directories to compile, separated by colon (:)
 
 - **-o, --make-options**
 
@@ -86,7 +86,7 @@ makei build [-h] [-t <target> | -d <subdir>] [-o <options>] [--bob-path <path>]
 
 - **-d, --subdir**
 
-  subdirtory to be built
+  subdirectory to be built (identical to __makei compile -f__)
 
 - **-o, --make-options**
 
@@ -111,11 +111,11 @@ makei build [-h] [-t <target> | -d <subdir>] [-o <options>] [--bob-path <path>]
 makei cvtsrcpf [-h] [-c <CCSID>] <file> <library>
 ```
 
-Converts all members in a source physical file to properly-named (Bob-compatible), ASCII-ish, LF-terminated source files in the current directory in the IFS. Generally speaking, the source member type will become the filename extension.
+Converts all members in a source physical file to properly-named (Bob-compatible), UTF-8 encoded, LF-terminated source files in the current directory in the IFS. Generally speaking, the source member type will become the filename extension.
 
 For example, RPGLE source member `AB1001` will become IFS source file `AB1001.RPGLE`. Four exceptions exist, however: source member types CMD, MENU, and PNLGRP result in filename extensions .CMDSRC, .MENUSRC, and .PNLGRPSRC, respectively, and source member type C residing in source physical file H results in filename extension .H.
 
-All source files will be encoded in UTF-8. If the source physical file was created successfully, a `.ibmi.json` file with the CCSID value from the SRC-PF will be created in the same directory. Note that It will not override an existing `.ibmi.json` file. [Link to discussions](https://github.com/IBM/ibmi-bob/pull/115#issuecomment-1194661949)
+All source files will be encoded in UTF-8. If the source physical file was created successfully, a `.ibmi.json` file with the CCSID value from the SRC-PF will be created in the same directory. Note that it will not override an existing `.ibmi.json` file. [Link to discussions](https://github.com/IBM/ibmi-bob/pull/115#issuecomment-1194661949)
 
 If the SRC-PF is 65535, then the value of the `ccsid` parameter of the cvtsrcpf command will be used.
 
