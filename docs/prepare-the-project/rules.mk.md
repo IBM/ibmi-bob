@@ -8,17 +8,16 @@
 
 Better Object Builder uses GNU Make to determine what code needs to be compiled. Make takes as input a _makefile_, which tells it what objects should be compiled, what source code they need, and what other objects they are dependent on. In Bob, we will reuse a common Makefile in the Bob directory which reads the `Rules.mk` files dynamically in the project.
 
-By itself, Make has no concept of ILE objects, and doesn't know how to compile an RPG module or bind together a service program.  Better Object Builder provides that functionality in the makefile `def_rules.mk`,  which contains all the special instructions for building various types of IBM i objects. That way, when your `Rules.mk` says "build module XY1001 from source file XY1001.RPGLE", Make will know how to do that.
+By itself, Make has no concept of ILE objects, and doesn't know how to compile an RPG module or bind together a service program.  Better Object Builder provides that functionality in the makefile `mk/def_rules.mk`,  which contains all the special instructions for building various types of IBM i objects. That way, when your `Rules.mk` says "build module XY1001 from source file XY1001.RPGLE", Make will know how to do that.
 
-Each of your projects will have its own sets of `Rules.mk` files to specific that project's objects.
+Each directory of your project that contains source will have its own `Rules.mk` file to specific that directory's source.  This allows you to decompose your application into logical units that can be built together or independently.
 
 ## Rules.mk layout
 
-The `Rules.mk` consists of three sections:
+The `Rules.mk` consists of two sections:
 
-- Subdir declaration
-- An _object list_ area where you specify each object that should get built
-- A _rules_ area that defines dependency information and custom compile settings for each object
+- Optional _subdirs_ declaration
+- A _rules_ area that lists each object that should be built and from which source file. Optionally information about other dependencies and custom compile settings can be specified.
 
 ## Creating the Rules.mk
 
@@ -28,7 +27,7 @@ The `Rules.mk` consists of three sections:
 
 Create a new `Rules.mk` in your project directory.  Open it in any text editor.
 
-### Subdir declaration
+### Subdirs declaration
 
 In this optional section, you may declare that one or more subdirectories is also part of this project and they may contain some objects to build.
 
@@ -40,39 +39,23 @@ SUBDIRS = functionsVAT QDDSSRC QDTASRC QPNLSRC QCLSRC QMSGSRC QRPGSRC QRPGLESRC 
 
 This line at the project root directory will tell Bob to build all the subdirectories under the [bob-recursive-example](https://github.com/edmundreinhardt/bob-recursive-example).
 
-### Object List section
-
-The object list section is where you list out each object Bob should build, grouped by object type and separated by spaces. Object names should be specified as the unqualified IFS file name. For example program names would be `MYPGM.PGM` and files would be `MYFILE.FILE`, etc. Object names should be specified as they appear in the Integrated File System (IFS), so program names end in `.PGM`, files end in `.FILE`, etc.  All object names should be in upper case.  For ease of maintenance, it is recommended that the objects are listed alphabetically.  Here's an example of part of an object list section:
-
-```makefile
-PFs := VATDEF.FILE
-
-MODULEs := VAT300.MODULE
-
-SRVPGMs := FVAT.SRVPGM
-```
-
-In this example, Make is told that one file should be built (one PFs), one module, and one service program.  We haven't yet told it _how_ to build these objects, only that they exist and should be built.
-
-The object types should be one of the followings:  `TRGs` `DTAs` `SQLs` `BNDDs` `PFs` `LFs` `DSPFs` `PRTFs` `CMDs` `SQLs` `MODULEs` `SRVPGMs` `PGMs` `MENUs` `PNLGRPs` `QMQRYs` `WSCSTs` `MSGs`.
-
 ### Rules section
 
 The rules section specifies dependency information and custom compile settings. This is where Bob is told which source files and other objects are needed to build each object, and is where object-specific compile settings are overridden.
 
-To create a rule, first write the object name (with the IFS suffix), followed by a colon and a space.  Then write the name of the object's source file:
+To create a rule, first write the object name, followed by a colon and a space.  Then write the name of the object's source file :
 
 ```makefile
-VATDEF.FILE: $(d)/VATDEF.PF SAMREF.FILE
+VATDEF.FILE: VATDEF.PF SAMREF.FILE
 ```
 
 The example above is physical file `VATDEF.FILE`.  It is compiled from source code `VATDEF.PF` under the same directory of the `Rules.mk` file.
 
 > [!WARNING]
 >
-> Note that we have to specify the the source file using the special `$(d)` variable. This is to indicate that the source file is within the current directory. We may remove the need for the `$(d)` variable in future versions.
+> Note previous versions of BOB required a `$(d)/` prefix on the source file, but this is no longer required and can be removed.  There also was an _object list_ section which broke down the list of target objects by type ( `TRGs` `DTAs` `SQLs` `BNDDs` `PFs` `LFs` `DSPFs` `PRTFs` `CMDs` `SQLs` `MODULEs` `SRVPGMs` `PGMs` `MENUs` `PNLGRPs` `QMQRYs` `WSCSTs` `MSGs`).  This is also unnecessary as of BOB 2.4 since these are now automatically discovered.
 
-If the object depends on other objects, add them to the end, separated by spaces:
+If the object depends on other objects (referenced files or called programs) or source files (includes), add them to the end, separated by spaces:
 
 `VATDEF.FILE` depends on physical file `SAMREF.FILE` which is defined somewhere else in the project.  Specifying dependencies is important, for this is what causes the physical file to automatically get recompiled when source code for its dependent physical file changes.
 
@@ -81,10 +64,9 @@ In summary, for the rules section, simply specify each object, followed by its s
 ---
 
 
-
 > [!TIP]
 >
-> The Bob developers like to add a comment before each object rule that specifies the object name and intended compile command.  We find the syntax coloring helps the eye quickly locate object rules, and the compile command helps clarify what Make should do.  Makefile comments begin with a `#`.
+> In order to determine if an object is out-of-date and needs to be built, BOB looks within the library list (using VPATH for gmake gurus).  This library list consists of the current library list for your user profile that is updated via the iproj.json at the root of the project.  See [iproj.json documentation](iproj-json.md) for details.
 
 ---
 
