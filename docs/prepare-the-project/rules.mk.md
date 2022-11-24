@@ -10,7 +10,7 @@ Better Object Builder uses GNU Make to determine what code needs to be compiled.
 
 By itself, Make has no concept of ILE objects, and doesn't know how to compile an RPG module or bind together a service program.  Better Object Builder provides that functionality in the makefile `mk/def_rules.mk`,  which contains all the special instructions for building various types of IBM i objects. That way, when your `Rules.mk` says "build module XY1001 from source file XY1001.RPGLE", Make will know how to do that.
 
-Each directory of your project that contains source will have its own `Rules.mk` file to specific that directory's source.  This allows you to decompose your application into logical units that can be built together or independently.
+Each directory of your project that contains source will have its own `Rules.mk` file specific that directory's source.  This allows you to decompose your application into logical units that can be built together or independently.
 
 ## Rules.mk layout
 
