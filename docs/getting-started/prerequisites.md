@@ -44,10 +44,6 @@ It is important that the directory `/QOpenSys/pkgs/bin` directory is on your pat
 You can add the following lines to the `$HOME/.bash_profile` file (or create it if it does not exist).
 
 ```bash
-# Set locale to UTF-8
-# UTF-8 is recommended, as it will preserve all characters
-export LC_ALL='EN_US.UTF-8'
-
 # Set the path to find IBM open-source ports as well as Perzl AIX binaries
 export PATH="/QOpenSys/pkgs/bin:${PATH}"
 ```
