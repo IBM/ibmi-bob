@@ -58,11 +58,10 @@ class IBMiJson:
             build["objlib"] = self.build["objlib"]
 
         if len(build.keys()) > 0:
-            ibmi = {
+            return  {
                 "version": self.version,
                 "build": build
             }
-            return json.dumps(ibmi, indent=4)
         else:
             return None
 
