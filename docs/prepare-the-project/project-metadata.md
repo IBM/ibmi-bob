@@ -7,12 +7,12 @@ The IBM i projects will self-describe how to build themselves as much as possibl
 ## Technical Assumptions
 
 * Metadata will be stored in JSON because:
-  * JSON is the most popular persistence mechanism because it is lightweight and easily derstood by both humans and computers
+  * JSON is the most popular persistence mechanism because it is lightweight and easily understood by both humans and computers
   * JSON is native any node.js based platform and has readily available tooling in all others
 * All third parties should generate/use the common metadata. Third-parties can store additional metadata in additional JSON within the same file.
 * Places to store information
-  * Project level json – in the root directory of the project - iproj.json (analogous to package.json) – could be used for storing name of project, version information, dependencies, git repo, description, license  AND IBM i attributes like target object library, target CCSID, LIBL, initial CL and include directories
+  * Project level JSON – in the root directory of the project - iproj.json (analogous to package.json) – could be used for storing name of project, version information, dependencies, git repo, description, license  AND IBM i attributes like target object library, target CCSID, LIBL, initial CL and include directories
   (part of the vision to make an IBM i package manager that is still in progress)
-  * Directory level json - .ibmi.json in each directory allows overriding of target library and CCSID in  for that directory and its sub-directories.
+  * Directory level JSON - .ibmi.json in each directory allows overriding of target library and CCSID in  for that directory and its sub-directories.
   * Comments  in the code itself
 
