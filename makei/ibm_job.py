@@ -2,9 +2,16 @@
 # -*- coding: utf-8 -*-
 
 import json
+import os
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple
-import ibm_db_dbi
+
+if "BOBTEST" in os.environ:
+    from .mocks import ibm_db_dbi
+    print("Using mock ibm_db_dbi")
+else:
+    import ibm_db_dbi
+
 from contextlib import closing
 from makei.utils import format_datetime
 
