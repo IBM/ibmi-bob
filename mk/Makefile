@@ -1,14 +1,21 @@
-SHELL:=/QOpenSys/pkgs/bin/bash
+# SHELL:=/QOpenSys/pkgs/bin/bash
 BOB:=/QOpenSys/pkgs/lib/bob
-MAKEFLAGS += --no-builtin-rules
-MAKEFLAGS += --no-builtin-variables
+MAKEFLAGS+=--no-builtin-rules
+MAKEFLAGS+=--no-builtin-variables
+
+.SUFFIXES:
+SUFFIXES :=
 MK := $(BOB)/mk
 SCRIPTSPATH := $(BOB)/scripts
 COLOR_TTY :=
 BUILDVARSMKPATH :=
 
 ifndef IBMiRelease
+ifdef BOBTEST
+IBMiRelease := 750
+else
 IBMiRelease := $(shell cl 'dspdtaara qgpl/qss1MRI' | /QOpenSys/pkgs/bin/grep 'V[[:digit:]]R[[:digit:]]M[[:digit:]]' -wo | /QOpenSys/pkgs/bin/sed 's/[^0-9]$*//g')
+endif
 endif
 
 COMPATIBILITYMODE := false
