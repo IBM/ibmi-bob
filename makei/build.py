@@ -4,6 +4,7 @@
 # 57XX-XXX
 # (c) Copyright IBM Corp. 2021
 """ The module used to build a project"""
+import os
 import sys
 from pathlib import Path
 from tempfile import mkstemp
@@ -69,9 +70,9 @@ class BuildEnv():
         self.build_vars_path.unlink()
 
     def generate_make_cmd(self):
-        """ Returns the make command used to build the project."""
-        cmd = f'/QOpenSys/pkgs/bin/make -k BUILDVARSMKPATH="{self.build_vars_path}"' + \
-            f' -k BOB="{self.bob_path}" -f "{self.bob_makefile}"'
+        """ Returns the make command used to build the project."""            
+        cmd = f'make -k BUILDVARSMKPATH="{self.build_vars_path}"' + \
+            f' -k BOB="{self.bob_path}" {"BOBTEST=1" if "BOBTEST" in os.environ else ""} -f "{self.bob_makefile}"'
         if self.make_options:
             cmd = f"{cmd} {self.make_options}"
         cmd = f"{cmd} {' '.join(self.targets)}"
