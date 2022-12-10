@@ -190,8 +190,9 @@ def run_command(cmd: str, stdoutHandler: Callable[[bytes], None]=print_to_stdout
         print(colored(f"> {cmd}", Colors.OKGREEN))
     sys.stdout.flush()
     try:
+        os.environ["PATH"] = os.environ["PATH"] + ":/QOpenSys/pkgs/bin"
         process = subprocess.Popen(
-            ["bash", "-c", cmd], stdout=subprocess.PIPE, )
+            ["bash", "-c", cmd], stdout=subprocess.PIPE, env={"PATH": os.environ["PATH"]})
         for line in iter(process.stdout.readline, b''):
             stdoutHandler(line)
         return process.wait()
