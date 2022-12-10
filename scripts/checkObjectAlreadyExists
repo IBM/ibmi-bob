@@ -1,4 +1,4 @@
-#!/QOpenSys/pkgs/bin/bash
+#!/usr/bin/env bash
 if [[ -e /QSYS.LIB/${2}.LIB/${1} ]]; then
    echo "Object ${2}/${1} exists"
    if [[ -e /QSYS.LIB/QTEMP.LIB/${1} ]]; then
