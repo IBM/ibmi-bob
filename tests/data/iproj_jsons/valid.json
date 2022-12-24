@@ -1,0 +1,16 @@
+{
+    "version": "1.0.0",
+    "description": "Test project",
+    "includePath": ["libs"],
+    "preUsrlibl": ["QSYS"],
+    "postUsrlibl": ["QGPL"],
+    "setIBMiEnvCmd": ["CRTBNDRPG PGM(HELLO) SRCFILE(QCLLESRC)"],
+    "repository": "https://github.com/user/project",
+    "license": "MIT",
+    "tgtCcsid": "1208",
+    "extensions" : {
+        "custom_extension": {
+            "key": "value"
+        }
+    }
+  }
