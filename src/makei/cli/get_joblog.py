@@ -1,11 +1,9 @@
-#!/QOpenSys/pkgs/bin/python3.6
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import argparse
-from pathlib import Path
-import sys  # nopep8
-sys.path.append(str(Path(__file__).resolve().parent.parent))  # nopep8
-from makei.ibm_job import save_joblog_json  # nopep8
+
+from makei.ibm_job import save_joblog_json
 
 
 def cli():

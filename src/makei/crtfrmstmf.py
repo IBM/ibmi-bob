@@ -1,16 +1,14 @@
-#!/QOpenSys/pkgs/bin/python3.6
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import argparse
 import os
-from pathlib import Path
 import shutil
-import sys
-from typing import Any, Dict, List, Optional, Tuple
 from datetime import datetime
-sys.path.append(str(Path(__file__).resolve().parent.parent))  # nopep8
-from makei.ibm_job import IBMJob, save_joblog_json  # nopep8
-from makei.utils import format_datetime, objlib_to_path, validate_ccsid, makeIncludeDirsAbsolute  # nopep8
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple
 
+from makei.ibm_job import IBMJob, save_joblog_json
+from makei.utils import format_datetime, objlib_to_path, validate_ccsid, makeIncludeDirsAbsolute
 
 COMMAND_MAP = {'CRTCMD': 'CMD',
                'CRTBNDCL': 'PGM',
@@ -31,7 +29,7 @@ COMMAND_MAP = {'CRTCMD': 'CMD',
 class CrtFrmStmf():
     """create from stream file
     """
-    
+
     job: IBMJob
     setup_job: IBMJob
     srcstmf: str
@@ -42,10 +40,12 @@ class CrtFrmStmf():
     env_settings: Dict[str, str]
     ccsid_c: str
     joblog_path: Optional[str]
-    back_up_obj_list: List[Tuple[str, str, str]] # List of (obj, lib, obj_type) tuples
+    back_up_obj_list: List[Tuple[str, str, str]]  # List of (obj, lib, obj_type) tuples
     obj_type: str
 
-    def __init__(self, srcstmf: str, obj: str, lib: str, cmd: str, tgtCcsid: Optional[str] = None, parameters: Optional[str] = None, env_settings: Optional[Dict[str, str]] = None, joblog_path: Optional[str] = None, tmp_lib="QTEMP", tmp_src="QSOURCE") -> None:
+    def __init__(self, srcstmf: str, obj: str, lib: str, cmd: str, tgtCcsid: Optional[str] = None,
+                 parameters: Optional[str] = None, env_settings: Optional[Dict[str, str]] = None,
+                 joblog_path: Optional[str] = None, tmp_lib="QTEMP", tmp_src="QSOURCE") -> None:
         self.job = IBMJob()
         self.setup_job = IBMJob()
         self.srcstmf = srcstmf
@@ -151,22 +151,22 @@ class CrtFrmStmf():
         self.setup_job.run_sql(
             f"CREATE OR REPLACE ALIAS {self.tmp_lib}.{self.obj} FOR {self.lib}.EVFEVENT ({self.obj});")
         results = self.setup_job.run_sql(" ".join(["SELECT",
-                                        f"CAST(EVFEVENT AS VARCHAR(300) CCSID {ccsid}) AS FULL",
-                                        f"FROM {self.tmp_lib}.{self.obj}",
-                                        f"WHERE Cast(evfevent As Varchar(300) Ccsid {ccsid}) LIKE 'FILEID%{self.tmp_lib}/{self.tmp_src}({self.obj})%'",
-                                        ]))[0]
+                                                   f"CAST(EVFEVENT AS VARCHAR(300) CCSID {ccsid}) AS FULL",
+                                                   f"FROM {self.tmp_lib}.{self.obj}",
+                                                   f"WHERE Cast(evfevent As Varchar(300) Ccsid {ccsid}) LIKE 'FILEID%{self.tmp_lib}/{self.tmp_src}({self.obj})%'",
+                                                   ]))[0]
         if results:
             parts = results[0][0].split()
         else:
             return
         self.setup_job.run_sql(" ".join([f"Update {self.tmp_lib}.{self.obj}",
-                              "Set evfevent =",
-                              "(",
-                              f"SELECT Cast(evfevent As Varchar(24) Ccsid {ccsid}) CONCAT '{len(self.srcstmf):03} {self.srcstmf} {parts[-2]} {parts[-1]}'",
-                              f"FROM {self.tmp_lib}.{self.obj}",
-                              f"WHERE Cast(evfevent As Varchar(300) Ccsid {ccsid}) LIKE 'FILEID%{self.tmp_lib}/{self.tmp_src}({self.obj})%'",
-                              "FETCH First 1 Row Only)",
-                              f"WHERE Cast(evfevent As Varchar(300) Ccsid {ccsid}) LIKE 'FILEID%{self.tmp_lib}/{self.tmp_src}({self.obj})%'"]))
+                                         "Set evfevent =",
+                                         "(",
+                                         f"SELECT Cast(evfevent As Varchar(24) Ccsid {ccsid}) CONCAT '{len(self.srcstmf):03} {self.srcstmf} {parts[-2]} {parts[-1]}'",
+                                         f"FROM {self.tmp_lib}.{self.obj}",
+                                         f"WHERE Cast(evfevent As Varchar(300) Ccsid {ccsid}) LIKE 'FILEID%{self.tmp_lib}/{self.tmp_src}({self.obj})%'",
+                                         "FETCH First 1 Row Only)",
+                                         f"WHERE Cast(evfevent As Varchar(300) Ccsid {ccsid}) LIKE 'FILEID%{self.tmp_lib}/{self.tmp_src}({self.obj})%'"]))
 
         self.setup_job.run_sql(f"DROP ALIAS {self.tmp_lib}.{self.obj}")
 
@@ -178,18 +178,18 @@ class CrtFrmStmf():
         print(f"Backing up {len(obj_list)} object(s)...")
 
         _, lib_list, _ = list(zip(*obj_list))
-        obj_list_by_lib = {lib: [(obj_tuple[0], obj_tuple[2]) for obj_tuple in obj_list if lib == obj_tuple[1]] for lib in set(lib_list)}
+        obj_list_by_lib = {lib: [(obj_tuple[0], obj_tuple[2]) for obj_tuple in obj_list if lib == obj_tuple[1]] for lib
+                           in set(lib_list)}
 
         for lib, obj_tuples in obj_list_by_lib.items():
             obj_name_list, obj_type_list = list(zip(*obj_tuples))
             self.setup_job.run_cl(f"CRTSAVF FILE({self.tmp_lib}/{lib})")
             self.setup_job.run_cl(
                 f"SAVOBJ OBJ({' '.join(set(obj_name_list))}) LIB({self.lib}) DEV(*SAVF) OBJTYPE({' '.join(map(lambda obj_type: f'*{obj_type}', set(obj_type_list)))}) SAVF({self.tmp_lib}/{lib}) SPLFDTA(*ALL) ACCPTH(*YES) QDTA(*DTAQ)")
-        
+
         for obj_tuple in obj_list:
             self.setup_job.run_cl(
                 f"DLTOBJ OBJ({obj_tuple[1]}/{obj_tuple[0]}) OBJTYPE(*{obj_tuple[2]})")
-
 
     def _restore_objs(self):
         obj_list = self.back_up_obj_list
@@ -198,7 +198,8 @@ class CrtFrmStmf():
         print(f"Restoring {len(obj_list)} object(s)...")
 
         _, lib_list, _ = list(zip(*obj_list))
-        obj_list_by_lib = {lib: [(obj_tuple[0], obj_tuple[2]) for obj_tuple in obj_list if lib == obj_tuple[1]] for lib in set(lib_list)}
+        obj_list_by_lib = {lib: [(obj_tuple[0], obj_tuple[2]) for obj_tuple in obj_list if lib == obj_tuple[1]] for lib
+                           in set(lib_list)}
 
         for lib, obj_tuples in obj_list_by_lib.items():
             obj_name_list, obj_type_list = list(zip(*obj_tuples))
@@ -279,12 +280,15 @@ def cli():
         env_settings["IBMiEnvCmd"] = os.environ["IBMiEnvCmd"]
 
     handle = CrtFrmStmf(srcstmf_absolute_path, args.object.strip(),
-    args.library.strip(), args.command.strip(), args.ccsid, args.parameters, env_settings, args.save_joblog)
+                        args.library.strip(), args.command.strip(), args.ccsid, args.parameters, env_settings,
+                        args.save_joblog)
 
     print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
     success = handle.run()
     print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
     exit(0 if success else 1)
+
+
 # Helper functions
 
 
@@ -308,7 +312,8 @@ def check_object_exists(obj: str, lib: str, obj_type: str) -> bool:
     return obj_path.exists()
 
 
-def get_physical_dependencies(obj: str, lib: str, include_self: bool, job: Optional[IBMJob]=None, verbose: bool=False) -> List[Tuple[str, str, str]]:
+def get_physical_dependencies(obj: str, lib: str, include_self: bool, job: Optional[IBMJob] = None,
+                              verbose: bool = False) -> List[Tuple[str, str, str]]:
     """Get the dependencies for a given physical file object
 
     Args:
@@ -328,7 +333,7 @@ def get_physical_dependencies(obj: str, lib: str, include_self: bool, job: Optio
         if verbose:
             print(f"delete_physical_dependencies: {pf_path} does not exist.")
         return
-    
+
     if job is None:
         job = IBMJob()
 
@@ -343,7 +348,8 @@ def get_physical_dependencies(obj: str, lib: str, include_self: bool, job: Optio
         result.append((obj, lib, "FILE"))
     return result
 
-def delete_objects(obj_list:List[Tuple[str, str, str]], job: IBMJob=None, verbose: bool=False):
+
+def delete_objects(obj_list: List[Tuple[str, str, str]], job: IBMJob = None, verbose: bool = False):
     for obj_tuple in obj_list:
         obj, lib, obj_type = obj_tuple
         obj_path = Path(objlib_to_path(lib, f"{obj}.{obj_type}"))
@@ -385,6 +391,7 @@ def filter_joblogs(record: Dict[str, Any]) -> bool:
         # Ignore all SQL errors
         return False
     return True
+
 
 if __name__ == "__main__":
     cli()

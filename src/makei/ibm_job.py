@@ -1,11 +1,13 @@
-#!/QOpenSys/pkgs/bin/python3.6
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import json
+from contextlib import closing
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple
+
 import ibm_db_dbi
-from contextlib import closing
+
 from makei.utils import format_datetime
 
 
@@ -18,7 +20,7 @@ class IBMJob():
             self.conn = ibm_db_dbi.connect()
             # https://kadler.io/2018/09/20/using-python-ibm-db-with-un-journaled-files.html#
             self.conn.set_option({ibm_db_dbi.SQL_ATTR_TXN_ISOLATION:
-                                  ibm_db_dbi.SQL_TXN_NO_COMMIT})
+                                      ibm_db_dbi.SQL_TXN_NO_COMMIT})
             self.job_id = self.run_sql("VALUES(QSYS2.JOB_NAME)")[0][0][0]
         except Exception as e:
             print(e)
@@ -72,29 +74,30 @@ class IBMJob():
 def get_joblog_for_job(id: str) -> List[Dict[str, Any]]:
     query_job = IBMJob()
     sql = f"SELECT MESSAGE_ID," + \
-        "MESSAGE_TEXT," + \
-        "MESSAGE_SECOND_LEVEL_TEXT," + \
-        "MESSAGE_TYPE," + \
-        "SEVERITY," + \
-        "MESSAGE_TIMESTAMP," + \
-        "FROM_PROGRAM," + \
-        "FROM_LIBRARY," + \
-        "FROM_INSTRUCTION," + \
-        "TO_PROGRAM," + \
-        "TO_LIBRARY," + \
-        "TO_MODULE," + \
-        "TO_PROCEDURE," + \
-        "TO_INSTRUCTION" + \
-        " " + \
-        "FROM TABLE(" + \
-        f"QSYS2.JOBLOG_INFO('{id}')" + \
-        ") A"
+          "MESSAGE_TEXT," + \
+          "MESSAGE_SECOND_LEVEL_TEXT," + \
+          "MESSAGE_TYPE," + \
+          "SEVERITY," + \
+          "MESSAGE_TIMESTAMP," + \
+          "FROM_PROGRAM," + \
+          "FROM_LIBRARY," + \
+          "FROM_INSTRUCTION," + \
+          "TO_PROGRAM," + \
+          "TO_LIBRARY," + \
+          "TO_MODULE," + \
+          "TO_PROCEDURE," + \
+          "TO_INSTRUCTION" + \
+          " " + \
+          "FROM TABLE(" + \
+          f"QSYS2.JOBLOG_INFO('{id}')" + \
+          ") A"
     results = query_job.run_sql(sql)
     joblog_dict = query_job._dump_results_to_dict(results)
     return joblog_dict
 
 
-def save_joblog_json(cmd: str, cmd_time: str, jobid: str, joblog_json: Optional[str], filter: Callable[[Dict[str, Any]], bool] = None):
+def save_joblog_json(cmd: str, cmd_time: str, jobid: str, joblog_json: Optional[str],
+                     filter: Callable[[Dict[str, Any]], bool] = None):
     records = get_joblog_for_job(jobid)
     messages = []
     for record in records:

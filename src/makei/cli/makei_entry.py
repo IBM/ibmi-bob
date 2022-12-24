@@ -1,4 +1,4 @@
-#!/QOpenSys/pkgs/bin/python3.6
+#!/usr/bin/env python3
 
 # Licensed Materials - Property of IBM
 # 57XX-XXX
@@ -6,21 +6,14 @@
 """ The CLI entry for BOB"""
 
 import argparse
-import json
 import os
-from pathlib import Path
-
 import sys
 
-sys.path.append(str(Path(__file__).resolve().parent.parent))  # nopep8
-from makei.cvtsrcpf import CvtSrcPf  # nopep8
-from makei.const import BOB_PATH  # nopep8
-from makei import init_project  # nopep8
-from makei.build import BuildEnv  # nopep8
-from makei.utils import Colors, colored, get_compile_targets_from_filenames, run_command  # nopep8
-
-
-__version__ = "2.4.4"
+from makei import __version__
+from makei import init_project
+from makei.build import BuildEnv
+from makei.cvtsrcpf import CvtSrcPf
+from makei.utils import Colors, colored, get_compile_targets_from_filenames
 
 
 def cli():
@@ -143,6 +136,7 @@ def add_init_parser(subparsers: argparse.ArgumentParser):
                              action='store_true')
     init_parser.set_defaults(handle=handle_init)
 
+
 def add_cvtsrcpf_parser(subparsers: argparse.ArgumentParser):
     cvtsrcpf_parser = subparsers.add_parser(
         'cvtsrcpf',
@@ -167,7 +161,10 @@ def add_cvtsrcpf_parser(subparsers: argparse.ArgumentParser):
     cvtsrcpf_parser.add_argument(
         "-c",
         "--ccsid",
-        help='The target EBCDIC CCSID that the source in this directory should be compiled with. If not specified, then the CCSID of the SRC-PF being converted will be used. If that CCSID is 65535 or an invalid CCSID is encountered than the CCSID of the JOB running the build will be used.',
+        help='The target EBCDIC CCSID that the source in this directory should be compiled with. If not specified, '
+             'then the CCSID of the SRC-PF being converted will be used. '
+             'If that CCSID is 65535 or an invalid CCSID is encountered than the CCSID of the JOB running '
+             'the build will be used.',
         metavar='<ccsid>',
         type=str
     )
@@ -207,6 +204,8 @@ def handle_compile(args):
         filenames = [args.file]
     elif args.files:
         filenames = map(os.path.basename, args.files.split(':'))
+    else:
+        filenames = []
     targets = []
     source_names = []
     for name in filenames:
@@ -214,15 +213,16 @@ def handle_compile(args):
             targets.append(make_dir_target(name))
         else:
             source_names.append(name)
-    #print("source:"+' '.join(source_names))
-    #print("compile targets:"+' '.join(get_compile_targets_from_filenames(source_names)))
+    # print("source:"+' '.join(source_names))
+    # print("compile targets:"+' '.join(get_compile_targets_from_filenames(source_names)))
     targets.extend(get_compile_targets_from_filenames(source_names))
-    print(colored("targets: "+' '.join(targets), Colors.OKBLUE))
+    print(colored("targets: " + ' '.join(targets), Colors.OKBLUE))
     build_env = BuildEnv(targets, args.make_options, get_override_vars(args))
     if build_env.make():
         exit(0)
     else:
         exit(1)
+
 
 def handle_build(args):
     """
@@ -240,14 +240,18 @@ def handle_build(args):
         exit(0)
     else:
         exit(1)
+
+
 def make_dir_target(filename):
     return f"dir_{os.path.basename(filename.strip(os.sep))}"
+
 
 def handle_cvtsrcpf(args):
     """
     Processing the cvtsrcpf command
     """
     CvtSrcPf(args.file, args.library, args.ccsid).run()
+
 
 def get_override_vars(args):
     """ Get the override variables from the arguments"""

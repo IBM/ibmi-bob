@@ -1,11 +1,13 @@
-#!/QOpenSys/pkgs/bin/python3.6
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import json
 from pathlib import Path
-from typing import Dict, Tuple
+from typing import Dict
+
 from makei.const import DEFAULT_TGT_CCSID, DEFAULT_OBJLIB
 from makei.utils import parse_all_variables
+
 
 class IBMiJson:
     """A class to represent the ibmi.json file"""
@@ -16,7 +18,7 @@ class IBMiJson:
     def __init__(self, version: str, build: Dict[str, str]):
         self.version = version
         self.build = build
-    
+
     @classmethod
     def from_values(cls, tgt_ccsid: str, objlib: str, version: str = None) -> "IBMiJson":
         """Creates an IBMiJson object from values"""
@@ -58,7 +60,7 @@ class IBMiJson:
             build["objlib"] = self.build["objlib"]
 
         if len(build.keys()) > 0:
-            return  {
+            return {
                 "version": self.version,
                 "build": build
             }

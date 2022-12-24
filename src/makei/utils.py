@@ -1,4 +1,4 @@
-#!/QOpenSys/pkgs/bin/python3.6
+#!/usr/bin/env python3
 
 # Licensed Materials - Property of IBM
 # 57XX-XXX
@@ -6,15 +6,15 @@
 
 """ The utility module"""
 
-from datetime import datetime
-from enum import Enum
-from tempfile import mkstemp, gettempdir
 import json
 import os
-from pathlib import Path
-from shutil import move, copymode
 import subprocess
 import sys
+from datetime import datetime
+from enum import Enum
+from pathlib import Path
+from shutil import move, copymode
+from tempfile import mkstemp, gettempdir
 from typing import Callable, List, Optional, Tuple, Union
 
 from makei.const import FILE_MAX_EXT_LENGTH, FILE_TARGET_MAPPING
@@ -42,6 +42,7 @@ def colored(message: str, color: Colors) -> str:
 def support_color():
     """ Detects if the terminal supports color."""
     return sys.stdout.isatty()
+
 
 def parse_variable(var_name: str):
     """ Returns the value of the given variable name in the system environment,
@@ -103,6 +104,7 @@ def parse_all_variables(input_str: str) -> str:
     result = result[:-1]
     return result
 
+
 def objlib_to_path(lib, object=None) -> str:
     """Returns the path for the given objlib in IFS
 
@@ -120,12 +122,14 @@ def objlib_to_path(lib, object=None) -> str:
     else:
         return f"/QSYS.LIB/{lib}.LIB"
 
+
 def create_temp_file(file_name: str) -> Path:
     """ Creates a temporary file with the given name and returns the path to it.
     """
     temp_file = Path(gettempdir()) / file_name
     temp_file.touch()
     return temp_file
+
 
 def validate_ccsid(ccsid: str):
     """Returns if the ccsid is a valid value
@@ -146,6 +150,7 @@ def validate_ccsid(ccsid: str):
         return True
     except Exception:
         return False
+
 
 def create_ibmi_json(ibmi_json_path: Path, tgt_ccsid: str = None, version: str = None, objlib: str = None):
     """ Creates the .ibmi.json file with the given parameters.
@@ -178,7 +183,8 @@ def print_to_stdout(line: Union[str, bytes]):
     sys.stdout.buffer.write(line)
     sys.stdout.buffer.flush()
 
-def run_command(cmd: str, stdoutHandler: Callable[[bytes], None]=print_to_stdout, echo_cmd: bool = True) -> int:
+
+def run_command(cmd: str, stdoutHandler: Callable[[bytes], None] = print_to_stdout, echo_cmd: bool = True) -> int:
     """ Run a command in a shell environment and redirect its stdout and stderr
         and returns the exit code
 
@@ -199,6 +205,7 @@ def run_command(cmd: str, stdoutHandler: Callable[[bytes], None]=print_to_stdout
         print(colored(f'Cannot find command {error.filename}!', Colors.FAIL))
     finally:
         process.kill()
+
 
 def decompose_filename(filename: str) -> Tuple[str, Optional[str], str, str]:
     """Returns the (name, text-attribute, extension, dirname) of the file name
@@ -237,6 +244,7 @@ def decompose_filename(filename: str) -> Tuple[str, Optional[str], str, str]:
     if ext_len == 0:
         raise ValueError(f"Cannot decomposite filename: {filename} as {ext} is not a recognized file extension")
 
+
 def is_source_file(filename: str) -> bool:
     """Returns true if the file is a source file
     >>> is_source_file("SAMREF.PF")
@@ -258,11 +266,13 @@ def is_source_file(filename: str) -> bool:
     except ValueError:
         return False
 
+
 def get_target_from_filename(filename: str) -> str:
     """Returns the target from the filename
     """
     name, _, ext, _ = decompose_filename(filename)
     return f'{name.upper()}.{FILE_TARGET_MAPPING[ext]}'
+
 
 def get_compile_targets_from_filenames(filenames: List[str]) -> List[str]:
     """ Returns the possible target name for the given filename
@@ -292,21 +302,23 @@ def format_datetime(d: datetime) -> str:
     # 2022-03-25-09.33.34.064676
     return d.strftime("%Y-%m-%d-%H.%M.%S.%f")
 
+
 def replace_file_content(file_path: Path, replace: Callable[[str], str]):
-    #Create temp file
+    # Create temp file
     fh, abs_path = mkstemp()
-    with os.fdopen(fh,'w') as new_file:
+    with os.fdopen(fh, 'w') as new_file:
         with open(file_path) as old_file:
             for line in old_file:
                 new_file.write(replace(line))
-    #Copy the file permissions from the old file to the new file
+    # Copy the file permissions from the old file to the new file
     copymode(file_path, abs_path)
-    #Remove original file
+    # Remove original file
     os.remove(file_path)
-    #Move new file
+    # Move new file
     move(abs_path, file_path)
 
-def makeIncludeDirsAbsolute(jobLogPath: str, parameters: str ):
+
+def makeIncludeDirsAbsolute(jobLogPath: str, parameters: str):
     """
     Return modified parameters with absolute dirs if it includes INCDIR
     joblog_path is the full qualified path to the joblog.json.
@@ -344,24 +356,25 @@ def makeIncludeDirsAbsolute(jobLogPath: str, parameters: str ):
     try:
         indexOfJobLogSubstr = jobLogPath.index('.logs/joblog.json')
         curDir = jobLogPath[0:indexOfJobLogSubstr]
-    except: 
+    except:
         return parameters
-    
+
     try:
         incDirKeyWordIndex = parameters.index('INCDIR')
         startOfIncDir = parameters.index('(', incDirKeyWordIndex)
         endOfIncDir = parameters.index(')', startOfIncDir)
     except:
         return parameters
-    
+
     includePath = []
     includePathStr = parameters[startOfIncDir + 1: endOfIncDir]
     includePath = includePathStr.split()
 
     for i in range(len(includePath)):
-        relativePath = includePath[i][1] != '/' and not (len(includePath[i]) > 3 and  includePath[i][1] == "'" and includePath[i][2] == "/")
+        relativePath = includePath[i][1] != '/' and not (
+                len(includePath[i]) > 3 and includePath[i][1] == "'" and includePath[i][2] == "/")
         enclosedByQuotes = includePath[i][1] == "'" and len(includePath[i]) > 2
-        
+
         if relativePath and curDir:
             if enclosedByQuotes:
                 includePathDir = includePath[i][2:-2]
@@ -371,9 +384,11 @@ def makeIncludeDirsAbsolute(jobLogPath: str, parameters: str ):
                 includePath[i] = "'" + curDir + includePathDir + "'"
 
     startOfParamString = parameters[0:startOfIncDir + 1]
-    endOfParamString = parameters[endOfIncDir:] 
+    endOfParamString = parameters[endOfIncDir:]
     return startOfParamString + " ".join(includePath) + endOfParamString
+
 
 if __name__ == "__main__":
     import doctest
+
     doctest.testmod()

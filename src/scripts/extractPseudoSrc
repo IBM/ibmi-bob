@@ -1,4 +1,4 @@
-#! /QOpenSys/pkgs/bin/bash
+#!/usr/bin/env bash
 
 pseudoSrcFile=$1
 objlib=$2

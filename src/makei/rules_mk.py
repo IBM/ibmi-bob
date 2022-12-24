@@ -1,14 +1,13 @@
-#!/QOpenSys/pkgs/bin/python3.6
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from pathlib import Path
 import re
-from typing import Callable, Dict, List, Optional, Tuple
-import sys
-sys.path.append(str(Path(__file__).resolve().parent.parent))  # nopep8
+from pathlib import Path
+from typing import Callable, Dict, List, Optional
 
-from makei.utils import decompose_filename, is_source_file
 from makei.const import FILE_TARGETGROUPS_MAPPING, TARGET_GROUPS, TARGET_TARGETGROUPS_MAPPING
+from makei.utils import decompose_filename, is_source_file
+
 
 class MKRule:
     """Class representing a make rule"""
@@ -21,7 +20,8 @@ class MKRule:
 
     source_file: Optional[str] = None
 
-    def __init__(self, target: str, dependencies: List[str], commands: List[str], variables: Dict[str, str], containing_dir: Path, include_dirs: List[Path]):
+    def __init__(self, target: str, dependencies: List[str], commands: List[str], variables: Dict[str, str],
+                 containing_dir: Path, include_dirs: List[Path]):
         self.target = target
         self.dependencies = dependencies
         self.commands = list(filter(lambda command: command.strip(), commands))
@@ -45,19 +45,19 @@ class MKRule:
             self.commands.insert(0, f"@$(call echo_cmd,=== Creating [{self.target}] from custom recipe)")
             self.commands.append(f"@$(call echo_success_cmd,End of creating {self.target})")
 
-
-
     def __str__(self):
         variable_assignment = ''.join(f"{self.target} : {key} = {value}\n" for key, value in self.variables.items())
         if len(self.commands) > 0:
-            return f"{self.target}_CUSTOM_RECIPE=true" + '\n' + f"{self.target} : {' '.join(self._parse_dependencies())}" + '\n' + ''.join(['\t' + cmd + '\n' for cmd in self.commands]) + variable_assignment
+            return f"{self.target}_CUSTOM_RECIPE=true" + '\n' + f"{self.target} : {' '.join(self._parse_dependencies())}" + '\n' + ''.join(
+                ['\t' + cmd + '\n' for cmd in self.commands]) + variable_assignment
         else:
             try:
                 target_type = self.target.split(".")[-1].upper()
                 if target_type == "SQL" or target_type == "MSGF":
                     recipe_name = f"{target_type}_RECIPE"
                 else:
-                    recipe_name = decompose_filename(self.source_file)[2].upper() + '_TO_' + self.target.split(".")[-1].upper() + '_RECIPE'
+                    recipe_name = decompose_filename(self.source_file)[2].upper() + '_TO_' + self.target.split(".")[
+                        -1].upper() + '_RECIPE'
                 return f"{self.target}_SRC={self.source_file}" + '\n' + f"{self.target}_DEP={' '.join(self.dependencies)}" + '\n' + f"{self.target}_RECIPE={recipe_name}" + '\n' + variable_assignment
             except AttributeError:
                 print(f"No source file found for {self.target}")
@@ -82,8 +82,7 @@ class MKRule:
             else:
                 result.append(dependency)
         return result
-                        
-                        
+
     @staticmethod
     def from_str(rule_str: str, containing_dir: Path, include_dirs: List[Path]) -> "MKRule":
         r"""Creates a MKRule object from a string
@@ -105,10 +104,11 @@ class MKRule:
         if target_match:
             target = target_match.group("target")
             dependencies = target_match.group("dependencies").split()
-            commands = list(filter(lambda cmd: cmd, map(lambda cmd: cmd.strip(), target_match.group("cmds").split('\n'))))
+            commands = list(
+                filter(lambda cmd: cmd, map(lambda cmd: cmd.strip(), target_match.group("cmds").split('\n'))))
         else:
             raise ValueError(f"Invalid rule string '{rule_str}'")
-        
+
         return MKRule(target, dependencies, commands, {}, containing_dir, include_dirs)
 
 
@@ -122,7 +122,7 @@ class RulesMk:
     build_context: Optional["BuildEnv"] = None
 
     def __init__(self, subdirs: List[str], rules: List[MKRule], containing_dir: Path) -> None:
-        self.targets = { tgt_group + 's': [] for tgt_group in TARGET_GROUPS }
+        self.targets = {tgt_group + 's': [] for tgt_group in TARGET_GROUPS}
         for rule in rules:
             if rule.source_file is not None:
                 tgt_group = FILE_TARGETGROUPS_MAPPING[decompose_filename(rule.source_file)[-2]]
@@ -135,11 +135,11 @@ class RulesMk:
                     exit(1)
 
                 self.targets[tgt_group + 's'].append(rule.target)
-                
+
         self.subdirs = subdirs
         self.rules = rules
         self.containing_dir = containing_dir
-        
+
     # Read makefile and create a RulesMk object
     @classmethod
     def from_file(cls, rules_mk_path: Path, include_dirs: List[Path] = []) -> "RulesMk":
@@ -204,7 +204,7 @@ class RulesMk:
             else:
                 # print(f"Skipped line {line}")
                 continue
-            
+
         if recipe_env:
             rules.append(MKRule.from_str(recipe_str, containing_dir, include_dirs))
 
@@ -220,7 +220,7 @@ class RulesMk:
         rules_str = ""
         if len(self.subdirs) > 0:
             rules_str += "SUBDIRS := " + " ".join(self.subdirs) + "\n\n"
-        
+
         for target_group, targets in self.targets.items():
             if len(targets) > 0:
                 rules_str += f"{target_group} := {' '.join(targets)}\n"
@@ -228,8 +228,10 @@ class RulesMk:
         rules_str += ''.join(map(str, map(rules_middleware, self.rules)))
         return rules_str
 
+
 if __name__ == "__main__":
     # print(RulesMk.from_file(Path("/Users/tongkun/git/bob-recursive-example/QDDSSRC/Rules.mk")))
     # print(str(RulesMk.from_file(Path("/Users/tongkun/git/bob-recursive-example/functionsVAT/Rules.mk"))))
     import doctest
+
     doctest.testmod()

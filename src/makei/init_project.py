@@ -1,4 +1,4 @@
-#!/QOpenSys/pkgs/bin/python3.6
+#!/usr/bin/env python3
 
 # Licensed Materials - Property of IBM
 # 57XX-XXX
@@ -7,16 +7,16 @@
 """This module is """
 
 import json
-from pathlib import Path
 import re
 import signal
 import sys
+from pathlib import Path
 from typing import List, Optional
 
 from makei.const import DEFAULT_CURLIB, DEFAULT_TGT_CCSID, DEFAULT_OBJLIB
-from .iproj_json import IProjJson
-from .ibmi_json import IBMiJson
 from makei.utils import colored, Colors
+from .ibmi_json import IBMiJson
+from .iproj_json import IProjJson
 
 
 class ProjSpec():
@@ -83,16 +83,16 @@ class ProjSpec():
     def generate_iproj_json(self) -> str:
         """ Generates an iProj.json template"""
         iproj_json = IProjJson(self.description,
-                                self.version,
-                                self.license,
-                                self.repository,
-                                self.include_path,
-                                self.objlib,
-                                self.curlib,
-                                self.pre_usr_libl,
-                                self.post_usr_libl,
-                                self.set_ibm_i_env_cmd,
-                                self.tgt_ccsid)
+                               self.version,
+                               self.license,
+                               self.repository,
+                               self.include_path,
+                               self.objlib,
+                               self.curlib,
+                               self.pre_usr_libl,
+                               self.post_usr_libl,
+                               self.set_ibm_i_env_cmd,
+                               self.tgt_ccsid)
         return json.dumps(iproj_json.__dict__(), indent=4)
 
     def generate_ibmi_json(self) -> Optional[str]:
@@ -189,10 +189,10 @@ def init_project(force: bool = False) -> None:
 
     print('\n'.join(['',
                      "The following files will be added to the project"] + list(filter(None, [
-                         f"+ {iproj_json_path}" if iproj_json_content else None,
-                         f"+ {ibmi_json_path}" if ibmi_json_content else None,
-                         f"+ {rules_mk_path}" if rules_mk_content else None,
-                     ]))))
+        f"+ {iproj_json_path}" if iproj_json_content else None,
+        f"+ {ibmi_json_path}" if ibmi_json_content else None,
+        f"+ {rules_mk_path}" if rules_mk_content else None,
+    ]))))
     if force or yes(input('Continue? (yes) ')):
         create_file(iproj_json_path, proj_spec.generate_iproj_json(), force)
         create_file(ibmi_json_path, proj_spec.generate_ibmi_json(), force)
@@ -203,4 +203,5 @@ def init_project(force: bool = False) -> None:
 
 if __name__ == "__main__":
     import doctest
+
     doctest.testmod()

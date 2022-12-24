@@ -1,0 +1,49 @@
+#!/usr/bin/env sh
+# This script provides functions for checking if required tools are installed and in the system path.
+
+check_tool() {
+    # Check if a tool is installed and in the system path
+    if command -v "$1" > /dev/null 2>&1; then
+        return 0
+    else
+        echo "$1 is not installed or not in your system PATH."
+        exit 1
+    fi
+}
+
+check_path() {
+    # Check if the system path is set correctly
+    # Check if the system path is set correctly
+    if [ "$(uname -s)" = "OS400" ]; then
+        case "$PATH" in
+            *:/QOpenSys/pkgs/bin*)
+                # Substring is present
+                ;;
+            *)
+                echo "It looks like /QOpenSys/pkgs/bin/ is not currently in your system PATH. "
+                echo "This means that programs and tools installed in this directory may not be "
+                echo "easily accessible from the command line."
+                echo ""
+                echo "To add /QOpenSys/pkgs/bin/ to your system PATH (if it is not already present), "
+                echo "use the following command:"
+                echo ""
+                echo "export PATH=\$PATH:/QOpenSys/pkgs/bin"
+                echo ""
+                echo "You can also add this command to your shell profile file "
+                echo "(e.g. ~/.bashrc or ~/.bash_profile) to make the change permanent."
+                echo ""
+                return 1
+            ;;
+        esac
+    fi
+    return 0
+}
+
+check_dependencies() {
+    # Check if a list of tools are installed and in the system path
+    check_path
+    check_tool python3
+    check_tool bash
+    check_tool make
+    check_tool jq
+}

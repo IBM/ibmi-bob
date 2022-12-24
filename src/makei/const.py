@@ -8,24 +8,24 @@ DEFAULT_CURLIB = "*CRTDFT"
 BOB_PATH = Path(__file__).resolve().parent.parent
 
 TARGET_GROUPS = ["TRG",
-                    "DTA",
-                    "SQL",
-                    "BNDD",
-                    "PF",
-                    "LF",
-                    "DSPF",
-                    "PRTF",
-                    "CMD",
-                    "SQL",
-                    "MODULE",
-                    "SRVPGM",
-                    "PGM",
-                    "MENU",
-                    "PNLGRP",
-                    "QMQRY",
-                    "WSCST",
-                    "MSG"
-                ]
+                 "DTA",
+                 "SQL",
+                 "BNDD",
+                 "PF",
+                 "LF",
+                 "DSPF",
+                 "PRTF",
+                 "CMD",
+                 "SQL",
+                 "MODULE",
+                 "SRVPGM",
+                 "PGM",
+                 "MENU",
+                 "PNLGRP",
+                 "QMQRY",
+                 "WSCST",
+                 "MSG"
+                 ]
 
 FILE_TARGETGROUPS_MAPPING = {
     "PGM.SQLRPGLE": "PGM",

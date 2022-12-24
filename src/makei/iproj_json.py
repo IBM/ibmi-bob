@@ -1,15 +1,16 @@
-#!/QOpenSys/pkgs/bin/python3.6
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import json
-from pathlib import Path
 import sys
+from pathlib import Path
 from typing import Dict, List, Optional, Union
 
 from makei.const import DEFAULT_CURLIB, DEFAULT_OBJLIB
 from makei.utils import parse_all_variables, Colors, colored
 
 JsonType = Union[None, int, str, bool, List["JsonType"], Dict["JsonType", "JsonType"]]
+
 
 class IProjJson:
     """A class to represent the iproj.json file"""
@@ -26,19 +27,19 @@ class IProjJson:
     set_ibm_i_env_cmd: List[str]
     tgt_ccsid: str
     extensions: Optional[Dict[str, "JsonType"]]
-    
+
     def __init__(self, description: str = "",
-                    version: Optional[str] = None,
-                    license: str = "",
-                    repository: Optional[str] = None,
-                    include_path: List[str] = None,
-                    objlib: str = DEFAULT_OBJLIB,
-                    curlib: str = DEFAULT_CURLIB,
-                    pre_usr_libl: List[str] = None,
-                    post_usr_libl: List[str] = None,
-                    set_ibm_i_env_cmd: List[str] = None,
-                    tgt_ccsid: str = "*JOB",
-                    extensions: Optional[Dict[str, JsonType]] = None):
+                 version: Optional[str] = None,
+                 license: str = "",
+                 repository: Optional[str] = None,
+                 include_path: List[str] = None,
+                 objlib: str = DEFAULT_OBJLIB,
+                 curlib: str = DEFAULT_CURLIB,
+                 pre_usr_libl: List[str] = None,
+                 post_usr_libl: List[str] = None,
+                 set_ibm_i_env_cmd: List[str] = None,
+                 tgt_ccsid: str = "*JOB",
+                 extensions: Optional[Dict[str, JsonType]] = None):
         self.description = description
         self.version = version
         self.license = license
@@ -51,10 +52,11 @@ class IProjJson:
         self.set_ibm_i_env_cmd = set_ibm_i_env_cmd if set_ibm_i_env_cmd else []
         self.tgt_ccsid = tgt_ccsid
         self.extensions = extensions if extensions else {}
-    
+
     @classmethod
     def from_file(cls, file_path: Path) -> "IProjJson":
         """Creates an IBMiJson object from a file"""
+
         def with_default_value(key, default_value, dict):
             if key in dict:
                 return dict[key]
@@ -77,7 +79,7 @@ class IProjJson:
                 pre_usr_libl = list(map(parse_all_variables, with_default_value("preUsrlibl", [], iproj_json)))
 
                 post_usr_libl = list(map(parse_all_variables, with_default_value("postUsrlibl", [], iproj_json)))
-                include_path = list(map(parse_all_variables, with_default_value("includePath",[], iproj_json)))
+                include_path = list(map(parse_all_variables, with_default_value("includePath", [], iproj_json)))
 
                 tgt_ccsid = with_default_value("tgtCcsid", "*JOB", iproj_json)
                 set_ibm_i_env_cmd = list(map(parse_all_variables, with_default_value("setIBMiEnvCmd", [], iproj_json)))
@@ -126,4 +128,5 @@ class IProjJson:
 
 if __name__ == "__main__":
     import doctest
+
     doctest.testmod()
