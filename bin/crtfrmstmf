@@ -1,0 +1,10 @@
+#!/usr/bin/env sh
+
+SCRIPT_DIR="$(dirname "$0")"
+BOB_DIR="${SCRIPT_DIR}/.."
+
+. "${BOB_DIR}/src/scripts/checkDependencies"
+
+check_dependencies
+
+python3 "${BOB_DIR}/src/makei/crtfrmstmf.py" "$@"
