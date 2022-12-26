@@ -38,7 +38,6 @@ setup(
     keywords=["bob", "IBM i", "QSYS", "make", "build"],
     scripts=[
         "bin/makei",
-        "bin/getJobLog",
         "bin/crtfrmstmf",
     ],
     classifiers=[
