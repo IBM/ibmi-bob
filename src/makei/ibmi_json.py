@@ -64,8 +64,7 @@ class IBMiJson:
                 "version": self.version,
                 "build": build
             }
-        else:
-            return None
+        return None
 
     def copy(self) -> "IBMiJson":
         """Returns a copy of the IBMiJson object"""
@@ -75,5 +74,5 @@ class IBMiJson:
         """Saves the IBMiJson object to a file"""
         if not Path(file_path).exists():
             Path(file_path).touch()
-        with open(file_path, 'w') as f:
+        with open(file_path, 'w', encoding="utf-8") as f:
             json.dump(self.__dict__, f, indent=4)

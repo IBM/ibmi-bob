@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import json
+import sys
 from contextlib import closing
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple
@@ -22,10 +23,11 @@ class IBMJob():
             self.conn.set_option({ibm_db_dbi.SQL_ATTR_TXN_ISOLATION:
                                       ibm_db_dbi.SQL_TXN_NO_COMMIT})
             self.job_id = self.run_sql("VALUES(QSYS2.JOB_NAME)")[0][0][0]
+        # pylint: disable=broad-except
         except Exception as e:
             print(e)
             print("Cannot connect to the database")
-            exit(1)
+            sys.exit(1)
 
     def __del__(self):
         self.conn.close()
@@ -37,7 +39,8 @@ class IBMJob():
             try:
                 cursor.callproc("qsys2.qcmdexc", [cmd])
                 return True
-            except Exception as e:
+            # pylint: disable=broad-except
+            except Exception:
                 if not ignore_errors:
                     print(f"[FAILED]  {cmd}")
                     raise
@@ -52,15 +55,17 @@ class IBMJob():
                 try:
                     column_names = [column[0] for column in cursor.description]
                     rows = cursor.fetchall()
-                except:
+                # pylint: disable=broad-except
+                except Exception:
                     return None
                 return (rows, column_names)
-            except Exception as e:
+            # pylint: disable=broad-except
+            except Exception:
                 if not ignore_errors:
                     print(f"[FAILED]  {sql}")
                     raise
 
-    def _dump_results_to_dict(self, results: Tuple[List[str], List[List[Any]]]):
+    def dump_results_to_dict(self, results: Tuple[List[str], List[List[Any]]]):
         record_dicts = []
         records, column_names = results
         for record in records:
@@ -71,9 +76,9 @@ class IBMJob():
         return get_joblog_for_job(self.job_id)
 
 
-def get_joblog_for_job(id: str) -> List[Dict[str, Any]]:
+def get_joblog_for_job(job_id: str) -> List[Dict[str, Any]]:
     query_job = IBMJob()
-    sql = f"SELECT MESSAGE_ID," + \
+    sql = "SELECT MESSAGE_ID," + \
           "MESSAGE_TEXT," + \
           "MESSAGE_SECOND_LEVEL_TEXT," + \
           "MESSAGE_TYPE," + \
@@ -89,19 +94,19 @@ def get_joblog_for_job(id: str) -> List[Dict[str, Any]]:
           "TO_INSTRUCTION" + \
           " " + \
           "FROM TABLE(" + \
-          f"QSYS2.JOBLOG_INFO('{id}')" + \
+          f"QSYS2.JOBLOG_INFO('{job_id}')" + \
           ") A"
     results = query_job.run_sql(sql)
-    joblog_dict = query_job._dump_results_to_dict(results)
+    joblog_dict = query_job.dump_results_to_dict(results)
     return joblog_dict
 
 
 def save_joblog_json(cmd: str, cmd_time: str, jobid: str, joblog_json: Optional[str],
-                     filter: Callable[[Dict[str, Any]], bool] = None):
+                     filter_func: Callable[[Dict[str, Any]], bool] = None):
     records = get_joblog_for_job(jobid)
     messages = []
     for record in records:
-        if filter is not None and not filter(record):
+        if filter_func is not None and not filter_func(record):
             continue
         if "not safe for a multithreaded job" in record["MESSAGE_TEXT"]:
             continue
@@ -128,14 +133,14 @@ def save_joblog_json(cmd: str, cmd_time: str, jobid: str, joblog_json: Optional[
 
     if joblog_json is not None:
         joblog_json_path = Path(joblog_json)
-        if (joblog_json_path.is_file()):
-            with joblog_json_path.open() as json_file:
+        if joblog_json_path.is_file():
+            with joblog_json_path.open(encoding="utf-8") as json_file:
                 data = json.load(json_file)
                 data.append(dumped_joblog)
         else:
             data = [dumped_joblog]
 
-        with joblog_json_path.open('w') as json_file:
+        with joblog_json_path.open('w', encoding="utf-8") as json_file:
             json.dump(data, json_file, indent=4)
     else:
         print(json.dumps([dumped_joblog], indent=4))

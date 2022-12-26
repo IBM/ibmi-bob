@@ -7,7 +7,7 @@ class Config:
         self._config = self._load_config()
 
     def _load_config(self):
-        with open(self.config_file, 'r') as f:
+        with open(self.config_file, 'r', encoding="utf-8") as f:
             return json.load(f)
 
     def get_config(self):
@@ -18,5 +18,5 @@ class Config:
         self._save_config()
 
     def _save_config(self):
-        with open(self.config_file, 'w') as f:
+        with open(self.config_file, 'w', encoding="utf-8") as f:
             json.dump(self._config, f)

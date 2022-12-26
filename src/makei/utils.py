@@ -35,8 +35,7 @@ def colored(message: str, color: Colors) -> str:
     """
     if support_color():
         return f"{color}{message}{Colors.ENDC}"
-    else:
-        return f"{message}"
+    return f"{message}"
 
 
 def support_color():
@@ -105,7 +104,7 @@ def parse_all_variables(input_str: str) -> str:
     return result
 
 
-def objlib_to_path(lib, object=None) -> str:
+def objlib_to_path(lib, object_name=None) -> str:
     """Returns the path for the given objlib in IFS
 
     >>> objlib_to_path("TONGKUN")
@@ -116,11 +115,10 @@ def objlib_to_path(lib, object=None) -> str:
     if not lib:
         raise ValueError()
     if lib == "QSYS":
-        return f"/QSYS.LIB/{object}"
-    if object is not None:
-        return f"/QSYS.LIB/{lib}.LIB/{object}"
-    else:
-        return f"/QSYS.LIB/{lib}.LIB"
+        return f"/QSYS.LIB/{object_name}"
+    if object_name is not None:
+        return f"/QSYS.LIB/{lib}.LIB/{object_name}"
+    return f"/QSYS.LIB/{lib}.LIB"
 
 
 def create_temp_file(file_name: str) -> Path:
@@ -178,7 +176,7 @@ def create_ibmi_json(ibmi_json_path: Path, tgt_ccsid: str = None, version: str =
 def print_to_stdout(line: Union[str, bytes]):
     """Default stdoutHandler for run_command defined below to write the bytes to the stdout
     """
-    if type(line) == str:
+    if isinstance(line, str):
         line = line.encode(sys.getdefaultencoding())
     sys.stdout.buffer.write(line)
     sys.stdout.buffer.flush()
@@ -318,7 +316,7 @@ def replace_file_content(file_path: Path, replace: Callable[[str], str]):
     move(abs_path, file_path)
 
 
-def makeIncludeDirsAbsolute(jobLogPath: str, parameters: str):
+def make_include_dirs_absolute(job_log_path: str, parameters: str):
     """
     Return modified parameters with absolute dirs if it includes INCDIR
     joblog_path is the full qualified path to the joblog.json.
@@ -330,62 +328,64 @@ def makeIncludeDirsAbsolute(jobLogPath: str, parameters: str):
         to INCDIR('<project path>/dir' '<project path>/dir2')
     Note it is possible to have INCDIR(''dir1'' ''dir2'')
 
-    >>> makeIncludeDirsAbsolute('/a/b/.logs/joblog.json', " PARM1( beginning)INCDIR ('PARAM1'   'PARAM2' ''PARAM3'' 'PARAM4' )parm2( after )   ")
+    >>> make_include_dirs_absolute('/a/b/.logs/joblog.json', " PARM1( beginning)INCDIR ('PARAM1'   'PARAM2' ''PARAM3'' 'PARAM4' )parm2( after )   ")
     " PARM1( beginning)INCDIR ('/a/b/PARAM1' '/a/b/PARAM2' ''/a/b/PARAM3'' '/a/b/PARAM4')parm2( after )   "
-    >>> makeIncludeDirsAbsolute('/a/b/.logs/joblog.json', "INCDIR (''  '''')")
+    >>> make_include_dirs_absolute('/a/b/.logs/joblog.json', "INCDIR (''  '''')")
     "INCDIR ('/a/b/' ''/a/b/'')"
-    >>> makeIncludeDirsAbsolute('/a/b/cd/efg/hijklmnop/.logs/joblog.json', " INCDIR( 'dir1'  ''dir2'')")
+    >>> make_include_dirs_absolute('/a/b/cd/efg/hijklmnop/.logs/joblog.json', " INCDIR( 'dir1'  ''dir2'')")
     " INCDIR('/a/b/cd/efg/hijklmnop/dir1' ''/a/b/cd/efg/hijklmnop/dir2'')"
-    >>> makeIncludeDirsAbsolute('/a/b/cd/efg/hijklmnop/.logs/joblog.json', " INCDIR( '/a/b/dir1'  ''dir2'')")
+    >>> make_include_dirs_absolute('/a/b/cd/efg/hijklmnop/.logs/joblog.json', " INCDIR( '/a/b/dir1'  ''dir2'')")
     " INCDIR('/a/b/dir1' ''/a/b/cd/efg/hijklmnop/dir2'')"
-    >>> makeIncludeDirsAbsolute('/a/b/cd/efg/hijklmnop/.logs/joblog.json', " INCDIR( ''/a/b/dir1''  ''dir2'')")
+    >>> make_include_dirs_absolute('/a/b/cd/efg/hijklmnop/.logs/joblog.json', " INCDIR( ''/a/b/dir1''  ''dir2'')")
     " INCDIR(''/a/b/dir1'' ''/a/b/cd/efg/hijklmnop/dir2'')"
-    >>> makeIncludeDirsAbsolute('/.logs/joblog.json', " INCDIR('dir2')")
+    >>> make_include_dirs_absolute('/.logs/joblog.json', " INCDIR('dir2')")
     " INCDIR('/dir2')"
-    >>> makeIncludeDirsAbsolute('/a/b/cd/efg/hijklmnop/.logs/joblogs.json', " INCDIR( ''/a/b/dir1''  ''dir2'')")
+    >>> make_include_dirs_absolute('/a/b/cd/efg/hijklmnop/.logs/joblogs.json', " INCDIR( ''/a/b/dir1''  ''dir2'')")
     " INCDIR( ''/a/b/dir1''  ''dir2'')"
-    >>> makeIncludeDirsAbsolute('/a/b/.logs/joblogs.json', "no include path here")
+    >>> make_include_dirs_absolute('/a/b/.logs/joblogs.json', "no include path here")
     'no include path here'
-    >>> makeIncludeDirsAbsolute('/joblogs.json', "no .logs")
+    >>> make_include_dirs_absolute('/joblogs.json', "no .logs")
     'no .logs'
-    >>> makeIncludeDirsAbsolute('/.logs/joblogs.json', "INCDIR but no paren")
+    >>> make_include_dirs_absolute('/.logs/joblogs.json', "INCDIR but no paren")
     'INCDIR but no paren'
-    >>> makeIncludeDirsAbsolute('/.logs/joblogs.json', "INCDIR( but no close paren")
+    >>> make_include_dirs_absolute('/.logs/joblogs.json', "INCDIR( but no close paren")
     'INCDIR( but no close paren'
     """
     try:
-        indexOfJobLogSubstr = jobLogPath.index('.logs/joblog.json')
-        curDir = jobLogPath[0:indexOfJobLogSubstr]
-    except:
+        index_of_job_log_substr = job_log_path.index('.logs/joblog.json')
+        cur_dir = job_log_path[0:index_of_job_log_substr]
+    # pylint: disable=broad-except
+    except Exception:
         return parameters
 
     try:
-        incDirKeyWordIndex = parameters.index('INCDIR')
-        startOfIncDir = parameters.index('(', incDirKeyWordIndex)
-        endOfIncDir = parameters.index(')', startOfIncDir)
-    except:
+        inc_dir_key_word_index = parameters.index('INCDIR')
+        start_of_inc_dir = parameters.index('(', inc_dir_key_word_index)
+        end_of_inc_dir = parameters.index(')', start_of_inc_dir)
+    # pylint: disable=broad-except
+    except Exception:
         return parameters
 
-    includePath = []
-    includePathStr = parameters[startOfIncDir + 1: endOfIncDir]
-    includePath = includePathStr.split()
+    include_path = []
+    include_path_str = parameters[start_of_inc_dir + 1: end_of_inc_dir]
+    include_path = include_path_str.split()
 
-    for i in range(len(includePath)):
-        relativePath = includePath[i][1] != '/' and not (
-                len(includePath[i]) > 3 and includePath[i][1] == "'" and includePath[i][2] == "/")
-        enclosedByQuotes = includePath[i][1] == "'" and len(includePath[i]) > 2
+    for i in range(len(include_path)):
+        relative_path = include_path[i][1] != '/' and not (
+                len(include_path[i]) > 3 and include_path[i][1] == "'" and include_path[i][2] == "/")
+        enclosed_by_quotes = include_path[i][1] == "'" and len(include_path[i]) > 2
 
-        if relativePath and curDir:
-            if enclosedByQuotes:
-                includePathDir = includePath[i][2:-2]
-                includePath[i] = "''" + curDir + includePathDir + "''"
+        if relative_path and cur_dir:
+            if enclosed_by_quotes:
+                include_path_dir = include_path[i][2:-2]
+                include_path[i] = "''" + cur_dir + include_path_dir + "''"
             else:
-                includePathDir = includePath[i][1:-1]
-                includePath[i] = "'" + curDir + includePathDir + "'"
+                include_path_dir = include_path[i][1:-1]
+                include_path[i] = "'" + cur_dir + include_path_dir + "'"
 
-    startOfParamString = parameters[0:startOfIncDir + 1]
-    endOfParamString = parameters[endOfIncDir:]
-    return startOfParamString + " ".join(includePath) + endOfParamString
+    start_of_param_string = parameters[0:start_of_inc_dir + 1]
+    end_of_param_string = parameters[end_of_inc_dir:]
+    return start_of_param_string + " ".join(include_path) + end_of_param_string
 
 
 if __name__ == "__main__":
