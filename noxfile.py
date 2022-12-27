@@ -66,6 +66,13 @@ def dev(session: nox.Session) -> None:
     session.run(python, "-m", "pip", "install", "-e", ".[dev]", external=True)
 
 
+def check_changelog_version(new_version: str) -> bool:
+    """Returns True if the new version is in the changelog, False otherwise."""
+    changelog = pathlib.Path("CHANGELOG").read_text(encoding="utf-8")
+    first_line = changelog.splitlines()[0]
+    return new_version in first_line
+
+
 @nox.session
 def release(session: nox.Session) -> None:
     """
@@ -87,21 +94,36 @@ def release(session: nox.Session) -> None:
     args: argparse.Namespace = parser.parse_args(args=session.posargs)
     version: str = args.version.pop()
 
+    version_info = session.run("bump2version", "--dry-run", "--list", version,
+                               silent=True, env={"LC_CTYPE": "en_US.UTF-8"})
+    current_version = [line for line in version_info.splitlines()
+                       if "current_version" in line][0].split("=")[1]
+    new_version = [line for line in version_info.splitlines()
+                   if "new_version" in line][0].split("=")[1]
+
     # If we get here, we should be good to go
     # Let's do a final check for safety
     confirm = input(
-        f"You are about to bump the {version!r} version. Are you sure? [y/n]: "
+        f"You are about to bump from v{current_version} to v{new_version}. "
+        "This will create a new tag and push it to the remote. Continue? [y/N] "
     )
 
     # Abort on anything other than 'y'
     if confirm.lower().strip() != "y":
         session.error(f"You said no when prompted to bump the {version!r} version.")
 
+    if not check_changelog_version(new_version):
+        session.error(
+            f"Could not find {new_version} in CHANGELOG. "
+            "Please make sure the latest version is at the top of the changelog.")
+
     session.install("bump2version")
 
     session.log(f"Bumping the {version!r} version")
-    session.run("bump2version", version)
+    # session.run("bump2version", version)
 
     session.log("Pushing the new tag")
-    session.run("git", "push", external=True)
-    session.run("git", "push", "--tags", external=True)
+    # session.run("git", "push", external=True)
+    # session.run("git", "push", "--tags", external=True)
+    session.log("Done!")
+    session.log("A new release should be available on GitHub and the rpm repo shortly.")
