@@ -6,6 +6,15 @@ on:
     branches: [ master ]
     types:
       - completed
+      -
+env:
+  SPEC_REPO_SPEC_PATH: ${{ secrets.SPEC_REPO_SPEC_PATH }}
+  SPEC_GITHUB_BASE_URL: ${{ secrets.SPEC_GITHUB_BASE_URL }}
+  SPEC_REPO_NAME: ${{ secrets.SPEC_REPO_NAME }}
+  SPEC_REPO_OWNER: ${{ secrets.SPEC_REPO_OWNER }}
+  SPEC_GITHUB_TOKEN: ${{ secrets.SPEC_GITHUB_TOKEN }}
+  SPEC_PROJECT_NAME: ${{ secrets.SPEC_PROJECT_NAME }}
+  
 jobs:
   publish:
     runs-on: ubuntu-latest
