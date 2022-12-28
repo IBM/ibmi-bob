@@ -55,29 +55,38 @@ jobs:
         id: remote_build
         run: |
           $ssh_command "cd $remote_build_dir /QOpenSys/pkgs/bin/rpmbuild -ba --define '_topdir `pwd`/rpmbuild' rpmbuild/SPECS/bob.spec"
+      - name: Find RPM file
+        id: find_rpm
+        run: |
           $scp_dist_command
           RPM_FILE_PATH=$(find . -name '*.rpm' -print -quit)
-          echo "::set-output name=rpm_file_path::$RPM_FILE_PATH"
-        finally:
-          - name: Clean up remote build directory
-            run: $ssh_command "rm -rf $remote_build_dir"
+      - name: Cleanup remote build dir
+        if: always()
+        run: $ssh_command "rm -fr $remote_build_dir"
       - name: Create the release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          draft: false
-          prerelease: false
+        run: echo "Release ${{ github.ref }}"
       - name: Upload RPM file to release
-        id: upload-release-asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ steps.remote_build.outputs.RPM_FILE_PATH }}
-          asset_name: bob.rpm
-          asset_content_type: application/octet-stream
+        run: |
+         echo "Upload RPM file to release"
+         echo "asset_path: ${{ steps.find_rpm.outputs.RPM_FILE_PATH }}"
+         
+      # - name: Create the release
+      #   id: create_release
+      #   uses: actions/create-release@v1
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   with:
+      #     tag_name: ${{ github.ref }}
+      #     release_name: Release ${{ github.ref }}
+      #     draft: false
+      #     prerelease: false
+      # - name: Upload RPM file to release
+      #   id: upload-release-asset
+      #   uses: actions/upload-release-asset@v1
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   with:
+      #     upload_url: ${{ steps.create_release.outputs.upload_url }}
+      #     asset_path: ${{ steps.find_rpm.outputs.RPM_FILE_PATH }}
+      #     asset_name: bob.rpm
+      #     asset_content_type: application/octet-stream
