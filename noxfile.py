@@ -2,12 +2,13 @@ import argparse
 import os
 import pathlib
 import sys
+from typing import Tuple
 
 import nox
 
 # fmt: off
 sys.path.append(".")
-from tools import release  # isort:skip  # noqa
+from tools.release import publish_spec, generate_spec  # isort:skip  # noqa
 
 sys.path.pop()
 
@@ -17,6 +18,7 @@ nox.options.sessions = ["lint", "test"]  # Sessions other than 'dev'
 
 REQUIREMENTS = {
     "tests": "tests/requirements.txt",
+    "tools": "tools/requirements.txt",
 }
 
 
@@ -73,6 +75,17 @@ def check_changelog_version(new_version: str) -> bool:
     return new_version in first_line
 
 
+def _get_version(session: nox.Session, part: str = "build") -> Tuple[str, str]:
+    """Returns the current version and the next version."""
+    version_info = session.run("bump2version", "--dry-run", "--list", part,
+                               silent=True, env={"LC_CTYPE": "en_US.UTF-8"})
+    current_version = [line for line in version_info.splitlines()
+                       if "current_version" in line][0].split("=")[1]
+    new_version = [line for line in version_info.splitlines()
+                   if "new_version" in line][0].split("=")[1]
+    return current_version, new_version
+
+
 @nox.session
 def release(session: nox.Session) -> None:
     """
@@ -94,12 +107,7 @@ def release(session: nox.Session) -> None:
     args: argparse.Namespace = parser.parse_args(args=session.posargs)
     version: str = args.version.pop()
 
-    version_info = session.run("bump2version", "--dry-run", "--list", version,
-                               silent=True, env={"LC_CTYPE": "en_US.UTF-8"})
-    current_version = [line for line in version_info.splitlines()
-                       if "current_version" in line][0].split("=")[1]
-    new_version = [line for line in version_info.splitlines()
-                   if "new_version" in line][0].split("=")[1]
+    current_version, new_version = _get_version(session, version)
 
     # If we get here, we should be good to go
     # Let's do a final check for safety
@@ -117,7 +125,7 @@ def release(session: nox.Session) -> None:
             f"Could not find {new_version} in CHANGELOG. "
             "Please make sure the latest version is at the top of the changelog.")
 
-    session.install("bump2version")
+    session.install("-r", REQUIREMENTS["tools"])
 
     session.log(f"Bumping the {version!r} version")
     # session.run("bump2version", version)
@@ -127,3 +135,24 @@ def release(session: nox.Session) -> None:
     # session.run("git", "push", "--tags", external=True)
     session.log("Done!")
     session.log("A new release should be available on GitHub and the rpm repo shortly.")
+
+
+@nox.session
+def publish(session: nox.Session) -> None:
+    """
+    Generate and publishes the spec file to the rpm repo.
+    """
+    session.install("-r", REQUIREMENTS["tools"])
+
+    # Get the current version
+    current_version, _ = _get_version(session)
+
+    changelog_file = pathlib.Path("CHANGELOG").resolve()
+    spec_file = pathlib.Path("bob.spec").resolve()
+
+    session.log(f"Generating the spec file for v{current_version}")
+    spec = generate_spec.generate_spec(current_version, changelog_file)
+    spec_file.write_text(spec, encoding="utf-8")
+
+    session.log(f"Publishing the spec file for v{current_version}")
+    publish_spec.publish_spec(current_version, spec_file)

@@ -46,7 +46,7 @@ def replace_changelog(template: str,
     return re.sub(r"\${CHANGELOG}", changelog, template)
 
 
-def generate_spec(template: str, version: str, changelog_file: pathlib.Path) -> str:
+def generate_spec(version: str, changelog_file: pathlib.Path) -> str:
     """Generate the spec file by replacing ${version} and ${changelog} in the given template string.
 
     Args:
@@ -57,6 +57,7 @@ def generate_spec(template: str, version: str, changelog_file: pathlib.Path) -> 
     Returns:
         str: The modified spec file.
     """
+    template = template_file.read_text()
     template = replace_version(template, version)
     template = replace_changelog(template, changelog_file)
     return template
@@ -74,8 +75,7 @@ def main():
         print(f"Changelog file {changelog_file} does not exist")
         sys.exit(1)
 
-    template = template_file.read_text()
-    spec = generate_spec(template, version, changelog_file)
+    spec = generate_spec(version, changelog_file)
     with open("bob.spec", "w", encoding="utf-8") as out_file:
         out_file.write(spec)
 
