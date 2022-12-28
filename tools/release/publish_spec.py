@@ -46,8 +46,6 @@ def _create_pull_request(repo: Repository, version: str, project_name: str):
     pr = repo.create_pull(title=f"[{project_name}] Update to {version}", body="", head=f"{project_name}-{version}",
                           base="master", maintainer_can_modify=True)
 
-    print(f"Created pull request: {pr.html_url}")
-
     # pr.create_review_request(reviewers=["kadler", "edmund-reinhardt", "esimpson"])
 
 
@@ -55,7 +53,7 @@ def publish_spec(version: str, spec_file: pathlib.Path, env=os.environ):
     """Publish the spec file to the spec repository."""
     logging.getLogger("urllib3").setLevel(logging.FATAL)
     logging.getLogger("github").setLevel(logging.FATAL)
-    
+
     spec_content = spec_file.read_text()
     g = Github(base_url=env.get("SPEC_GITHUB_BASE_URL"), login_or_token=env.get("SPEC_GITHUB_TOKEN"))
 
