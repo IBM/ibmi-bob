@@ -1,0 +1,2 @@
+bump2version
+PyGithub>=1.57
