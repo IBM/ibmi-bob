@@ -1,12 +1,12 @@
 name: IBM i build new release
 on:
+  workflow_dispatch:
   push:
     # Sequence of patterns matched against refs/tags
     tags:
       - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
     branches:
       - master
-      - pythonic
 
 env:
   ssh_command: ssh ${{ secrets.IBMI_BUILD_USRPRF }}@${{ secrets.IBMI_BUILD_SYS }}
@@ -16,9 +16,7 @@ env:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
