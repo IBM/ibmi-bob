@@ -11,7 +11,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: excitedleigh/setup-nox@v2.0.0
+      - uses: actions/setup-python@v2
+        with:
+          python-version: "3.9"
+      - name: install nox
+        run: python -m pip install nox
       - name: Publish RPM to the spec repo
         run: |
           nox -s publish

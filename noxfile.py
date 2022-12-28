@@ -1,18 +1,10 @@
 import argparse
 import os
 import pathlib
-import sys
 from typing import Tuple
 
 import nox
 
-# fmt: off
-sys.path.append(".")
-from tools.release import publish_spec, generate_spec  # isort:skip  # noqa
-
-sys.path.pop()
-
-# fmt: on
 
 nox.options.sessions = ["lint", "test"]  # Sessions other than 'dev'
 
@@ -151,8 +143,8 @@ def publish(session: nox.Session) -> None:
     spec_file = pathlib.Path("bob.spec").resolve()
 
     session.log(f"Generating the spec file for v{current_version}")
-    spec = generate_spec.generate_spec(current_version, changelog_file)
-    spec_file.write_text(spec, encoding="utf-8")
+    
+    session.run("python", "tools/release/generate_spec.py", current_version, os.fsdecode(changelog_file))
 
     session.log(f"Publishing the spec file for v{current_version}")
-    publish_spec.publish_spec(current_version, spec_file)
+    session.run("python", "tools/release/publish_spec.py", current_version, os.fsdecode(spec_file))
