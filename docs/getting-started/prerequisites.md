@@ -70,7 +70,7 @@ CALL QSYS2.SET_PASE_SHELL_INFO('*CURRENT', '/QOpenSys/pkgs/bin/bash')
 
 
 > [!WARNING]
-> If you did not add `/QOpenSys/pkgs/bin` to the PATH variable, you may not be able to invok *yum* or *chsh* directly. Try specifing the full path using `/QOpenSys/pkgs/bin/yum` or `/QOpenSys/pkgs/bin/chsh`.
+> If you did not add `/QOpenSys/pkgs/bin` to the PATH variable, you may not be able to invok *yum* or *chsh* directly. Try specifying the full path using `/QOpenSys/pkgs/bin/yum` or `/QOpenSys/pkgs/bin/chsh`.
 
 ## TGTCCSID support on the ILE RPG compilers
 

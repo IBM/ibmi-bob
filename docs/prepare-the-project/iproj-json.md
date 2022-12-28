@@ -78,7 +78,7 @@ license for this project
 
 ### iasp
 
-the Independent Auxillary Storage Pool that should be used when developing this project.  If not specified, it is assumed to be "*SYSBAS".  
+the Independent Auxiliary Storage Pool that should be used when developing this project.  If not specified, it is assumed to be "*SYSBAS".  
 
 ### sql
 
