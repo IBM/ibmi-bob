@@ -53,7 +53,7 @@ jobs:
       - name: Perform remote RPM build
         id: remote_build
         run: |
-          $ssh_command "cd $remote_build_dir && /QOpenSys/pkgs/bin/rpmbuild -ba --define '_topdir `pwd`/rpmbuild' rpmbuild/SPECS/bob.spec"
+          $ssh_command "cd $remote_build_dir && /QOpenSys/pkgs/bin/rpmbuild -ba --define '_topdir $remote_build_dir/rpmbuild' rpmbuild/SPECS/bob.spec"
       - name: Find RPM file
         id: find_rpm
         run: |
