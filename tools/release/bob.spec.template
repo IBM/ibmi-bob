@@ -18,7 +18,7 @@ Requires: make-gnu >= 4.2-2
 Requires: python3 >= 3.6
 Requires: python3-ibm_db >= 2.0.5.12
 
-Source0: https://github.com/IBM/ibmi-bob/archive/refs/tags/v%{version}.tar.gz
+Source0: https://github.com/IBM/ibmi-bob/archive/refs/tags/v${VERSION}.tar.gz
 
 %description
 Better Object Builder, or Bob, is a free and open source build system for the
@@ -41,7 +41,7 @@ Here's what makes Bob different.
 
 
 %prep
-%setup -n ibmi-bob-%{version}
+%setup -n ibmi-bob-${VERSION}
 
 
 %install
