@@ -146,6 +146,7 @@ def validate_ccsid(ccsid: str):
             # If the ccsid is invalid, the command will fail.
             return False
         return True
+    # pylint: disable=broad-except
     except Exception:
         return False
 
@@ -182,22 +183,23 @@ def print_to_stdout(line: Union[str, bytes]):
     sys.stdout.buffer.flush()
 
 
-def run_command(cmd: str, stdoutHandler: Callable[[bytes], None] = print_to_stdout, echo_cmd: bool = True) -> int:
+def run_command(cmd: str, stdout_handler: Callable[[bytes], None] = print_to_stdout, echo_cmd: bool = True) -> int:
     """ Run a command in a shell environment and redirect its stdout and stderr
         and returns the exit code
 
     Args:
         cmd (str): The command to run
-        stdoutHandler (Callable[[bytes], None]]): the handle function to process the stdout
+        stdout_handler (Callable[[bytes], None]]): the handle function to process the stdout
     """
     if echo_cmd:
         print(colored(f"> {cmd}", Colors.OKGREEN))
     sys.stdout.flush()
     try:
+        # pylint: disable=consider-using-with
         process = subprocess.Popen(
             ["bash", "-c", cmd], stdout=subprocess.PIPE, )
         for line in iter(process.stdout.readline, b''):
-            stdoutHandler(line)
+            stdout_handler(line)
         return process.wait()
     except FileNotFoundError as error:
         print(colored(f'Cannot find command {error.filename}!', Colors.FAIL))
@@ -303,9 +305,9 @@ def format_datetime(d: datetime) -> str:
 
 def replace_file_content(file_path: Path, replace: Callable[[str], str]):
     # Create temp file
-    fh, abs_path = mkstemp()
-    with os.fdopen(fh, 'w') as new_file:
-        with open(file_path) as old_file:
+    fd, abs_path = mkstemp()
+    with os.fdopen(fd, 'w') as new_file:
+        with open(file_path, encoding="utf-8") as old_file:
             for line in old_file:
                 new_file.write(replace(line))
     # Copy the file permissions from the old file to the new file
@@ -328,7 +330,8 @@ def make_include_dirs_absolute(job_log_path: str, parameters: str):
         to INCDIR('<project path>/dir' '<project path>/dir2')
     Note it is possible to have INCDIR(''dir1'' ''dir2'')
 
-    >>> make_include_dirs_absolute('/a/b/.logs/joblog.json', " PARM1( beginning)INCDIR ('PARAM1'   'PARAM2' ''PARAM3'' 'PARAM4' )parm2( after )   ")
+    >>> make_include_dirs_absolute('/a/b/.logs/joblog.json', " PARM1( beginning)INCDIR ('PARAM1'   'PARAM2' "
+    ... "''PARAM3'' 'PARAM4' )parm2( after )   ")
     " PARM1( beginning)INCDIR ('/a/b/PARAM1' '/a/b/PARAM2' ''/a/b/PARAM3'' '/a/b/PARAM4')parm2( after )   "
     >>> make_include_dirs_absolute('/a/b/.logs/joblog.json', "INCDIR (''  '''')")
     "INCDIR ('/a/b/' ''/a/b/'')"
@@ -351,6 +354,9 @@ def make_include_dirs_absolute(job_log_path: str, parameters: str):
     >>> make_include_dirs_absolute('/.logs/joblogs.json', "INCDIR( but no close paren")
     'INCDIR( but no close paren'
     """
+
+    # pylint: disable=too-many-locals
+
     try:
         index_of_job_log_substr = job_log_path.index('.logs/joblog.json')
         cur_dir = job_log_path[0:index_of_job_log_substr]
@@ -370,6 +376,7 @@ def make_include_dirs_absolute(job_log_path: str, parameters: str):
     include_path_str = parameters[start_of_inc_dir + 1: end_of_inc_dir]
     include_path = include_path_str.split()
 
+    # pylint: disable=consider-using-enumerate
     for i in range(len(include_path)):
         relative_path = include_path[i][1] != '/' and not (
                 len(include_path[i]) > 3 and include_path[i][1] == "'" and include_path[i][2] == "/")

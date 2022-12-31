@@ -110,7 +110,7 @@ class CrtFrmStmf():
             self.job.run_cl(cmd, False, True)
             success = True
         # pylint: disable=broad-except
-        except Exception as e:
+        except Exception:
             print(f"Build not successful for {self.lib}/{self.obj}")
             if len(self.back_up_obj_list) > 0:
                 self._restore_objs()
@@ -333,7 +333,8 @@ def get_physical_dependencies(obj: str, lib: str, include_self: bool, job: Optio
         obj (str): Object name of the physical file
         lib (str): Library name of the physical file
         include_self (bool): whether to include the physical file itself in the result
-        job (IBMJob, optional): Job used to run the commands. If none is set, a new job will be created. Defaults to None.
+        job (IBMJob, optional): Job used to run the commands. If none is set, a new job will be created. Defaults to
+        None.
         verbose (bool, optional): Defaults to False.
 
     Returns:

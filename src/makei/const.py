@@ -5,7 +5,8 @@ DEFAULT_TGT_CCSID = "*JOB"
 DEFAULT_OBJLIB = "*CURLIB"
 DEFAULT_CURLIB = "*CRTDFT"
 
-BOB_PATH = Path(__file__).resolve().parent.parent
+BOB_PATH = Path(__file__).resolve().parent.parent.parent
+MK_PATH = BOB_PATH / "src" / "mk"
 
 TARGET_GROUPS = ["TRG",
                  "DTA",

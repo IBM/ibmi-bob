@@ -14,6 +14,7 @@ JsonType = Union[None, int, str, bool, List["JsonType"], Dict["JsonType", "JsonT
 
 class IProjJson:
     """A class to represent the iproj.json file"""
+    # pylint: disable=too-many-instance-attributes
 
     description: str
     version: Optional[str]
@@ -40,6 +41,8 @@ class IProjJson:
                  set_ibm_i_env_cmd: List[str] = None,
                  tgt_ccsid: str = "*JOB",
                  extensions: Optional[Dict[str, JsonType]] = None):
+        # pylint: disable=too-many-arguments
+
         self.description = description
         self.version = version
         self.license = license
@@ -57,11 +60,10 @@ class IProjJson:
     def from_file(cls, file_path: Path) -> "IProjJson":
         """Creates an IBMiJson object from a file"""
 
-        def with_default_value(key, default_value, dict):
-            if key in dict:
-                return dict[key]
-            else:
-                return default_value
+        def with_default_value(key, default_value, src_dict):
+            if key in src_dict:
+                return src_dict[key]
+            return default_value
 
         try:
             with file_path.open() as file:
@@ -122,7 +124,7 @@ class IProjJson:
         """Saves the IBMiJson object to a file"""
         if not Path(file_path).exists():
             Path(file_path).touch()
-        with open(file_path, 'w') as f:
+        with open(file_path, 'w', encoding="utf-8") as f:
             json.dump(self.__dict__, f, indent=4)
 
 

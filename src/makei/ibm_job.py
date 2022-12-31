@@ -20,8 +20,7 @@ class IBMJob():
         try:
             self.conn = ibm_db_dbi.connect()
             # https://kadler.io/2018/09/20/using-python-ibm-db-with-un-journaled-files.html#
-            self.conn.set_option({ibm_db_dbi.SQL_ATTR_TXN_ISOLATION:
-                                      ibm_db_dbi.SQL_TXN_NO_COMMIT})
+            self.conn.set_option({ibm_db_dbi.SQL_ATTR_TXN_ISOLATION: ibm_db_dbi.SQL_TXN_NO_COMMIT})
             self.job_id = self.run_sql("VALUES(QSYS2.JOB_NAME)")[0][0][0]
         # pylint: disable=broad-except
         except Exception as e:
@@ -64,6 +63,7 @@ class IBMJob():
                 if not ignore_errors:
                     print(f"[FAILED]  {sql}")
                     raise
+                return None
 
     def dump_results_to_dict(self, results: Tuple[List[str], List[List[Any]]]):
         record_dicts = []

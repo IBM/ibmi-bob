@@ -21,6 +21,7 @@ from .iproj_json import IProjJson
 
 class ProjSpec():
     """ Class containing information about a project. """
+    # pylint: disable=too-many-instance-attributes
 
     description: str
     version: str
@@ -74,6 +75,7 @@ class ProjSpec():
                     line = re.sub(r"^git@github.com:",
                                   'https://github.com/', line)
                 return line
+        # pylint: disable=broad-except
         except Exception:
             return ""
 
@@ -93,16 +95,16 @@ class ProjSpec():
                                self.post_usr_libl,
                                self.set_ibm_i_env_cmd,
                                self.tgt_ccsid)
-        return json.dumps(iproj_json.__dict__(), indent=4)
+        return json.dumps(iproj_json.__dict__, indent=4)
 
     def generate_ibmi_json(self) -> Optional[str]:
         """ Returns a string representation of the .ibmi.json file of current project"""
 
-        ibmijson = IBMiJson(self.version, {
+        ibmi_json = IBMiJson(self.version, {
             "tgt_ccsid": self.tgt_ccsid,
             "objlib": self.objlib,
         })
-        return json.dumps(ibmijson.__dict__(), indent=4)
+        return json.dumps(ibmi_json.__dict__, indent=4)
 
     def generate_rules_mk(self) -> str:
         """ Generates a Rules.mk template"""
@@ -188,11 +190,12 @@ def init_project(force: bool = False) -> None:
     rules_mk_content = proj_spec.generate_rules_mk()
 
     print('\n'.join(['',
-                     "The following files will be added to the project"] + list(filter(None, [
-        f"+ {iproj_json_path}" if iproj_json_content else None,
-        f"+ {ibmi_json_path}" if ibmi_json_content else None,
-        f"+ {rules_mk_path}" if rules_mk_content else None,
-    ]))))
+                     "The following files will be added to the project"] +
+                    list(filter(None, [
+                        f"+ {iproj_json_path}" if iproj_json_content else None,
+                        f"+ {ibmi_json_path}" if ibmi_json_content else None,
+                        f"+ {rules_mk_path}" if rules_mk_content else None,
+                    ]))))
     if force or yes(input('Continue? (yes) ')):
         create_file(iproj_json_path, proj_spec.generate_iproj_json(), force)
         create_file(ibmi_json_path, proj_spec.generate_ibmi_json(), force)

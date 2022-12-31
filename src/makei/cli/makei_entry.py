@@ -219,9 +219,9 @@ def handle_compile(args):
     print(colored("targets: " + ' '.join(targets), Colors.OKBLUE))
     build_env = BuildEnv(targets, args.make_options, get_override_vars(args))
     if build_env.make():
-        exit(0)
+        sys.exit(0)
     else:
-        exit(1)
+        sys.exit(1)
 
 
 def handle_build(args):
@@ -237,9 +237,9 @@ def handle_build(args):
         target = "all"
     build_env = BuildEnv([target], args.make_options, get_override_vars(args))
     if build_env.make():
-        exit(0)
+        sys.exit(0)
     else:
-        exit(1)
+        sys.exit(1)
 
 
 def make_dir_target(filename):
@@ -257,8 +257,7 @@ def get_override_vars(args):
     """ Get the override variables from the arguments"""
     if args.bob_path:
         return {"bob_path": args.bob_path}
-    else:
-        return {}
+    return {}
 
 
 def set_environment_vars(args):
