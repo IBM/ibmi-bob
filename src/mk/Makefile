@@ -2,8 +2,8 @@ SHELL:=/QOpenSys/pkgs/bin/bash
 BOB:=/QOpenSys/pkgs/lib/bob
 MAKEFLAGS += --no-builtin-rules
 MAKEFLAGS += --no-builtin-variables
-MK := $(BOB)/mk
-SCRIPTSPATH := $(BOB)/scripts
+MK := $(BOB)/src/mk
+SCRIPTSPATH := $(BOB)/src/scripts
 COLOR_TTY :=
 BUILDVARSMKPATH :=
 
