@@ -5,7 +5,6 @@ from typing import Tuple
 
 import nox
 
-
 nox.options.sessions = ["lint", "test"]  # Sessions other than 'dev'
 
 REQUIREMENTS = {
@@ -14,13 +13,13 @@ REQUIREMENTS = {
 }
 
 
-@nox.session(python=["3.6", "3.9", "3.10", "3.11"])
+@nox.session
 def lint(session):
     session.install("flake8")
     session.run("flake8", "src", "tests", "noxfile.py")
 
 
-@nox.session(python=["3.6", "3.9"])
+@nox.session
 def test(session: nox.Session):
     # Install source
     session.install(".")
@@ -29,8 +28,8 @@ def test(session: nox.Session):
     session.install("-r", REQUIREMENTS["tests"])
 
     # Parallelize tests as much as possible, by default.
-    arguments = session.posargs or ["-n", "auto"]
-    session.run("pytest", env={"LC_CTYPE": "en_US.UTF-8"})
+    arguments = session.posargs
+    session.run("pytest", *arguments, env={"LC_CTYPE": "en_US.UTF-8"})
 
 
 VENV_DIR = pathlib.Path('./.venv').resolve()
@@ -143,7 +142,7 @@ def publish(session: nox.Session) -> None:
     spec_file = pathlib.Path("bob.spec").resolve()
 
     session.log(f"Generating the spec file for v{current_version}")
-    
+
     session.run("python", "tools/release/generate_spec.py", current_version, os.fsdecode(changelog_file))
 
     session.log(f"Publishing the spec file for v{current_version}")
