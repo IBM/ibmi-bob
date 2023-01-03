@@ -23,7 +23,7 @@ mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
 
 * Create a new draft version named `v{r.v.m}` where `{r.v.m}` is the new version number
 * make sure you update bob.spec to the new release level
-* publish the release so the curl commmand below will find it
+* publish the release so the curl command below will find it
 * Execute the following commands
 
 ```bash

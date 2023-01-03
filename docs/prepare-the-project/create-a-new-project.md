@@ -40,7 +40,7 @@ Simply press enter to confirm the changes and you have created a minimal bob pro
 You may choose to manually setup the project by creating 
 
 - [x] `iproj.json` at the project root
-- [x] `.ibmi.json` at the directories you want to overide build variables to target a different object library, or use a different EBCDIC CCSID for the compile.
+- [x] `.ibmi.json` at the directories you want to override build variables to target a different object library, or use a different EBCDIC CCSID for the compile.
 - [x] `Rules.mk` at each level of the project defining the targets
 
 
