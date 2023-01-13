@@ -22,7 +22,7 @@ By default the source files will be encoded as UTF-8, but you may use `-c` optio
 
 Before running this tool, verify that the CCSID of the source physical file is set correctly; a value of 65535 can result in an improper conversion.
 
-[How to use `makei svtsrcpf` command](cli/makei?id=cvtsrcpf)
+[How to use `makei cvtsrcpf` command](cli/makei?id=cvtsrcpf)
 
 There are a couple of other file extension changes that need to be made after converting to stream files.  Any `.RPGLE`  files that are included should be renamed to `.RPGLEINC` so that Bob knows not to compile them.  It is ambiguous for Bob to know whether an ILE source is intended to be compiled into a MODULE, PGM or SRVPGM.  Bob will assume that a MODULE is the default.  If a PGM object is the target using CRTBNDxxx then the file extension should be `PGM.xxx` i.e. PGM.RPGLE for ILE RPG.  If a SRVPGM object is the target then the file extension should be `SRVPGM.xxx` where `xxx` is the ILE language file extension.  See [Supported object types](welcome/features.md?id=supported-object-types) for more discussion of this.
 

@@ -1,0 +1,17 @@
+name: Publish RPM to the spec repo
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: [ "IBM i build new release" ]
+    branches: [ master ]
+    types:
+      - completed
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: excitedleigh/setup-nox@v2.0.0
+      - name: Publish RPM to the spec repo
+        run: |
+          nox -s publish

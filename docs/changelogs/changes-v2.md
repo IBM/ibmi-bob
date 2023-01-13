@@ -12,7 +12,7 @@ Since Bob v2, we require additional packages to be installed on the IBM i as the
 
 [More on the Prerequisites for IBM i](getting-started/prerequisites.md) 
 
-## Installment
+## Installation
 
 In Bob v1, we install `Bob` by putting all the `Bob` files under `/Build/Bob` and point to it in the makefiles we create for the project.
 
