@@ -4,11 +4,13 @@
 import re
 import sys
 from pathlib import Path
-from typing import Callable, Dict, List, Optional
+from typing import Callable, Dict, List, Optional, TYPE_CHECKING
 
-from makei.build import BuildEnv
 from makei.const import FILE_TARGETGROUPS_MAPPING, TARGET_GROUPS, TARGET_TARGETGROUPS_MAPPING
 from makei.utils import decompose_filename, is_source_file
+
+if TYPE_CHECKING:
+    from makei.build import BuildEnv
 
 
 class MKRule:
@@ -126,7 +128,7 @@ class RulesMk:
     subdirs: List[str]
     targets: Dict[str, List[str]]
     rules: List[MKRule]
-    build_context: Optional[BuildEnv] = None
+    build_context: Optional['BuildEnv'] = None
 
     def __init__(self, subdirs: List[str], rules: List[MKRule], containing_dir: Path) -> None:
         self.targets = {tgt_group + 's': [] for tgt_group in TARGET_GROUPS}
