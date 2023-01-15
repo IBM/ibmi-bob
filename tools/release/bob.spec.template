@@ -54,8 +54,9 @@ ln -sf %{_libdir}/bob/bin/crtfrmstmf %{buildroot}%{_bindir}/crtfrmstmf
 
 %files
 %defattr(-, qsys, *none)
-%{_libdir}/src
-%{_bindir}/bin
+%{_libdir}/bob
+%{_bindir}/makei
+%{_bindir}/crtfrmstmf
 
 %changelog
 ${CHANGELOG}
