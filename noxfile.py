@@ -56,7 +56,8 @@ def dev(session: nox.Session) -> None:
 
     # Use the venv's interpreter to install the project along with
     # all it's dev dependencies, this ensures it's installed in the right way
-    session.run(python, "-m", "pip", "install", "-e", ".[dev]", external=True)
+    session.run(python, "-m", "pip", "install", "-r", REQUIREMENTS["tests"], external=True)
+    session.run(python, "-m", "pip", "install", "-r", REQUIREMENTS["tools"], external=True)
 
 
 def check_changelog_version(new_version: str) -> bool:
@@ -122,8 +123,8 @@ def release(session: nox.Session) -> None:
     # session.run("bump2version", version)
 
     session.log("Pushing the new tag")
-    # session.run("git", "push", external=True)
-    # session.run("git", "push", "--tags", external=True)
+    session.run("git", "push", external=True)
+    session.run("git", "push", "--tags", external=True)
     session.log("Done!")
     session.log("A new release should be available on GitHub and the rpm repo shortly.")
 
