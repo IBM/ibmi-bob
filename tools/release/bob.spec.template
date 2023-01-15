@@ -49,14 +49,13 @@ Here's what makes Bob different.
 mkdir -p %{buildroot}%{_libdir}/bob
 mkdir -p %{buildroot}%{_bindir}/
 cp -r ./* %{buildroot}%{_libdir}/bob
-ln -sf %{_libdir}/bob/scripts/makei %{buildroot}%{_bindir}/makei
-ln -sf %{_libdir}/bob/scripts/crtfrmstmf %{buildroot}%{_bindir}/crtfrmstmf
+ln -sf %{_libdir}/bob/bin/makei %{buildroot}%{_bindir}/makei
+ln -sf %{_libdir}/bob/bin/crtfrmstmf %{buildroot}%{_bindir}/crtfrmstmf
 
 %files
 %defattr(-, qsys, *none)
-%{_libdir}/bob
-%{_bindir}/makei
-%{_bindir}/crtfrmstmf
+%{_libdir}/src
+%{_bindir}/bin
 
 %changelog
 ${CHANGELOG}
