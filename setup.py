@@ -1,6 +1,7 @@
 import pathlib
 
 from setuptools import find_packages, setup
+from glob import glob
 
 here = pathlib.Path(__file__).parent.resolve()
 
@@ -32,6 +33,8 @@ setup(
         "Source": "https://github.com/IBM/ibmi-bob/",
     },
     package_dir={"": "src"},
+    include_package_data=True,
+    data_files=[("lib/bob/mk",glob('src/mk/*')), ("lib/bob/scripts",glob('src/scripts/*'))],
     python_requires=">=3.6",
     long_description=read("README.md"),
     license="Apache License 2.0",
