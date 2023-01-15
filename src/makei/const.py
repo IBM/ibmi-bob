@@ -126,6 +126,6 @@ FILE_TARGET_MAPPING = {
     "MSGF": "MSGF",
     "WSCSTSRC": "WSCST",
 }
-# This is the maximum number of dot seperated parts in the file extensions defined above.
+# This is the maximum number of dot separated parts in the file extensions defined above.
 FILE_MAX_EXT_LENGTH = max(
     map(lambda ext: len(ext.split('.')), FILE_TARGET_MAPPING.keys()))
