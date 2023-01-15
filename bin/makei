@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 
 SCRIPT_DIR="$(dirname "$0")"
-BOB_DIR="${SCRIPT_DIR}/.."
+BOB_DIR=$(realpath "${SCRIPT_DIR}/..")
 
 check_tool() {
     # Check if a tool is installed and in the system path
@@ -18,7 +18,7 @@ check_path() {
     # Check if the system path is set correctly
     if [ "$(uname -s)" = "OS400" ]; then
         case "$PATH" in
-            *:/QOpenSys/pkgs/bin*)
+            */QOpenSys/pkgs/bin*)
                 # Substring is present
                 ;;
             *)
@@ -34,7 +34,6 @@ check_path() {
                 echo "You can also add this command to your shell profile file "
                 echo "(e.g. ~/.bashrc or ~/.bash_profile) to make the change permanent."
                 echo ""
-                return 1
             ;;
         esac
     fi
@@ -52,4 +51,6 @@ check_dependencies() {
 
 check_dependencies
 
+export PYTHONPATH="${BOB_DIR}/src":${PYTHONPATH}
+echo "PYTHONPATH is ${PYTHONPATH}"
 python3 "${BOB_DIR}/src/makei/cli/makei_entry.py" "$@"
