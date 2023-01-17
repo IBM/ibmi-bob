@@ -121,7 +121,6 @@ def release(session: nox.Session) -> None:
             f"Could not find {new_version} in CHANGELOG. "
             "Please make sure the latest version is at the top of the changelog.")
 
-
     session.log(f"Bumping the {version!r} version")
     # session.run("bump2version", version)
 
