@@ -1,6 +1,6 @@
 import argparse
 import os
-import pathlib
+from pathlib import Path
 from typing import Tuple
 
 import nox
@@ -12,27 +12,29 @@ REQUIREMENTS = {
     "tools": "tools/requirements.txt",
 }
 
+PYTHONPATH = f"{Path(__file__).parent}/src:{Path(__file__).parent}/tests:{Path(__file__).parent}/tools"
+
 
 @nox.session
 def lint(session):
+    session.env['PYTHONPATH'] = PYTHONPATH
     session.install("flake8")
     session.run("flake8", "src", "tests", "noxfile.py")
 
 
 @nox.session
 def test(session: nox.Session):
-    # Install source
-    session.install(".")
-
     # Install test dependencies
     session.install("-r", REQUIREMENTS["tests"])
 
     # Parallelize tests as much as possible, by default.
     arguments = session.posargs
+    session.env['PYTHONPATH'] = PYTHONPATH
+    print(session.env['PYTHONPATH'])
     session.run("pytest", *arguments, env={"LC_CTYPE": "en_US.UTF-8"})
 
 
-VENV_DIR = pathlib.Path('./.venv').resolve()
+VENV_DIR = Path('./.venv').resolve()
 
 
 @nox.session
@@ -62,7 +64,7 @@ def dev(session: nox.Session) -> None:
 
 def check_changelog_version(new_version: str) -> bool:
     """Returns True if the new version is in the changelog, False otherwise."""
-    changelog = pathlib.Path("CHANGELOG").read_text(encoding="utf-8")
+    changelog = Path("CHANGELOG").read_text(encoding="utf-8")
     first_line = changelog.splitlines()[0]
     return new_version in first_line
 
@@ -88,6 +90,8 @@ def release(session: nox.Session) -> None:
     Usage:
     $ nox -s release -- [major|minor|patch]
     """
+    session.env['PYTHONPATH'] = PYTHONPATH
+    session.install("-r", REQUIREMENTS["tools"])
     parser = argparse.ArgumentParser(description="Release a semver version.")
     parser.add_argument(
         "version",
@@ -117,7 +121,6 @@ def release(session: nox.Session) -> None:
             f"Could not find {new_version} in CHANGELOG. "
             "Please make sure the latest version is at the top of the changelog.")
 
-    session.install("-r", REQUIREMENTS["tools"])
 
     session.log(f"Bumping the {version!r} version")
     # session.run("bump2version", version)
@@ -134,13 +137,14 @@ def publish(session: nox.Session) -> None:
     """
     Generate and publishes the spec file to the rpm repo.
     """
+    session.env['PYTHONPATH'] = PYTHONPATH
     session.install("-r", REQUIREMENTS["tools"])
 
     # Get the current version
     current_version, _ = _get_version(session)
 
-    changelog_file = pathlib.Path("CHANGELOG").resolve()
-    spec_file = pathlib.Path("bob.spec").resolve()
+    changelog_file = Path("CHANGELOG").resolve()
+    spec_file = Path("bob.spec").resolve()
 
     session.log(f"Generating the spec file for v{current_version}")
 
