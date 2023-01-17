@@ -1,3 +1,8 @@
+* Tue Jan 17 2023 Edmund Reinhardt <edmund.reinhard@ca.ibm.com> - 2.4.7-0
+- Improve project structure and automate release process.  See the documentation
+at https://ibm.github.io/ibmi-bob/#/contributing/getting-started for how to setup
+development and run linter and tests and also release using `nox`.  
+Github actions are configured to be triggered when a tag of the vn.n.n-n is pushed to master to publish to the yum repository.
 * Mon Nov 14 2022 Edmund Reinhardt <edmund.reinhard@ca.ibm.com> - 2.4.6
 - Update bob.spec
 * Mon Nov 14 2022 Edmund Reinhardt <edmund.reinhard@ca.ibm.com> - 2.4.5
