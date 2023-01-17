@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+
+SCRIPT_DIR="$(dirname "$0")"
+BOB_DIR=$(realpath "${SCRIPT_DIR}/../..")
+
+PYTHONPATH="${BOB_DIR}/src":${PYTHONPATH} python3 "${BOB_DIR}/src/makei/crtfrmstmf.py" "$@"

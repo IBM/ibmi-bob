@@ -1,0 +1,122 @@
+#!/usr/bin/env bash
+#
+# Copyright 2017 S4i Systems, Inc.
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+#     http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+#
+# Deletes logical files associated with a physical file, but only
+# in the specified library (to be safe).
+# 
+# Written by Jeff Berman, 2016-07-15
+#
+
+print_help() {
+	echo "dltpfdeps -- delete physical file dependencies"
+    echo
+	echo "Deletes all logical files attached to a given physical file.  Only logical"
+    echo "files in the specified library will be deleted."
+    echo
+	echo "Usage: dltpfdeps [-p] [-d] file library"
+    echo
+	echo "  -d  Debug mode. Enables extra logging."
+	echo "  -p  Delete the physical file as well as any logical files attached to it."
+    echo
+	echo "EXAMPLES"
+	echo "  Delete all logical files in library MYLIB that are attached to physical file"
+    echo "  MYPF."
+	echo "      dltpfdeps MYPF MYLIB"
+    echo
+	echo "  Delete all logical files in library MYLIB that are attached to physical file"
+    echo "  MYPF, and also delete the physical file."
+	echo "      dltpfdeps -p MYPF MYLIB"
+	
+	exit 0
+}
+
+# Print a string in upper case
+print_upper() {
+	local string=$(echo "$1" | tr '[:lower:]' '[:upper:]')
+	echo $string
+}
+
+# Print the name of this script
+script_name() {
+	echo "${0##*/}"
+}
+	
+dltPF=false
+debug=false
+
+# Process options
+while getopts :pd opt; do
+	case "$opt" in
+	p)	dltPF=true
+		;;
+	d)	debug=true
+		;;
+	\?)	print_help
+		exit 1
+		;;
+	esac
+done
+
+# Require two arguments
+shift "$(($OPTIND-1))"
+
+if [ $# -ne 2 ]; then
+	print_help
+	exit 1
+fi
+
+PF=$(print_upper $1)
+lib=$(print_upper $2)
+path=/QSYS.LIB/${lib}.lib
+error=0
+
+# First check if PF even exists; if not, we're all done.
+if [ ! -d $path/${PF}.FILE ]; then
+	[ "$debug" == "true" ] && echo "dltpfdeps: file ${path}/${PF}.FILE doesn't exist; exiting."
+	exit 0
+fi
+
+# Parse output of DSPDBR command and extract out logical file names.
+files=$(system "dspdbr ${lib}/${PF}" | sed -n '/Dependent File/,$p' | tail -n +2 | awk -v lib="$lib" '$2 == lib { print $1 }')
+[ "$debug" == "true" ] && echo "dltpfdeps: determined dependent files to be: ${files}."
+
+# Loop through list of LFs and try to delete each one.
+for f in $files; do
+	[ "$debug" == "true" ] && echo "dltpfdeps: attempting to delete LF $path/${f}.FILE."
+	if [ -d $path/${f}.FILE ]; then
+		rm -R $path/${f}.FILE
+		printf "*** $(script_name): Logical file [$(print_upper $f)] for physical file $(print_upper $PF) "
+		if [ -d $path/${f}.FILE ]; then
+			printf "NOT "
+		fi
+		echo "deleted."
+	fi
+done
+
+# Try to delete PF.  This may fail if LFs located in other libraries are attached to it.
+if [[ $dltPF = true && -d $path/${PF}.FILE ]]; then
+	[ "$debug" == "true" ] && echo "dltpfdeps: attempting to delete PF $path/${PF}.FILE."
+	rm -R $path/$PF.FILE
+	if [ $? -eq 0 ]; then
+		echo "*** $(script_name): Physical file [$(print_upper $PF)] deleted."
+	else
+		echo "*** $(script_name): Physical file [$(print_upper $PF)] NOT deleted."
+		error=1
+	fi
+fi
+
+exit $error

@@ -27,9 +27,10 @@
   - [Build Recipes](reference/recipes.md)
   - [joblog.json](reference/joblog-json.md) 
 - Contributing
-  - [Source Structure](contributing/source-structure.md)
+  - [Getting Started](contributing/getting-started.md)
+  - [Source Structure (outdated)](contributing/source-structure.md)
   - [Guidelines](contributing/guidelines)
-  - [Build RPM](contributing/build-rpm)
+  - [Build RPM (outdated)](contributing/build-rpm)
   - [Documentation](contributing/documentation.md) 
   - [To Do List](contributing/to-do.md)
 - Changelogs
