@@ -91,6 +91,7 @@ def release(session: nox.Session) -> None:
     $ nox -s release -- [major|minor|patch]
     """
     session.env['PYTHONPATH'] = PYTHONPATH
+    session.install("-r", REQUIREMENTS["tools"])
     parser = argparse.ArgumentParser(description="Release a semver version.")
     parser.add_argument(
         "version",
@@ -120,7 +121,6 @@ def release(session: nox.Session) -> None:
             f"Could not find {new_version} in CHANGELOG. "
             "Please make sure the latest version is at the top of the changelog.")
 
-    session.install("-r", REQUIREMENTS["tools"])
 
     session.log(f"Bumping the {version!r} version")
     # session.run("bump2version", version)
