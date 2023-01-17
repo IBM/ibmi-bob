@@ -122,7 +122,7 @@ def release(session: nox.Session) -> None:
             "Please make sure the latest version is at the top of the changelog.")
 
     session.log(f"Bumping the {version!r} version")
-    # session.run("bump2version", version)
+    session.run("bump2version", version)
 
     session.log("Pushing the new tag")
     session.run("git", "push", external=True)
