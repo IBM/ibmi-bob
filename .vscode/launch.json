@@ -7,7 +7,14 @@
         {
             "name": "bob utils",
             "type": "python",
-            "program": "makei\\utils.py",
+            "program": "makei/utils.py",
+            "request": "launch",
+            "env": {"PYTHONPATH": "."}
+        },
+        {
+            "name": "bob init",
+            "type": "python",
+            "program": "makei/init_project.py",
             "request": "launch",
             "env": {"PYTHONPATH": "."}
         }
