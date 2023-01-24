@@ -90,6 +90,7 @@ endef
 # tl;dr: If you want to customize a compile setting for an object, change these variables
 # in your TARGET (not here).
 ACTGRP :=
+ALLOW :=
 AUT :=
 BNDDIR :=
 COMMIT := *NONE
@@ -141,6 +142,7 @@ BNDRPG_TGTRLS := $(TGTRLS)
 
 
 CMD_AUT := $(AUT)
+CMD_ALLOW :=$(ALLOW)
 CMD_HLPID = $(basename $@)
 CMD_HLPPNLGRP = $(basename $@)
 CMD_PGM = $(basename $@)
@@ -252,7 +254,7 @@ WSCST_AUT := $(AUT)
 
 # Creation command parameters with variables (the ones listed at the top) for the most common ones.
 CRTCLMODFLAGS = AUT($(AUT)) DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) TEXT('$(TEXT)') TGTRLS($(TGTRLS)) INCDIR($(INCDIR))
-CRTCMDFLAGS = PGM($(PGM)) VLDCKR($(VLDCKR)) PMTFILE($(PMTFILE)) HLPPNLGRP($(HLPPNLGRP)) HLPID($(HLPID)) AUT($(AUT)) TEXT('$(TEXT)')
+CRTCMDFLAGS = PGM($(PGM)) VLDCKR($(VLDCKR)) PMTFILE($(PMTFILE)) HLPPNLGRP($(HLPPNLGRP)) HLPID($(HLPID)) AUT($(AUT)) ALLOW($(ALLOW)) TEXT('$(TEXT)')
 CRTCMODFLAGS = TERASPACE($(TERASPACE)) STGMDL($(STGMDL)) OUTPUT(*PRINT) OPTION($(OPTION)) DBGVIEW($(DBGVIEW)) \
                SYSIFCOPT($(SYSIFCOPT)) AUT($(AUT)) TEXT('$(TEXT)') TGTCCSID($(TGTCCSID)) TGTRLS($(TGTRLS)) INCDIR($(INCDIR))
 CRTDSPFFLAGS = ENHDSP(*YES) RSTDSP($(RSTDSP)) DFRWRT(*YES) AUT($(AUT)) OPTION($(OPTION)) TEXT('$(TEXT)')
@@ -626,6 +628,7 @@ programINCDIR = $(strip \
 
 define CMDSRC_TO_CMD_RECIPE = 
 	$(eval AUT = $(CMD_AUT))
+	$(eval ALLOW = $(CMD_ALLOW))
 	$(eval HLPID = $(CMD_HLPID))
 	$(eval HLPPNLGRP = $(CMD_HLPPNLGRP))
 	$(eval PGM = $(CMD_PGM))
