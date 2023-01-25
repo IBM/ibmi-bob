@@ -2,7 +2,7 @@ name: Publish RPM to the spec repo
 on:
   workflow_dispatch:
   workflow_run:
-    workflows: [ "IBM i build new release" ]
+    workflows: [IBM i build new release]
     branches: [ master ]
     types:
       - completed
