@@ -534,11 +534,11 @@ moduleSYSIFCOPT = $(strip \
 moduleTERASPACE = $(strip \
 	$(if $(filter %.C,$<),$(CMOD_TERASPACE), \
 	$(if $(filter %.c,$<),$(CMOD_TERASPACE), \
-	$(if $(filter %.CPP$<),$(CPPMOD_TERASPACE), \
+	$(if $(filter %.CPP,$<),$(CPPMOD_TERASPACE), \
 	$(if $(filter %.cpp,$<),$(CPPMOD_TERASPACE), \
 	$(if $(filter %.SQLC,$<),$(SQLCIMOD_TERASPACE), \
 	$(if $(filter %.sqlc,$<),$(SQLCIMOD_TERASPACE), \
-	UNKNOWN_FILE_TYPE))))))
+	UNKNOWN_FILE_TYPE)))))))
 moduleTGTRLS = $(strip \
 	$(if $(filter %.C,$<),$(CMOD_TGTRLS), \
 	$(if $(filter %.c,$<),$(CMOD_TGTRLS), \
@@ -847,13 +847,15 @@ define C_TO_MODULE_RECIPE =
 	@$(POSTCCOMPILE)
 endef
 
+# CRTCPPMOD is special because it launches PASE and can't be run in a PASE job so we 
+# spawn a job and lose the ability to get joblog info
 define CPP_TO_MODULE_RECIPE = 
 	$(MODULE_VARIABLES)
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating CPP module [$(notdir $<)] Note environment and library list are not set up")
 	$(eval crtcmd := crtcppmod module($(OBJLIB)/$(basename $(@F))) srcstmf('$<') $(CRTCMODFLAGS) $(ADHOCCRTFLAGS))
 	@$(PRESETUP) \
-	system "$(crtcmd)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
+	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)"  "$(crtcmd)" "Y" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
 	@($(call EVFEVENT_DOWNLOAD,$(basename $(@F)).evfevent); ret=$$?; rm $(DEPDIR)/$*.Td 2>/dev/null; exit $$ret)
 	@$(POSTCCOMPILE)
 endef
