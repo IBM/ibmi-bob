@@ -1,8 +1,5 @@
 #!/usr/bin/env sh
 
-SCRIPT_DIR="$(dirname "$0")"
-BOB_DIR=$(realpath "${SCRIPT_DIR}/..")
-
 check_tool() {
     # Check if a tool is installed and in the system path
     if command -v "$1" > /dev/null 2>&1; then
@@ -51,6 +48,7 @@ check_dependencies() {
 
 check_dependencies
 
-export PYTHONPATH="${BOB_DIR}/src":${PYTHONPATH}
-echo "PYTHONPATH is ${PYTHONPATH}"
-python3 "${BOB_DIR}/src/makei/cli/makei_entry.py" "$@"
+SCRIPT_DIR="$(readlink -f "$0" | xargs dirname)"
+BOB_DIR=$(realpath "${SCRIPT_DIR}/..")
+
+PYTHONPATH="${BOB_DIR}/src":${PYTHONPATH} python3 "${BOB_DIR}/src/makei/cli/makei_entry.py" "$@"

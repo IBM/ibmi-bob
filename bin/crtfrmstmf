@@ -1,7 +1,5 @@
 #!/usr/bin/env sh
 
-SCRIPT_DIR="$(dirname "$0")"
-BOB_DIR=$(realpath "${SCRIPT_DIR}/..")
 
 check_tool() {
     # Check if a tool is installed and in the system path
@@ -50,5 +48,8 @@ check_dependencies() {
 }
 
 check_dependencies
+
+SCRIPT_DIR="$(readlink -f "$0" | xargs dirname)"
+BOB_DIR=$(realpath "${SCRIPT_DIR}/..")
 
 PYTHONPATH="${BOB_DIR}/src":${PYTHONPATH} python3 "${BOB_DIR}/src/makei/crtfrmstmf.py" "$@"
