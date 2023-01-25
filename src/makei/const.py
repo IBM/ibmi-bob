@@ -17,7 +17,6 @@ TARGET_GROUPS = ["TRG",
                  "DSPF",
                  "PRTF",
                  "CMD",
-                 "SQL",
                  "MODULE",
                  "SRVPGM",
                  "PGM",
@@ -26,7 +25,7 @@ TARGET_GROUPS = ["TRG",
                  "QMQRY",
                  "WSCST",
                  "MSG"
-                ]
+                 ]
 
 FILE_TARGETGROUPS_MAPPING = {
     "PGM.SQLRPGLE": "PGM",
