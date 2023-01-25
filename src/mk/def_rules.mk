@@ -90,6 +90,7 @@ endef
 # tl;dr: If you want to customize a compile setting for an object, change these variables
 # in your TARGET (not here).
 ACTGRP :=
+ALLOW :=
 AUT :=
 BNDDIR :=
 COMMIT := *NONE
@@ -139,8 +140,17 @@ BNDRPG_INCDIR := $(INCDIR)
 BNDRPG_OPTION := $(OPTION)
 BNDRPG_TGTRLS := $(TGTRLS)
 
+CPPMOD_AUT := $(AUT)
+CPPMOD_DBGVIEW := $(DBGVIEW)
+CPPMOD_OPTION := *EVENTF *SHOWUSR *XREF
+CPPMOD_INCDIR := $(INCDIR)
+CPPMOD_STGMDL := *INHERIT
+CPPMOD_SYSIFCOPT := *IFS64IO
+CPPMOD_TERASPACE := *YES *NOTSIFC
+CPPMOD_TGTRLS := $(TGTRLS)
 
 CMD_AUT := $(AUT)
+CMD_ALLOW :=$(ALLOW)
 CMD_HLPID = $(basename $@)
 CMD_HLPPNLGRP = $(basename $@)
 CMD_PGM = $(basename $@)
@@ -252,8 +262,10 @@ WSCST_AUT := $(AUT)
 
 # Creation command parameters with variables (the ones listed at the top) for the most common ones.
 CRTCLMODFLAGS = AUT($(AUT)) DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) TEXT('$(TEXT)') TGTRLS($(TGTRLS)) INCDIR($(INCDIR))
-CRTCMDFLAGS = PGM($(PGM)) VLDCKR($(VLDCKR)) PMTFILE($(PMTFILE)) HLPPNLGRP($(HLPPNLGRP)) HLPID($(HLPID)) AUT($(AUT)) TEXT('$(TEXT)')
+CRTCMDFLAGS = PGM($(PGM)) VLDCKR($(VLDCKR)) PMTFILE($(PMTFILE)) HLPPNLGRP($(HLPPNLGRP)) HLPID($(HLPID)) AUT($(AUT)) ALLOW($(ALLOW)) TEXT('$(TEXT)')
 CRTCMODFLAGS = TERASPACE($(TERASPACE)) STGMDL($(STGMDL)) OUTPUT(*PRINT) OPTION($(OPTION)) DBGVIEW($(DBGVIEW)) \
+               SYSIFCOPT($(SYSIFCOPT)) AUT($(AUT)) TEXT('$(TEXT)') TGTCCSID($(TGTCCSID)) TGTRLS($(TGTRLS)) INCDIR($(INCDIR))
+CRTCPPMODFLAGS = TERASPACE($(TERASPACE)) STGMDL($(STGMDL)) OUTPUT(*PRINT) OPTION($(OPTION)) DBGVIEW($(DBGVIEW)) \
                SYSIFCOPT($(SYSIFCOPT)) AUT($(AUT)) TEXT('$(TEXT)') TGTCCSID($(TGTCCSID)) TGTRLS($(TGTRLS)) INCDIR($(INCDIR))
 CRTDSPFFLAGS = ENHDSP(*YES) RSTDSP($(RSTDSP)) DFRWRT(*YES) AUT($(AUT)) OPTION($(OPTION)) TEXT('$(TEXT)')
 CRTLFFLAGS = AUT($(AUT)) OPTION($(OPTION)) TEXT('$(TEXT)')
@@ -442,14 +454,18 @@ fileSIZE = $(strip \
 moduleAUT = $(strip \
 	$(if $(filter %.C,$<),    $(CMOD_AUT), \
 	$(if $(filter %.c,$<),    $(CMOD_AUT), \
+	$(if $(filter %.CPP,$<),  $(CPPMOD_AUT), \
+	$(if $(filter %.cpp,$<),  $(CPPMOD_AUT), \
 	$(if $(filter %.CLLE,$<), $(CLMOD_AUT), \
 	$(if $(filter %.clle,$<), $(CLMOD_AUT), \
 	$(if $(filter %.RPGLE,$<),$(RPGMOD_AUT), \
 	$(if $(filter %.rpgle,$<),$(RPGMOD_AUT), \
-	UNKNOWN_FILE_TYPE)))))))
+	UNKNOWN_FILE_TYPE)))))))))
 moduleDBGVIEW = $(strip \
 	$(if $(filter %.C,$<),$(CMOD_DBGVIEW), \
 	$(if $(filter %.c,$<),$(CMOD_DBGVIEW), \
+	$(if $(filter %.CPP,$<),$(CPPMOD_DBGVIEW), \
+	$(if $(filter %.cpp,$<),$(CPPMOD_DBGVIEW), \
 	$(if $(filter %.CLLE,$<),$(CLMOD_DBGVIEW), \
 	$(if $(filter %.clle,$<),$(CLMOD_DBGVIEW), \
 	$(if $(filter %.RPGLE,$<),$(RPGMOD_DBGVIEW), \
@@ -458,7 +474,7 @@ moduleDBGVIEW = $(strip \
 	$(if $(filter %.sqlc,$<),$(SQLCIMOD_DBGVIEW), \
 	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIMOD_DBGVIEW), \
 	$(if $(filter %.sqlrpgle,$<),$(SQLRPGIMOD_DBGVIEW), \
-	UNKNOWN_FILE_TYPE)))))))))))
+	UNKNOWN_FILE_TYPE)))))))))))))
 moduleOBJTYPE = $(strip \
 	$(if $(filter %.SQLC,$<),$(SQLCIMOD_OBJTYPE), \
 	$(if $(filter %.sqlc,$<),$(SQLCIMOD_OBJTYPE), \
@@ -468,6 +484,8 @@ moduleOBJTYPE = $(strip \
 moduleOPTION = $(strip \
 	$(if $(filter %.C,$<),$(CMOD_OPTION), \
 	$(if $(filter %.c,$<),$(CMOD_OPTION), \
+	$(if $(filter %.CPP,$<),$(CPPMOD_OPTION), \
+	$(if $(filter %.cpp,$<),$(CPPMOD_OPTION), \
 	$(if $(filter %.CLLE,$<),$(CLMOD_OPTION), \
 	$(if $(filter %.clle,$<),$(CLMOD_OPTION), \
 	$(if $(filter %.RPGLE,$<),$(RPGMOD_OPTION), \
@@ -476,10 +494,12 @@ moduleOPTION = $(strip \
 	$(if $(filter %.sqlc,$<),$(SQLCIMOD_OPTION), \
 	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIMOD_OPTION), \
 	$(if $(filter %.sqlrpgle,$<),$(SQLRPGIMOD_OPTION), \
-	UNKNOWN_FILE_TYPE)))))))))))
+	UNKNOWN_FILE_TYPE)))))))))))))
 moduleINCDIR = $(strip \
 	$(if $(filter %.C,$<),$(CMOD_INCDIR), \
 	$(if $(filter %.c,$<),$(CMOD_INCDIR), \
+	$(if $(filter %.CPP,$<),$(CPPMOD_INCDIR), \
+	$(if $(filter %.cpp,$<),$(CPPMOD_INCDIR), \
 	$(if $(filter %.CLLE,$<),$(CLMOD_INCDIR), \
 	$(if $(filter %.clle,$<),$(CLMOD_INCDIR), \
 	$(if $(filter %.RPGLE,$<),$(RPGMOD_INCDIR), \
@@ -490,7 +510,7 @@ moduleINCDIR = $(strip \
 	$(if $(filter %.cblle,$<),$(CBLMOD_INCDIR), \
 	$(if $(filter %.SQLC,$<),$(SQLCIMOD_INCDIR), \
 	$(if $(filter %.sqlc,$<),$(SQLCIMOD_INCDIR), \
-	UNKNOWN_FILE_TYPE)))))))))))))
+	UNKNOWN_FILE_TYPE)))))))))))))))
 moduleRPGPPOPT = $(strip \
 	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIMOD_RPGPPOPT), \
 	$(if $(filter %.sqlrpgle,$<),$(SQLRPGIMOD_RPGPPOPT), \
@@ -498,24 +518,32 @@ moduleRPGPPOPT = $(strip \
 moduleSTGMDL = $(strip \
 	$(if $(filter %.C,$<),$(CMOD_STGMDL), \
 	$(if $(filter %.c,$<),$(CMOD_STGMDL), \
+	$(if $(filter %.CPP,$<),$(CPPMOD_STGMDL), \
+	$(if $(filter %.cpp,$<),$(CPPMOD_STGMDL), \
 	$(if $(filter %.SQLC,$<),$(SQLCIMOD_STGMDL), \
 	$(if $(filter %.sqlc,$<),$(SQLCIMOD_STGMDL), \
-	UNKNOWN_FILE_TYPE)))))
+	UNKNOWN_FILE_TYPE)))))))
 moduleSYSIFCOPT = $(strip \
 	$(if $(filter %.C,$<),$(CMOD_SYSIFCOPT), \
 	$(if $(filter %.c,$<),$(CMOD_SYSIFCOPT), \
+	$(if $(filter %.CPP,$<),$(CPPMOD_SYSIFCOPT), \
+	$(if $(filter %.cpp,$<),$(CPPMOD_SYSIFCOPT), \
 	$(if $(filter %.SQLC,$<),$(SQLCIMOD_SYSIFCOPT), \
 	$(if $(filter %.sqlc,$<),$(SQLCIMOD_SYSIFCOPT), \
-	UNKNOWN_FILE_TYPE)))))
+	UNKNOWN_FILE_TYPE)))))))
 moduleTERASPACE = $(strip \
 	$(if $(filter %.C,$<),$(CMOD_TERASPACE), \
 	$(if $(filter %.c,$<),$(CMOD_TERASPACE), \
+	$(if $(filter %.CPP,$<),$(CPPMOD_TERASPACE), \
+	$(if $(filter %.cpp,$<),$(CPPMOD_TERASPACE), \
 	$(if $(filter %.SQLC,$<),$(SQLCIMOD_TERASPACE), \
 	$(if $(filter %.sqlc,$<),$(SQLCIMOD_TERASPACE), \
-	UNKNOWN_FILE_TYPE)))))
+	UNKNOWN_FILE_TYPE)))))))
 moduleTGTRLS = $(strip \
 	$(if $(filter %.C,$<),$(CMOD_TGTRLS), \
 	$(if $(filter %.c,$<),$(CMOD_TGTRLS), \
+	$(if $(filter %.CPP,$<),$(CPPMOD_TGTRLS), \
+	$(if $(filter %.cpp,$<),$(CPPMOD_TGTRLS), \
 	$(if $(filter %.CLLE,$<),$(CLMOD_TGTRLS), \
 	$(if $(filter %.clle,$<),$(CLMOD_TGTRLS), \
 	$(if $(filter %.RPGLE,$<),$(RPGMOD_TGTRLS), \
@@ -524,7 +552,7 @@ moduleTGTRLS = $(strip \
 	$(if $(filter %.sqlc,$<),$(SQLCIMOD_TGTRLS), \
 	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIMOD_TGTRLS), \
 	$(if $(filter %.sqlrpgle,$<),$(SQLRPGIMOD_TGTRLS), \
-	UNKNOWN_FILE_TYPE)))))))))))
+	UNKNOWN_FILE_TYPE)))))))))))))
 
 # Determine default settings for the various source types that can make a program object.
 programACTGRP = $(strip \
@@ -626,6 +654,7 @@ programINCDIR = $(strip \
 
 define CMDSRC_TO_CMD_RECIPE = 
 	$(eval AUT = $(CMD_AUT))
+	$(eval ALLOW = $(CMD_ALLOW))
 	$(eval HLPID = $(CMD_HLPID))
 	$(eval HLPPNLGRP = $(CMD_HLPPNLGRP))
 	$(eval PGM = $(CMD_PGM))
@@ -814,6 +843,19 @@ define C_TO_MODULE_RECIPE =
 	$(eval crtcmd := crtcmod module($(OBJLIB)/$(basename $(@F))) srcstmf('$<') $(CRTCMODFLAGS) $(ADHOCCRTFLAGS))
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
+	@($(call EVFEVENT_DOWNLOAD,$(basename $(@F)).evfevent); ret=$$?; rm $(DEPDIR)/$*.Td 2>/dev/null; exit $$ret)
+	@$(POSTCCOMPILE)
+endef
+
+# CRTCPPMOD is special because it launches PASE and can't be run in a PASE job so we 
+# spawn a job and lose the ability to get joblog info
+define CPP_TO_MODULE_RECIPE = 
+	$(MODULE_VARIABLES)
+	$(eval d = $($@_d))
+	@$(call echo_cmd,"=== Creating CPP module [$(notdir $<)] Note environment and library list are not set up")
+	$(eval crtcmd := crtcppmod module($(OBJLIB)/$(basename $(@F))) srcstmf('$<') $(CRTCMODFLAGS) $(ADHOCCRTFLAGS))
+	@$(PRESETUP) \
+	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)"  "$(crtcmd)" "Y" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
 	@($(call EVFEVENT_DOWNLOAD,$(basename $(@F)).evfevent); ret=$$?; rm $(DEPDIR)/$*.Td 2>/dev/null; exit $$ret)
 	@$(POSTCCOMPILE)
 endef

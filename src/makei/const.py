@@ -26,7 +26,7 @@ TARGET_GROUPS = ["TRG",
                  "QMQRY",
                  "WSCST",
                  "MSG"
-                 ]
+                ]
 
 FILE_TARGETGROUPS_MAPPING = {
     "PGM.SQLRPGLE": "PGM",
@@ -42,6 +42,7 @@ FILE_TARGETGROUPS_MAPPING = {
     "MENUSRC": "MENU",
     "MENU": "MENU",
     "C": "MODULE",
+    "CPP": "MODULE",
     "RPGLE": "MODULE",
     "CLLE": "MODULE",
     "SQLC": "MODULE",
@@ -80,6 +81,7 @@ TARGET_TARGETGROUPS_MAPPING = {
     "QMQRY": "QMQRY",
     "BNDDIR": "BNDD",
     "DTA": "DTA",
+    "PGM": "PGM",
     "DTAARA": "SQL",
     "SRVPGM": "SRVPGM",
     "MSGF": "MSG",
@@ -100,6 +102,7 @@ FILE_TARGET_MAPPING = {
     "MENUSRC": "MENU",
     "MENU": "MENU",
     "C": "MODULE",
+    "CPP": "MODULE",
     "RPGLE": "MODULE",
     "CLLE": "MODULE",
     "SQLC": "MODULE",
@@ -126,6 +129,6 @@ FILE_TARGET_MAPPING = {
     "MSGF": "MSGF",
     "WSCSTSRC": "WSCST",
 }
-# This is the maximum number of dot separated parts in the file extensions defined above.
+# This is the maximum number of dot seperated parts in the file extensions defined above.
 FILE_MAX_EXT_LENGTH = max(
     map(lambda ext: len(ext.split('.')), FILE_TARGET_MAPPING.keys()))
