@@ -95,7 +95,7 @@ class ProjSpec():
                                self.post_usr_libl,
                                self.set_ibm_i_env_cmd,
                                self.tgt_ccsid)
-        return json.dumps(iproj_json.__dict__, indent=4)
+        return json.dumps(iproj_json.__dict__(), indent=4)
 
     def generate_ibmi_json(self) -> Optional[str]:
         """ Returns a string representation of the .ibmi.json file of current project"""
@@ -104,7 +104,7 @@ class ProjSpec():
             "tgt_ccsid": self.tgt_ccsid,
             "objlib": self.objlib,
         })
-        return json.dumps(ibmi_json.__dict__, indent=4)
+        return json.dumps(ibmi_json.__dict__(), indent=4)
 
     def generate_rules_mk(self) -> str:
         """ Generates a Rules.mk template"""
