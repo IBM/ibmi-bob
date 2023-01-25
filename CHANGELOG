@@ -1,3 +1,7 @@
+* Wed Jan 25 2023 Edmund Reinhardt <edmund.reinhard@ca.ibm.com> - 2.4.8
+- fix 'makei init'
+- support CRTCMD ALLOW()
+- support CRTCPPMOD - C++ compiler uses PASE which means that we have to spawm a job and lose the joblog.json info
 * Tue Jan 17 2023 Edmund Reinhardt <edmund.reinhard@ca.ibm.com> - 2.4.7
 - Improve project structure and automate release process.  See the documentation
 at https://ibm.github.io/ibmi-bob/#/contributing/getting-started for how to setup
