@@ -47,12 +47,12 @@ def replace_changelog(template: str,
 
 
 def generate_spec(version: str, changelog_file: pathlib.Path) -> str:
-    """Generate the spec file by replacing ${version} and ${changelog} in the given template string.
+    """Generate the spec file by replacing ${VERSION} and ${CHANGELOG} in the given template string.
 
     Args:
         template (str): The template string.
-        version (str): The version string to replace ${version} with.
-        changelog_file (pathlib.Path): The path to the changelog file to replace ${changelog} with.
+        version (str): The version string to replace ${VERSION} with.
+        changelog_file (pathlib.Path): The path to the changelog file to replace ${CHANGELOG} with.
 
     Returns:
         str: The modified spec file.
@@ -64,7 +64,7 @@ def generate_spec(version: str, changelog_file: pathlib.Path) -> str:
 
 
 def main():
-    """Generate the spec file by replacing ${version} and ${changelog} in the template file."""
+    """Generate the spec file by replacing ${VERSION} and ${CHANGELOG} in the template file."""
     if len(sys.argv) != 3:
         print("Usage: generate_spec.py VERSION CHANGELOG_FILE")
         sys.exit(1)
