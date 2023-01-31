@@ -44,7 +44,6 @@ check_dependencies() {
     check_tool python3
     check_tool bash
     check_tool make
-    check_tool jq
 }
 
 check_dependencies
