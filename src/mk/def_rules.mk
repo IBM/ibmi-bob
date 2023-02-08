@@ -364,7 +364,6 @@ cleanRPGDeps = awk '$$1 == "FILEID" && $$6 !~ /^QTEMP/ && toupper($$6) !~ /QSYS/
 # - The above is not being done at this time
 #  parm is name of local evfevent file (might have .PGM.eventf suffix)
 define EVFEVENT_DOWNLOAD =
-echo "downloading from "$(OBJPATH)/EVFEVENT.FILE/$(basename $@).MBR" to "$(EVTDIR)/$1
 system "CPYTOSTMF FROMMBR('$(OBJPATH)/EVFEVENT.FILE/$(basename $@).MBR') TOSTMF('$(EVTDIR)/$1') STMFCCSID(1208) ENDLINFMT(*LF) CVTDTA(*AUTO) STMFOPT(*REPLACE)" >/dev/null
 endef
 # define POSTRPGCOMPILE =
@@ -955,7 +954,7 @@ define PGM.RPGLE_TO_PGM_RECIPE =
 	$(eval crtcmd := CRTBNDRPG srcstmf('$<') PGM($(OBJLIB)/$(basename $(@F))) $(CRTBNDRPGFLAGS))
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
-	$(call EVFEVENT_DOWNLOAD,$(basename $($@)).PGM.evfevent)
+	@$(call EVFEVENT_DOWNLOAD,$(basename $($@)).PGM.evfevent)
 endef
 
 define PGM.SQLRPGLE_TO_PGM_RECIPE =
