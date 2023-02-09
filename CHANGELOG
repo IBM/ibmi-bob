@@ -1,3 +1,6 @@
+* Thu Feb 9 2023 Edmund Reinhardt <edmund.reinhard@ca.ibm.com> - 2.4.9
+- Event file names for source compiled directly into programs was broken, 
+  causing errors not to be shown in tooling such as Merlin
 * Wed Jan 25 2023 Edmund Reinhardt <edmund.reinhard@ca.ibm.com> - 2.4.8
 - fix 'makei init'
 - support CRTCMD ALLOW()
