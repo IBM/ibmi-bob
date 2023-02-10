@@ -36,7 +36,7 @@ jobs:
           echo "  StrictHostKeyChecking no" >> ~/.ssh/config
       - name: Generate the RPM spec file
         run: |
-          python3 tools/release/generate_spec.py ${{ steps.get_version.outputs.VERSION }} CHANGELOG
+          python3 tools/release/generate_spec.py ${{ steps.get_version.outputs.VERSION }} CHANGELOG True
       - name: Create rpmbuild directory
         run: |
           mkdir -p rpmbuild/{BUILD,RPMS,SOURCES,SPECS,BUILDROOT}

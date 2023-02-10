@@ -147,7 +147,7 @@ def publish(session: nox.Session) -> None:
 
     session.log(f"Generating the spec file for v{current_version}")
 
-    session.run("python", "tools/release/generate_spec.py", current_version, os.fsdecode(changelog_file))
+    session.run("python", "tools/release/generate_spec.py", current_version, os.fsdecode(changelog_file), "False")
 
     session.log(f"Publishing the spec file for v{current_version}")
     session.run("python", "tools/release/publish_spec.py", current_version, os.fsdecode(spec_file))
