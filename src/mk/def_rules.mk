@@ -954,7 +954,7 @@ define PGM.RPGLE_TO_PGM_RECIPE =
 	$(eval crtcmd := CRTBNDRPG srcstmf('$<') PGM($(OBJLIB)/$(basename $(@F))) $(CRTBNDRPGFLAGS))
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
-	@$(call EVFEVENT_DOWNLOAD,$(basename $($@)).PGM.evfevent)
+	@$(call EVFEVENT_DOWNLOAD,$(basename $@).PGM.evfevent)
 endef
 
 define PGM.SQLRPGLE_TO_PGM_RECIPE =
