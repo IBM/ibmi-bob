@@ -94,7 +94,7 @@ class CrtFrmStmf():
         self.job.run_cl(f'DLTF FILE({self.tmp_lib}/{self.tmp_src})', True)
         # Create the temp source file
         self.job.run_cl(
-            f'CRTSRCPF FILE({self.tmp_lib}/{self.tmp_src}) RCDLEN(198) MBR({self.obj}) CCSID({self.ccsid_c})')
+            f'CRTSRCPF FILE({self.tmp_lib}/{self.tmp_src}) RCDLEN(2000) MBR({self.obj}) CCSID({self.ccsid_c})')
         # Copy the source stream file to the temp source file
         self.job.run_cl(
             f'CPYFRMSTMF FROMSTMF("{self.srcstmf}") '
