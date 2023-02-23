@@ -957,28 +957,24 @@ define CLLE_TO_MODULE_RECIPE =
 	@$(call EVFEVENT_DOWNLOAD,$(basename $(@F)).evfevent)
 endef
 
-# Temp: Convert UTF-8 to temporary Windows Latin-1, because SQLC pre-compiler doesn't understand UTF-8
 define SQLC_TO_MODULE_RECIPE = 
 	$(MODULE_VARIABLES)
+	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating SQLC module [$(notdir $<)]")
-	@qsh_out -c "touch -C 1252 $<-1252 && cat $< >$<-1252"
-	$(eval crtcmd := crtsqlci obj($(OBJLIB)/$(basename $(@F))) srcstmf('$<-1252') $(CRTSQLCIFLAGS))
+	$(eval crtcmd := crtsqlci obj($(OBJLIB)/$(basename $(@F))) srcstmf('$<') $(CRTSQLCIFLAGS))
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
-	@($(call EVFEVENT_DOWNLOAD,$(basename $(@F)).evfevent); ret=$$?; rm $(DEPDIR)/$*.Td 2>/dev/null; rm "$<-1252" 2>/dev/null; exit $$ret)
-	@rm "$<-1252"
+	@($(call EVFEVENT_DOWNLOAD,$(basename $(@F)).evfevent); ret=$$?; rm $(DEPDIR)/$*.Td 2>/dev/null;  exit $$ret)
 endef
 
-# Temp: Convert UTF-8 to temporary Windows Latin-1, because SQLC pre-compiler doesn't understand UTF-8
 define SQLCPP_TO_MODULE_RECIPE = 
 	$(MODULE_VARIABLES)
+	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating SQLCPP module [$(notdir $<)]")
-    @qsh_out -c "touch -C 1252 $<-1252 && cat $< >$<-1252"
-	$(eval crtcmd := crtsqlcppi obj($(OBJLIB)/$(basename $(@F))) srcstmf('$<-1252') $(CRTSQLCPPIFLAGS))
+	$(eval crtcmd := crtsqlcppi obj($(OBJLIB)/$(basename $(@F))) srcstmf('$<') $(CRTSQLCPPIFLAGS))
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
-	@($(call EVFEVENT_DOWNLOAD,$(basename $(@F)).evfevent); ret=$$?; rm $(DEPDIR)/$*.Td 2>/dev/null; rm "$<-1252" 2>/dev/null; exit $$ret)
-	@rm "$<-1252"
+	@($(call EVFEVENT_DOWNLOAD,$(basename $(@F)).evfevent); ret=$$?; rm $(DEPDIR)/$*.Td 2>/dev/null;  exit $$ret)
 endef
 
 define SQLRPGLE_TO_MODULE_RECIPE = 
