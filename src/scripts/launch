@@ -3,16 +3,17 @@ SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 
 if [ $# -lt 2 ]; then
   echo 1>&2 "$0: not enough arguments"
-  echo 1>&2 "Usage: launch path_to_joblog_json command"
+  echo 1>&2 "Usage: launch path_to_joblog_json command Y_if_run_in_spawned_job"
   exit 2
-elif [ $# -gt 2 ]; then
+elif [ $# -gt 3 ]; then
   echo 1>&2 "$0: too many arguments"
-  echo 1>&2 "Usage: launch path_to_joblog_json command"
+  echo 1>&2 "Usage: launch path_to_joblog_json command Y_if_run_in_spawned_job"
   exit 2
 fi
 
 joblog_json=$1
 cmd=$2
+spawned_job=$3
 
 if [ ! -f "$joblog_json" ]; then
   echo "[]" >"$joblog_json"
@@ -39,18 +40,24 @@ if [ ! -z "$IBMiEnvCmd" ]; then
   done
 fi
 
-getjobid -s >"$tmppipe"
-jobid=$(cat <"$tmppipe")
-rm -rf "$tmppipe"
 cl "CHGJOB LOG(4 00 *SECLVL)"
 echo ">> executing command: ${cmd}"
 echo ">> liblist: $(liblist | awk '{print $1}' | sed ':a;N;$!ba;s/\n/ /g')"
 timestamp=$(date +"%Y-%m-%d-%H.%M.%S.%N")
 echo ">> executing time: ${timestamp}"
 echo
-cl "$cmd"
+if [ -n $spawned_job ]; then
+  cl_parms="-S"
+fi
+cl $cl_parms "$cmd" 
 exitCode=$?
-echo "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
-echo
-"$SCRIPT_DIR"/getJobLog "$cmd" "$timestamp" "$jobid" -f "$joblog_json"
+if [ -z $spawned_job ]; then
+  # Append to the passed in joblog.json file, will not work with spawned jobs
+  echo "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+  echo
+  getjobid -s >"$tmppipe"
+  jobid=$(cat <"$tmppipe")
+  rm -rf "$tmppipe"
+  "$SCRIPT_DIR"/getJobLog "$cmd" "$timestamp" "$jobid" -f "$joblog_json"
+fi
 exit $exitCode

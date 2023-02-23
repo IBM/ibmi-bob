@@ -5,27 +5,27 @@ DEFAULT_TGT_CCSID = "*JOB"
 DEFAULT_OBJLIB = "*CURLIB"
 DEFAULT_CURLIB = "*CRTDFT"
 
-BOB_PATH = Path(__file__).resolve().parent.parent
+BOB_PATH = Path(__file__).resolve().parent.parent.parent
+MK_PATH = BOB_PATH / "src" / "mk"
 
 TARGET_GROUPS = ["TRG",
-                    "DTA",
-                    "SQL",
-                    "BNDD",
-                    "PF",
-                    "LF",
-                    "DSPF",
-                    "PRTF",
-                    "CMD",
-                    "SQL",
-                    "MODULE",
-                    "SRVPGM",
-                    "PGM",
-                    "MENU",
-                    "PNLGRP",
-                    "QMQRY",
-                    "WSCST",
-                    "MSG"
-                ]
+                 "DTA",
+                 "SQL",
+                 "BNDD",
+                 "PF",
+                 "LF",
+                 "DSPF",
+                 "PRTF",
+                 "CMD",
+                 "MODULE",
+                 "SRVPGM",
+                 "PGM",
+                 "MENU",
+                 "PNLGRP",
+                 "QMQRY",
+                 "WSCST",
+                 "MSG"
+                 ]
 
 FILE_TARGETGROUPS_MAPPING = {
     "PGM.SQLRPGLE": "PGM",
@@ -80,7 +80,6 @@ TARGET_TARGETGROUPS_MAPPING = {
     "QMQRY": "QMQRY",
     "BNDDIR": "BNDD",
     "DTA": "DTA",
-    "PGM": "PGM",
     "DTAARA": "SQL",
     "SRVPGM": "SRVPGM",
     "MSGF": "MSG",

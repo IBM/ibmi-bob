@@ -46,36 +46,42 @@ def replace_changelog(template: str,
     return re.sub(r"\${CHANGELOG}", changelog, template)
 
 
-def generate_spec(version: str, changelog_file: pathlib.Path) -> str:
-    """Generate the spec file by replacing ${version} and ${changelog} in the given template string.
+def generate_spec(version: str, changelog_file: pathlib.Path, fetch_source: bool) -> str:
+    """Generate the spec file by replacing ${VERSION} and ${CHANGELOG} in the given template string.
 
     Args:
         template (str): The template string.
-        version (str): The version string to replace ${version} with.
-        changelog_file (pathlib.Path): The path to the changelog file to replace ${changelog} with.
+        version (str): The version string to replace ${VERSION} with.
+        changelog_file (pathlib.Path): The path to the changelog file to replace ${CHANGELOG} with.
 
     Returns:
         str: The modified spec file.
     """
-    template = template_file.read_text()
+    if fetch_source:
+        template = "%undefine _disable_source_fetch\n"
+    else:
+        template = ""
+    template = template + template_file.read_text()
     template = replace_version(template, version)
     template = replace_changelog(template, changelog_file)
     return template
 
 
 def main():
-    """Generate the spec file by replacing ${version} and ${changelog} in the template file."""
-    if len(sys.argv) != 3:
-        print("Usage: generate_spec.py VERSION CHANGELOG_FILE")
+    """Generate the spec file by replacing ${VERSION} and ${CHANGELOG} in the template file."""
+    if len(sys.argv) != 4:
+        print("Usage: generate_spec.py VERSION CHANGELOG_FILE FETCH_SOURCE")
         sys.exit(1)
     version = sys.argv[1]
     changelog_file = pathlib.Path(sys.argv[2])
+    fetch_source = sys.argv[3] == "True"
+
 
     if not changelog_file.exists():
         print(f"Changelog file {changelog_file} does not exist")
         sys.exit(1)
 
-    spec = generate_spec(version, changelog_file)
+    spec = generate_spec(version, changelog_file, fetch_source)
     with open("bob.spec", "w", encoding="utf-8") as out_file:
         out_file.write(spec)
 

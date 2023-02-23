@@ -33,7 +33,7 @@ yum install bash coreutils gawk grep-gnu make-gnu python39 python39-ibm_db sed-g
 To download the latest rpm file on IBM i, run the following
 
 ```bash
-curl -L https://github.com/IBM/ibmi-bob/releases/latest/download/bob-x.x.x-1.ibmi7.3.ppc64.rpm -o bob.ppc64.rpm
+curl -L https://github.com/IBM/ibmi-bob/releases/latest/download/bob.rpm -o bob.ppc64.rpm
 ```
 
 **Note:** the path may differ than the URL used above in the `curl` command above. 

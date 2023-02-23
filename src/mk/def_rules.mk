@@ -304,10 +304,11 @@ CRTRPGMODFLAGS = AUT($(AUT)) DBGVIEW($(DBGVIEW)) OPTIMIZE($(OPTIMIZE)) OPTION($(
 CRTQMQRYFLAGS = AUT($(AUT)) TEXT('$(TEXT)')
 CRTSQLCIFLAGS = COMMIT($(COMMIT)) OBJTYPE($(OBJTYPE)) OUTPUT(*PRINT) TEXT('$(TEXT)') TGTRLS($(TGTRLS)) DBGVIEW($(DBGVIEW)) \
                 COMPILEOPT('INCDIR($(doublequotedINCDIR)) OPTION($(OPTION)) STGMDL($(STGMDL)) SYSIFCOPT($(SYSIFCOPT)) \
-                            TGTCCSID($(TGTCCSID)) TERASPACE($(TERASPACE))')			
-CRTSQLCPPIFLAGS = COMMIT($(COMMIT)) OUTPUT(*PRINT) TEXT('$(TEXT)') TGTRLS($(TGTRLS)) DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) \
+                           TGTCCSID($(TGTCCSID)) TERASPACE($(TERASPACE))') CVTCCSID($(TGTCCSID))
+CRTSQLCPPIFLAGS = COMMIT($(COMMIT)) OUTPUT(*PRINT) TEXT('$(TEXT)') TGTRLS($(TGTRLS)) DBGVIEW($(DBGVIEW)) \
+				  CVTCCSID($(TGTCCSID)) OPTION($(OPTION)) \
                   COMPILEOPT('STGMDL($(STGMDL)) SYSIFCOPT($(SYSIFCOPT)) DEFINE($(DEFINE)) \
-                  TGTCCSID($(TGTCCSID)) TERASPACE($(TERASPACE)) INCDIR($(doublequotedINCDIR))')
+                             TGTCCSID($(TGTCCSID)) TERASPACE($(TERASPACE)) INCDIR($(doublequotedINCDIR))') 
 CRTSQLRPGIFLAGS = COMMIT($(COMMIT)) OBJTYPE($(OBJTYPE)) OPTION($(OPTION)) OUTPUT(*PRINT) TEXT('$(TEXT)') \
                   TGTRLS($(TGTRLS)) DBGVIEW($(DBGVIEW)) RPGPPOPT($(RPGPPOPT)) \
                   COMPILEOPT('TGTCCSID($(TGTCCSID)) INCDIR($(doublequotedINCDIR))')
@@ -388,6 +389,8 @@ cleanRPGDeps = awk '$$1 == "FILEID" && $$6 !~ /^QTEMP/ && toupper($$6) !~ /QSYS/
 # if any externally-described files are declared.  If so, isolate the actual source file name from its path,
 # convert everything to upper case, format in makefile dependency format, and output all these dependencies
 # to a file that will be included by Make.
+# - The above is not being done at this time
+#  parm is name of local evfevent file (might have .PGM.eventf suffix)
 define EVFEVENT_DOWNLOAD =
 system "CPYTOSTMF FROMMBR('$(OBJPATH)/EVFEVENT.FILE/$(basename $@).MBR') TOSTMF('$(EVTDIR)/$1') STMFCCSID(1208) ENDLINFMT(*LF) CVTDTA(*AUTO) STMFOPT(*REPLACE)" >/dev/null
 endef
@@ -985,7 +988,7 @@ define SQLRPGLE_TO_MODULE_RECIPE =
 	$(eval crtcmd := crtsqlrpgi obj($(OBJLIB)/$(basename $(@F))) srcstmf('$<') $(CRTSQLRPGIFLAGS))
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
-	@$(call EVFEVENT_DOWNLOAD,$(basename $(@F)).evfevent)
+	@$(call EVFEVENT_DOWNLOAD,$(notdir $<).evfevent)
 endef
 
 #   ____   ____ __  __   ____           _                 
@@ -1038,7 +1041,7 @@ define PGM.RPGLE_TO_PGM_RECIPE =
 	$(eval crtcmd := CRTBNDRPG srcstmf('$<') PGM($(OBJLIB)/$(basename $(@F))) $(CRTBNDRPGFLAGS))
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
-	@$(call EVFEVENT_DOWNLOAD,$*.PGM.RPGLE.evfevent)
+	@$(call EVFEVENT_DOWNLOAD,$(basename $@).PGM.evfevent)
 endef
 
 define PGM.SQLRPGLE_TO_PGM_RECIPE =
@@ -1048,7 +1051,7 @@ define PGM.SQLRPGLE_TO_PGM_RECIPE =
 	$(eval crtcmd := CRTSQLRPGI srcstmf('$<') OBJ($(OBJLIB)/$(basename $(@F))) $(CRTSQLRPGIFLAGS))
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
-	@$(call EVFEVENT_DOWNLOAD,$*.PGM.SQLRPGLE.evfevent)
+	@$(call EVFEVENT_DOWNLOAD,$(basename $@).PGM.evfevent)
 endef
 
 define PGM.C_TO_PGM_RECIPE =
@@ -1058,7 +1061,7 @@ define PGM.C_TO_PGM_RECIPE =
 	$(eval crtcmd := CRTBNDC srcstmf('$<') PGM($(OBJLIB)/$(basename $(@F))) $(CRTBNDCFLAGS))
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
-	@$(call EVFEVENT_DOWNLOAD,$*.PGM.C.evfevent)
+	@$(call EVFEVENT_DOWNLOAD,$(basename $(@F)).PGM.evfevent)
 endef
 
 define CBL_TO_PGM_RECIPE =
@@ -1108,7 +1111,7 @@ define MODULE_TO_PGM_RECIPE =
 	$(eval crtcmd := crtpgm pgm($(OBJLIB)/$(basename $(@F))) module($(basename $(filter %.MODULE,$(notdir $^)))) bndsrvpgm($(if $(BNDSRVPGMPATH),$(BNDSRVPGMPATH),*NONE)) $(CRTPGMFLAGS))
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
-	@$(call EVFEVENT_DOWNLOAD,$*.PGM.evfevent)
+	@$(call EVFEVENT_DOWNLOAD,$(tgt).PGM.evfevent)
 endef
 
 #   ____  _   _ _     ____ ____  ____    ____           _                 
