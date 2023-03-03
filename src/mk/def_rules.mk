@@ -112,6 +112,7 @@ PAGESIZE :=
 PGM :=
 PMTFILE :=
 PRDLIB :=
+RCDLEN := 
 REUSEDLT := *NO
 RPGPPOPT :=
 RSTDSP :=
@@ -885,10 +886,11 @@ endef
 define MENUSRC_TO_MENU_RECIPE =
 	$(MENU_VARIABLES)
 	$(eval d = $($@_d))
+	$(eval RCDLEN = 268)
 	@$(call echo_cmd,"=== Creating menu [$(notdir $<)]")
-	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTMNU" -p '"$(CRTMNUFLAGS)"'")
+	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTMNU" -r $(RCDLEN)  -p '"$(CRTMNUFLAGS)"'")
 	@$(PRESETUP) \
-	$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTMNU" -p "$(CRTMNUFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
+	$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTMNU" -r $(RCDLEN) -p "$(CRTMNUFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
 	@$(call EVFEVENT_DOWNLOAD,$(basename $(@F)).evfevent)
 endef
 
@@ -1125,10 +1127,11 @@ endef
 define PNLGRPSRC_TO_PNLGRP_RECIPE =
 	$(PNLGRP_VARIABLES)
 	$(eval d = $($@_d))
+	$(eval RCDLEN = 268)
 	@$(call echo_cmd,"=== Create panel group [$(basename $@)]")
-	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTPNLGRP" -p '"$(CRTPNLGRPFLAGS)"'")
+	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTPNLGRP" -r $(RCDLEN) -p '"$(CRTPNLGRPFLAGS)"'")
 	@$(PRESETUP) \
-	$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID) -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTPNLGRP" -p "$(CRTPNLGRPFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
+	$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID) -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTPNLGRP" -r $(RCDLEN) -p "$(CRTPNLGRPFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
 endef
 
 
