@@ -38,6 +38,7 @@ class CrtFrmStmf():
     obj: str
     lib: str
     cmd: str
+    rcdlen: int
     parameters: Optional[str]
     env_settings: Dict[str, str]
     ccsid_c: str
@@ -45,7 +46,7 @@ class CrtFrmStmf():
     back_up_obj_list: List[Tuple[str, str, str]]  # List of (obj, lib, obj_type) tuples
     obj_type: str
 
-    def __init__(self, srcstmf: str, obj: str, lib: str, cmd: str, tgt_ccsid: Optional[str] = None,
+    def __init__(self, srcstmf: str, obj: str, lib: str, cmd: str, rcdlen: int, tgt_ccsid: Optional[str] = None,
                  parameters: Optional[str] = None, env_settings: Optional[Dict[str, str]] = None,
                  joblog_path: Optional[str] = None, tmp_lib="QTEMP", tmp_src="QSOURCE") -> None:
         # pylint: disable=too-many-arguments
@@ -55,6 +56,7 @@ class CrtFrmStmf():
         self.obj = obj
         self.lib = lib
         self.cmd = cmd
+        self.rcdlen = rcdlen
         self.parameters = parameters
         self.env_settings = env_settings if env_settings is not None else {}
         self.joblog_path = joblog_path
@@ -94,7 +96,7 @@ class CrtFrmStmf():
         self.job.run_cl(f'DLTF FILE({self.tmp_lib}/{self.tmp_src})', True)
         # Create the temp source file
         self.job.run_cl(
-            f'CRTSRCPF FILE({self.tmp_lib}/{self.tmp_src}) RCDLEN(198) MBR({self.obj}) CCSID({self.ccsid_c})')
+            f'CRTSRCPF FILE({self.tmp_lib}/{self.tmp_src}) RCDLEN({self.rcdlen}) MBR({self.obj}) CCSID({self.ccsid_c})')
         # Copy the source stream file to the temp source file
         self.job.run_cl(
             f'CPYFRMSTMF FROMSTMF("{self.srcstmf}") '
@@ -263,6 +265,15 @@ def cli():
     )
 
     parser.add_argument(
+        "-r",
+        '--rcdlen',
+        help='Specifies the record length for the temporary source physical file.',
+        metavar='<rcdlen>',
+        default=32000
+
+    )
+
+    parser.add_argument(
         "-p",
         '--parameters',
         help='Specifies the parameters added to the compile command.',
@@ -294,8 +305,8 @@ def cli():
         env_settings["IBMiEnvCmd"] = os.environ["IBMiEnvCmd"]
 
     handle = CrtFrmStmf(srcstmf_absolute_path, args.object.strip(),
-                        args.library.strip(), args.command.strip(), args.ccsid, args.parameters, env_settings,
-                        args.save_joblog)
+                        args.library.strip(), args.command.strip(), args.rcdlen, args.ccsid, args.parameters,
+                        env_settings, args.save_joblog)
 
     print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
     success = handle.run()

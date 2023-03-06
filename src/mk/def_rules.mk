@@ -94,19 +94,25 @@ ALLOW :=
 AUT :=
 BNDDIR :=
 COMMIT := *NONE
+COMPILEOPT :=
 CURLIB :=
 DBGVIEW := *ALL
+DEFINE :=
 DETAIL := *EXTENDED
 DFTACTGRP := *NO
 DLTPCT := *NONE
 HLPID =
 HLPPNLGRP =
+INLINE :=
+LOCALETYPE :=
 OBJTYPE :=
+OPTIMIZE := 
 OPTION := *EVENTF
 PAGESIZE :=
 PGM :=
 PMTFILE :=
 PRDLIB :=
+RCDLEN := 
 REUSEDLT := *NO
 RPGPPOPT :=
 RSTDSP :=
@@ -142,8 +148,12 @@ BNDRPG_TGTRLS := $(TGTRLS)
 
 CPPMOD_AUT := $(AUT)
 CPPMOD_DBGVIEW := $(DBGVIEW)
-CPPMOD_OPTION := *EVENTF *SHOWUSR *XREF
+CMOD_DEFINE := $(DEFINE)
+CPPMOD_OPTIMIZE := $(OPTIMIZE)
+CPPMOD_OPTION := $(OPTION)
 CPPMOD_INCDIR := $(INCDIR)
+CPPMOD_INLINE := $(INLINE)
+CPPMOD_LOCALETYPE := $(LOCALETYPE)
 CPPMOD_STGMDL := *INHERIT
 CPPMOD_SYSIFCOPT := *IFS64IO
 CPPMOD_TERASPACE := *YES *NOTSIFC
@@ -158,9 +168,13 @@ CMD_PMTFILE := *NONE
 CMD_VLDCKR := *NONE
 
 CMOD_AUT := $(AUT)
+CMOD_DEFINE := $(DEFINE)
 CMOD_DBGVIEW := $(DBGVIEW)
+CMOD_OPTIMIZE := $(OPTIMIZE)
 CMOD_OPTION := *EVENTF *SHOWUSR *XREF *AGR
 CMOD_INCDIR := $(INCDIR)
+CMOD_INLINE := $(INLINE)
+CMOD_LOCALETYPE := $(LOCALETYPE)
 CMOD_STGMDL := *INHERIT
 CMOD_SYSIFCOPT := *IFS64IO
 CMOD_TERASPACE := *YES *NOTSIFC
@@ -173,6 +187,7 @@ endif
 
 CLMOD_AUT := $(AUT)
 CLMOD_DBGVIEW := $(DBGVIEW)
+CLMOD_OPTIMIZE := $(OPTIMIZE)
 CLMOD_OPTION := $(OPTION)
 CLMOD_INCDIR := $(INCDIR)
 CLMOD_TGTRLS := $(TGTRLS)
@@ -219,6 +234,7 @@ QMQRY_AUT := $(AUT)
 RPGMOD_AUT := $(AUT)
 RPGMOD_DBGVIEW := $(DBGVIEW)
 RPGMOD_INCDIR := $(INCDIR)
+RPGMOD_OPTIMIZE := $(OPTIMIZE)
 RPGMOD_OPTION := $(OPTION)
 RPGMOD_TGTRLS := $(TGTRLS)
 
@@ -230,6 +246,13 @@ SQLCIMOD_STGMDL := $(CMOD_STGMDL)
 SQLCIMOD_SYSIFCOPT := $(CMOD_SYSIFCOPT)
 SQLCIMOD_TERASPACE := *YES *TSIFC
 SQLCIMOD_TGTRLS := $(TGTRLS)
+
+SQLCPPIMOD_DBGVIEW := *SOURCE
+SQLCPPIMOD_DEFINE := $(DEFINE)
+SQLCPPIMOD_INCDIR := $(INCDIR)
+SQLCPPIMOD_OBJTYPE := *MODULE
+SQLCPPIMOD_OPTION := $(CPPMOD_OPTION)
+SQLCPPIMOD_TGTRLS := $(TGTRLS)
 
 SQLCIPGM_DBGVIEW := *SOURCE
 SQLCIPGM_INCDIR := $(INCDIR)
@@ -261,12 +284,14 @@ SRVPGM_OPTION :=
 WSCST_AUT := $(AUT)
 
 # Creation command parameters with variables (the ones listed at the top) for the most common ones.
-CRTCLMODFLAGS = AUT($(AUT)) DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) TEXT('$(TEXT)') TGTRLS($(TGTRLS)) INCDIR($(INCDIR))
+CRTCLMODFLAGS = AUT($(AUT)) DBGVIEW($(DBGVIEW)) OPTIMIZE($(OPTIMIZE)) OPTION($(OPTION)) TEXT('$(TEXT)') TGTRLS($(TGTRLS)) INCDIR($(INCDIR))
 CRTCMDFLAGS = PGM($(PGM)) VLDCKR($(VLDCKR)) PMTFILE($(PMTFILE)) HLPPNLGRP($(HLPPNLGRP)) HLPID($(HLPID)) AUT($(AUT)) ALLOW($(ALLOW)) TEXT('$(TEXT)')
-CRTCMODFLAGS = TERASPACE($(TERASPACE)) STGMDL($(STGMDL)) OUTPUT(*PRINT) OPTION($(OPTION)) DBGVIEW($(DBGVIEW)) \
-               SYSIFCOPT($(SYSIFCOPT)) AUT($(AUT)) TEXT('$(TEXT)') TGTCCSID($(TGTCCSID)) TGTRLS($(TGTRLS)) INCDIR($(INCDIR))
-CRTCPPMODFLAGS = TERASPACE($(TERASPACE)) STGMDL($(STGMDL)) OUTPUT(*PRINT) OPTION($(OPTION)) DBGVIEW($(DBGVIEW)) \
-               SYSIFCOPT($(SYSIFCOPT)) AUT($(AUT)) TEXT('$(TEXT)') TGTCCSID($(TGTCCSID)) TGTRLS($(TGTRLS)) INCDIR($(INCDIR))
+CRTCMODFLAGS = TERASPACE($(TERASPACE)) STGMDL($(STGMDL)) OUTPUT(*PRINT) OPTION($(OPTION)) DBGVIEW($(DBGVIEW)) OPTIMIZE($(OPTIMIZE)) \
+               SYSIFCOPT($(SYSIFCOPT)) AUT($(AUT)) TEXT('$(TEXT)') TGTCCSID($(TGTCCSID)) TGTRLS($(TGTRLS)) INLINE($(INLINE)) INCDIR($(INCDIR)) \
+               LOCALETYPE($(LOCALETYPE)) DEFINE($(DEFINE))
+CRTCPPMODFLAGS = TERASPACE($(TERASPACE)) STGMDL($(STGMDL)) OUTPUT(*PRINT) OPTION($(OPTION)) DBGVIEW($(DBGVIEW)) OPTIMIZE($(OPTIMIZE)) \
+                 SYSIFCOPT($(SYSIFCOPT)) AUT($(AUT)) TEXT('$(TEXT)') TGTCCSID($(TGTCCSID)) TGTRLS($(TGTRLS)) INLINE($(INLINE)) INCDIR($(INCDIR)) \
+                 LOCALETYPE($(LOCALETYPE)) DEFINE($(DEFINE))
 CRTDSPFFLAGS = ENHDSP(*YES) RSTDSP($(RSTDSP)) DFRWRT(*YES) AUT($(AUT)) OPTION($(OPTION)) TEXT('$(TEXT)')
 CRTLFFLAGS = AUT($(AUT)) OPTION($(OPTION)) TEXT('$(TEXT)')
 CRTMNUFLAGS = AUT($(AUT)) OPTION($(OPTION)) CURLIB($(CURLIB)) PRDLIB($(PRDLIB)) TEXT('$(TEXT)') TYPE($(TYPE))
@@ -275,12 +300,16 @@ CRTPGMFLAGS = ACTGRP($(ACTGRP)) USRPRF(*USER) TGTRLS($(TGTRLS)) AUT($(AUT)) DETA
 CRTPNLGRPFLAGS = AUT($(AUT)) OPTION($(OPTION)) TEXT('$(TEXT)')
 CRTCBLPGMFLAGS = OPTION($(OPTION)) TEXT('$(TEXT)')
 CRTPRTFFLAGS = AUT($(AUT)) OPTION($(OPTION)) PAGESIZE($(PAGESIZE)) TEXT('$(TEXT)')
-CRTRPGMODFLAGS = AUT($(AUT)) DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) OUTPUT(*PRINT) TEXT('$(TEXT)') \
-                 TGTCCSID($(TGTCCSID)) TGTRLS($(TGTRLS)) INCDIR($(INCDIR))
+CRTRPGMODFLAGS = AUT($(AUT)) DBGVIEW($(DBGVIEW)) OPTIMIZE($(OPTIMIZE)) OPTION($(OPTION)) OUTPUT(*PRINT) TEXT('$(TEXT)') \
+                 TGTCCSID($(TGTCCSID)) TGTRLS($(TGTRLS)) INCDIR($(INCDIR)) DEFINE($(DEFINE))
 CRTQMQRYFLAGS = AUT($(AUT)) TEXT('$(TEXT)')
 CRTSQLCIFLAGS = COMMIT($(COMMIT)) OBJTYPE($(OBJTYPE)) OUTPUT(*PRINT) TEXT('$(TEXT)') TGTRLS($(TGTRLS)) DBGVIEW($(DBGVIEW)) \
                 COMPILEOPT('INCDIR($(doublequotedINCDIR)) OPTION($(OPTION)) STGMDL($(STGMDL)) SYSIFCOPT($(SYSIFCOPT)) \
-                            TGTCCSID($(TGTCCSID)) TERASPACE($(TERASPACE))')
+                           TGTCCSID($(TGTCCSID)) TERASPACE($(TERASPACE))') CVTCCSID($(TGTCCSID))
+CRTSQLCPPIFLAGS = COMMIT($(COMMIT)) OUTPUT(*PRINT) TEXT('$(TEXT)') TGTRLS($(TGTRLS)) DBGVIEW($(DBGVIEW)) \
+				  CVTCCSID($(TGTCCSID)) OPTION($(OPTION)) \
+                  COMPILEOPT('STGMDL($(STGMDL)) SYSIFCOPT($(SYSIFCOPT)) DEFINE($(DEFINE)) \
+                             TGTCCSID($(TGTCCSID)) TERASPACE($(TERASPACE)) INCDIR($(doublequotedINCDIR))') 
 CRTSQLRPGIFLAGS = COMMIT($(COMMIT)) OBJTYPE($(OBJTYPE)) OPTION($(OPTION)) OUTPUT(*PRINT) TEXT('$(TEXT)') \
                   TGTRLS($(TGTRLS)) DBGVIEW($(DBGVIEW)) RPGPPOPT($(RPGPPOPT)) \
                   COMPILEOPT('TGTCCSID($(TGTCCSID)) INCDIR($(doublequotedINCDIR))')
@@ -474,15 +503,37 @@ moduleDBGVIEW = $(strip \
 	$(if $(filter %.rpgle,$<),$(RPGMOD_DBGVIEW), \
 	$(if $(filter %.SQLC,$<),$(SQLCIMOD_DBGVIEW), \
 	$(if $(filter %.sqlc,$<),$(SQLCIMOD_DBGVIEW), \
+	$(if $(filter %.SQLCPP,$<),$(SQLCPPIMOD_DBGVIEW), \
+	$(if $(filter %.sqlcpp,$<),$(SQLCPPIMOD_DBGVIEW), \
 	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIMOD_DBGVIEW), \
 	$(if $(filter %.sqlrpgle,$<),$(SQLRPGIMOD_DBGVIEW), \
-	UNKNOWN_FILE_TYPE)))))))))))))
+	UNKNOWN_FILE_TYPE)))))))))))))))
+moduleDEFINE = $(strip \
+	$(if $(filter %.C,$<),    $(CMOD_DEFINE), \
+	$(if $(filter %.c,$<),    $(CMOD_DEFINE), \
+	$(if $(filter %.CPP,$<),  $(CPPMOD_DEFINE), \
+	$(if $(filter %.cpp,$<),  $(CPPMOD_DEFINE), \
+	$(if $(filter %.RPGLE,$<),$(RPGMOD_DEFINE), \
+	$(if $(filter %.rpgle,$<),$(RPGMOD_DEFINE), \
+	UNKNOWN_FILE_TYPE)))))))
+moduleOPTIMIZE = $(strip \
+	$(if $(filter %.C,$<),    $(CMOD_OPTIMIZE), \
+	$(if $(filter %.c,$<),    $(CMOD_OPTIMIZE), \
+	$(if $(filter %.CPP,$<),  $(CPPMOD_OPTIMIZE), \
+	$(if $(filter %.cpp,$<),  $(CPPMOD_OPTIMIZE), \
+	$(if $(filter %.CLLE,$<), $(CLMOD_OPTIMIZE), \
+	$(if $(filter %.clle,$<), $(CLMOD_OPTIMIZE), \
+	$(if $(filter %.RPGLE,$<),$(RPGMOD_OPTIMIZE), \
+	$(if $(filter %.rpgle,$<),$(RPGMOD_OPTIMIZE), \
+	UNKNOWN_FILE_TYPE)))))))))
 moduleOBJTYPE = $(strip \
 	$(if $(filter %.SQLC,$<),$(SQLCIMOD_OBJTYPE), \
 	$(if $(filter %.sqlc,$<),$(SQLCIMOD_OBJTYPE), \
+	$(if $(filter %.SQLCPP,$<),$(SQLCPPIMOD_OBJTYPE), \
+	$(if $(filter %.sqlcpp,$<),$(SQLCPPIMOD_OBJTYPE), \
 	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIMOD_OBJTYPE), \
 	$(if $(filter %.sqlrpgle,$<),$(SQLRPGIMOD_OBJTYPE), \
-	UNKNOWN_FILE_TYPE)))))
+	UNKNOWN_FILE_TYPE)))))))
 moduleOPTION = $(strip \
 	$(if $(filter %.C,$<),$(CMOD_OPTION), \
 	$(if $(filter %.c,$<),$(CMOD_OPTION), \
@@ -494,9 +545,11 @@ moduleOPTION = $(strip \
 	$(if $(filter %.rpgle,$<),$(RPGMOD_OPTION), \
 	$(if $(filter %.SQLC,$<),$(SQLCIMOD_OPTION), \
 	$(if $(filter %.sqlc,$<),$(SQLCIMOD_OPTION), \
+	$(if $(filter %.SQLCPP,$<),$(SQLCPPIMOD_OPTION), \
+	$(if $(filter %.sqlcpp,$<),$(SQLCPPIMOD_OPTION), \
 	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIMOD_OPTION), \
 	$(if $(filter %.sqlrpgle,$<),$(SQLRPGIMOD_OPTION), \
-	UNKNOWN_FILE_TYPE)))))))))))))
+	UNKNOWN_FILE_TYPE)))))))))))))))
 moduleINCDIR = $(strip \
 	$(if $(filter %.C,$<),$(CMOD_INCDIR), \
 	$(if $(filter %.c,$<),$(CMOD_INCDIR), \
@@ -512,7 +565,21 @@ moduleINCDIR = $(strip \
 	$(if $(filter %.cblle,$<),$(CBLMOD_INCDIR), \
 	$(if $(filter %.SQLC,$<),$(SQLCIMOD_INCDIR), \
 	$(if $(filter %.sqlc,$<),$(SQLCIMOD_INCDIR), \
-	UNKNOWN_FILE_TYPE)))))))))))))))
+	$(if $(filter %.SQLCPP,$<),$(SQLCPPIMOD_INCDIR), \
+	$(if $(filter %.sqlcpp,$<),$(SQLCPPIMOD_INCDIR), \
+	UNKNOWN_FILE_TYPE)))))))))))))))))
+moduleINLINE = $(strip \
+	$(if $(filter %.C,$<),    $(CMOD_INLINE), \
+	$(if $(filter %.c,$<),    $(CMOD_INLINE), \
+	$(if $(filter %.CPP,$<),  $(CPPMOD_INLINE), \
+	$(if $(filter %.cpp,$<),  $(CPPMOD_INLINE), \
+	UNKNOWN_FILE_TYPE)))))
+moduleLOCALETYPE = $(strip \
+	$(if $(filter %.C,$<),    $(CMOD_LOCALETYPE), \
+	$(if $(filter %.c,$<),    $(CMOD_LOCALETYPE), \
+	$(if $(filter %.CPP,$<),  $(CPPMOD_LOCALETYPE), \
+	$(if $(filter %.cpp,$<),  $(CPPMOD_LOCALETYPE), \
+	UNKNOWN_FILE_TYPE)))))			
 moduleRPGPPOPT = $(strip \
 	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIMOD_RPGPPOPT), \
 	$(if $(filter %.sqlrpgle,$<),$(SQLRPGIMOD_RPGPPOPT), \
@@ -524,7 +591,9 @@ moduleSTGMDL = $(strip \
 	$(if $(filter %.cpp,$<),$(CPPMOD_STGMDL), \
 	$(if $(filter %.SQLC,$<),$(SQLCIMOD_STGMDL), \
 	$(if $(filter %.sqlc,$<),$(SQLCIMOD_STGMDL), \
-	UNKNOWN_FILE_TYPE)))))))
+	$(if $(filter %.SQLCPP,$<),$(SQLCPPIMOD_STGMDL), \
+	$(if $(filter %.sqlcpp,$<),$(SQLCPPIMOD_STGMDL), \
+	UNKNOWN_FILE_TYPE)))))))))
 moduleSYSIFCOPT = $(strip \
 	$(if $(filter %.C,$<),$(CMOD_SYSIFCOPT), \
 	$(if $(filter %.c,$<),$(CMOD_SYSIFCOPT), \
@@ -532,7 +601,9 @@ moduleSYSIFCOPT = $(strip \
 	$(if $(filter %.cpp,$<),$(CPPMOD_SYSIFCOPT), \
 	$(if $(filter %.SQLC,$<),$(SQLCIMOD_SYSIFCOPT), \
 	$(if $(filter %.sqlc,$<),$(SQLCIMOD_SYSIFCOPT), \
-	UNKNOWN_FILE_TYPE)))))))
+	$(if $(filter %.SQLCPP,$<),$(SQLCPPIMOD_SYSIFCOPT), \
+	$(if $(filter %.sqlcpp,$<),$(SQLCPPIMOD_SYSIFCOPT), \
+	UNKNOWN_FILE_TYPE)))))))))
 moduleTERASPACE = $(strip \
 	$(if $(filter %.C,$<),$(CMOD_TERASPACE), \
 	$(if $(filter %.c,$<),$(CMOD_TERASPACE), \
@@ -540,7 +611,9 @@ moduleTERASPACE = $(strip \
 	$(if $(filter %.cpp,$<),$(CPPMOD_TERASPACE), \
 	$(if $(filter %.SQLC,$<),$(SQLCIMOD_TERASPACE), \
 	$(if $(filter %.sqlc,$<),$(SQLCIMOD_TERASPACE), \
-	UNKNOWN_FILE_TYPE)))))))
+	$(if $(filter %.SQLCPP,$<),$(SQLCPPIMOD_TERASPACE), \
+	$(if $(filter %.sqlcpp,$<),$(SQLCPPIMOD_TERASPACE), \
+	UNKNOWN_FILE_TYPE)))))))))
 moduleTGTRLS = $(strip \
 	$(if $(filter %.C,$<),$(CMOD_TGTRLS), \
 	$(if $(filter %.c,$<),$(CMOD_TGTRLS), \
@@ -552,9 +625,11 @@ moduleTGTRLS = $(strip \
 	$(if $(filter %.rpgle,$<),$(RPGMOD_TGTRLS), \
 	$(if $(filter %.SQLC,$<),$(SQLCIMOD_TGTRLS), \
 	$(if $(filter %.sqlc,$<),$(SQLCIMOD_TGTRLS), \
+	$(if $(filter %.SQLCPP,$<),$(SQLCPPIMOD_TGTRLS), \
+	$(if $(filter %.sqlcpp,$<),$(SQLCPPMOD_TGTRLS), \
 	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIMOD_TGTRLS), \
 	$(if $(filter %.sqlrpgle,$<),$(SQLRPGIMOD_TGTRLS), \
-	UNKNOWN_FILE_TYPE)))))))))))))
+	UNKNOWN_FILE_TYPE)))))))))))))))
 
 # Determine default settings for the various source types that can make a program object.
 programACTGRP = $(strip \
@@ -659,7 +734,7 @@ define CMDSRC_TO_CMD_RECIPE =
 	$(eval ALLOW = $(CMD_ALLOW))
 	$(eval HLPID = $(CMD_HLPID))
 	$(eval HLPPNLGRP = $(CMD_HLPPNLGRP))
-	$(eval PGM = $(CMD_PGM))
+    $(eval PGM = $(OBJLIB)/$(CMD_PGM))
 	$(eval PMTFILE = $(CMD_PMTFILE))
 	$(eval VLDCKR = $(CMD_VLDCKR))
 	$(eval d = $($@_d))
@@ -811,10 +886,11 @@ endef
 define MENUSRC_TO_MENU_RECIPE =
 	$(MENU_VARIABLES)
 	$(eval d = $($@_d))
+	$(eval RCDLEN = 268)
 	@$(call echo_cmd,"=== Creating menu [$(notdir $<)]")
-	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTMNU" -p '"$(CRTMNUFLAGS)"'")
+	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTMNU" -r $(RCDLEN)  -p '"$(CRTMNUFLAGS)"'")
 	@$(PRESETUP) \
-	$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTMNU" -p "$(CRTMNUFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
+	$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTMNU" -r $(RCDLEN) -p "$(CRTMNUFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
 	@$(call EVFEVENT_DOWNLOAD,$(basename $(@F)).evfevent)
 endef
 
@@ -830,6 +906,7 @@ define MODULE_VARIABLES
 	$(eval DBGVIEW = $(moduleDBGVIEW))\
 	$(eval OBJTYPE = $(moduleOBJTYPE))\
 	$(eval OPTION = $(moduleOPTION))\
+	$(eval OPTIMIZE = $(moduleOPTIMIZE))\
 	$(eval INCDIR = $(moduleINCDIR))\
 	$(eval RPGPPOPT = $(moduleRPGPPOPT))\
 	$(eval STGMDL = $(moduleSTGMDL))\
@@ -882,16 +959,24 @@ define CLLE_TO_MODULE_RECIPE =
 	@$(call EVFEVENT_DOWNLOAD,$(basename $(@F)).evfevent)
 endef
 
-# Temp: Convert UTF-8 to temporary Windows Latin-1, because SQLC pre-compiler doesn't understand UTF-8
 define SQLC_TO_MODULE_RECIPE = 
 	$(MODULE_VARIABLES)
+	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating SQLC module [$(notdir $<)]")
-	@qsh_out -c "touch -C 1252 $<-1252 && cat $< >$<-1252"
-	$(eval crtcmd := crtsqlci obj($(OBJLIB)/$(basename $(@F))) srcstmf('$<-1252') $(CRTSQLCIFLAGS))
+	$(eval crtcmd := crtsqlci obj($(OBJLIB)/$(basename $(@F))) srcstmf('$<') $(CRTSQLCIFLAGS))
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
-	@($(call EVFEVENT_DOWNLOAD,$(basename $(@F)).evfevent); ret=$$?; rm $(DEPDIR)/$*.Td 2>/dev/null; rm "$<-1252" 2>/dev/null; exit $$ret)
-	@rm "$<-1252"
+	@($(call EVFEVENT_DOWNLOAD,$(basename $(@F)).evfevent); ret=$$?; rm $(DEPDIR)/$*.Td 2>/dev/null;  exit $$ret)
+endef
+
+define SQLCPP_TO_MODULE_RECIPE = 
+	$(MODULE_VARIABLES)
+	$(eval d = $($@_d))
+	@$(call echo_cmd,"=== Creating SQLCPP module [$(notdir $<)]")
+	$(eval crtcmd := crtsqlcppi obj($(OBJLIB)/$(basename $(@F))) srcstmf('$<') $(CRTSQLCPPIFLAGS))
+	@$(PRESETUP) \
+	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
+	@($(call EVFEVENT_DOWNLOAD,$(basename $(@F)).evfevent); ret=$$?; rm $(DEPDIR)/$*.Td 2>/dev/null;  exit $$ret)
 endef
 
 define SQLRPGLE_TO_MODULE_RECIPE = 
@@ -1042,10 +1127,11 @@ endef
 define PNLGRPSRC_TO_PNLGRP_RECIPE =
 	$(PNLGRP_VARIABLES)
 	$(eval d = $($@_d))
+	$(eval RCDLEN = 268)
 	@$(call echo_cmd,"=== Create panel group [$(basename $@)]")
-	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTPNLGRP" -p '"$(CRTPNLGRPFLAGS)"'")
+	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTPNLGRP" -r $(RCDLEN) -p '"$(CRTPNLGRPFLAGS)"'")
 	@$(PRESETUP) \
-	$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID) -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTPNLGRP" -p "$(CRTPNLGRPFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
+	$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID) -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTPNLGRP" -r $(RCDLEN) -p "$(CRTPNLGRPFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
 endef
 
 
