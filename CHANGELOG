@@ -1,3 +1,10 @@
+* Mon Mar 6 2023 Edmund Reinhardt <edmund.reinhard@ca.ibm.com> - 2.4.10
+- Support CRTSQLCPPI and additional parameters for CMOD 
+- Support CVTCCSID and TGTCCSID for CCSID support of C and CPP
+- Default record length for CRTFRMSTMF is now defaults 32000 except for MNU and PNLGRP
+  whose record length is automatically set to max of 268.  Can be overridden via
+  parameter to CRTFRMSTMF or RCDLEN variable.
+- CRTCMD PGM are now explicitly qualified to the specified OBJLIB
 * Thu Feb 9 2023 Edmund Reinhardt <edmund.reinhard@ca.ibm.com> - 2.4.9
 - Event file names for source compiled directly into programs was broken, 
   causing errors not to be shown in tooling such as Merlin
