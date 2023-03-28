@@ -10,6 +10,12 @@ git clone git@github.com:IBM/ibmi-bob.git
 cd ibmi-bob
 ```
 
+## Overview of the source structure
+<object data="http:/ibm.github.io/ibmi-bob/#/contributing/Bob_Details.pdf" type="application/pdf" width="700px" height="700px">
+    <embed src="http:/ibm.github.io/ibmi-bob/#/contributing/Bob_Details.pdf">
+        <p>This browser does not support PDFs. Please download the PDF to view it: <a href=http:/ibm.github.io/ibmi-bob/#/contributing/Bob_Details.pdf">Download PDF</a>.</p>
+    </embed>
+</object>
 ## Set up the develop environment
 For developing bob, you should install `Python3` and `nox` on your computer.
 
