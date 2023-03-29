@@ -11,11 +11,7 @@ cd ibmi-bob
 ```
 
 ## Overview of the source structure
-<object data="https://github.com/IBM/ibmi-bob/blob/master/docs/contributing/BobDetails.pdf" type="application/pdf" width="700px" height="700px">
-    <embed src="https://github.com/IBM/ibmi-bob/blob/master/docs/contributing/BobDetails.pdf">
-        <p>This browser does not support PDFs. Please download the PDF to view it: <a href="https://github.com/IBM/ibmi-bob/blob/master/docs/contributing/BobDetails.pdf">Download PDF</a>.</p>
-    </embed>
-</object>
+This PDF has an overview of the structure of BOB: <a href="https://github.com/IBM/ibmi-bob/blob/master/docs/assets/BobDetails.pdf">Download PDF</a>
 
 ## Set up the develop environment
 For developing bob, you should install `Python3` and `nox` on your computer.
