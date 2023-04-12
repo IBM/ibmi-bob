@@ -6,6 +6,7 @@
   - [Prerequisties](getting-started/prerequisites.md)
   - [Installation](getting-started/installation)
   - [Sample Build](getting-started/sample-build.md) 
+  - [Usage](getting-started/usage.md) 
   - [FAQ](getting-started/faq.md) 
 - Prepare the project
   - [Create a new project](prepare-the-project/create-a-new-project.md)
