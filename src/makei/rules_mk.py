@@ -92,6 +92,12 @@ class MKRule:
                 result.append(dependency)
         return result
 
+    def __eq__(self, other):
+        if isinstance(other, MKRule):
+            return self.target == other.target and self.commands == other.commands and self.dependencies == other.dependencies and self.variables == other.variables and self.containing_dir == other.containing_dir
+
+        return False
+
     @staticmethod
     def from_str(rule_str: str, containing_dir: Path, include_dirs: List[Path]) -> "MKRule":
         r"""Creates a MKRule object from a string
@@ -211,7 +217,10 @@ class RulesMk:
                     # private variable definition
                     target, variable = line.strip().split(':')
                     var_name, var_value = variable.split('=')
-                    variables[target.strip()] = (var_name.strip(), var_value.strip())
+                    key = target.strip()
+                    if key not in variables:
+                        variables[key] = []                  
+                    variables[key].append((var_name.strip(), var_value.strip()))
                 else:
                     # recipe
                     recipe_env = True
@@ -224,10 +233,11 @@ class RulesMk:
         if recipe_env:
             rules.append(MKRule.from_str(recipe_str, containing_dir, include_dirs))
 
-        for target, variable in variables.items():
+        for target, variableList in variables.items():
             matched_rules = filter(lambda rule: rule.target == target, rules)
             for rule in matched_rules:
-                rule.variables[variable[0].strip()] = variable[1].strip()
+                for variable in variableList:
+                    rule.variables[variable[0]] = variable[1]
         return RulesMk(subdir, rules, containing_dir)
 
     def __str__(self, rules_middleware: Callable[[MKRule], MKRule] = lambda rule: rule) -> str:
