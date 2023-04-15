@@ -40,17 +40,17 @@ To run the linter, you can run the following command:
 nox -s lint
 ```
 
-## TODO: Release process
+## Release process
 1. Once all the tests and linters pass, you can create a pull request to the `master` branch.
 2. Switch to the `master` branch and pull the latest code.
 3. Update the CHANGELOG file under the `changelogs` folder. Make sure you add the new version.
-4. Use `nox -s release -- {major, minor, patch, build}` to release a new version. For example, 
+4. Use `nox -s release -- {major, minor, patch}` to release a new version. For example, 
 if you want to release a new patch version, you can run `nox -s release -- patch`. This will bump
 the version number, create a new tag, and push the tag to the remote repository.
-5. Once the new tag is pushed, the CI will automatically
-   1. build the RPM and upload it to the release
-   2. create the spec file and create a new pull request to the spec file repository
+5. Once the new tag is pushed, the CI will automatically build the RPM and upload it to the release
+6. Install RPM on a machine and test it [ Install RPM ](getting-started/installation)
+7. Use `nox -s publish` to create the spec file and create a new pull request to the spec file repository.
 
 ## Versioning
 The version number is defined in the `src/makei/__init__.py` file and is handled by `bump2version` package.
-The format of the version number is `{major}.{minor}.{patch}-{build}`. For example, the version number is `2.4.6-0`.
+The format of the version number is `{major}.{minor}.{patch}`. For example, the version number is `2.4.6`.
