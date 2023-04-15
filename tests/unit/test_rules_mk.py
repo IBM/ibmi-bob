@@ -13,7 +13,7 @@ def test_from_file():
     #build_context: Optional['BuildEnv'] = None
     expected_targets = {'TRGs': [], 'DTAs': [], 'SQLs': [], 'BNDDs': [], 'PFs': [], 'LFs': [], 'DSPFs': [], 'PRTFs': [], 'CMDs': [], 'MODULEs': ['VAT300.MODULE'], 'SRVPGMs': [], 'PGMs': [], 'MENUs': [], 'PNLGRPs': [], 'QMQRYs': [], 'WSCSTs': [], 'MSGs': []}
     variables1 = ['private DFTACTGRP = *NO', 'private TEXT := Andy is cool', 'private VARSHELL ?= SHELL', 
-    'private VARAPPEND += TOAPPEND', 'private VARIMMED ::= IMMED', 'private VARESCAPE :::= ESCAPE']
+    'private VARAPPEND += TOAPPEND', 'private VARAPPEND+=APPEND2 # we support end of line comments', 'private VARIMMED ::= IMMED', 'private VARESCAPE :::= ESCAPE']
     mkrule1 = MKRule('VAT300.MODULE', ['vat300.rpgle', 'some.rpgleinc'], [], variables1, data_dir, [])
     expected_rules = [mkrule1]
     assert rules_mk.containing_dir == data_dir
@@ -28,6 +28,7 @@ VAT300.MODULE: private DFTACTGRP = *NO
 VAT300.MODULE: private TEXT := Andy is cool
 VAT300.MODULE: private VARSHELL ?= SHELL
 VAT300.MODULE: private VARAPPEND += TOAPPEND
+VAT300.MODULE: private VARAPPEND+=APPEND2 # we support end of line comments
 VAT300.MODULE: private VARIMMED ::= IMMED
 VAT300.MODULE: private VARESCAPE :::= ESCAPE
 '''
@@ -43,6 +44,7 @@ VAT300.MODULE: private DFTACTGRP = *NO
 VAT300.MODULE: private TEXT := Andy is cool
 VAT300.MODULE: private VARSHELL ?= SHELL
 VAT300.MODULE: private VARAPPEND += TOAPPEND
+VAT300.MODULE: private VARAPPEND+=APPEND2 # we support end of line comments
 VAT300.MODULE: private VARIMMED ::= IMMED
 VAT300.MODULE: private VARESCAPE :::= ESCAPE
 '''
