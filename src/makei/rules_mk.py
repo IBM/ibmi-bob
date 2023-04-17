@@ -94,7 +94,9 @@ class MKRule:
 
     def __eq__(self, other):
         if isinstance(other, MKRule):
-            return self.target == other.target and self.commands == other.commands and self.dependencies == other.dependencies and self.variables == other.variables and self.containing_dir == other.containing_dir
+            return (self.target == other.target and self.commands == other.commands and
+                    self.dependencies == other.dependencies and self.variables == other.variables and
+                    self.containing_dir == other.containing_dir)
 
         return False
 
@@ -213,10 +215,10 @@ class RulesMk:
                 # Recipe declaration
                 if '=' in line:
                     # private variable definition
-                    target, variable = line.strip().split(':',1)
+                    target, variable = line.strip().split(':', 1)
                     key = target.strip()
                     if key not in variables:
-                        variables[key] = []                  
+                        variables[key] = []
                     variables[key].append(variable.strip())
                 else:
                     # recipe
