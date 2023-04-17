@@ -4,6 +4,8 @@ depend on a PF. https://github.com/IBM/ibmi-bob/issues/215 and
 https://github.com/IBM/ibmi-bob/issues/207
 - Fix that only last private compile parameter override processed from Rules.mk took 
 effect.  Documented under https://github.com/IBM/ibmi-bob/issues/201.
+- Support multiple variable assignment operators, fixing 
+https://github.com/IBM/ibmi-bob/issues/194
 * Mon Mar 6 2023 Edmund Reinhardt <edmund.reinhard@ca.ibm.com> - 2.4.10
 - Support CRTSQLCPPI and additional parameters for CMOD 
 - Support CVTCCSID and TGTCCSID for CCSID support of C and CPP
