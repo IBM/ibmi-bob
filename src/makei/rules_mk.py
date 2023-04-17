@@ -18,13 +18,13 @@ class MKRule:
     target: str
     dependencies: List[str]
     commands: List[str]
-    variables: Dict[str, str]
+    variables: List[str]
     containing_dir: Path
     include_dirs: List[Path]
 
     source_file: Optional[str] = None
 
-    def __init__(self, target: str, dependencies: List[str], commands: List[str], variables: Dict[str, str],
+    def __init__(self, target: str, dependencies: List[str], commands: List[str], variables: List[str],
                  containing_dir: Path, include_dirs: List[Path]):
         # pylint: disable=too-many-arguments
 
@@ -52,7 +52,7 @@ class MKRule:
             self.commands.append(f"@$(call echo_success_cmd,End of creating {self.target})")
 
     def __str__(self):
-        variable_assignment = ''.join(f"{self.target} : {key} = {value}\n" for key, value in self.variables.items())
+        variable_assignment = ''.join(f"{self.target}: {variable}\n" for variable in self.variables)
         if len(self.commands) > 0:
             return f"{self.target}_CUSTOM_RECIPE=true" + '\n' + f"{self.target} : " \
                                                                 f"{' '.join(self._parse_dependencies())}" + '\n' + \
@@ -205,22 +205,19 @@ class RulesMk:
                 continue
 
             # pylint: disable=no-else-continue
-            if ":=" in line or ("=" in line and ":" not in line):
-                # Variable assignment
-                if line.strip().startswith('SUBDIRS'):
-                    # Subdir definition
-                    subdir = line.strip().split('=')[1].split()
+            if line.strip().startswith('SUBDIRS'):
+                # Subdir definition
+                subdir = line.strip().split('=')[1].split()
                 continue
             elif ':' in line:
                 # Recipe declaration
                 if '=' in line:
                     # private variable definition
-                    target, variable = line.strip().split(':')
-                    var_name, var_value = variable.split('=')
+                    target, variable = line.strip().split(':',1)
                     key = target.strip()
                     if key not in variables:
                         variables[key] = []                  
-                    variables[key].append((var_name.strip(), var_value.strip()))
+                    variables[key].append(variable.strip())
                 else:
                     # recipe
                     recipe_env = True
@@ -236,8 +233,7 @@ class RulesMk:
         for target, variableList in variables.items():
             matched_rules = filter(lambda rule: rule.target == target, rules)
             for rule in matched_rules:
-                for variable in variableList:
-                    rule.variables[variable[0]] = variable[1]
+                rule.variables = variableList
         return RulesMk(subdir, rules, containing_dir)
 
     def __str__(self, rules_middleware: Callable[[MKRule], MKRule] = lambda rule: rule) -> str:

@@ -12,15 +12,26 @@ def test_from_file():
     #rules: List[MKRule]
     #build_context: Optional['BuildEnv'] = None
     expected_targets = {'TRGs': [], 'DTAs': [], 'SQLs': [], 'BNDDs': [], 'PFs': [], 'LFs': [], 'DSPFs': [], 'PRTFs': [], 'CMDs': [], 'MODULEs': ['VAT300.MODULE'], 'SRVPGMs': [], 'PGMs': [], 'MENUs': [], 'PNLGRPs': [], 'QMQRYs': [], 'WSCSTs': [], 'MSGs': []}
-    variables1 = {'private DFTACTGRP': '*NO', 'private TEXT': 'Andy is cool', 'private DBGVIEW': '*LIST'}
+    variables1 = ['private DFTACTGRP = *NO', 'private TEXT := Andy is cool', 'private VARSHELL ?= SHELL', 
+    'private VARAPPEND += TOAPPEND', 'private VARAPPEND+=APPEND2 # we support end of line comments', 'private VARIMMED ::= IMMED', 'private VARESCAPE :::= ESCAPE']
     mkrule1 = MKRule('VAT300.MODULE', ['vat300.rpgle', 'some.rpgleinc'], [], variables1, data_dir, [])
     expected_rules = [mkrule1]
     assert rules_mk.containing_dir == data_dir
     assert rules_mk.subdirs == ['adir', 'bdir']
     assert rules_mk.targets == expected_targets
+    assert rules_mk.rules[0].variables == variables1
     assert rules_mk.rules[0] == expected_rules[0]
     assert rules_mk.build_context == None
-    assert str(mkrule1) == 'VAT300.MODULE_SRC=vat300.rpgle\nVAT300.MODULE_DEP=some.rpgleinc\nVAT300.MODULE_RECIPE=RPGLE_TO_MODULE_RECIPE\nVAT300.MODULE : private DFTACTGRP = *NO\nVAT300.MODULE : private TEXT = Andy is cool\nVAT300.MODULE : private DBGVIEW = *LIST\n'
+    assert str(mkrule1) == '''VAT300.MODULE_SRC=vat300.rpgle\nVAT300.MODULE_DEP=some.rpgleinc
+VAT300.MODULE_RECIPE=RPGLE_TO_MODULE_RECIPE
+VAT300.MODULE: private DFTACTGRP = *NO
+VAT300.MODULE: private TEXT := Andy is cool
+VAT300.MODULE: private VARSHELL ?= SHELL
+VAT300.MODULE: private VARAPPEND += TOAPPEND
+VAT300.MODULE: private VARAPPEND+=APPEND2 # we support end of line comments
+VAT300.MODULE: private VARIMMED ::= IMMED
+VAT300.MODULE: private VARESCAPE :::= ESCAPE
+'''
     assert str(rules_mk) == '''SUBDIRS := adir bdir
 
 MODULEs := VAT300.MODULE
@@ -29,7 +40,11 @@ MODULEs := VAT300.MODULE
 VAT300.MODULE_SRC=vat300.rpgle
 VAT300.MODULE_DEP=some.rpgleinc
 VAT300.MODULE_RECIPE=RPGLE_TO_MODULE_RECIPE
-VAT300.MODULE : private DFTACTGRP = *NO
-VAT300.MODULE : private TEXT = Andy is cool
-VAT300.MODULE : private DBGVIEW = *LIST
+VAT300.MODULE: private DFTACTGRP = *NO
+VAT300.MODULE: private TEXT := Andy is cool
+VAT300.MODULE: private VARSHELL ?= SHELL
+VAT300.MODULE: private VARAPPEND += TOAPPEND
+VAT300.MODULE: private VARAPPEND+=APPEND2 # we support end of line comments
+VAT300.MODULE: private VARIMMED ::= IMMED
+VAT300.MODULE: private VARESCAPE :::= ESCAPE
 '''
