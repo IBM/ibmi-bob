@@ -305,14 +305,14 @@ CRTRPGMODFLAGS = AUT($(AUT)) DBGVIEW($(DBGVIEW)) OPTIMIZE($(OPTIMIZE)) OPTION($(
 CRTQMQRYFLAGS = AUT($(AUT)) TEXT('$(TEXT)')
 CRTSQLCIFLAGS = COMMIT($(COMMIT)) OBJTYPE($(OBJTYPE)) OUTPUT(*PRINT) TEXT('$(TEXT)') TGTRLS($(TGTRLS)) DBGVIEW($(DBGVIEW)) \
                 COMPILEOPT('INCDIR($(doublequotedINCDIR)) OPTION($(OPTION)) STGMDL($(STGMDL)) SYSIFCOPT($(SYSIFCOPT)) \
-                           TGTCCSID($(TGTCCSID)) TERASPACE($(TERASPACE))') CVTCCSID($(TGTCCSID))
+                           TGTCCSID($(TGTCCSID)) TERASPACE($(TERASPACE)) OPTIMIZE($(OPTIMIZE)) INLINE($(INLINE))') CVTCCSID($(TGTCCSID))
 CRTSQLCPPIFLAGS = COMMIT($(COMMIT)) OUTPUT(*PRINT) TEXT('$(TEXT)') TGTRLS($(TGTRLS)) DBGVIEW($(DBGVIEW)) \
 				  CVTCCSID($(TGTCCSID)) OPTION($(OPTION)) \
-                  COMPILEOPT('STGMDL($(STGMDL)) SYSIFCOPT($(SYSIFCOPT)) DEFINE($(DEFINE)) \
-                             TGTCCSID($(TGTCCSID)) TERASPACE($(TERASPACE)) INCDIR($(doublequotedINCDIR))') 
+                  COMPILEOPT('STGMDL($(STGMDL)) SYSIFCOPT($(SYSIFCOPT)) DEFINE($(DEFINE)) OPTIMIZE($(OPTIMIZE)) INLINE($(INLINE)) \
+                  TGTCCSID($(TGTCCSID)) TERASPACE($(TERASPACE)) INCDIR($(doublequotedINCDIR))') 
 CRTSQLRPGIFLAGS = COMMIT($(COMMIT)) OBJTYPE($(OBJTYPE)) OPTION($(OPTION)) OUTPUT(*PRINT) TEXT('$(TEXT)') \
                   TGTRLS($(TGTRLS)) DBGVIEW($(DBGVIEW)) RPGPPOPT($(RPGPPOPT)) \
-                  COMPILEOPT('TGTCCSID($(TGTCCSID)) INCDIR($(doublequotedINCDIR))')
+                  COMPILEOPT('TGTCCSID($(TGTCCSID)) OPTIMIZE($(OPTIMIZE)) INCDIR($(doublequotedINCDIR))')
 CRTSRVPGMFLAGS = ACTGRP($(ACTGRP)) TEXT('$(TEXT)') TGTRLS($(TGTRLS)) AUT($(AUT)) DETAIL($(DETAIL)) STGMDL($(STGMDL)) OPTION($(OPTION))
 CRTWSCSTFLAGS = AUT($(AUT)) TEXT('$(TEXT)')
 CRTBNDRPGFLAGS:= DBGVIEW($(DBGVIEW)) TGTCCSID($(TGTCCSID)) OPTION($(OPTION)) TEXT('$(TEXT)') INCDIR($(INCDIR))
@@ -525,7 +525,13 @@ moduleOPTIMIZE = $(strip \
 	$(if $(filter %.clle,$<), $(CLMOD_OPTIMIZE), \
 	$(if $(filter %.RPGLE,$<),$(RPGMOD_OPTIMIZE), \
 	$(if $(filter %.rpgle,$<),$(RPGMOD_OPTIMIZE), \
-	UNKNOWN_FILE_TYPE)))))))))
+	$(if $(filter %.SQLC,$<),$(SQLCIMOD_OPTIMIZE), \
+	$(if $(filter %.sqlc,$<),$(SQLCIMOD_OPTIMIZE), \
+	$(if $(filter %.SQLCPP,$<),$(SQLCPPIMOD_OPTIMIZE), \
+	$(if $(filter %.sqlcpp,$<),$(SQLCPPIMOD_OPTIMIZE), \
+	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIMOD_OPTIMIZE), \
+	$(if $(filter %.sqlrpgle,$<),$(SQLRPGIMOD_OPTIMIZE), \
+	UNKNOWN_FILE_TYPE)))))))))))))))
 moduleOBJTYPE = $(strip \
 	$(if $(filter %.SQLC,$<),$(SQLCIMOD_OBJTYPE), \
 	$(if $(filter %.sqlc,$<),$(SQLCIMOD_OBJTYPE), \
@@ -573,7 +579,11 @@ moduleINLINE = $(strip \
 	$(if $(filter %.c,$<),    $(CMOD_INLINE), \
 	$(if $(filter %.CPP,$<),  $(CPPMOD_INLINE), \
 	$(if $(filter %.cpp,$<),  $(CPPMOD_INLINE), \
-	UNKNOWN_FILE_TYPE)))))
+	$(if $(filter %.SQLC,$<),$(SQLCIMOD_INLINE), \
+	$(if $(filter %.sqlc,$<),$(SQLCIMOD_INLINE), \
+	$(if $(filter %.SQLCPP,$<),$(SQLCPPIMOD_INLINE), \
+	$(if $(filter %.sqlcpp,$<),$(SQLCPPIMOD_INLINE), \
+	UNKNOWN_FILE_TYPE)))))))))
 moduleLOCALETYPE = $(strip \
 	$(if $(filter %.C,$<),    $(CMOD_LOCALETYPE), \
 	$(if $(filter %.c,$<),    $(CMOD_LOCALETYPE), \
