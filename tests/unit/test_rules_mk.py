@@ -69,8 +69,7 @@ def test_custom_recipe():
     assert rules_mk.rules[0].source_file is None
     assert rules_mk.build_context is None
     assert str(rules_mk.rules[0]) == '''CRTSBSD.FILE_CUSTOM_RECIPE=true
-CRTSBSD.FILE : 
-\t@$(call echo_cmd,=== Creating [CRTSBSD.FILE] from custom recipe)
+CRTSBSD.FILE : \n\t@$(call echo_cmd,=== Creating [CRTSBSD.FILE] from custom recipe)
 \tsystem -i "CRTSBSD SBSD(BATCHWL/BATCHSBSD) POOLS((1 *SHRPOOL3 *N *MB))"
 \t@$(call echo_success_cmd,End of creating CRTSBSD.FILE)
 '''
@@ -78,8 +77,69 @@ CRTSBSD.FILE :
 
 
 CRTSBSD.FILE_CUSTOM_RECIPE=true
-CRTSBSD.FILE : 
-\t@$(call echo_cmd,=== Creating [CRTSBSD.FILE] from custom recipe)
+CRTSBSD.FILE : \n\t@$(call echo_cmd,=== Creating [CRTSBSD.FILE] from custom recipe)
 \tsystem -i "CRTSBSD SBSD(BATCHWL/BATCHSBSD) POOLS((1 *SHRPOOL3 *N *MB))"
 \t@$(call echo_success_cmd,End of creating CRTSBSD.FILE)
+'''
+
+
+def test_dds_recipe():
+    # Test loading from a valid file
+    rules_mk = RulesMk.from_file(data_dir / "dds.rules.mk")
+    expected_targets = {'TRGs': [], 'DTAs': [], 'SQLs': [], 'BNDDs': [], 'PFs': ['ARTICLE.FILE',
+                        'DETORD.FILE', 'TMPDETORD.FILE'], 'LFs': [], 'DSPFs': ['ART301D.FILE'],
+                        'PRTFs': ['ORD500O.FILE'], 'CMDs': [], 'MODULEs': [], 'SRVPGMs': [], 'PGMs': [],
+                        'MENUs': [], 'PNLGRPs': [], 'QMQRYs': [], 'WSCSTs': [], 'MSGs': []}
+
+    assert rules_mk.containing_dir == data_dir
+    assert rules_mk.subdirs == []
+    assert rules_mk.targets == expected_targets
+    assert rules_mk.rules[0].variables == []
+    assert rules_mk.rules[0].commands == []
+    assert rules_mk.rules[0].dependencies == ['SAMREF.FILE']
+    assert rules_mk.rules[0].include_dirs == []
+    assert rules_mk.rules[0].target == 'ARTICLE.FILE'
+    assert rules_mk.rules[0].source_file == 'ARTICLE-Article_File.PF'
+    assert str(rules_mk.rules[0]) == '''ARTICLE.FILE_SRC=ARTICLE-Article_File.PF\nARTICLE.FILE_DEP=SAMREF.FILE
+ARTICLE.FILE_RECIPE=PF_TO_FILE_RECIPE\n'''
+
+    assert rules_mk.rules[1].variables == []
+    assert rules_mk.rules[1].commands == []
+    assert rules_mk.rules[1].dependencies == ['ARTICLE.FILE', 'VATDEF.FILE']
+    assert rules_mk.rules[1].include_dirs == []
+    assert rules_mk.rules[1].target == 'ART301D.FILE'
+    assert rules_mk.rules[1].source_file == 'ART301D-Function_Select_an_article.DSPF'
+    assert str(rules_mk.rules[1]) == '''ART301D.FILE_SRC=ART301D-Function_Select_an_article.DSPF
+ART301D.FILE_DEP=ARTICLE.FILE VATDEF.FILE\nART301D.FILE_RECIPE=DSPF_TO_FILE_RECIPE\n'''
+
+    assert rules_mk.rules[4].variables == []
+    assert rules_mk.rules[4].commands == ['@$(call echo_cmd,=== Creating [TMPDETORD.FILE] from custom recipe)',
+                                          'system -i "CPYF FROMFILE($(OBJLIB)/DETORD) TOFILE($(OBJLIB)/TMPDETORD) \\',
+                                          'CRTFILE(*YES)"',
+                                          '@$(call echo_success_cmd,End of creating TMPDETORD.FILE)']
+    assert rules_mk.rules[4].dependencies == []
+    assert rules_mk.rules[4].include_dirs == []
+    assert rules_mk.rules[4].target == 'TMPDETORD.FILE'
+    assert rules_mk.rules[4].source_file is None
+    assert str(rules_mk.rules[4]) == '''TMPDETORD.FILE_CUSTOM_RECIPE=true
+TMPDETORD.FILE : \n\t@$(call echo_cmd,=== Creating [TMPDETORD.FILE] from custom recipe)
+\tsystem -i "CPYF FROMFILE($(OBJLIB)/DETORD) TOFILE($(OBJLIB)/TMPDETORD) \\
+\tCRTFILE(*YES)"\n\t@$(call echo_success_cmd,End of creating TMPDETORD.FILE)\n'''
+
+    assert str(rules_mk) == '''PFs := ARTICLE.FILE DETORD.FILE TMPDETORD.FILE
+DSPFs := ART301D.FILE
+PRTFs := ORD500O.FILE\n\n
+ARTICLE.FILE_SRC=ARTICLE-Article_File.PF\nARTICLE.FILE_DEP=SAMREF.FILE
+ARTICLE.FILE_RECIPE=PF_TO_FILE_RECIPE
+ART301D.FILE_SRC=ART301D-Function_Select_an_article.DSPF
+ART301D.FILE_DEP=ARTICLE.FILE VATDEF.FILE
+ART301D.FILE_RECIPE=DSPF_TO_FILE_RECIPE\nDETORD.FILE_SRC=DETORD.PF
+DETORD.FILE_DEP=SAMREF.FILE
+DETORD.FILE_RECIPE=PF_TO_FILE_RECIPE\nORD500O.FILE_SRC=ORD500O.PRTF
+ORD500O.FILE_DEP=ORDER.FILE CUSTOMER.FILE DETORD.FILE ARTICLE.FILE
+ORD500O.FILE_RECIPE=PRTF_TO_FILE_RECIPE\nTMPDETORD.FILE_CUSTOM_RECIPE=true
+TMPDETORD.FILE : \n\t@$(call echo_cmd,=== Creating [TMPDETORD.FILE] from custom recipe)
+\tsystem -i "CPYF FROMFILE($(OBJLIB)/DETORD) TOFILE($(OBJLIB)/TMPDETORD) \\
+\tCRTFILE(*YES)"
+\t@$(call echo_success_cmd,End of creating TMPDETORD.FILE)
 '''
