@@ -116,8 +116,10 @@ class MKRule:
         'target : dependency1 dependency2\n\tcommand1 param1 param2\n\tcommand2 param3 param4\n'
         """
         rule_str = rule_str
+
         rule_regex = re.compile(
-            r"^(?P<target>\S+)[ \t]*:(?!=)[ \t]*(?P<dependencies>[^\n]*)\n(?P<cmds>([^\S\r\n]+\S+[^\n]*\n?)*)$")
+            r"^(?P<target>\S+)[ \t]*:(?!=)[ \t]*(?P<dependencies>(?:[^\n]*)*)\n" +
+            r"(?P<cmds>(?:[^\S\r\n]+?\S[^\n]*\n?|\s*\n)*)$")
         target_match = rule_regex.match(rule_str)
         if target_match:
             target = target_match.group("target")
@@ -185,7 +187,7 @@ class RulesMk:
 
         if include_dirs is None:
             include_dirs = []
-        rules_mk_str = rules_mk_str.strip()
+        rules_mk_str = rules_mk_str.strip().replace("\\\n", "")
 
         rules = []
         variables = {}
