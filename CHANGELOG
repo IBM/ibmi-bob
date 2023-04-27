@@ -1,3 +1,8 @@
+* Thu Apr 27 2023 Edmund Reinhardt <edmund.reinhard@ca.ibm.com> - 2.4.12
+- Support rules with no dependencies, which is useful for custom recipes.
+  Addresses https://github.com/IBM/ibmi-bob/issues/223
+- Support the splitting of lines using escaped newlines as described by
+  https://www.gnu.org/software/make/manual/make.html#Splitting-Lines
 * Mon Apr 17 2023 Edmund Reinhardt <edmund.reinhard@ca.ibm.com> - 2.4.11
 - Fix SAVOBJ/RSTOBJ command for crtfrmstmf - failed when deleting files that
   depend on a PF. https://github.com/IBM/ibmi-bob/issues/215 and 
