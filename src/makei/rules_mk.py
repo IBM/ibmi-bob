@@ -115,8 +115,6 @@ class MKRule:
         >>> str(rule)
         'target : dependency1 dependency2\n\tcommand1 param1 param2\n\tcommand2 param3 param4\n'
         """
-        rule_str = rule_str
-
         rule_regex = re.compile(
             r"^(?P<target>\S+)[ \t]*:(?!=)[ \t]*(?P<dependencies>(?:[^\n]*)*)\n" +
             r"(?P<cmds>(?:[^\S\r\n]+?\S[^\n]*\n?|\s*\n)*)$")
