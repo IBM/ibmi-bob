@@ -325,7 +325,7 @@ ADHOCCRTFLAGS =
 
 # Miscellaneous variables
 SRCPATH := $(TOP)
-OBJPATH = $(OBJPATH_$(d))
+OBJPATH = $(OBJPATH_$($@_d))
 CURLIB :=
 # IBMiEnvCmd :=
 # override OBJPATH = $(shell echo "$(OBJPATH)" | tr '[:lower:]' '[:upper:]')
@@ -748,7 +748,7 @@ define CMDSRC_TO_CMD_RECIPE =
 	$(eval PMTFILE = $(CMD_PMTFILE))
 	$(eval VLDCKR = $(CMD_VLDCKR))
 	$(eval d = $($@_d))
-	@$(call echo_cmd,"=== Creating command [$(notdir $<)]")
+	@$(call echo_cmd,"=== Creating command [$(notdir $<)] in $(OBJLIB)")
 	$(eval crtcmd := CRTCMD CMD($(OBJLIB)/$(basename $(@F))) srcstmf('$<') $(CRTCMDFLAGS))
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@);
@@ -778,7 +778,7 @@ endef
 define DSPF_TO_FILE_RECIPE =
 	$(FILE_VARIABLES)
 	$(eval d = $($@_d))
-	@$(call echo_cmd,"=== Creating DSPF [$(notdir $<)]")
+	@$(call echo_cmd,"=== Creating DSPF [$(notdir $<)] in $(OBJLIB)")
 	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTDSPF" -p '"$(CRTDSPFFLAGS)"'")
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTDSPF" -p "$(CRTDSPFFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
@@ -788,7 +788,7 @@ endef
 define LF_TO_FILE_RECIPE =
 	$(FILE_VARIABLES)
 	$(eval d = $($@_d))
-	@$(call echo_cmd,"=== Creating LF [$(notdir $<)]")
+	@$(call echo_cmd,"=== Creating LF [$(notdir $<)] in $(OBJLIB)")
 	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTLF" -p '"$(CRTLFFLAGS)"'")
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTLF" -p "$(CRTLFFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
@@ -798,7 +798,7 @@ endef
 
 define PF_TO_FILE_RECIPE =
 	$(FILE_VARIABLES)
-	@$(call echo_cmd,"=== Creating PF [$(notdir $<)]")
+	@$(call echo_cmd,"=== Creating PF [$(notdir $<)] in $(OBJLIB)")
 	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTPF" -p '"$(CRTPFFLAGS)"'")
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID) -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTPF" -p "$(CRTPFFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
@@ -809,7 +809,7 @@ endef
 define PRTF_TO_FILE_RECIPE = 
 	$(FILE_VARIABLES)
 	$(eval d = $($@_d))
-	@$(call echo_cmd,"=== Creating PRTF [$(notdir $<)]")
+	@$(call echo_cmd,"=== Creating PRTF [$(notdir $<)] in $(OBJLIB)")
 	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTPRTF" -p '"$(CRTPRTFFLAGS)"'")
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTPRTF" -p "$(CRTPRTFFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
@@ -822,7 +822,7 @@ endef
 define TABLE_TO_FILE_RECIPE = 
 	$(FILE_VARIABLES)
 	$(eval d = $($@_d))
-	@$(call echo_cmd,"=== Creating SQL TABLE from Sql statement [$(notdir $<)]")
+	@$(call echo_cmd,"=== Creating SQL TABLE from Sql statement [$(notdir $<)] in $(OBJLIB)")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
 	@$(PRESETUP) \
 	$(SETCURLIBTOOBJLIB) \
@@ -834,7 +834,7 @@ endef
 define VIEW_TO_FILE_RECIPE = 
 	$(FILE_VARIABLES)
 	$(eval d = $($@_d))
-	@$(call echo_cmd,"=== Creating SQL VIEW from Sql statement [$(notdir $<)]")
+	@$(call echo_cmd,"=== Creating SQL VIEW from Sql statement [$(notdir $<)] in $(OBJLIB)")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
 	@$(PRESETUP) \
 	$(SETCURLIBTOOBJLIB) \
@@ -844,7 +844,7 @@ endef
 define SQLUDT_TO_FILE_RECIPE = 
 	$(FILE_VARIABLES)
 	$(eval d = $($@_d))
-	@$(call echo_cmd,"=== Creating SQL UDT from Sql statement [$(notdir $<)]")
+	@$(call echo_cmd,"=== Creating SQL UDT from Sql statement [$(notdir $<)] in $(OBJLIB)")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
 	@$(PRESETUP) \
 	$(SETCURLIBTOOBJLIB) \
@@ -854,7 +854,7 @@ endef
 define SQLALIAS_TO_FILE_RECIPE =
 	$(FILE_VARIABLES)
 	$(eval d = $($@_d))
-	@$(call echo_cmd,"=== Creating SQL ALIAS from Sql statement [$(notdir $<)]")
+	@$(call echo_cmd,"=== Creating SQL ALIAS from Sql statement [$(notdir $<)] in $(OBJLIB)")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
 	@$(PRESETUP) \
 	$(SETCURLIBTOOBJLIB) \
@@ -871,7 +871,7 @@ endef
 
 define SQLSEQ_TO_DTARRA_RECIPE =
 	$(eval d = $($@_d))
-	@$(call echo_cmd,"=== Creating SQL SEQUENCE from Sql statement [$(notdir $<)]")
+	@$(call echo_cmd,"=== Creating SQL SEQUENCE from Sql statement [$(notdir $<)] in $(OBJLIB)")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
 	@$(PRESETUP) \
 	$(SETCURLIBTOOBJLIB) \
@@ -897,7 +897,7 @@ define MENUSRC_TO_MENU_RECIPE =
 	$(MENU_VARIABLES)
 	$(eval d = $($@_d))
 	$(eval RCDLEN = 268)
-	@$(call echo_cmd,"=== Creating menu [$(notdir $<)]")
+	@$(call echo_cmd,"=== Creating menu [$(notdir $<)] in $(OBJLIB)")
 	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTMNU" -r $(RCDLEN)  -p '"$(CRTMNUFLAGS)"'")
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTMNU" -r $(RCDLEN) -p "$(CRTMNUFLAGS)" --save-joblog "$(JOBLOGFILE)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
