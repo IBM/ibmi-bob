@@ -14,9 +14,9 @@ fi
 
 joblog_json=$1
 cmd=$2
-spawned_job=$3
-precmd=$4
-postcmd=$5
+precmd=$3
+postcmd=$4
+spawned_job=$5
 
 if [ ! -f "$joblog_json" ]; then
   echo "[]" >"$joblog_json"
@@ -52,10 +52,18 @@ echo
 if [ -n $spawned_job ]; then
   cl_parms="-S"
 fi
-cl $cl_parms "$precmd"
+
+if [ -n "$precmd" ]; then
+  echo ">> precmd: ${precmd}"
+  cl $cl_parms "$precmd"
+fi
 cl $cl_parms "$cmd" 
-cl $cl_parms "$postcmd"
 exitCode=$?
+if [ -n "$postcmd" ]; then
+  echo ">> postcmd: ${postcmd}"
+  cl $cl_parms "$postcmd"
+fi
+
 if [ -z $spawned_job ]; then
   # Append to the passed in joblog.json file, will not work with spawned jobs
   echo "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"

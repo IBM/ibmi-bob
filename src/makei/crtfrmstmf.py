@@ -99,7 +99,8 @@ class CrtFrmStmf():
         run_datetime = datetime.now()
 
         # Run the pre_cmd
-        self.job.run_cl(self.precmd, False, True)
+        if self.precmd:
+            self.job.run_cl(self.precmd, False, True)
 
         # Delete the temp source file
         self.job.run_cl(f'DLTF FILE({self.tmp_lib}/{self.tmp_src})', True)
@@ -122,7 +123,8 @@ class CrtFrmStmf():
             success = True
             
             # Run the post_cmd
-            self.job.run_cl(self.postcmd, False, True)
+            if self.postcmd:
+                self.job.run_cl(self.postcmd, False, True)
         # pylint: disable=broad-except
         except Exception:
             print(f"Build not successful for {self.lib}/{self.obj}")
@@ -326,7 +328,7 @@ def cli():
 
     handle = CrtFrmStmf(srcstmf_absolute_path, args.object.strip(),
                         args.library.strip(), args.command.strip(), args.rcdlen, args.ccsid, args.parameters,
-                        env_settings, args.save_joblog, precmd=args.pre_cmd, postcmd=args.post_cmd)
+                        env_settings, args.save_joblog, precmd=args.precmd, postcmd=args.postcmd)
 
     print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
     success = handle.run()

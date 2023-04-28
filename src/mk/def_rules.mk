@@ -952,7 +952,7 @@ define CPP_TO_MODULE_RECIPE =
 	@$(call echo_cmd,"=== Creating CPP module [$(notdir $<)] Note environment and library list are not set up")
 	$(eval crtcmd := crtcppmod module($(OBJLIB)/$(basename $(@F))) srcstmf('$<') $(CRTCMODFLAGS) $(ADHOCCRTFLAGS))
 	@$(PRESETUP) \
-	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)"  "$(crtcmd)" "Y" "$(PRECMD)" "$(POSTCMD)">> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
+	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)"  "$(crtcmd)" "$(PRECMD)" "$(POSTCMD)" "Y">> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
 	@($(call EVFEVENT_DOWNLOAD,$(basename $(@F)).evfevent); ret=$$?; rm $(DEPDIR)/$*.Td 2>/dev/null; exit $$ret)
 	@$(POSTCCOMPILE)
 endef
