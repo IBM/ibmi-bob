@@ -304,11 +304,11 @@ def cli():
         metavar='<ccsid>',
     )
     parser.add_argument(
-        "--pre-cmd",
+        "--precmd",
         metavar='<precmd>',
     )
     parser.add_argument(
-        "--post-cmd",
+        "--postcmd",
         metavar='<postcmd>',
     )
 
