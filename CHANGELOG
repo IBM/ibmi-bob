@@ -2,11 +2,6 @@
 - All compiler parameters can be overwritten by environment variables
   by passing -e var=val on the makei command or by having a separate
   'export var=val' command.
-- By setting the 'precmd' and 'postcmd' environment variables to a
-  CL command, that CL command will be executed before or after the
-  compile command.  Typically this is done using a 
-  'MYTARGET.PGM: private precmd = MYCUSTOMCL' rule in the Rules.mk
-  This implements https://github.com/IBM/ibmi-bob/issues/208
 - The overriding of OBJLIB and TGTCCSID using .ibmi.json in
   a subdirectory needed to be restored. Fixed through
   https://github.com/IBM/ibmi-bob/pull/229
