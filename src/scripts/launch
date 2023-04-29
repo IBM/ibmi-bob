@@ -4,11 +4,11 @@ SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 
 if [ $# -lt 2 ]; then
   echo 1>&2 "$0: not enough arguments"
-  echo 1>&2 "Usage: launch path_to_joblog_json command Y_if_run_in_spawned_job [precmd] [postcmd]"
+  echo 1>&2 "Usage: launch path_to_joblog_json command [precmd] [postcmd] Y_if_run_in_spawned_job"
   exit 2
 elif [ $# -gt 5 ]; then
   echo 1>&2 "$0: too many arguments"
-  echo 1>&2 "Usage: launch path_to_joblog_json command Y_if_run_in_spawned_job [precmd] [postcmd]"
+  echo 1>&2 "Usage: launch path_to_joblog_json command [precmd] [postcmd] Y_if_run_in_spawned_job"
   exit 2
 fi
 
