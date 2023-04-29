@@ -36,10 +36,10 @@ To download the latest rpm file on IBM i, run the following
 curl -L https://github.com/IBM/ibmi-bob/releases/latest/download/bob.rpm -o bob.ppc64.rpm
 ```
 
-**Note:** the path may differ than the URL used above in the `curl` command above. 
 
-* You can manually replace the x.x.x version in the URL, or 
-* even better you can grab the URL from the [latest release on GitHub](https://github.com/ibm/ibmi-bob/releases).
+
+
+* If you want to test an older release, you can grab the URL from the [latest release on GitHub](https://github.com/ibm/ibmi-bob/releases).
     * right click on the `.rpm` file and copy the link URL.
 
 3. Install the `.rpm`
