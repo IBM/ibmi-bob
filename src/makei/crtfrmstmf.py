@@ -45,10 +45,12 @@ class CrtFrmStmf():
     joblog_path: Optional[str]
     back_up_obj_list: List[Tuple[str, str, str]]  # List of (obj, lib, obj_type) tuples
     obj_type: str
+    precmd: str
+    postcmd: str
 
     def __init__(self, srcstmf: str, obj: str, lib: str, cmd: str, rcdlen: int, tgt_ccsid: Optional[str] = None,
                  parameters: Optional[str] = None, env_settings: Optional[Dict[str, str]] = None,
-                 joblog_path: Optional[str] = None, tmp_lib="QTEMP", tmp_src="QSOURCE") -> None:
+                 joblog_path: Optional[str] = None, tmp_lib="QTEMP", tmp_src="QSOURCE", precmd="", postcmd="") -> None:
         # pylint: disable=too-many-arguments
         self.job = IBMJob()
         self.setup_job = IBMJob()
@@ -64,6 +66,9 @@ class CrtFrmStmf():
         self.tmp_lib = tmp_lib
         self.tmp_src = tmp_src
         self.obj_type = COMMAND_MAP[self.cmd]
+        self.precmd = precmd
+        self.postcmd = postcmd
+
         if tgt_ccsid is None or not validate_ccsid(tgt_ccsid):
             ccsid = retrieve_ccsid(srcstmf)
             if ccsid in ["1208", "819"]:
@@ -92,6 +97,11 @@ class CrtFrmStmf():
         self.setup_env()
 
         run_datetime = datetime.now()
+
+        # Run the pre_cmd
+        if self.precmd:
+            self.job.run_cl(self.precmd, False, True)
+
         # Delete the temp source file
         self.job.run_cl(f'DLTF FILE({self.tmp_lib}/{self.tmp_src})', True)
         # Create the temp source file
@@ -111,6 +121,10 @@ class CrtFrmStmf():
         try:
             self.job.run_cl(cmd, False, True)
             success = True
+            
+            # Run the post_cmd
+            if self.postcmd:
+                self.job.run_cl(self.postcmd, False, True)
         # pylint: disable=broad-except
         except Exception:
             print(f"Build not successful for {self.lib}/{self.obj}")
@@ -291,6 +305,14 @@ def cli():
         help='The CCSID of the source code.',
         metavar='<ccsid>',
     )
+    parser.add_argument(
+        "--precmd",
+        metavar='<precmd>',
+    )
+    parser.add_argument(
+        "--postcmd",
+        metavar='<postcmd>',
+    )
 
     args = parser.parse_args()
     srcstmf_absolute_path = str(Path(args.stream_file.strip()).resolve())
@@ -306,7 +328,7 @@ def cli():
 
     handle = CrtFrmStmf(srcstmf_absolute_path, args.object.strip(),
                         args.library.strip(), args.command.strip(), args.rcdlen, args.ccsid, args.parameters,
-                        env_settings, args.save_joblog)
+                        env_settings, args.save_joblog, precmd=args.precmd, postcmd=args.postcmd)
 
     print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
     success = handle.run()
