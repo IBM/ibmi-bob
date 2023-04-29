@@ -97,43 +97,114 @@ endif
 # instead of a constant so that all settings are defined in one place, at the top.)
 # tl;dr: If you want to customize a compile setting for an object, change these variables
 # in your TARGET (not here).
+ifndef ACTGRP
 ACTGRP :=
+endif
+ifndef ALLOW 
 ALLOW :=
-AUT :=
-BNDDIR :=
-COMMIT := *NONE
-COMPILEOPT :=
-CURLIB :=
-DBGVIEW := *ALL
-DEFINE :=
-DETAIL := *EXTENDED
-DFTACTGRP := *NO
-DLTPCT := *NONE
-HLPID =
-HLPPNLGRP =
-INLINE :=
-LOCALETYPE :=
-OBJTYPE :=
-OPTIMIZE := 
-OPTION := *EVENTF
-PAGESIZE :=
-PGM :=
-PMTFILE :=
-PRDLIB :=
-RCDLEN := 
-REUSEDLT := *NO
-RPGPPOPT :=
-RSTDSP :=
-SIZE :=
-STGMDL := *SNGLVL
-SYSIFCOPT :=
-TERASPACE :=
-TEXT = $(shell $(extractTextDescriptor))
-TYPE :=
-TGTCCSID = $(TGTCCSID_$($@_d))
-ECHOCCSID = $(if $(filter *JOB,$(TGTCCSID)),," CCSID: $(TGTCCSID)")
-TGTRLS := 
-VLDCKR :=
+endif
+ifndef AUT
+AUT := 
+endif
+ifndef BNDDIR
+BNDDIR := 
+endif
+ifndef COMMIT
+COMMIT := *NONE 
+endif
+ifndef COMPILEOPT
+COMPILEOPT := 
+endif
+ifndef CURLIB
+CURLIB := 
+endif
+ifndef DBGVIEW
+DBGVIEW := *ALL 
+endif
+ifndef DEFINE
+DEFINE := 
+endif
+ifndef DETAIL
+DETAIL := *EXTENDED 
+endif
+ifndef DFTACTGRP
+DFTACTGRP := *NO 
+endif
+ifndef DLTPCT
+DLTPCT := *NONE 
+endif
+ifndef HLPID
+HLPID = 
+endif
+ifndef HLPPNLGRP
+HLPPNLGRP = 
+endif
+ifndef INLINE
+INLINE := 
+endif
+ifndef LOCALETYPE
+LOCALETYPE := 
+endif
+ifndef OBJTYPE
+OBJTYPE := 
+endif
+ifndef OPTIMIZE
+OPTIMIZE :=  
+endif
+ifndef OPTION
+OPTION := *EVENTF 
+endif
+ifndef PAGESIZE
+PAGESIZE := 
+endif
+ifndef PGM
+PGM := 
+endif
+ifndef PMTFILE
+PMTFILE := 
+endif
+ifndef PRDLIB
+PRDLIB := 
+endif
+ifndef RCDLEN
+RCDLEN :=  
+endif
+ifndef REUSEDLT
+REUSEDLT := *NO 
+endif
+ifndef RPGPPOPT
+RPGPPOPT := 
+endif
+ifndef RSTDSP
+RSTDSP := 
+endif
+ifndef SIZE
+SIZE := 
+endif
+ifndef STGMDL
+STGMDL := *SNGLVL 
+endif
+ifndef SYSIFCOPT
+SYSIFCOPT := 
+endif
+ifndef TERASPACE
+TERASPACE := 
+endif
+ifndef TEXT
+TEXT = $(shell $(extractTextDescriptor)) 
+endif
+ifndef TYPE
+TYPE := 
+endif
+ifndef TGTCCSID
+TGTCCSID = $(TGTCCSID_$(d)) 
+endif
+ifndef TGTRLS
+TGTRLS :=  
+endif
+ifndef VLDCKR
+VLDCKR := 
+endif
 
 # Object-type-specific defaults.  Not used directly, but copied to the standard ones above and then
 # inserted into the compile commands.  Each variable here should also precede its corresponding pattern
