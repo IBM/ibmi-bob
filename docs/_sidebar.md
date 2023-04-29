@@ -29,7 +29,7 @@
   - [joblog.json](reference/joblog-json.md) 
 - Contributing
   - [Getting Started](contributing/getting-started.md)
-  - [Source Structure (outdated)](contributing/source-structure.md)
+  - [Source Structure](contributing/source-structure.md)
   - [Guidelines](contributing/guidelines)
   - [Build RPM (outdated)](contributing/build-rpm)
   - [Documentation](contributing/documentation.md) 
