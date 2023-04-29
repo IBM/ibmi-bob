@@ -11,7 +11,7 @@ cd ibmi-bob
 ```
 
 ## Overview of the source structure
-This PDF has an overview of the structure of BOB: <a href="https://github.com/IBM/ibmi-bob/blob/master/docs/assets/BobDetails.pdf">Download PDF</a>
+
 
 ## Set up the develop environment
 For developing bob, you should install `Python3` and `nox` on your computer.
@@ -48,7 +48,7 @@ nox -s lint
 if you want to release a new patch version, you can run `nox -s release -- patch`. This will bump
 the version number, create a new tag, and push the tag to the remote repository.
 5. Once the new tag is pushed, the CI will automatically build the RPM and upload it to the release
-6. Install RPM on a machine and test it [ Install RPM ](getting-started/installation)
+6. Install RPM on a machine and test it [ Install RPM ](../getting-started/installation#install-via-prebuilt-rpm-packages)
 7. Use `nox -s publish` to create the spec file and create a new pull request to the spec file repository.
 
 ## Versioning
