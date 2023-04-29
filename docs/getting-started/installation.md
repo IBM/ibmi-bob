@@ -3,7 +3,6 @@
 > Some software needs to be installed on the IBM i before Bob can be installed.
 > Please follow the [instructions to install prerequisites](getting-started/prerequisites.md) before continuing here.
 
-<!-- tabs:start -->
 
 ## **Install via yum package manager**
 
@@ -17,44 +16,6 @@
  # Install bob
 yum install bob
 ```
-
-
-
-## **Install via prebuilt RPM packages**
-
-1. Bob depends on many open source packages. You need to install the dependencies first before continuing.
-
-```bash
-yum install bash coreutils gawk grep-gnu make-gnu python39 python39-ibm_db sed-gnu
-```
-
-2. You may always grab the latest binary from the [releases](https://github.com/ibm/ibmi-bob/releases) page.
-
-To download the latest rpm file on IBM i, run the following
-
-```bash
-curl -L https://github.com/IBM/ibmi-bob/releases/latest/download/bob.rpm -o bob.ppc64.rpm
-```
-
-
-
-
-* If you want to test an older release, you can grab the URL from the [latest release on GitHub](https://github.com/ibm/ibmi-bob/releases).
-    * right click on the `.rpm` file and copy the link URL.
-
-3. Install the `.rpm`
-
-```bash
-# install bob from rpm file
-rpm -i bob.ppc64.rpm
-```
-or upgrade from a previous version
-```bash
-# upgrade bob from rpm file
-rpm -U bob.ppc64.rpm
-```
-
-<!-- tabs:end -->
 
 ## Verify Bob is installed correctly
 
