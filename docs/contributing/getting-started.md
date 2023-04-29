@@ -10,9 +10,6 @@ git clone git@github.com:IBM/ibmi-bob.git
 cd ibmi-bob
 ```
 
-## Overview of the source structure
-
-
 ## Set up the develop environment
 For developing bob, you should install `Python3` and `nox` on your computer.
 
