@@ -121,7 +121,7 @@ class CrtFrmStmf():
         try:
             self.job.run_cl(cmd, False, True)
             success = True
-            
+
             # Run the post_cmd
             if self.postcmd:
                 self.job.run_cl(self.postcmd, False, True)
