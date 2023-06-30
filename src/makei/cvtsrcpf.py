@@ -81,12 +81,15 @@ class CvtSrcPf:
         """
         results = self.job.run_sql(
             f"select SYSTEM_TABLE_MEMBER, SOURCE_TYPE from qsys2.syspartitionstat "
-            f"where SYSTEM_TABLE_SCHEMA='{self.lib}' and SYSTEM_TABLE_NAME='{self.srcfile}'")
+            f"where SYSTEM_TABLE_SCHEMA='{self.lib}.upper()' and SYSTEM_TABLE_NAME='{self.srcfile}.upper()'")
         if results:
             src_mbrs = []
             for row in results[0]:
                 mbr_name = row[0].strip()
-                mbr_type = row[1].strip()
+                if len(row) > 1:
+                    mbr_type = row[1].strip()
+                else:
+                    mbr_type = ''
                 src_mbrs.append((mbr_name, mbr_type))
             return src_mbrs
         return []
