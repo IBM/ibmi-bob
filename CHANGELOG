@@ -1,3 +1,8 @@
+* Fri Jun 2830 2023 Edmund Reinhardt <edmund.reinhard@ca.ibm.com> - 2.4.13
+- `makei cvtsrcpf` now supports library and source physical file names
+  specified in lower case.
+- `makei cvtsrcpf` now support missing member types.  A stream file with
+  no file extension is created.
 * Sat Apr 28 2023 Edmund Reinhardt <edmund.reinhard@ca.ibm.com> - 2.4.13
 - All compiler parameters can be overwritten by environment variables
   by passing -e var=val on the makei command or by having a separate
