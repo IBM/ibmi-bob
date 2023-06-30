@@ -79,14 +79,16 @@ class CvtSrcPf:
     def _get_src_mbrs(self) -> List[Tuple[str, str]]:
         """Get the source members of the source file
         """
+        library = self.lib.upper()
+        srcpf = self.srcfile.upper()
         results = self.job.run_sql(
             f"select SYSTEM_TABLE_MEMBER, SOURCE_TYPE from qsys2.syspartitionstat "
-            f"where SYSTEM_TABLE_SCHEMA='{self.lib}.upper()' and SYSTEM_TABLE_NAME='{self.srcfile}.upper()'")
+            f"where SYSTEM_TABLE_SCHEMA='{library}' and SYSTEM_TABLE_NAME='{srcpf}'")
         if results:
             src_mbrs = []
             for row in results[0]:
                 mbr_name = row[0].strip()
-                if len(row) > 1:
+                if len(row) > 2:
                     mbr_type = row[1].strip()
                 else:
                     mbr_type = ''
