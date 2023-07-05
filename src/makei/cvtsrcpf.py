@@ -88,7 +88,7 @@ class CvtSrcPf:
             src_mbrs = []
             for row in results[0]:
                 mbr_name = row[0].strip()
-                if isinstance(row[1], str) :
+                if isinstance(row[1], str):
                     mbr_type = row[1].strip()
                 else:
                     mbr_type = ''
