@@ -40,7 +40,8 @@ nox -s lint
 ## Release process
 1. Once all the tests and linters pass, you can create a pull request to the `master` branch.
 2. Switch to the `master` branch and pull the latest code.
-3. Update the CHANGELOG file under the `changelogs` folder. Make sure you add the new version.
+3. Update the CHANGELOG file under the `changelogs` folder. Make sure that on the first line
+the date and version are correct!
 4. Use `nox -s release -- {major, minor, patch}` to release a new version. For example, 
 if you want to release a new patch version, you can run `nox -s release -- patch`. This will bump
 the version number, create a new tag, and push the tag to the remote repository.
