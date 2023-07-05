@@ -1,4 +1,4 @@
-* Fri Jun 2830 2023 Edmund Reinhardt <edmund.reinhard@ca.ibm.com> - 2.4.13
+* Fri Jun 30 2023 Edmund Reinhardt <edmund.reinhard@ca.ibm.com> - 2.4.15
 - `makei cvtsrcpf` now supports library and source physical file names
   specified in lower case.
 - `makei cvtsrcpf` now support missing member types.  A stream file with
