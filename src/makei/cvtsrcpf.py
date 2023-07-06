@@ -18,9 +18,12 @@ class CvtSrcPf:
     srcfile: str
     save_path: Path
     default_ccsid: Optional[str]
+    tolower: bool
     ibmi_json_path: Optional[Path]
 
-    def __init__(self, srcfile: str, lib: str, default_ccsid: str = None, save_path: Path = Path.cwd()) -> None:
+    def __init__(
+        self, srcfile: str, lib: str, tolower: bool, default_ccsid: str = None, save_path: Path = Path.cwd()
+    ) -> None:
         self.job = IBMJob()
 
         self.lib = lib
@@ -31,6 +34,7 @@ class CvtSrcPf:
         else:
             self.default_ccsid = None
 
+        self.tolower = tolower
         self.ibmi_json_path = save_path / ".ibmi.json"
 
     def run(self) -> int:
@@ -48,13 +52,13 @@ class CvtSrcPf:
         print(f"{len(src_mbrs)} source members found.")
         cvt_count = 0
         for src_mbr in src_mbrs:
-            if self._cvr_src_mbr(src_mbr, srcpath):
+            if self._cvr_src_mbr(src_mbr, srcpath, self.tolower):
                 cvt_count += 1
         if self.ibmi_json_path:
             create_ibmi_json(self.ibmi_json_path, tgt_ccsid=self.default_ccsid)
         return cvt_count
 
-    def _cvr_src_mbr(self, src_mbr, srcpath) -> bool:
+    def _cvr_src_mbr(self, src_mbr, srcpath, tolower: bool) -> bool:
         """Convert the source member
         """
         src_mbr_name = src_mbr[0]
@@ -62,6 +66,8 @@ class CvtSrcPf:
         if src_mbr_ext == ".src":
             src_mbr_ext = ".pf"
         dst_mbr_name = f"{src_mbr_name}.{src_mbr_ext}"
+        if tolower:
+            dst_mbr_name = dst_mbr_name.lower()
         dst_mbr_path = self.save_path / dst_mbr_name
         dups = 0
         while dst_mbr_path.exists():

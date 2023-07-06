@@ -169,6 +169,14 @@ def add_cvtsrcpf_parser(subparsers: argparse.ArgumentParser):
         type=str
     )
 
+    cvtsrcpf_parser.add_argument(
+        "-l",
+        "--tolower",
+        help='The generated source file name will be in lowercase.',
+        action='store_true'
+    )
+
+    cvtsrcpf_parser.set_defaults(tolower=False)
     cvtsrcpf_parser.set_defaults(handle=handle_cvtsrcpf)
 
 
@@ -250,7 +258,7 @@ def handle_cvtsrcpf(args):
     """
     Processing the cvtsrcpf command
     """
-    CvtSrcPf(args.file, args.library, args.ccsid).run()
+    CvtSrcPf(args.file, args.library, args.tolower, args.ccsid).run()
 
 
 def get_override_vars(args):
