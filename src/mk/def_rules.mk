@@ -1288,9 +1288,9 @@ define BNDDIRSRC_TO_BNDDIR_RECIPE =
 	$(SCRIPTSPATH)/extractAndLaunch "$(JOBLOGFILE)" "$<" $(OBJLIB) $(basename $(@F)) >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
 endef
 
-define DTA_TO_DTA_RECIPE =
+define DTAARA_TO_DTAARA_RECIPE =
 	$(eval d = $($@_d))
-	@$(call echo_cmd,"=== Creating DTA from [$(notdir $<)]")
+	@$(call echo_cmd,"=== Creating DTAARA from [$(notdir $<)]")
 	$(eval crtcmd := $(shell $(SCRIPTSPATH)/extractPseudoSrc $< $(OBJLIB) $(basename $(@F))))
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/extractAndLaunch "$(JOBLOGFILE)" "$<" $(OBJLIB) $(basename $(@F)) >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
