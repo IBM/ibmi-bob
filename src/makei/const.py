@@ -80,7 +80,6 @@ TARGET_TARGETGROUPS_MAPPING = {
     "QMQRY": "QMQRY",
     "BNDDIR": "BNDD",
     "DTAARA": "DTAARA",
-    "DTAARA": "SQL",
     "SRVPGM": "SRVPGM",
     "MSGF": "MSG",
     "WSCST": "WSCST",

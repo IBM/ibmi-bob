@@ -86,8 +86,8 @@ CRTSBSD.FILE : \n\t@$(call echo_cmd,=== Creating [CRTSBSD.FILE] from custom reci
 def test_dtaara_recipe():
     # Test loading from a valid file
     rules_mk = RulesMk.from_file(data_dir / "dtaara.rules.mk")
-    expected_targets = {'TRGs': [], 'DTAARAs': ['LASTORDNO.DTAARA'], 'SQLs': [], 'BNDDs': [], 'PFs': [], 'LFs': [], 'DSPFs': [],
-                        'PRTFs': [], 'CMDs': [], 'MODULEs': [], 'SRVPGMs': [], 'PGMs': [],
+    expected_targets = {'TRGs': [], 'DTAARAs': ['LASTORDNO.DTAARA'], 'SQLs': [], 'BNDDs': [], 'PFs': [], 'LFs': [],
+                        'DSPFs': [], 'PRTFs': [], 'CMDs': [], 'MODULEs': [], 'SRVPGMs': [], 'PGMs': [],
                         'MENUs': [], 'PNLGRPs': [], 'QMQRYs': [], 'WSCSTs': [], 'MSGs': []}
 
     assert rules_mk.containing_dir == data_dir
@@ -102,13 +102,12 @@ def test_dtaara_recipe():
     assert str(rules_mk.rules[0]) == '''LASTORDNO.DTAARA_SRC=LASTORDNO.DTAARA
 LASTORDNO.DTAARA_DEP=
 LASTORDNO.DTAARA_RECIPE=DTAARA_TO_DTAARA_RECIPE\n'''
-
-
     assert str(rules_mk) == '''DTAARAs := LASTORDNO.DTAARA\n\n
 LASTORDNO.DTAARA_SRC=LASTORDNO.DTAARA
 LASTORDNO.DTAARA_DEP=
 LASTORDNO.DTAARA_RECIPE=DTAARA_TO_DTAARA_RECIPE
 '''
+
 
 def test_dds_recipe():
     # Test loading from a valid file
