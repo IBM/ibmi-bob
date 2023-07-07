@@ -1,6 +1,7 @@
-* Thu Jul 06 2023 Edmund Reinhardt <edmund.reinhard@ca.ibm.com> - 2.4.16
+* Fri Jul 7 2023 Edmund Reinhardt <edmund.reinhard@ca.ibm.com> - 2.4.16
 - `makei cvtsrcpf -l` now supports optionally generating stream files
 with lowercase fie names.
+- Fixes https://github.com/IBM/ibmi-bob/issues/236 DTAARA now supported
 * Fri Jun 30 2023 Edmund Reinhardt <edmund.reinhard@ca.ibm.com> - 2.4.15
 - `makei cvtsrcpf` now supports library and source physical file names
   specified in lower case.
