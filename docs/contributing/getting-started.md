@@ -46,8 +46,8 @@ the date and version are correct!
 if you want to release a new patch version, you can run `nox -s release -- patch`. This will bump
 the version number, create a new tag, and push the tag to the remote repository.
 5. Once the new tag is pushed, the CI will automatically build the RPM and upload it to the release
-6. Install RPM on an IBM i machine  [ Install RPM ](rpm-install)
-7. [Test Bob](testing) on that IBM i.
+6. Install RPM on an IBM i machine  [ Install RPM ](contributing/rpm-install)
+7. [Test Bob](contributing/testing) on that IBM i.
 8. Use `nox -s publish` to create the spec file and create a new pull request to the spec file repository.
 
 ## Versioning
