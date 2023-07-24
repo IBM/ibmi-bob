@@ -66,7 +66,7 @@ Note that for *MSGF and *BNDDIR, the CL commands should include the delete of th
 | Object Type | File Extension | CL Command        |
 | :---------- | :------------- | :---------------- |
 | *MSGF       | .MSGF          | CRTMSGF + ADDMSGD |
-| *BNDDIR     | .BNDDIRSRC     | CRTBNDDIR         |
+| *BNDDIR     | .BNDDIR        | CRTBNDDIR         |
 | *PGM        | .ILEPGM        | CRTPGM            |
 | *SRVPGM     | .ILESRVPGM     | CRTSRVPGM         |
 | *DTAARA     | .DTAARA        | CRTDTAARA         |
