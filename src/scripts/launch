@@ -46,7 +46,7 @@ fi
 cl "CHGJOB LOG(4 00 *SECLVL)"
 echo ">> executing command: ${cmd}"
 echo ">> liblist: $(liblist | awk '{print $1}' | sed ':a;N;$!ba;s/\n/ /g')"
-timestamp=$(date +"%Y-%m-%d-%H.%M.%S.%N")
+timestamp=$(date +"%Y-%m-%d-%H.%M.%S)
 echo ">> executing time: ${timestamp}"
 echo
 if [ -n $spawned_job ]; then
