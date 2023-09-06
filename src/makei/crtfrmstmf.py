@@ -50,7 +50,7 @@ class CrtFrmStmf():
 
     def __init__(self, srcstmf: str, obj: str, lib: str, cmd: str, rcdlen: int, tgt_ccsid: Optional[str] = None,
                  parameters: Optional[str] = None, env_settings: Optional[Dict[str, str]] = None,
-                 joblog_path: Optional[str] = None, tmp_lib="QTEMP", tmp_src="QSOURCE", precmd="", postcmd="") -> None:
+                 joblog_path: Optional[str] = None, tmp_lib="QTEMP", tmp_src="QSOURCE", precmd="", postcmd="", output="") -> None:
         # pylint: disable=too-many-arguments
         self.job = IBMJob()
         self.setup_job = IBMJob()
@@ -68,6 +68,7 @@ class CrtFrmStmf():
         self.obj_type = COMMAND_MAP[self.cmd]
         self.precmd = precmd
         self.postcmd = postcmd
+        self.output = output
 
         if tgt_ccsid is None or not validate_ccsid(tgt_ccsid):
             ccsid = retrieve_ccsid(srcstmf)
@@ -141,7 +142,7 @@ class CrtFrmStmf():
 
         if self.joblog_path is not None:
             save_joblog_json(cmd, format_datetime(
-                run_datetime), self.job.job_id, self.joblog_path, filter_joblogs)
+                run_datetime), self.job.job_id, self.obj + "." + self.obj_type, self.srcstmf, self.output, not success, self.joblog_path, filter_joblogs)
         return success
 
     def setup_env(self):
@@ -313,6 +314,10 @@ def cli():
         "--postcmd",
         metavar='<postcmd>',
     )
+    parser.add_argument(
+        "--output",
+        metavar='<output>',
+    )
 
     args = parser.parse_args()
     srcstmf_absolute_path = str(Path(args.stream_file.strip()).resolve())
@@ -328,7 +333,7 @@ def cli():
 
     handle = CrtFrmStmf(srcstmf_absolute_path, args.object.strip(),
                         args.library.strip(), args.command.strip(), args.rcdlen, args.ccsid, args.parameters,
-                        env_settings, args.save_joblog, precmd=args.precmd, postcmd=args.postcmd)
+                        env_settings, args.save_joblog, precmd=args.precmd, postcmd=args.postcmd, output=args.output)
 
     print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
     success = handle.run()
