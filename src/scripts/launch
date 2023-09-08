@@ -6,7 +6,7 @@ if [ $# -lt 2 ]; then
   echo 1>&2 "$0: not enough arguments"
   echo 1>&2 "Usage: launch path_to_joblog_json command [precmd] [postcmd] Y_if_run_in_spawned_job"
   exit 2
-elif [ $# -gt 5 ]; then
+elif [ $# -gt 8 ]; then
   echo 1>&2 "$0: too many arguments"
   echo 1>&2 "Usage: launch path_to_joblog_json command [precmd] [postcmd] Y_if_run_in_spawned_job"
   exit 2
@@ -16,7 +16,10 @@ joblog_json=$1
 cmd=$2
 precmd=$3
 postcmd=$4
-spawned_job=$5
+object=$5
+source=$6
+output=$7
+spawned_job=$8
 
 if [ ! -f "$joblog_json" ]; then
   echo "[]" >"$joblog_json"
@@ -64,6 +67,12 @@ if [ -n "$postcmd" ]; then
   cl $cl_parms "$postcmd"
 fi
 
+if [ $exitCode -eq 0 ]; then
+  failed=False;
+else
+  failed=True;
+fi
+
 if [ -z $spawned_job ]; then
   # Append to the passed in joblog.json file, will not work with spawned jobs
   echo "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
@@ -71,6 +80,6 @@ if [ -z $spawned_job ]; then
   getjobid -s >"$tmppipe"
   jobid=$(cat <"$tmppipe")
   rm -rf "$tmppipe"
-  "$SCRIPT_DIR"/getJobLog "$cmd" "$timestamp" "$jobid" -f "$joblog_json"
+  "$SCRIPT_DIR"/getJobLog "$cmd" "$timestamp" "$jobid" "$object" "$source" "$output" "$failed" -f "$joblog_json"
 fi
 exit $exitCode
