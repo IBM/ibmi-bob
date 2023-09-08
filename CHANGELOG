@@ -1,3 +1,5 @@
+* Fri Sep 8 2023 Irfan Sharif <IrfanSharif@ibm.com> - 2.4.18
+- Fixed regression in launch.sh regarding timestamp
 * Fri Sep 8 2023 Irfan Sharif <IrfanSharif@ibm.com> - 2.4.17
 - logs separated into targetobject.log files and references in joblog.json.
   Updated joblog.json to include properties object, source, object and failed.
