@@ -101,7 +101,8 @@ def get_joblog_for_job(job_id: str) -> List[Dict[str, Any]]:
     return joblog_dict
 
 
-def save_joblog_json(cmd: str, cmd_time: str, jobid: str, object: str, source: str, output:str, failed: bool, joblog_json: Optional[str],
+def save_joblog_json(cmd: str, cmd_time: str, jobid: str, object: str, source: str, output: str,
+                     failed: bool, joblog_json: Optional[str],
                      filter_func: Callable[[Dict[str, Any]], bool] = None):
     records = get_joblog_for_job(jobid)
     messages = []

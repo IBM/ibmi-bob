@@ -50,7 +50,8 @@ class CrtFrmStmf():
 
     def __init__(self, srcstmf: str, obj: str, lib: str, cmd: str, rcdlen: int, tgt_ccsid: Optional[str] = None,
                  parameters: Optional[str] = None, env_settings: Optional[Dict[str, str]] = None,
-                 joblog_path: Optional[str] = None, tmp_lib="QTEMP", tmp_src="QSOURCE", precmd="", postcmd="", output="") -> None:
+                 joblog_path: Optional[str] = None, tmp_lib="QTEMP", tmp_src="QSOURCE", precmd="",
+                 postcmd="", output="") -> None:
         # pylint: disable=too-many-arguments
         self.job = IBMJob()
         self.setup_job = IBMJob()
@@ -142,7 +143,8 @@ class CrtFrmStmf():
 
         if self.joblog_path is not None:
             save_joblog_json(cmd, format_datetime(
-                run_datetime), self.job.job_id, self.obj + "." + self.obj_type, self.srcstmf, self.output, not success, self.joblog_path, filter_joblogs)
+                run_datetime), self.job.job_id, self.obj + "." + self.obj_type, self.srcstmf, self.output,
+                  not success, self.joblog_path, filter_joblogs)
         return success
 
     def setup_env(self):
