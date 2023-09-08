@@ -50,7 +50,9 @@ def cli():
     )
 
     args = parser.parse_args()
-    save_joblog_json(args.cmd, args.cmdtime, args.jobid, args.object, args.source, args.output, False if args.failed == "False" else True, args.f)
+    save_joblog_json(args.cmd, args.cmdtime, args.jobid, args.object, args.source, args.output,
+                     False if args.failed == "False" else True, args.f)
+
 
 if __name__ == "__main__":
     cli()
