@@ -42,12 +42,11 @@ class CvtSrcPf:
         if not srcpath.exists():
             raise Exception(f"Source file '{srcpath}' does not exist")
         src_mbrs = self._get_src_mbrs()
-        src_ccsid = retrieve_ccsid(str(srcpath))
-        if self.default_ccsid is None:
-            if validate_ccsid(src_ccsid):
-                self.default_ccsid = src_ccsid
-            else:
-                self.default_ccsid = "*JOB"
+        src_ccsid = retrieve_ccsid(str(srcpath), self._default_ccsid() )
+        if validate_ccsid(src_ccsid):
+            self.default_ccsid = src_ccsid
+        else:
+            self.default_ccsid = "*JOB"
 
         print(f"{len(src_mbrs)} source members found.")
         cvt_count = 0
@@ -57,6 +56,12 @@ class CvtSrcPf:
         if self.ibmi_json_path:
             create_ibmi_json(self.ibmi_json_path, tgt_ccsid=self.default_ccsid)
         return cvt_count
+
+    def _default_ccsid(self) -> str:
+        if self.default_ccsid is None:
+            return "*JOB"
+        else:
+            return self.default_ccsid
 
     def _cvr_src_mbr(self, src_mbr, srcpath, tolower: bool) -> bool:
         """Convert the source member
@@ -103,18 +108,21 @@ class CvtSrcPf:
         return []
 
 
-def _get_attr(filepath: str):
+def _get_attr(filepath: str, defaultCcsid: str):
     stream = os.popen(f'/QOpenSys/usr/bin/attr {filepath}')
     output = stream.read().strip()
-    attrs = {}
-    for attr in output.split("\n"):
-        [key, value] = attr.split("=")
-        attrs[key] = value
+    attrs = {"CCSID": defaultCcsid}
+    if not output.__contains__("="):
+        raise Exception(f"Unable to access '{filepath}' make sure file exists and that the user has permissions to it")
+    else:
+        for attr in output.split("\n"):
+            [key, value] = attr.split("=")
+            attrs[key] = value
     return attrs
 
 
-def retrieve_ccsid(filepath: str) -> str:
-    return _get_attr(filepath)["CCSID"]
+def retrieve_ccsid(filepath: str, defaultCcsid: str) -> str:
+    return _get_attr(filepath, defaultCcsid)["CCSID"]
 
 
 if __name__ == "__main__":
