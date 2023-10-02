@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import os
 import re
 import sys
 from pathlib import Path
@@ -153,6 +154,20 @@ class RulesMk:
                     sys.exit(1)
 
                 self.targets[tgt_group + 's'].append(rule.target)
+
+        if len(subdirs) > 0:
+            nestedDirs = os.listdir(containing_dir)
+
+            # Mapping from lowercase of directory name to the actual directory name
+            # Assumes that we can't have two mixed case directory names
+            dirLowerDict = dict(zip([dir.lower() for dir in nestedDirs], nestedDirs))
+
+            for i in range(len(subdirs)):
+                dir = dirLowerDict.get(subdirs[i].lower())
+
+                if dir is not None:
+                    subdirs[i] = dir
+
 
         self.subdirs = subdirs
         self.rules = rules
