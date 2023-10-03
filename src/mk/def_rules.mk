@@ -1132,7 +1132,7 @@ endef
 define SQLTRG_TO_PGM_RECIPE =
 	$(PGM_VARIABLES)
 	$(eval d = $($@_d))
-	@$(call echo_cmd,"=== Creating SQL TRIGGER from Sql statement [$(notdir $<)]")
+	@$(call echo_cmd,"=== Creating SQL TRIGGER in $(CURLIB)from Sql statement [$(notdir $<)]")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
 	$(eval logFile := $(LOGPATH)/$(notdir $(basename $<)).splf)
 	@$(PRESETUP) \
@@ -1144,7 +1144,7 @@ endef
 define PGM.RPGLE_TO_PGM_RECIPE =
 	$(PGM_VARIABLES)
 	$(eval d = $($@_d))
-	@$(call echo_cmd,"=== Create Bound RPG Program [$(basename $@)]")
+	@$(call echo_cmd,"=== Create Bound RPG Program [$(basename $@)] in $(OBJLIB)")
 	$(eval crtcmd := CRTBNDRPG srcstmf('$<') PGM($(OBJLIB)/$(basename $(@F))) $(CRTBNDRPGFLAGS))
 	$(eval logFile := $(LOGPATH)/$(notdir $(basename $<)).splf)
 	@$(PRESETUP) \
@@ -1155,7 +1155,7 @@ endef
 define PGM.SQLRPGLE_TO_PGM_RECIPE =
 	$(PGM_VARIABLES)
 	$(eval d = $($@_d))
-	@$(call echo_cmd,"=== Create Bound SQLRPGLE Program [$(basename $@)]")
+	@$(call echo_cmd,"=== Create Bound SQLRPGLE Program [$(basename $@)] in $(OBJLIB)")
 	$(eval crtcmd := CRTSQLRPGI srcstmf('$<') OBJ($(OBJLIB)/$(basename $(@F))) $(CRTSQLRPGIFLAGS))
 	$(eval logFile := $(LOGPATH)/$(notdir $(basename $<)).splf)
 	@$(PRESETUP) \
@@ -1166,7 +1166,7 @@ endef
 define PGM.C_TO_PGM_RECIPE =
 	$(PGM_VARIABLES)
 	$(eval d = $($@_d))
-	@$(call echo_cmd,"=== Create Bound RPG Program [$(basename $@)]")
+	@$(call echo_cmd,"=== Create Bound RPG Program [$(basename $@)] in $(OBJLIB)")
 	$(eval crtcmd := CRTBNDC srcstmf('$<') PGM($(OBJLIB)/$(basename $(@F))) $(CRTBNDCFLAGS))
 	$(eval logFile := $(LOGPATH)/$(notdir $(basename $<)).splf)
 	@$(PRESETUP) \
@@ -1177,7 +1177,7 @@ endef
 define CBL_TO_PGM_RECIPE =
 	$(PGM_VARIABLES)
 	$(eval d = $($@_d))
-	@$(call echo_cmd,"=== Create COBOL Program [$(basename $@)]")
+	@$(call echo_cmd,"=== Create COBOL Program [$(basename $@)] in $(OBJLIB)")
 	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID) -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTCBLPGM" -p '"$(CRTCBLPGMFLAGS)"'")
 	$(eval logFile := $(LOGPATH)/$(notdir $(basename $<)).splf)
 	@$(PRESETUP) \
