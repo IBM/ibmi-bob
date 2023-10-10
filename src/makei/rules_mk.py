@@ -29,7 +29,7 @@ class MKRule:
                  containing_dir: Path, include_dirs: List[Path]):
         # pylint: disable=too-many-arguments
 
-        self.target = target
+        self.target = target.upper()
         self.dependencies = dependencies
         self.commands = list(filter(lambda command: command.strip(), commands))
         self.variables = variables
