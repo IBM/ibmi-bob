@@ -14,8 +14,10 @@ ICONV="/QOpenSys/usr/bin/iconv"
 ICONV_EBCDIC="IBM-037"
 ICONV_ASCII="UTF-8"
 
+# Commands to generate typedef structure for *FILE objects (for use by C code)
+# Create struct via GENCSRC command, then strip out comments and compare with existing struct; only replace existing file if something has changed.
 if [ "$sourceSuffix" = 'PRTF' ]; then SLTFLD='*OUTPUT'; else SLTFLD='*BOTH *KEY'; fi; 
-system -v "GENCSRC OBJ('"$objpath"/"$object"') SRCSTMF('"$source".TH') SLTFLD($SLTFLD) TYPEDEFPFX('"$objectBasename"')"
+system -v "GENCSRC OBJ('"$objpath"/"$object"') SRCSTMF('"$source".TH') SLTFLD($SLTFLD) TYPEDEFPFX('"$objectBasename"')" > /dev/null
 (file="$sourceBasename"_"$sourceSuffix"_H; echo "#ifndef ${file}"; echo "   #define ${file}"; "$ICONV" -f "$ICONV_EBCDIC" -t "$ICONV_ASCII" "$source".TH | tr -d '\r' | sed -e '/^ *int/ s/;     /;/' -e '/^ *int/ s/int/long int/'; echo "#endif  /* ${file} */") > "$source".H1
 rm "$source".TH
 if [ -f ""$source".H" ]; then sed -e '/^\/\//d' "$source".H >"$source".H-old; fi

@@ -486,19 +486,6 @@ if [ ! -s $(DEPDIR)/$(basename $@).d ]; then \
 fi
 endef
 
-# Commands to generate typedef structure for *FILE objects (for use by C code)
-# Create struct via GENCSRC command, then strip out comments and compare with existing struct; only replace existing file if something has changed.
-define TYPEDEF_SCRIPT =
-if [ "$(suffix $<)" = '.PRTF' ]; then SLTFLD='*OUTPUT'; else SLTFLD='*BOTH *KEY'; fi; system -v "GENCSRC OBJ('$(OBJPATH)/$@') SRCSTMF('$<.TH') SLTFLD($$SLTFLD) TYPEDEFPFX('$(basename $@)')" > /dev/null
-(file=$(subst .,_,$(notdir $<))_H; echo "#ifndef $${file}"; echo "   #define $${file}"; $(ICONV) -f $(ICONV_EBCDIC) -t $(ICONV_ASCII) $<.TH | tr -d '\r' | sed -e '/^ *int/ s/;     /;/' -e '/^ *int/ s/int/long int/'; echo "#endif  /* $${file} */") > $<.H1
-rm $<.TH
-if [ -f "$<.H" ]; then sed -e '/^\/\//d' $<.H >$<.H-old; fi
-sed -e '/^\/\//d' $<.H1 >$<.H-new
-if ! cmp $<.H-new $<.H-old >/dev/null 2>&1; then mv -f $<.H1 $<.H; echo "*** Created new typedef file $<.H for file [$(tgt)]"; fi
-if [ -f "$<.H-old" ]; then rm "$<.H-old"; fi
-if [ -f "$<.H-new" ]; then rm "$<.H-new"; fi
-if [ -f "$<.H1" ]; then rm "$<.H1"; fi
-endef
 
 # Can't specify our default ACTGRP value if DFTACTGRP(*YES) is specified.
 derive_ACTGRP = $(if $(filter *YES,$(DFTACTGRP)),,$(ACTGRP))
@@ -853,7 +840,7 @@ define FILE_VARIABLES =
 	$(eval REUSEDLT = $(fileREUSEDLT))\
 	$(eval RSTDSP = $(fileRSTDSP))\
 	$(eval SIZE = $(fileSIZE))\
-	$(eval TYPEDEF = $(if $(filter YES,$(CREATE_TYPEDEF)),$(TYPEDEF_SCRIPT),))
+	$(eval TYPEDEF = $(if $(filter YES,$(CREATE_TYPEDEF)),$(SCRIPTSPATH)/crttypedef "$<" "$@" "$(OBJPATH)",))
 endef
 
 define DSPF_TO_FILE_RECIPE =
