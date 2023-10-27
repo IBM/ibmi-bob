@@ -167,8 +167,6 @@ class RulesMk:
 
                 if dir is not None:
                     subdirs[i] = dir
-
-
         self.subdirs = subdirs
         self.rules = rules
         self.containing_dir = containing_dir
