@@ -1167,7 +1167,7 @@ endef
 define CBLLE_TO_MODULE_RECIPE =
 	$(MODULE_VARIABLES)\
 	$(eval d = $($@_d))
-	@$(call echo_cmd,"=== Create ILE COBOL Program [$(basename $@)] in $(OBJLIB)")
+	@$(call echo_cmd,"=== Create ILE COBOL module [$(basename $@)] in $(OBJLIB)")
 	$(eval crtcmd := crtcblmod module($(OBJLIB)/$(basename $(@F))) srcstmf('$<') $(CRTCBLMODFLAGS))
 	$(eval logFile := $(LOGPATH)/$(notdir $(basename $<)).splf)
 	@$(PRESETUP) \
