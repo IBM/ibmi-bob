@@ -54,9 +54,9 @@ class IBMiJson:
     def __dict__(self):
         build = {}
 
-        if self.build["tgt_ccsid"] != DEFAULT_TGT_CCSID:
+        if self.build["tgt_ccsid"] != DEFAULT_TGT_CCSID and self.build["tgt_ccsid"] != "":
             build["tgtCcsid"] = self.build["tgt_ccsid"]
-        if self.build["objlib"] != DEFAULT_OBJLIB:
+        if self.build["objlib"] != DEFAULT_OBJLIB and self.build["objlib"] != "":
             build["objlib"] = self.build["objlib"]
 
         if len(build.keys()) > 0:
