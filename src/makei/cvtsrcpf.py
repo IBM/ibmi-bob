@@ -55,8 +55,15 @@ class CvtSrcPf:
         for src_mbr in src_mbrs:
             if self._cvr_src_mbr(src_mbr, srcpath, self.tolower):
                 cvt_count += 1
+                if(self.store_member_text):
+                    result = self._get_member_text(src_mbr, srcpath)
+                    query_title = result[1][0]
+                    query_result = result[0][0][0]
+
+                    
         if self.ibmi_json_path:
             create_ibmi_json(self.ibmi_json_path, tgt_ccsid=self.default_ccsid)
+        
         return cvt_count
 
     def _default_ccsid(self) -> str:
@@ -88,6 +95,15 @@ class CvtSrcPf:
             f"CPYTOSTMF FROMMBR('{srcpath}/{src_mbr_name}.MBR') "
             f"TOSTMF('{dst_mbr_path}') ENDLINFMT(*LF) STMFCCSID(1208) STMFOPT(*REPLACE)",
             ignore_errors=True, log=True)
+    
+    def _get_member_text(self, src_mbr, srcpath) -> bool:
+        """Convert the source member
+        """
+        src_mbr_name = src_mbr[0]
+        return self.job.run_sql(
+            f"SELECT TEXT_DESCRIPTION FROM TABLE(qsys2.ifs_object_statistics('{srcpath}/{src_mbr_name}.MBR'))",
+            ignore_errors=True, log=True)
+
 
     def _get_src_mbrs(self) -> List[Tuple[str, str]]:
         """Get the source members of the source file
