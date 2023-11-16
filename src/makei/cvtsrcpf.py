@@ -20,9 +20,10 @@ class CvtSrcPf:
     default_ccsid: Optional[str]
     tolower: bool
     ibmi_json_path: Optional[Path]
+    store_member_text: bool
 
     def __init__(
-        self, srcfile: str, lib: str, tolower: bool, default_ccsid: str = None, save_path: Path = Path.cwd()
+        self, srcfile: str, lib: str, tolower: bool, default_ccsid: str = None, text: bool = False, save_path: Path = Path.cwd()
     ) -> None:
         self.job = IBMJob()
 
@@ -36,6 +37,7 @@ class CvtSrcPf:
 
         self.tolower = tolower
         self.ibmi_json_path = save_path / ".ibmi.json"
+        self.store_member_text = text
 
     def run(self) -> int:
         srcpath = Path(objlib_to_path(self.lib, f"{self.srcfile}.FILE"))

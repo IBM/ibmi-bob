@@ -176,6 +176,13 @@ def add_cvtsrcpf_parser(subparsers: argparse.ArgumentParser):
         action='store_true'
     )
 
+    cvtsrcpf_parser.add_argument(
+        "-t",
+        "--text",
+        help='The generated source file will include the member text as a comment.',
+        action='store_false'
+    )
+
     cvtsrcpf_parser.set_defaults(tolower=False)
     cvtsrcpf_parser.set_defaults(handle=handle_cvtsrcpf)
 
@@ -258,7 +265,7 @@ def handle_cvtsrcpf(args):
     """
     Processing the cvtsrcpf command
     """
-    CvtSrcPf(args.file, args.library, args.tolower, args.ccsid).run()
+    CvtSrcPf(args.file, args.library, args.tolower, args.ccsid, args.text).run()
 
 
 def get_override_vars(args):
