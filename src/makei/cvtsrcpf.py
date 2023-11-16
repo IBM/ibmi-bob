@@ -39,6 +39,31 @@ class CvtSrcPf:
         self.ibmi_json_path = save_path / ".ibmi.json"
         self.store_member_text = text
 
+    def check_keyword_in_file(self, file_path: str, keyword: str, line_limit: str) -> bool:
+        with open(file_path, 'r') as file:
+            for line_number, line in enumerate(file, start=1):
+                if keyword.lower() in line.lower():
+                    return True
+                if line_number == line_limit:
+                    break
+        return False
+    
+    def insert_line_with_content(self, file_path, content, column):
+        with open(file_path, 'r+') as file:
+            lines = file.readlines()
+            lines.insert(0, '\n')
+            lines[0] = (' ' * column) + content + '\n' + lines[0][column:]
+            file.seek(0)
+            file.writelines(lines)
+
+    def import_member_text(self, file_path: str, member_text: str) -> bool:
+        text_comment_exists = self.check_keyword_in_file(file_path, 'TEXT', 15)
+        print(text_comment_exists)
+
+        if not text_comment_exists:
+            # Fixed-form RPG
+            self.insert_line_with_content(file_path, '*TEXT ' + member_text, 6)
+
     def run(self) -> int:
         srcpath = Path(objlib_to_path(self.lib, f"{self.srcfile}.FILE"))
         if not srcpath.exists():
@@ -58,17 +83,16 @@ class CvtSrcPf:
             dst_mbr_name = self._get_dst_mbr_name(src_mbr_name, src_mbr_ext, self.tolower)
             dst_mbr_path = self._get_dst_mbr_path(dst_mbr_name, src_mbr_name, src_mbr_ext)
 
-
             if self._cvr_src_mbr(src_mbr_name, srcpath, dst_mbr_name, dst_mbr_path):
                 cvt_count += 1
                 if self.store_member_text:
                     result = self._get_member_text(src_mbr_name, srcpath)
-                    query_title = result[1][0]
-                    query_result = result[0][0][0]
+                    member_text = result[0][0][0]
 
                     # If member has no text
-                    if query_result != None:
-                        print(query_result)
+                    if member_text != None:
+                        print(dst_mbr_path)
+                        self.import_member_text(dst_mbr_path, member_text)
             
                     
         if self.ibmi_json_path:
@@ -83,23 +107,23 @@ class CvtSrcPf:
             return self.default_ccsid
     
     # Returns the source member's name without the extension
-    def _get_src_mbr_name(self, src_mbr):
+    def _get_src_mbr_name(self, src_mbr) -> str: 
         return src_mbr[0]
 
     # Returns the source member's extension
-    def _get_src_mbr_ext(self, src_mbr):
+    def _get_src_mbr_ext(self, src_mbr) -> str:
         src_mbr_ext = src_mbr[1]
         if src_mbr_ext == ".src":
             src_mbr_ext = ".pf"
         return src_mbr_ext
 
-    def _get_dst_mbr_name(self, src_mbr_name, src_mbr_ext, tolower: bool):
+    def _get_dst_mbr_name(self, src_mbr_name, src_mbr_ext, tolower: bool) -> str:
         dst_mbr_name = f"{src_mbr_name}.{src_mbr_ext}"
         if tolower:
             dst_mbr_name = dst_mbr_name.lower()
         return dst_mbr_name
     
-    def _get_dst_mbr_path(self, dst_mbr_name, src_mbr_name, src_mbr_ext):
+    def _get_dst_mbr_path(self, dst_mbr_name, src_mbr_name, src_mbr_ext) -> str:
         dst_mbr_path = self.save_path / dst_mbr_name
         dups = 0
         while dst_mbr_path.exists():
@@ -112,14 +136,12 @@ class CvtSrcPf:
     def _cvr_src_mbr(self, src_mbr_name, srcpath, dst_mbr_name, dst_mbr_path) -> bool:
         """Convert the source member
         """
-        
         print(f"Converting {src_mbr_name} to {dst_mbr_name}")
         return self.job.run_cl(
             f"CPYTOSTMF FROMMBR('{srcpath}/{src_mbr_name}.MBR') "
             f"TOSTMF('{dst_mbr_path}') ENDLINFMT(*LF) STMFCCSID(1208) STMFOPT(*REPLACE)",
             ignore_errors=True, log=True)
     
-    # Fix return type
     def _get_member_text(self, src_mbr_name, srcpath):
         """Convert the source member
         """
