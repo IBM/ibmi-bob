@@ -98,7 +98,7 @@ class ProjSpec():
                                self.tgt_ccsid)
         return json.dumps(iproj_json.__dict__(), indent=4)
 
-    def generate_ibmi_json(self=None, version: str = "", tgt_ccsid: str = "") -> Optional[str]:
+    def generate_ibmi_json(self=None, version: str = "", tgt_ccsid: str = None) -> Optional[str]:
         """ Returns a string representation of the .ibmi.json file of current project"""
 
         # Creating an .ibmi.json file after a project has been created
