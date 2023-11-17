@@ -98,19 +98,17 @@ class ProjSpec():
                                self.tgt_ccsid)
         return json.dumps(iproj_json.__dict__(), indent=4)
 
-    def generate_ibmi_json(self=None, version: str = "", tgt_ccsid: str = "", objlib: str = "") -> Optional[str]:
+    def generate_ibmi_json(self=None, version: str = "", tgt_ccsid: str = "") -> Optional[str]:
         """ Returns a string representation of the .ibmi.json file of current project"""
 
         # Creating an .ibmi.json file after a project has been created
         if self is None:
             ibmi_json = IBMiJson(version, {
-                "tgt_ccsid": tgt_ccsid,
-                "objlib": objlib,
+                "tgt_ccsid": tgt_ccsid
             })
         else:
             ibmi_json = IBMiJson(self.version, {
-                "tgt_ccsid": self.tgt_ccsid,
-                "objlib": self.objlib,
+                "tgt_ccsid": self.tgt_ccsid
             })
         ibmiJSONDict = ibmi_json.__dict__()
         return None if ibmiJSONDict is None else json.dumps(ibmiJSONDict, indent=4)
@@ -222,13 +220,6 @@ def init_project(force: bool = False, objlib: str = "", tgtCcsid: str = "") -> N
                 # Update iproj.json
                 update_json_field(iproj_json_path, "objlib", objlib)
 
-                # Update .ibmi.json
-                if os.path.exists(ibmi_json_path):
-                    update_json_field(ibmi_json_path, "build", objlib, "objlib")
-                else:
-                    create_file(ibmi_json_path, ProjSpec.generate_ibmi_json(None, version, "", objlib))
-                    print(colored('Created .ibmi.json!', Colors.OKGREEN))
-
             if tgtCcsid is not None:
                 # Updating  iproj.json
                 update_json_field(iproj_json_path, "tgtCcsid", tgtCcsid)
@@ -237,7 +228,7 @@ def init_project(force: bool = False, objlib: str = "", tgtCcsid: str = "") -> N
                 if os.path.exists(ibmi_json_path):
                     update_json_field(ibmi_json_path, "build", tgtCcsid, "tgtCcsid")
                 else:
-                    create_file(ibmi_json_path, ProjSpec.generate_ibmi_json(None, version, tgtCcsid, ""))
+                    create_file(ibmi_json_path, ProjSpec.generate_ibmi_json(None, version, tgtCcsid))
                     print(colored('Created .ibmi.json!', Colors.OKGREEN))
     # Creating a new project
     else:
