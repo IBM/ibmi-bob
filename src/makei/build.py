@@ -94,7 +94,7 @@ class BuildEnv:
         subdirs = list(map(lambda x: x.parents[0], rules_mk_paths))
 
         subdirs.sort(key=lambda x: len(x.parts))
-        dir_var_map = {Path('.'): IBMiJson.from_values(self.iproj_json.tgt_ccsid)}
+        dir_var_map = {Path('.'): IBMiJson.from_values(self.iproj_json.tgt_ccsid, self.iproj_json.objlib)}
 
         def map_ibmi_json_var(path):
             if path != Path("."):
