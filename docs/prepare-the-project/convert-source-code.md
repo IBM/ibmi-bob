@@ -31,3 +31,5 @@ Finally if there are any objects that are not compiled, they can be represented 
 ---
 
 Now you have converted the source files into an IFS directory. Make sure put them in a Bob project after conversion. You will need some special files to enable Bob. This is fully described in [Project metadata](project-metadata) and [Create a New Project](prepare-the-project/create-a-new-project).
+
+If you are concerned about national characters or supporting multiple EBCDIC encodings in the same project see [Encoding source files](prepare-the-project/encoding-source-code)
