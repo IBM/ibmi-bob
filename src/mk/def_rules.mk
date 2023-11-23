@@ -410,7 +410,7 @@ CRTPRTFFLAGS = AUT($(AUT)) OPTION($(OPTION)) PAGESIZE($(PAGESIZE)) TEXT('$(TEXT)
 CRTRPGMODFLAGS = AUT($(AUT)) DBGVIEW($(DBGVIEW)) OPTIMIZE($(OPTIMIZE)) OPTION($(OPTION)) OUTPUT(*PRINT) TEXT('$(TEXT)') \
                  TGTCCSID($(TGTCCSID)) TGTRLS($(TGTRLS)) INCDIR($(INCDIR)) DEFINE($(DEFINE))
 CRTCBLMODFLAGS = AUT($(AUT)) DBGVIEW($(DBGVIEW)) OPTIMIZE($(OPTIMIZE)) OPTION($(OPTION)) OUTPUT(*PRINT) TEXT('$(TEXT)') \
-                 TGTCCSID($(TGTCCSID)) TGTRLS($(TGTRLS)) INCDIR($(INCDIR)) DEFINE($(DEFINE))
+                TGTRLS($(TGTRLS)) INCDIR($(INCDIR)) DEFINE($(DEFINE))
 CRTQMQRYFLAGS = AUT($(AUT)) TEXT('$(TEXT)')
 CRTSQLCIFLAGS = COMMIT($(COMMIT)) OBJTYPE($(OBJTYPE)) OUTPUT(*PRINT) TEXT('$(TEXT)') TGTRLS($(TGTRLS)) DBGVIEW($(DBGVIEW)) \
                 COMPILEOPT('INCDIR($(doublequotedINCDIR)) OPTION($(OPTION)) STGMDL($(STGMDL)) SYSIFCOPT($(SYSIFCOPT)) \
@@ -428,7 +428,7 @@ CRTSQLCBLIFLAGS = COMMIT($(COMMIT)) OBJTYPE($(OBJTYPE)) OPTION($(OPTION)) OUTPUT
 CRTSRVPGMFLAGS = ACTGRP($(ACTGRP)) TEXT('$(TEXT)') TGTRLS($(TGTRLS)) AUT($(AUT)) DETAIL($(DETAIL)) STGMDL($(STGMDL)) OPTION($(OPTION))
 CRTWSCSTFLAGS = AUT($(AUT)) TEXT('$(TEXT)')
 CRTBNDRPGFLAGS:= DBGVIEW($(DBGVIEW)) TGTCCSID($(TGTCCSID)) OPTION($(OPTION)) TEXT('$(TEXT)') INCDIR($(INCDIR))
-CRTBNDCBLFLAGS:= DBGVIEW($(DBGVIEW)) TGTCCSID($(TGTCCSID)) OPTION($(OPTION)) TEXT('$(TEXT)') INCDIR($(INCDIR))
+CRTBNDCBLFLAGS:= DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) TEXT('$(TEXT)') INCDIR($(INCDIR))
 CRTBNDCFLAGS:=TGTCCSID($(TGTCCSID)) OPTION($(OPTION)) TEXT('$(TEXT)') INCDIR($(INCDIR))
 CRTBNDCLFLAGS = AUT($(AUT)) DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) TEXT('$(TEXT)') TGTRLS($(TGTRLS)) INCDIR($(INCDIR))
 RUNSQLFLAGS:= DBGVIEW(*SOURCE) TGTRLS($(TGTRLS)) OUTPUT(*PRINT) MARGINS(1024) COMMIT($(COMMIT))
@@ -689,13 +689,11 @@ moduleINCDIR = $(strip \
 	$(if $(filter %.sqlrpgle,$<),$(SQLRPGIMOD_INCDIR), \
 	$(if $(filter %.SQLCBLLE,$<),$(SQLCBLIMOD_INCDIR), \
 	$(if $(filter %.sqlcblle,$<),$(SQLCBLIMOD_INCDIR), \
-	$(if $(filter %.CBLLE,$<),$(CBLMOD_INCDIR), \
-	$(if $(filter %.cblle,$<),$(CBLMOD_INCDIR), \
 	$(if $(filter %.SQLC,$<),$(SQLCIMOD_INCDIR), \
 	$(if $(filter %.sqlc,$<),$(SQLCIMOD_INCDIR), \
 	$(if $(filter %.SQLCPP,$<),$(SQLCPPIMOD_INCDIR), \
 	$(if $(filter %.sqlcpp,$<),$(SQLCPPIMOD_INCDIR), \
-	UNKNOWN_FILE_TYPE)))))))))))))))))))))
+	UNKNOWN_FILE_TYPE)))))))))))))))))))
 moduleINLINE = $(strip \
 	$(if $(filter %.C,$<),    $(CMOD_INLINE), \
 	$(if $(filter %.c,$<),    $(CMOD_INLINE), \
@@ -1168,7 +1166,9 @@ define CBLLE_TO_MODULE_RECIPE =
 	$(MODULE_VARIABLES)\
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Create ILE COBOL module [$(basename $@)] in $(OBJLIB)")
-	$(eval crtcmd := crtcblmod module($(OBJLIB)/$(basename $(@F))) srcstmf('$<') $(CRTCBLMODFLAGS))
+	$(eval tgtccsid_parm := $(shell tgtfound=`system 'crtcblmod  test tgtccsid()' 2>&1 >/dev/null | grep 'CPD0043:' -wo | wc -w`; if [ $tgtfound -gt 0 ]; then echo " TGTCCSID(&TGTCCSID)"; else echo ""; fi ;))
+    @$(call echo_cmd,"=== TGTCCSID [$(tgtccsid_parm)]")
+	$(eval crtcmd := crtcblmod module($(OBJLIB)/$(basename $(@F))) srcstmf('$<') $(CRTCBLMODFLAGS)) $(tgtccsid_parm)
 	$(eval logFile := $(LOGPATH)/$(notdir $(basename $<)).splf)
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" "$(PRECMD)" "$(POSTCMD)" "$(notdir $@)" "$<" "$(logFile)"> $(logFile) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
@@ -1279,7 +1279,9 @@ define PGM.CBLLE_TO_PGM_RECIPE =
 	$(PGM_VARIABLES)
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Create COBOL Program [$(basename $@)] in $(OBJLIB)")
-	$(eval crtcmd := CRTBNDCBL srcstmf('$<') PGM($(OBJLIB)/$(basename $(@F))) $(CRTBNDCBLFLAGS))
+	$(eval tgtccsid_parm := $(shell tgtfound=`system 'CRTBNDCBL test TGTCCSID()' 2>&1 >/dev/null | grep 'CPD0043:' -wo | wc -w`; if [ $tgtfound -gt 0 ]; then echo " TGTCCSID(&TGTCCSID)"; else echo ""; fi ;))
+    @$(call echo_cmd,"=== TGTCCSID [$(tgtccsid_parm)]")
+	$(eval crtcmd := CRTBNDCBL srcstmf('$<') PGM($(OBJLIB)/$(basename $(@F))) $(CRTBNDCBLFLAGS)) $(tgtccsid_parm)
 	$(eval logFile := $(LOGPATH)/$(notdir $(basename $<)).splf)
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" "$(PRECMD)" "$(POSTCMD)" "$(notdir $@)" "$<" "$(logFile)"> $(logFile) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
