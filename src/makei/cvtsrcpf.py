@@ -7,7 +7,6 @@ from typing import List, Optional, Tuple
 from makei.ibm_job import IBMJob
 from makei.utils import create_ibmi_json, objlib_to_path, validate_ccsid
 
-
 class CvtSrcPf:
     """convert from source physical file
     """
@@ -48,21 +47,39 @@ class CvtSrcPf:
                     break
         return False
     
-    def insert_line_with_content(self, file_path, content, column):
-        with open(file_path, 'r+') as file:
-            lines = file.readlines()
-            lines.insert(0, '\n')
-            lines[0] = (' ' * column) + content + '\n' + lines[0][column:]
-            file.seek(0)
-            file.writelines(lines)
+    # for free form rpg, write_on_line = 1
+    def insert_line(self, file_path, content, start_comment_characters: str, end_comment_characters: str, write_on_line: int = 0, start_column: int = 7, end_column: int = 71) -> bool:
+        try:
+            if end_column <= start_column: return False
+            with open(file_path, 'r+') as file:
+                lines = file.readlines()
+                lines.insert(write_on_line, '\n')
 
-    def import_member_text(self, file_path: str, member_text: str) -> bool:
+                starting_whitespace = 0 if start_column == 0 else start_column - 1
+                ending_whitespace = (end_column - 1) - (starting_whitespace + len(content))
+
+                lines[write_on_line] = (' ' * starting_whitespace) + start_comment_characters + content + (' ' * ending_whitespace) + end_comment_characters + '\n'
+                file.seek(0)
+                file.writelines(lines)
+            return True
+        except:
+            return False
+        
+    def import_member_text(self, file_path: str, member_text: str, member_extension: str) -> bool:
         text_comment_exists = self.check_keyword_in_file(file_path, 'TEXT', 15)
-        print(text_comment_exists)
 
         if not text_comment_exists:
             # Fixed-form RPG
-            self.insert_line_with_content(file_path, '*TEXT ' + member_text, 6)
+            is_free_form = self.check_keyword_in_file(file_path, 'FREE', 1)
+            if is_free_form:
+                self.insert_line(file_path, '%EMETADATA ', '//', '*', write_on_line=1)
+                self.insert_line(file_path, ' %TEXT ' + member_text, '//', '*', write_on_line=1)
+                self.insert_line(file_path, '%METADATA ', '//', '*', write_on_line=1)
+            else:
+                self.insert_line(file_path, '%EMETADATA ', '*', '*', 0, 7, 71)
+                self.insert_line(file_path, ' %TEXT ' + member_text, '*', '*', 0, 7, 71)
+                self.insert_line(file_path, '%METADATA ', '*', '*', 0, 7, 71)
+
 
     def run(self) -> int:
         srcpath = Path(objlib_to_path(self.lib, f"{self.srcfile}.FILE"))
@@ -91,8 +108,7 @@ class CvtSrcPf:
 
                     # If member has no text
                     if member_text != None:
-                        print(dst_mbr_path)
-                        self.import_member_text(dst_mbr_path, member_text)
+                        self.import_member_text(dst_mbr_path, member_text, src_mbr_ext)
             
                     
         if self.ibmi_json_path:

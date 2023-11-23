@@ -180,7 +180,7 @@ def add_cvtsrcpf_parser(subparsers: argparse.ArgumentParser):
         "-t",
         "--text",
         help='The generated source file will include the member text as a comment.',
-        action='store_false'
+        action='store_true'
     )
 
     cvtsrcpf_parser.set_defaults(tolower=False)
