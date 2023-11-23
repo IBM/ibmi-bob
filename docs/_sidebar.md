@@ -11,6 +11,7 @@
 - Prepare the project
   - [Create a new project](prepare-the-project/create-a-new-project.md)
   - [Convert Source Code](prepare-the-project/convert-source-code.md)
+  - [Encoding of Source Code](prepare-the-project/encoding-source-code.md)
   - [Project Metadata](prepare-the-project/project-metadata)
     - [iproj.json](prepare-the-project/iproj-json)
     - [.ibmi.json](prepare-the-project/ibmi-json)
