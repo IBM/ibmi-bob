@@ -162,7 +162,9 @@ class CvtSrcPf:
 
                     # If member has text
                     if member_text != None:
-                        self.import_member_text(dst_mbr_path, member_text, src_mbr_ext)
+                        successfulImport = self.import_member_text(dst_mbr_path, member_text, src_mbr_ext)
+                        if successfulImport:
+                            print("Successfully imported member text!")
                     
         if self.ibmi_json_path:
             create_ibmi_json(self.ibmi_json_path, tgt_ccsid=self.default_ccsid)
