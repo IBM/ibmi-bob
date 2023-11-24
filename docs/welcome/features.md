@@ -25,12 +25,12 @@ Obviously, we think Bob is pretty great.  But, in fairness, there are some chall
 
 These IBM i source types can be compiled directly from the IFS
 
-| Object Type | File Extension                              |
-| :---------- | :------------------------------------------ |
-| *CMD        | .CMDSRC                                     |
-| *MODULE     | C, CLLE, RPGLE, SQLC, SQLRPGLE              |
-| *PGM        | .PGM.RPGLE, .PGM.SQLRPGLE, PGM.C, .PGM.CLLE |
-| *SRVPGM     | .BND                                        |
+| Object Type | File Extension                                                        |
+| :---------- | :-------------------------------------------------------------------- |
+| *CMD        | .CMDSRC                                                               |
+| *MODULE     | .RPGLE, .CLLE, .C, .SQLC, .CPP, .SQLCPP, .SQLRPGLE, .CBLLE, .SQLCBLLE |
+| *PGM        | .PGM.RPGLE, .PGM.SQLRPGLE, .PGM.C, .PGM.CBLLE, .PGM.SQLCBLLE          |
+| *SRVPGM     | .BND                                                                  |
 
 Note:
 
@@ -46,12 +46,11 @@ These older IBM i source types are compiled directly from the IFS using the CRTF
 | *CMD        | .CMDSRC                             |
 | *FILE       | .DSPF, .LF, .PF, .PRTF              |
 | *MENU       | .MENU                               |
-| *MODULE     | .C, .CLLE, .RPGLE, .SQLC, .SQLRPGLE |
-| *PGM        | .RPG                                |
+| *MODULE     | .CLLE                               |
+| *PGM        | .RPG, .PGM.CLLE                     |
 | *PNLGRP     | .PNLGRPSRC                          |
+| *WSCST      | .WSCSTSRC                           |
 | *QMQRY      | .SQL                                |
-| *SRVPGM     | .BND                                |
-| *WSCST      | .WSCST                              |
 
 Note:
 
@@ -70,6 +69,7 @@ Note that for *MSGF and *BNDDIR, the CL commands should include the delete of th
 | *PGM        | .ILEPGM        | CRTPGM            |
 | *SRVPGM     | .ILESRVPGM     | CRTSRVPGM         |
 | *DTAARA     | .DTAARA        | CRTDTAARA         |
+| *TRG        | .SYSTRG        | ADDPFTRG          |
 
 Note:
 
@@ -86,7 +86,7 @@ The set of SQL commands to create the object is stored in a file with the given 
 | VIEW      | *FILE       | .VIEW          | CREATE OR REPLACE VIEW      |
 | PROCEDURE | *PGM        | .SQLPRC        | CREATE OR REPLACE PROCEDURE |
 | FUNCTION  | *SRVPGM     | .SQLUDF        | CREATE OR REPLACE FUNCTION  |
-| FUNCTION  | *SRVPGM     | .SQLUDT        | CREATE OR REPLACE FUNCTION  |
+| FUNCTION  | *SRVPGM     | .SQLUDT        | CREATE DISTINCT TYPE        |
 | TRIGGER   | *PGM        | .SQLTRG        | CREATE OR REPLACE TRIGGER   |
 | ALIAS     | *FILE       | .SQLALIAS      | CREATE OR REPLACE ALIAS     |
 | SEQUENCE  | *DTAARA     | .SQLSEQ        | CREATE OR REPLACE SEQUENCE  |
