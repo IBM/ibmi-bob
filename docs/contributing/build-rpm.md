@@ -50,4 +50,4 @@ rpm -i ~/rpmbuild/RPMS/PPC64/bob-${BOB_VERSION}-0.ibmi7.3.ppc64.rpm
 
 ### 5. Test BOB RPM
 
-Then test according to the [Testing instructions](testing.md)
+Then test according to the [Testing instructions](contributing/testing.md)
