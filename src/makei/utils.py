@@ -223,6 +223,8 @@ def decompose_filename(filename: str) -> Tuple[str, Optional[str], str, str]:
     ('SAMHELP', 'Help_Application_Sam', 'PNLGRP', '')
     >>> decompose_filename("SAMMNU-Main_menu_application_SAMPLE.MENUSRC")
     ('SAMMNU', 'Main_menu_application_SAMPLE', 'MENUSRC', '')
+    >>> decompose_filename("verifysql.sqlcblle")
+    ('verifysql', None, 'SQLCBLLE', '')
     """
     if not filename:
         raise ValueError()
