@@ -6,7 +6,6 @@
 | ILE C/CPP   | SRCSTMF() <sup>[1](#fn1)</sup> | TGTCCSID() <sup>[2](#fn2)</sup> |
 | ILE COBOL   | SRCSTMF() <sup>[1](#fn1)</sup> | TGTCCSID() <sup id="a3">[3](#fn3)</sup> |
 | ILE CL      | limited to CRTFRMSTMF <sup id="a5">[5](#fn5)</sup> | CRTFRMSTMF -ccsid <sup id="a4">[4](#fn4)</sup> |
-| BND         | SRCSTMF() <sup>[1](#fn1)</sup> | n/a no national chars |
 | SQL         | RUNSQLSTM SRCSTMF() | UTF8 is supported |
 | OPM, DDS, PNLGRP, MENU, CMD   | CRTFRMSTMF <sup>[4](#fn4)</sup> | CRTFRMSTMF -ccsid <sup>[4](#fn4)</sup> |
 
@@ -35,7 +34,6 @@ IFS file system.  There are not issues with line length etc.[↩](#a1)
 - ILE COBOL commands CRTBNDCBL and CRTCBLMOD: 5770WDS SI81049
 
 Otherwise the compile will fail because the TGTCCSID parameter will not be recognized.[↩](#a3)
-
 
 <b id="fn4">4</b>:  The `crtfmrstmf` command copies the stream file to a source member in SRC-PF create in QTEMP.  The `-ccsid` parameter specifies the encoding for that SRC-PF.  However it is important that the job running the compile is able to read that encoding without losing any characters.  Note that this is no different than compiling from a QSYS member.
 [↩](#a4)
