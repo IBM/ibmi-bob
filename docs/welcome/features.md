@@ -43,7 +43,6 @@ These older IBM i source types are compiled directly from the IFS using the CRTF
 
 | Object Type | File Extension                      |
 | :---------- | :---------------------------------- |
-| *CMD        | .CMDSRC                             |
 | *FILE       | .DSPF, .LF, .PF, .PRTF              |
 | *MENU       | .MENU                               |
 | *MODULE     | .CLLE                               |
