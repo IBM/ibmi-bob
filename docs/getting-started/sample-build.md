@@ -1,6 +1,6 @@
 # Build the sample project
 
-Now that everything is installed and configured, let's build a [sample project](https://github.com/edmundreinhardt/bob-recursive-example).
+Now that everything is installed and configured, let's build a [sample project](https://github.com/ibm/bob-recursive-example).
 
 ## Perform a build
 
@@ -20,7 +20,7 @@ Now that everything is installed and configured, let's build a [sample project](
 1. **Get the source from a sample git project**
 
    ```shell
-   git clone https://github.com/edmundreinhardt/bob-recursive-example
+   git clone https://github.com/ibm/bob-recursive-example
    cd bob-recursive-example
    ```
 

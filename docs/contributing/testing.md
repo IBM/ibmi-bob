@@ -4,7 +4,7 @@
 makei/utils.py can be tested via doctest
 Requires PYTHONPATH being set to the ibmi-bob project root so that the 'makei' module is recognized. 
 ```
-export PYTHONPATH=<bob project root>
+export PYTHONPATH=<bob project root>/src
 python makei/utils.py -v
 ```
 
