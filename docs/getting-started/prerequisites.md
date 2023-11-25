@@ -72,9 +72,9 @@ CALL QSYS2.SET_PASE_SHELL_INFO('*CURRENT', '/QOpenSys/pkgs/bin/bash')
 > [!WARNING]
 > If you did not add `/QOpenSys/pkgs/bin` to the PATH variable, you may not be able to invok *yum* or *chsh* directly. Try specifying the full path using `/QOpenSys/pkgs/bin/yum` or `/QOpenSys/pkgs/bin/chsh`.
 
-## TGTCCSID support on the ILE RPG compilers
+## TGTCCSID support on the ILE RPG and COBOL compilers
 
-BOB supports specifying the EBCDIC CCSID to compile the source in. This requires the TGTCCSID parameter on the RPG compiler commands. This is in the base for IBM i 7.4 and following but for IBM i 7.3 please make sure the PTF `SI74590` in product `5770WDS` is applied.
+BOB supports specifying the EBCDIC CCSID to compile the source in. This requires the TGTCCSID parameter on the RPG and COBOL compiler commands. Details of which PTFs are needed on which release are found [here](prepare-the-project/compiler-specific.md).
 
 ## Ensure the SSH daemon is running
 
