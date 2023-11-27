@@ -98,7 +98,7 @@ class ProjSpec():
                                self.tgt_ccsid)
         return json.dumps(iproj_json.__dict__(), indent=4)
 
-    def generate_ibmi_json(self=None, version: str = "", tgt_ccsid: str = None) -> Optional[str]:
+    def generate_ibmi_json(self=None, version: str = "", tgt_ccsid: Optional[str] = None) -> Optional[str]:
         """ Returns a string representation of the .ibmi.json file of current project"""
 
         # Creating an .ibmi.json file after a project has been created
@@ -175,10 +175,10 @@ def create_file(file_path: Path, content: Optional[str], force: bool = False) ->
         file.write(content)
 
 
-def update_json_field(pathToJsonFile: str, updateKey1: str, updateVal: str, updateKey2: str = "") -> None:
+def update_json_field(pathToJsonFile: str, updateKey1: str, updateVal: str, updateKey2: Optional[str] = None) -> None:
     with open(pathToJsonFile, 'r') as file:
         data = json.load(file)
-    if updateKey2 == "":
+    if updateKey2 == None:
         data[updateKey1] = updateVal
     else:
         data[updateKey1][updateKey2] = updateVal
@@ -187,11 +187,11 @@ def update_json_field(pathToJsonFile: str, updateKey1: str, updateVal: str, upda
     print(colored('Updated ' + Path(pathToJsonFile).name + '!', Colors.OKGREEN))
 
 
-def retrieve_json_val(pathToJsonFile: str, key1: str, key2: str = "") -> Optional[str]:
+def retrieve_json_val(pathToJsonFile: str, key1: str, key2: Optional[str] = None) -> Optional[str]:
     try:
         with open(pathToJsonFile, 'r') as file:
             data = json.load(file)
-        if key2 == "":
+        if key2 == None:
             returnVal = data[key1]
         else:
             returnVal = data[key1][key2]
@@ -201,7 +201,7 @@ def retrieve_json_val(pathToJsonFile: str, key1: str, key2: str = "") -> Optiona
     return returnVal
 
 
-def init_project(force: bool = False, objlib: str = "", tgtCcsid: str = "") -> None:
+def init_project(force: bool = False, objlib: Optional[str] = None, tgtCcsid: Optional[str] = None) -> None:
     """ A CLI utility to create a project"""
     signal.signal(signal.SIGINT, _signal_handler)
 
