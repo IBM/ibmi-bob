@@ -38,11 +38,12 @@ class CvtSrcPf:
         self.ibmi_json_path = save_path / ".ibmi.json"
         self.store_member_text = text
 
+    # Returns the line number where the keyword was found at (starting at 1), False otherwise
     def check_keyword_in_file(self, file_path: str, keyword: str, line_limit: str) -> bool:
         with open(file_path, 'r') as file:
             for line_number, line in enumerate(file, start=1):
                 if keyword.lower() in line.lower():
-                    return True
+                    return line_number
                 if line_number == line_limit:
                     break
         return False
@@ -66,10 +67,12 @@ class CvtSrcPf:
             return False
         
     def import_member_text(self, file_path: str, member_text: str, member_extension: str) -> bool:
-        text_comment_exists = self.check_keyword_in_file(file_path, 'TEXT', 15)
-        
-        # Text comment already exists
-        if text_comment_exists: return False
+        # Check if member text exists
+        metadata_comment_exists = self.check_keyword_in_file(file_path, '%METADATA', 15)
+        if metadata_comment_exists:
+            text_comment_exists = self.check_keyword_in_file(file_path, '%TEXT', 15)
+            if text_comment_exists and metadata_comment_exists < text_comment_exists:
+                return False
 
         start_column = 7
         end_column = 72
