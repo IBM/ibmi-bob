@@ -38,15 +38,22 @@ class CvtSrcPf:
         self.ibmi_json_path = save_path / ".ibmi.json"
         self.store_member_text = text
 
-    # Returns the line number where the keyword was found at (starting at 1), False otherwise
-    def check_keyword_in_file(self, file_path: str, keyword: str, line_limit: str) -> bool:
+    # Returns the line number where the keyword was found at (starting at 1), otherwise 0
+    def check_keyword_in_file(self, file_path: str, keyword: str, lines_to_check: int, line_start_check: int = 1) -> int:
+        if (line_start_check < 1):
+            line_start_check = 1
+        lines_counted = 0
+
         with open(file_path, 'r') as file:
-            for line_number, line in enumerate(file, start=1):
+            lines = file.readlines()
+
+            for line_number, line in enumerate(lines[line_start_check-1:], start=line_start_check):
+                if lines_counted == lines_to_check:
+                    break
                 if keyword.lower() in line.lower():
                     return line_number
-                if line_number == line_limit:
-                    break
-        return False
+                lines_counted += 1
+        return 0
     
     # for free form rpg, write_on_line = 1
     def insert_line(self, file_path, content, start_comment_characters: str, end_comment_characters: str, write_on_line: int, start_column: int, end_column: int) -> bool:
@@ -70,7 +77,7 @@ class CvtSrcPf:
         # Check if member text exists
         metadata_comment_exists = self.check_keyword_in_file(file_path, '%METADATA', 15)
         if metadata_comment_exists:
-            text_comment_exists = self.check_keyword_in_file(file_path, '%TEXT', 15)
+            text_comment_exists = self.check_keyword_in_file(file_path, '%TEXT', 15, metadata_comment_exists)
             if text_comment_exists and metadata_comment_exists < text_comment_exists:
                 return False
 
