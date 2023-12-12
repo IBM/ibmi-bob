@@ -11,6 +11,7 @@ import re
 import signal
 import sys
 from pathlib import Path
+import os
 from typing import List, Optional
 
 from makei.const import DEFAULT_CURLIB, DEFAULT_TGT_CCSID, DEFAULT_OBJLIB
@@ -35,7 +36,7 @@ class ProjSpec():
     set_ibm_i_env_cmd: Optional[str]
     tgt_ccsid: str
 
-    def __init__(self):
+    def __init__(self, objlib, tgt_ccsid):
         # try:
         self.description = prompt(
             'descriptive application name', Path.cwd().name)
@@ -43,9 +44,9 @@ class ProjSpec():
         self.repository = prompt('git repository', self._get_repository())
         self.include_path = self._input_str_to_list(
             prompt('include path, separated by commas', ""))
-        self.objlib = prompt(
+        self.objlib = objlib if objlib is not None else prompt(
             'What library should objects be compiled into (objlib)', DEFAULT_OBJLIB)
-        self.tgt_ccsid = prompt(
+        self.tgt_ccsid = tgt_ccsid if tgt_ccsid is not None else prompt(
             'What EBCDIC CCSID should the source be compiled in', DEFAULT_TGT_CCSID)
         self.curlib = prompt('curlib', DEFAULT_CURLIB)
         self.pre_usr_libl = self._input_str_to_list(
@@ -97,14 +98,20 @@ class ProjSpec():
                                self.tgt_ccsid)
         return json.dumps(iproj_json.__dict__(), indent=4)
 
-    def generate_ibmi_json(self) -> Optional[str]:
+    def generate_ibmi_json(self=None, version: str = "", tgt_ccsid: Optional[str] = None) -> Optional[str]:
         """ Returns a string representation of the .ibmi.json file of current project"""
 
-        ibmi_json = IBMiJson(self.version, {
-            "tgt_ccsid": self.tgt_ccsid,
-            "objlib": self.objlib,
-        })
-        return json.dumps(ibmi_json.__dict__(), indent=4)
+        # Creating an .ibmi.json file after a project has been created
+        if self is None:
+            ibmi_json = IBMiJson(version, {
+                "tgt_ccsid": tgt_ccsid
+            })
+        else:
+            ibmi_json = IBMiJson(self.version, {
+                "tgt_ccsid": self.tgt_ccsid
+            })
+        ibmiJSONDict = ibmi_json.__dict__()
+        return None if ibmiJSONDict is None else json.dumps(ibmiJSONDict, indent=4)
 
     def generate_rules_mk(self) -> str:
         """ Generates a Rules.mk template"""
@@ -168,40 +175,88 @@ def create_file(file_path: Path, content: Optional[str], force: bool = False) ->
         file.write(content)
 
 
-def init_project(force: bool = False) -> None:
+def update_json_field(pathToJsonFile: str, updateKey1: str, updateVal: str, updateKey2: Optional[str] = None) -> None:
+    with open(pathToJsonFile, 'r') as file:
+        data = json.load(file)
+    if updateKey2 == None:
+        data[updateKey1] = updateVal
+    else:
+        data[updateKey1][updateKey2] = updateVal
+    with open(pathToJsonFile, 'w') as file:
+        json.dump(data, file, indent=4)
+    print(colored('Updated ' + Path(pathToJsonFile).name + '!', Colors.OKGREEN))
+
+
+def retrieve_json_val(pathToJsonFile: str, key1: str, key2: Optional[str] = None) -> Optional[str]:
+    try:
+        with open(pathToJsonFile, 'r') as file:
+            data = json.load(file)
+        if key2 == None:
+            returnVal = data[key1]
+        else:
+            returnVal = data[key1][key2]
+    except KeyError:
+        returnVal = None
+
+    return returnVal
+
+
+def init_project(force: bool = False, objlib: Optional[str] = None, tgtCcsid: Optional[str] = None) -> None:
     """ A CLI utility to create a project"""
     signal.signal(signal.SIGINT, _signal_handler)
-
-    print('\n'.join([
-        'This utility will walk you through creating a project.',
-        'It only covers some common items.',
-        '',
-        'Press ^C at any time to quit.',
-    ]))
-
-    proj_spec = ProjSpec()
 
     iproj_json_path = Path.cwd() / 'iproj.json'
     ibmi_json_path = Path.cwd() / '.ibmi.json'
     rules_mk_path = Path.cwd() / 'Rules.mk'
 
-    iproj_json_content = proj_spec.generate_iproj_json()
-    ibmi_json_content = proj_spec.generate_ibmi_json()
-    rules_mk_content = proj_spec.generate_rules_mk()
+    # Project already exists
+    if os.path.exists(iproj_json_path):
+        if objlib is None and tgtCcsid is None:
+            print(colored('A project already exists in this directory!', Colors.WARNING))
+        else:
+            version = retrieve_json_val(iproj_json_path, "version")
 
-    print('\n'.join(['',
-                     "The following files will be added to the project"] +
-                    list(filter(None, [
-                        f"+ {iproj_json_path}" if iproj_json_content else None,
-                        f"+ {ibmi_json_path}" if ibmi_json_content else None,
-                        f"+ {rules_mk_path}" if rules_mk_content else None,
-                    ]))))
-    if force or yes(input('Continue? (yes) ')):
-        create_file(iproj_json_path, proj_spec.generate_iproj_json(), force)
-        create_file(ibmi_json_path, proj_spec.generate_ibmi_json(), force)
-        create_file(rules_mk_path, proj_spec.generate_rules_mk(), force)
+            if objlib is not None:
+                # Update iproj.json
+                update_json_field(iproj_json_path, "objlib", objlib)
+
+            if tgtCcsid is not None:
+                # Updating  iproj.json
+                update_json_field(iproj_json_path, "tgtCcsid", tgtCcsid)
+
+                # Update .ibmi.json
+                if os.path.exists(ibmi_json_path):
+                    update_json_field(ibmi_json_path, "build", tgtCcsid, "tgtCcsid")
+                else:
+                    create_file(ibmi_json_path, ProjSpec.generate_ibmi_json(None, version, tgtCcsid))
+                    print(colored('Created .ibmi.json!', Colors.OKGREEN))
+    # Creating a new project
     else:
-        _init_cancelled()
+        print('\n'.join([
+            'This utility will walk you through creating a project.',
+            'It only covers some common items.',
+            '',
+            'Press ^C at any time to quit.',
+            ]))
+        proj_spec = ProjSpec(objlib, tgtCcsid)
+
+        iproj_json_content = proj_spec.generate_iproj_json()
+        ibmi_json_content = proj_spec.generate_ibmi_json()
+        rules_mk_content = proj_spec.generate_rules_mk()
+
+        print('\n'.join(['',
+                        "The following files will be added to the project"] +
+                        list(filter(None, [
+                            f"+ {iproj_json_path}" if iproj_json_content else None,
+                            f"+ {ibmi_json_path}" if ibmi_json_content else None,
+                            f"+ {rules_mk_path}" if rules_mk_content else None,
+                        ]))))
+        if force or yes(input('Continue? (yes) ')):
+            create_file(iproj_json_path, proj_spec.generate_iproj_json(), force)
+            create_file(ibmi_json_path, proj_spec.generate_ibmi_json(), force)
+            create_file(rules_mk_path, proj_spec.generate_rules_mk(), force)
+        else:
+            _init_cancelled()
 
 
 if __name__ == "__main__":

@@ -134,6 +134,10 @@ def add_init_parser(subparsers: argparse.ArgumentParser):
     init_parser.add_argument('-f', '--force',
                              help='force overwrite any existing files',
                              action='store_true')
+    init_parser.add_argument('-o', '--objlib',
+                             help='update object library')
+    init_parser.add_argument('-c', '--ccsid',
+                             help='update target ccsid')
     init_parser.set_defaults(handle=handle_init)
 
 
@@ -200,7 +204,7 @@ def handle_init(args):
     """
     Handling the init command
     """
-    init_project.init_project(force=args.force)
+    init_project.init_project(force=args.force, objlib=args.objlib, tgtCcsid=args.ccsid)
 
 
 def handle_info(_args):
