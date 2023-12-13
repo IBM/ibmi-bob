@@ -55,10 +55,12 @@ class IBMiJson:
         build = {}
 
         if "tgt_ccsid" in self.build:
-            if self.build["tgt_ccsid"] != DEFAULT_TGT_CCSID and self.build["tgt_ccsid"] != None and self.build["tgt_ccsid"] != "":
+            if (self.build["tgt_ccsid"] != DEFAULT_TGT_CCSID and self.build["tgt_ccsid"] is not None and
+                    self.build["tgt_ccsid"] != ""):
                 build["tgtCcsid"] = self.build["tgt_ccsid"]
         if "objlib" in self.build:
-            if self.build["objlib"] != DEFAULT_OBJLIB and self.build["objlib"] != None and self.build["objlib"] != "":
+            if (self.build["objlib"] != DEFAULT_OBJLIB and self.build["objlib"] is not None and
+                    self.build["objlib"] != ""):
                 build["objlib"] = self.build["objlib"]
 
         if len(build.keys()) > 0:

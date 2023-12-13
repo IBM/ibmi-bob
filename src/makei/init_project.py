@@ -178,7 +178,7 @@ def create_file(file_path: Path, content: Optional[str], force: bool = False) ->
 def update_json_field(pathToJsonFile: str, updateKey1: str, updateVal: str, updateKey2: Optional[str] = None) -> None:
     with open(pathToJsonFile, 'r') as file:
         data = json.load(file)
-    if updateKey2 == None:
+    if updateKey2 is None:
         data[updateKey1] = updateVal
     else:
         data[updateKey1][updateKey2] = updateVal
@@ -191,7 +191,7 @@ def retrieve_json_val(pathToJsonFile: str, key1: str, key2: Optional[str] = None
     try:
         with open(pathToJsonFile, 'r') as file:
             data = json.load(file)
-        if key2 == None:
+        if key2 is None:
             returnVal = data[key1]
         else:
             returnVal = data[key1][key2]

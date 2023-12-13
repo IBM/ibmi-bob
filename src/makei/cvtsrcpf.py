@@ -7,6 +7,7 @@ from typing import List, Optional, Tuple
 from makei.ibm_job import IBMJob
 from makei.utils import create_ibmi_json, objlib_to_path, validate_ccsid
 
+
 class CvtSrcPf:
     """convert from source physical file
     """
@@ -22,7 +23,8 @@ class CvtSrcPf:
     store_member_text: bool
 
     def __init__(
-        self, srcfile: str, lib: str, tolower: bool, default_ccsid: str = None, text: bool = False, save_path: Path = Path.cwd()
+        self, srcfile: str, lib: str, tolower: bool, default_ccsid: str = None, text: bool = False,
+        save_path: Path = Path.cwd()
     ) -> None:
         self.job = IBMJob()
 
@@ -39,7 +41,8 @@ class CvtSrcPf:
         self.store_member_text = text
 
     # Returns the line number where the keyword was found at (starting at 1), otherwise 0
-    def check_keyword_in_file(self, file_path: str, keyword: str, lines_to_check: int, line_start_check: int = 1) -> int:
+    def check_keyword_in_file(self, file_path: str, keyword: str, lines_to_check: int,
+                              line_start_check: int = 1) -> int:
         if (line_start_check < 1):
             line_start_check = 1
         lines_counted = 0
@@ -54,25 +57,29 @@ class CvtSrcPf:
                     return line_number
                 lines_counted += 1
         return 0
-    
+
     # for free form rpg, write_on_line = 1
-    def insert_line(self, file_path, content, start_comment_characters: str, end_comment_characters: str, write_on_line: int, start_column: int, end_column: int) -> bool:
+    def insert_line(self, file_path, content, start_comment_characters: str, end_comment_characters: str,
+                    write_on_line: int, start_column: int, end_column: int) -> bool:
         try:
-            if end_column <= start_column: return False
+            if end_column <= start_column:
+                return False
             with open(file_path, 'r+') as file:
                 lines = file.readlines()
                 lines.insert(write_on_line, '\n')
 
                 starting_whitespace = 0 if start_column == 0 else start_column - 1
-                ending_whitespace = (end_column) - (starting_whitespace + len(start_comment_characters + content + end_comment_characters))
+                ending_whitespace = (end_column) - (starting_whitespace +
+                                                    len(start_comment_characters + content + end_comment_characters))
 
-                lines[write_on_line] = (' ' * starting_whitespace) + start_comment_characters + content + (' ' * ending_whitespace) + end_comment_characters + '\n'
+                lines[write_on_line] = (' ' * starting_whitespace)
+                + start_comment_characters + content + (' ' * ending_whitespace) + end_comment_characters + '\n'
                 file.seek(0)
                 file.writelines(lines)
             return True
-        except:
+        except BaseException:
             return False
-        
+
     def import_member_text(self, file_path: str, member_text: str, member_extension: str) -> bool:
         # Check if member text exists
         metadata_comment_exists = self.check_keyword_in_file(file_path, '%METADATA', 15)
@@ -83,7 +90,8 @@ class CvtSrcPf:
 
         start_column = 7
         end_column = 72
-        C_Style = {"CMDSRC", "C", "CPP", "CLLE", "SQLC", "SQLCPP", "PGM.C", "PGM.CLLE", "BND", "ILESRVPGM", "BNDDIR", "DTAARA", "SYSTRG", "MSGF"}
+        C_Style = {"CMDSRC", "C", "CPP", "CLLE", "SQLC", "SQLCPP", "PGM.C", "PGM.CLLE", "BND",
+                   "ILESRVPGM", "BNDDIR", "DTAARA", "SYSTRG", "MSGF"}
         C_Style_Comments = (C_Style, {
             "style_type": "C",
             "start_comment": "/*",
@@ -101,7 +109,8 @@ class CvtSrcPf:
             "end_column": end_column
         })
 
-        COBOL_Style={"DSPF", "LF", "PF", "PRTF", "RPGLE", "SQLRPGLE", "CBLLE", "SQLCBLLE", "PGM.RPGLE", "PGM.SQLRPGLE", "CBL", "PGM.CBLLE", "PGM.SQLCBLLE", "RPG"}
+        COBOL_Style = {"DSPF", "LF", "PF", "PRTF", "RPGLE", "SQLRPGLE", "CBLLE", "SQLCBLLE", "PGM.RPGLE",
+                       "PGM.SQLRPGLE", "CBL", "PGM.CBLLE", "PGM.SQLCBLLE", "RPG"}
         COBOL_Style_Comments = (COBOL_Style, {
             "style_type": "COBOL",
             "start_comment": "*",
@@ -110,7 +119,7 @@ class CvtSrcPf:
             "end_column": end_column
         })
 
-        PNL_Style={"PNLGRPSRC", "MENUSRC"}
+        PNL_Style = {"PNLGRPSRC", "MENUSRC"}
         PNL_Style_Comments = (PNL_Style, {
             "style_type": "PNL",
             "start_comment": ".*",
@@ -123,26 +132,29 @@ class CvtSrcPf:
 
         for style_set, style_dict in Comment_Styles:
             if member_extension in style_set:
-        
+
                 start_comment = style_dict["start_comment"]
                 end_comment = style_dict["end_comment"]
                 write_on_line = 0
                 start_column = style_dict["start_column"]
-                end_column = end_column=style_dict["end_column"]
+                end_column = end_column = style_dict["end_column"]
 
                 # Checking for free-form RPG
-                if style_dict["style_type"] == "COBOL": 
+                if style_dict["style_type"] == "COBOL":
                     if self.check_keyword_in_file(file_path, 'FREE', 1):
                         start_comment = "//"
                         end_comment = "*"
                         write_on_line = 1
 
-                first_write = self.insert_line(file_path, '%EMETADATA ', start_comment, end_comment, write_on_line, start_column, end_column)
-                second_write = self.insert_line(file_path, ' %TEXT ' + member_text, start_comment, end_comment, write_on_line, start_column, end_column)
-                third_write = self.insert_line(file_path, '%METADATA ', start_comment, end_comment, write_on_line, start_column, end_column)
-                
+                first_write = self.insert_line(file_path, '%EMETADATA ', start_comment,
+                                               end_comment, write_on_line, start_column, end_column)
+                second_write = self.insert_line(file_path, ' %TEXT ' + member_text, start_comment,
+                                                end_comment, write_on_line, start_column, end_column)
+                third_write = self.insert_line(file_path, '%METADATA ', start_comment, end_comment,
+                                               write_on_line, start_column, end_column)
+
                 return first_write + second_write + third_write
-        
+
         return False
 
     def run(self) -> int:
@@ -171,14 +183,14 @@ class CvtSrcPf:
                     member_text = result[0][0][0]
 
                     # If member has text
-                    if member_text != None:
+                    if member_text is not None:
                         successfulImport = self.import_member_text(dst_mbr_path, member_text, src_mbr_ext)
                         if successfulImport:
                             print("Successfully imported member text!")
-                    
+
         if self.ibmi_json_path:
             create_ibmi_json(self.ibmi_json_path, tgt_ccsid=self.default_ccsid)
-        
+
         return cvt_count
 
     def _default_ccsid(self) -> str:
@@ -186,9 +198,9 @@ class CvtSrcPf:
             return "*JOB"
         else:
             return self.default_ccsid
-    
+
     # Returns the source member's name without the extension
-    def _get_src_mbr_name(self, src_mbr) -> str: 
+    def _get_src_mbr_name(self, src_mbr) -> str:
         return src_mbr[0]
 
     # Returns the source member's extension
@@ -203,7 +215,7 @@ class CvtSrcPf:
         if tolower:
             dst_mbr_name = dst_mbr_name.lower()
         return dst_mbr_name
-    
+
     def _get_dst_mbr_path(self, dst_mbr_name, src_mbr_name, src_mbr_ext) -> str:
         dst_mbr_path = self.save_path / dst_mbr_name
         dups = 0
@@ -222,14 +234,13 @@ class CvtSrcPf:
             f"CPYTOSTMF FROMMBR('{srcpath}/{src_mbr_name}.MBR') "
             f"TOSTMF('{dst_mbr_path}') ENDLINFMT(*LF) STMFCCSID(1208) STMFOPT(*REPLACE)",
             ignore_errors=True, log=True)
-    
+
     def _get_member_text(self, src_mbr_name, srcpath):
         """Convert the source member
         """
         return self.job.run_sql(
             f"SELECT TEXT_DESCRIPTION FROM TABLE(qsys2.ifs_object_statistics('{srcpath}/{src_mbr_name}.MBR'))",
             ignore_errors=True, log=False)
-
 
     def _get_src_mbrs(self) -> List[Tuple[str, str]]:
         """Get the source members of the source file
