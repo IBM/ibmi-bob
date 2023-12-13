@@ -1,3 +1,6 @@
+* Wed Dec 13 2023 Irfan Sharif <IrfanSharif@ibm.com> - 2.4.22
+- Fix launch.sh timestamp to include millisecond
+  so Merlin v1 viewer can parse date properly
 * Fri Nov 3 2023 Irfan Sharif <IrfanSharif@ibm.com> - 2.4.21
 - Full support of ILE COBOL including embedded SQL
 * Fri Oct 27 2023 Irfan Sharif <IrfanSharif@ibm.com> - 2.4.20
