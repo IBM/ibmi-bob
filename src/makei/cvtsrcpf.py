@@ -72,8 +72,8 @@ class CvtSrcPf:
                 ending_whitespace = (end_column) - (starting_whitespace +
                                                     len(start_comment_characters + content + end_comment_characters))
 
-                lines[write_on_line] = (' ' * starting_whitespace)
-                + start_comment_characters + content + (' ' * ending_whitespace) + end_comment_characters + '\n'
+                lines[write_on_line] = ((' ' * starting_whitespace) + start_comment_characters
+                                        + content + (' ' * ending_whitespace) + end_comment_characters + '\n')
                 file.seek(0)
                 file.writelines(lines)
             return True
