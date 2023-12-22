@@ -23,6 +23,7 @@ class MKRule:
     containing_dir: Path
     include_dirs: List[Path]
 
+    is_source_file: bool
     source_file: Optional[str] = None
 
     def __init__(self, target: str, dependencies: List[str], commands: List[str], variables: List[str],
@@ -35,11 +36,13 @@ class MKRule:
         self.variables = variables
         self.containing_dir = containing_dir
         self.include_dirs = include_dirs
+        self.is_source_file = False
 
         if len(self.commands) == 0:
             for dependency in self.dependencies:
                 if is_source_file(dependency) and decompose_filename(dependency)[-1] == "":
                     if (self.containing_dir / dependency).exists():
+                        self.is_source_file = True
                         self.source_file = '$(d)/' + dependency
                         self.dependencies.remove(dependency)
                         return
@@ -173,16 +176,16 @@ class RulesMk:
 
     # Read makefile and create a RulesMk object
     @classmethod
-    def from_file(cls, rules_mk_path: Path, include_dirs=None) -> "RulesMk":
+    def from_file(cls, rules_mk_path: Path, src_dir: str, include_dirs=None) -> "RulesMk":
         if include_dirs is None:
             include_dirs = []
         with rules_mk_path.open("r") as f:
             rules_mk_str = f.read()
-        rules_mk = RulesMk.from_str(rules_mk_str, rules_mk_path.parent, include_dirs)
+        rules_mk = RulesMk.from_str(rules_mk_str, rules_mk_path.parent, src_dir, include_dirs)
         return rules_mk
 
     @classmethod
-    def from_str(cls, rules_mk_str: str, containing_dir: Path, include_dirs=None) -> "RulesMk":
+    def from_str(cls, rules_mk_str: str, containing_dir: Path, src_dir: Path, include_dirs=None) -> "RulesMk":
         """Creates a RulesMk object from a string
 
         >>> rules_mk_str = "subdir1 subdir2\n\n\ttarget1 target2\n\n\ttarget3 target4\n\n\ttarget5 target6\n"
@@ -206,6 +209,8 @@ class RulesMk:
 
         recipe_env = False
         recipe_str = ""
+        dir_path = src_dir.joinpath(containing_dir) # directory with the source code 
+
         for line in rules_mk_str.split('\n'):
             if recipe_env:
                 if re.match(r'\s', line):
@@ -250,6 +255,11 @@ class RulesMk:
             matched_rules = filter(lambda rule: rule.target == target, rules)
             for rule in matched_rules:
                 rule.variables = variableList
+        
+        for rule in rules:
+            if rule.is_source_file:
+                source_location = dir_path.joinpath(rule.source_file.rsplit("/", 1)[-1])
+
         return RulesMk(subdir, rules, containing_dir)
 
     def __str__(self, rules_middleware: Callable[[MKRule], MKRule] = lambda rule: rule) -> str:
