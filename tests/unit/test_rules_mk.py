@@ -108,6 +108,32 @@ LASTORDNO.DTAARA_DEP=
 LASTORDNO.DTAARA_RECIPE=DTAARA_TO_DTAARA_RECIPE
 '''
 
+def test_dtaq_recipe():
+    # Test loading from a valid file
+    rules_mk = RulesMk.from_file(data_dir / "dtaq.rules.mk")
+    expected_targets = {'TRGs': [], 'DTAARAs': [], 'DTAQs': ['ORDERS.DTAQ'], 'SQLs': [], 'BNDDs': [], 'PFs': [], 'LFs': [],
+                        'DSPFs': [], 'PRTFs': [], 'CMDs': [], 'MODULEs': [], 'SRVPGMs': [], 'PGMs': [],
+                        'MENUs': [], 'PNLGRPs': [], 'QMQRYs': [], 'WSCSTs': [], 'MSGs': []}
+
+    assert rules_mk.containing_dir == data_dir
+    assert rules_mk.subdirs == []
+    assert rules_mk.targets == expected_targets
+    assert rules_mk.rules[0].variables == []
+    assert rules_mk.rules[0].commands == []
+    assert rules_mk.rules[0].dependencies == []
+    assert rules_mk.rules[0].include_dirs == []
+    assert rules_mk.rules[0].target == 'ORDERS.DTAQ'
+    assert rules_mk.rules[0].source_file == 'ORDERS.DTAQ'
+    assert str(rules_mk.rules[0]) == '''ORDERS.DTAQ_SRC=ORDERS.DTAQ
+ORDERS.DTAQ_DEP=
+ORDERS.DTAQ_RECIPE=DTAQ_TO_DTAQ_RECIPE\n'''
+    assert str(rules_mk) == '''DTAQs := ORDERS.DTAQ\n\n
+ORDERS.DTAQ_SRC=ORDERS.DTAQ
+ORDERS.DTAQ_DEP=
+ORDERS.DTAQ_RECIPE=DTAQ_TO_DTAQ_RECIPE
+'''
+
+
 
 def test_dds_recipe():
     # Test loading from a valid file

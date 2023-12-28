@@ -68,6 +68,7 @@ Note that for *MSGF and *BNDDIR, the CL commands should include the delete of th
 | *PGM        | .ILEPGM        | CRTPGM            |
 | *SRVPGM     | .ILESRVPGM     | CRTSRVPGM         |
 | *DTAARA     | .DTAARA        | CRTDTAARA         |
+| *DTAQ       | .DTAQ          | CRTDTAQ           |
 | *TRG        | .SYSTRG        | ADDPFTRG          |
 
 Note:

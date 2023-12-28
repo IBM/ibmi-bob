@@ -91,7 +91,7 @@ class CvtSrcPf:
         start_column = 7
         end_column = 72
         C_Style = {"CMDSRC", "C", "CPP", "CLLE", "SQLC", "SQLCPP", "PGM.C", "PGM.CLLE", "BND",
-                   "ILESRVPGM", "BNDDIR", "DTAARA", "SYSTRG", "MSGF"}
+                   "ILESRVPGM", "BNDDIR", "DTAARA", "DTAQ", "SYSTRG", "MSGF"}
         C_Style_Comments = (C_Style, {
             "style_type": "C",
             "start_comment": "/*",
