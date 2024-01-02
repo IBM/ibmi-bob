@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import List, Optional, Tuple
 
 from makei.ibm_job import IBMJob
-from makei.utils import create_ibmi_json, objlib_to_path, validate_ccsid
+from makei.utils import create_ibmi_json, objlib_to_path, validate_ccsid, check_keyword_in_file
 from makei.const import MEMBER_TEXT_LINES
 
 
@@ -40,24 +40,7 @@ class CvtSrcPf:
         self.tolower = tolower
         self.ibmi_json_path = save_path / ".ibmi.json"
         self.store_member_text = text
-
-    # Returns the line number where the keyword was found at (starting at 1), otherwise 0
-    def check_keyword_in_file(self, file_path: str, keyword: str, lines_to_check: int,
-                              line_start_check: int = 1) -> int:
-        if (line_start_check < 1):
-            line_start_check = 1
-        lines_counted = 0
-
-        with open(file_path, 'r') as file:
-            lines = file.readlines()
-
-            for line_number, line in enumerate(lines[line_start_check-1:], start=line_start_check):
-                if lines_counted == lines_to_check:
-                    break
-                if keyword.lower() in line.lower():
-                    return line_number
-                lines_counted += 1
-        return 0
+        
 
     # for free form rpg, write_on_line = 1
     def insert_line(self, file_path, content, start_comment_characters: str, end_comment_characters: str,
@@ -83,9 +66,9 @@ class CvtSrcPf:
 
     def import_member_text(self, file_path: str, member_text: str, member_extension: str) -> bool:
         # Check if member text exists
-        metadata_comment_exists = self.check_keyword_in_file(file_path, '%METADATA', MEMBER_TEXT_LINES)
+        metadata_comment_exists = check_keyword_in_file(file_path, '%METADATA', MEMBER_TEXT_LINES)
         if metadata_comment_exists:
-            text_comment_exists = self.check_keyword_in_file(file_path, '%TEXT', MEMBER_TEXT_LINES, metadata_comment_exists)
+            text_comment_exists = check_keyword_in_file(file_path, '%TEXT', MEMBER_TEXT_LINES, metadata_comment_exists)
             if text_comment_exists and metadata_comment_exists < text_comment_exists:
                 return False
 
@@ -142,7 +125,7 @@ class CvtSrcPf:
 
                 # Checking for free-form RPG
                 if style_dict["style_type"] == "COBOL":
-                    if self.check_keyword_in_file(file_path, 'FREE', 1):
+                    if check_keyword_in_file(file_path, 'FREE', 1):
                         start_comment = "//"
                         end_comment = "*"
                         write_on_line = 1

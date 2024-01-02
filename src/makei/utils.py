@@ -396,6 +396,23 @@ def make_include_dirs_absolute(job_log_path: str, parameters: str):
     end_of_param_string = parameters[end_of_inc_dir:]
     return start_of_param_string + " ".join(include_path) + end_of_param_string
 
+# Returns the line number where the keyword was found at (starting at 1), otherwise 0
+def check_keyword_in_file(file_path: str, keyword: str, lines_to_check: int,
+                            line_start_check: int = 1) -> int:
+    if (line_start_check < 1):
+        line_start_check = 1
+    lines_counted = 0
+
+    with open(file_path, 'r') as file:
+        lines = file.readlines()
+
+        for line_number, line in enumerate(lines[line_start_check-1:], start=line_start_check):
+            if lines_counted == lines_to_check:
+                break
+            if keyword.lower() in line.lower():
+                return line_number
+            lines_counted += 1
+    return 0
 
 if __name__ == "__main__":
     import doctest
