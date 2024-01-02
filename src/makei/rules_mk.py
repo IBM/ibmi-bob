@@ -7,8 +7,8 @@ import sys
 from pathlib import Path
 from typing import Callable, Dict, List, Optional, TYPE_CHECKING
 
-from makei.const import FILE_TARGETGROUPS_MAPPING, TARGET_GROUPS, TARGET_TARGETGROUPS_MAPPING
-from makei.utils import decompose_filename, is_source_file
+from makei.const import FILE_TARGETGROUPS_MAPPING, TARGET_GROUPS, TARGET_TARGETGROUPS_MAPPING, MEMBER_TEXT_LINES
+from makei.utils import decompose_filename, is_source_file, check_keyword_in_file
 
 if TYPE_CHECKING:
     from makei.build import BuildEnv
@@ -259,8 +259,30 @@ class RulesMk:
         for rule in rules:
             if rule.is_source_file:
                 source_location = dir_path.joinpath(rule.source_file.rsplit("/", 1)[-1])
+                does_text_exist = RulesMk._find_source_member_text(source_location)
 
         return RulesMk(subdir, rules, containing_dir)
+    
+    @classmethod
+    def _get_line_by_line_number(cls, file_path, line_number):
+        with open(file_path, "r") as file:
+            for _ in range(line_number - 1):
+                file.readline()
+            return file.readline().rstrip('\n')
+            
+    # Will Return the member text if it exists, otherwise 
+    @classmethod
+    def _find_source_member_text(cls, file_path) -> str:
+        metadata_comment_exists = check_keyword_in_file(file_path, '%METADATA', MEMBER_TEXT_LINES)
+        if metadata_comment_exists:
+            text_comment_exists = check_keyword_in_file(file_path, '%TEXT', MEMBER_TEXT_LINES, metadata_comment_exists)
+            if text_comment_exists and text_comment_exists > metadata_comment_exists:
+                text_line = RulesMk._get_line_by_line_number(file_path, text_comment_exists)
+                return text_line
+            
+        return None
+            
+        
 
     def __str__(self, rules_middleware: Callable[[MKRule], MKRule] = lambda rule: rule) -> str:
         """Returns a string representation of the RulesMk object
