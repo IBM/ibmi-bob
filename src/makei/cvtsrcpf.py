@@ -6,6 +6,7 @@ from typing import List, Optional, Tuple
 
 from makei.ibm_job import IBMJob
 from makei.utils import create_ibmi_json, objlib_to_path, validate_ccsid
+from makei.const import MEMBER_TEXT_LINES
 
 
 class CvtSrcPf:
@@ -82,9 +83,9 @@ class CvtSrcPf:
 
     def import_member_text(self, file_path: str, member_text: str, member_extension: str) -> bool:
         # Check if member text exists
-        metadata_comment_exists = self.check_keyword_in_file(file_path, '%METADATA', 15)
+        metadata_comment_exists = self.check_keyword_in_file(file_path, '%METADATA', MEMBER_TEXT_LINES)
         if metadata_comment_exists:
-            text_comment_exists = self.check_keyword_in_file(file_path, '%TEXT', 15, metadata_comment_exists)
+            text_comment_exists = self.check_keyword_in_file(file_path, '%TEXT', MEMBER_TEXT_LINES, metadata_comment_exists)
             if text_comment_exists and metadata_comment_exists < text_comment_exists:
                 return False
 
