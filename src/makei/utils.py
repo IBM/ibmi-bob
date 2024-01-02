@@ -414,6 +414,24 @@ def check_keyword_in_file(file_path: str, keyword: str, lines_to_check: int,
             lines_counted += 1
     return 0
 
+# Returns the line at line_number
+def get_line(file_path: str, line_number: int) -> str:
+    try:
+        with open(file_path, "r") as file:
+            for _ in range(line_number - 1):
+                file.readline()
+            return file.readline().rstrip('\n')
+    except FileNotFoundError:
+        return None
+
+
+# Returns the file extension from a filepath
+def get_file_extension(file_path: Path) -> str:
+    extension = file_path.name.split(".", 1)[1]
+    if extension.upper() == ".SRC":
+        extension = ".PF"
+    return extension
+
 if __name__ == "__main__":
     import doctest
 

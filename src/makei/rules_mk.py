@@ -7,8 +7,8 @@ import sys
 from pathlib import Path
 from typing import Callable, Dict, List, Optional, TYPE_CHECKING
 
-from makei.const import FILE_TARGETGROUPS_MAPPING, TARGET_GROUPS, TARGET_TARGETGROUPS_MAPPING, MEMBER_TEXT_LINES
-from makei.utils import decompose_filename, is_source_file, check_keyword_in_file
+from makei.const import FILE_TARGETGROUPS_MAPPING, TARGET_GROUPS, TARGET_TARGETGROUPS_MAPPING, MEMBER_TEXT_LINES, COMMENT_STYLES, METADATA_HEADER, TEXT_HEADER
+from makei.utils import decompose_filename, is_source_file, check_keyword_in_file, get_file_extension, get_line
 
 if TYPE_CHECKING:
     from makei.build import BuildEnv
@@ -264,21 +264,32 @@ class RulesMk:
         return RulesMk(subdir, rules, containing_dir)
     
     @classmethod
-    def _get_line_by_line_number(cls, file_path, line_number):
-        with open(file_path, "r") as file:
-            for _ in range(line_number - 1):
-                file.readline()
-            return file.readline().rstrip('\n')
+    def _remove_comment_identifier(cls, source_extension: str, text: str, file_path: Path) -> str:
+        for style_set, style_dict in COMMENT_STYLES:
+            if source_extension.upper() in style_set:
+                start_comment = style_dict["start_comment"]
+                end_comment = style_dict["end_comment"]
+
+                if style_dict["style_type"] == "COBOL":
+                    if check_keyword_in_file(file_path, 'FREE', 1):
+                        start_comment = "//"
+                        end_comment = "*"
+                text = text.strip(" " + start_comment).strip(end_comment).strip(TEXT_HEADER).strip()
+        return text
             
     # Will Return the member text if it exists, otherwise 
     @classmethod
-    def _find_source_member_text(cls, file_path) -> str:
-        metadata_comment_exists = check_keyword_in_file(file_path, '%METADATA', MEMBER_TEXT_LINES)
+    def _find_source_member_text(cls, file_path: Path) -> str:
+        metadata_comment_exists = check_keyword_in_file(file_path, METADATA_HEADER, MEMBER_TEXT_LINES)
         if metadata_comment_exists:
-            text_comment_exists = check_keyword_in_file(file_path, '%TEXT', MEMBER_TEXT_LINES, metadata_comment_exists)
+            text_comment_exists = check_keyword_in_file(file_path, TEXT_HEADER, MEMBER_TEXT_LINES, metadata_comment_exists)
             if text_comment_exists and text_comment_exists > metadata_comment_exists:
-                text_line = RulesMk._get_line_by_line_number(file_path, text_comment_exists)
-                return text_line
+                text_line = get_line(file_path, text_comment_exists)
+                if text_line is not None:
+                    source_extension = get_file_extension(file_path)
+                    text = RulesMk._remove_comment_identifier(source_extension, text_line, file_path)
+                    print(text)
+                    return text_line
             
         return None
             
