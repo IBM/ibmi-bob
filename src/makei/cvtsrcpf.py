@@ -6,7 +6,7 @@ from typing import List, Optional, Tuple
 
 from makei.ibm_job import IBMJob
 from makei.utils import create_ibmi_json, objlib_to_path, validate_ccsid, check_keyword_in_file
-from makei.const import MEMBER_TEXT_LINES, COMMENT_STYLES
+from makei.const import MEMBER_TEXT_LINES, COMMENT_STYLES, METADATA_HEADER, METADATA_FOOTER, TEXT_HEADER
 
 
 class CvtSrcPf:
@@ -66,9 +66,9 @@ class CvtSrcPf:
 
     def import_member_text(self, file_path: str, member_text: str, member_extension: str) -> bool:
         # Check if member text exists
-        metadata_comment_exists = check_keyword_in_file(file_path, '%METADATA', MEMBER_TEXT_LINES)
+        metadata_comment_exists = check_keyword_in_file(file_path, METADATA_HEADER, MEMBER_TEXT_LINES)
         if metadata_comment_exists:
-            text_comment_exists = check_keyword_in_file(file_path, '%TEXT', MEMBER_TEXT_LINES, metadata_comment_exists)
+            text_comment_exists = check_keyword_in_file(file_path, TEXT_HEADER, MEMBER_TEXT_LINES, metadata_comment_exists)
             if text_comment_exists and metadata_comment_exists < text_comment_exists:
                 return False
 
@@ -88,11 +88,11 @@ class CvtSrcPf:
                         end_comment = "*"
                         write_on_line = 1
 
-                first_write = self.insert_line(file_path, '%EMETADATA ', start_comment,
+                first_write = self.insert_line(file_path, METADATA_FOOTER + ' ', start_comment,
                                                end_comment, write_on_line, start_column, end_column)
-                second_write = self.insert_line(file_path, ' %TEXT ' + member_text, start_comment,
+                second_write = self.insert_line(file_path, ' ' + TEXT_HEADER + ' ' + member_text, start_comment,
                                                 end_comment, write_on_line, start_column, end_column)
-                third_write = self.insert_line(file_path, '%METADATA ', start_comment, end_comment,
+                third_write = self.insert_line(file_path, METADATA_HEADER + ' ', start_comment, end_comment,
                                                write_on_line, start_column, end_column)
 
                 return first_write + second_write + third_write

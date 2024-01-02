@@ -8,6 +8,10 @@ DEFAULT_CURLIB = "*CRTDFT"
 BOB_PATH = Path(__file__).resolve().parent.parent.parent
 MK_PATH = BOB_PATH / "src" / "mk"
 
+METADATA_HEADER = "%METADATA"
+METADATA_FOOTER = "%EMETADATA"
+TEXT_HEADER = "%TEXT"
+
 TARGET_GROUPS = ["TRG",
                  "DTAARA",
                  "SQL",
