@@ -6,7 +6,7 @@ from typing import List, Optional, Tuple
 
 from makei.ibm_job import IBMJob
 from makei.utils import create_ibmi_json, objlib_to_path, validate_ccsid, check_keyword_in_file
-from makei.const import MEMBER_TEXT_LINES
+from makei.const import MEMBER_TEXT_LINES, COMMENT_STYLES
 
 
 class CvtSrcPf:
@@ -72,49 +72,7 @@ class CvtSrcPf:
             if text_comment_exists and metadata_comment_exists < text_comment_exists:
                 return False
 
-        start_column = 7
-        end_column = 72
-        C_Style = {"CMDSRC", "C", "CPP", "CLLE", "SQLC", "SQLCPP", "PGM.C", "PGM.CLLE", "BND",
-                   "ILESRVPGM", "BNDDIR", "DTAARA", "SYSTRG", "MSGF"}
-        C_Style_Comments = (C_Style, {
-            "style_type": "C",
-            "start_comment": "/*",
-            "end_comment": "*/",
-            "start_column": start_column,
-            "end_column": end_column
-        })
-
-        SQL_Style = {"TABLE", "VIEW", "SQLUDT", "SQLALIAS", "SQLSEQ", "SQLPRC", "SQLTRG", "SQLUDF", "SQL"}
-        SQL_Style_Comments = (SQL_Style, {
-            "style_type": "SQL",
-            "start_comment": "--",
-            "end_comment": "*",
-            "start_column": start_column,
-            "end_column": end_column
-        })
-
-        COBOL_Style = {"DSPF", "LF", "PF", "PRTF", "RPGLE", "SQLRPGLE", "CBLLE", "SQLCBLLE", "PGM.RPGLE",
-                       "PGM.SQLRPGLE", "CBL", "PGM.CBLLE", "PGM.SQLCBLLE", "RPG"}
-        COBOL_Style_Comments = (COBOL_Style, {
-            "style_type": "COBOL",
-            "start_comment": "*",
-            "end_comment": "*",
-            "start_column": start_column,
-            "end_column": end_column
-        })
-
-        PNL_Style = {"PNLGRPSRC", "MENUSRC"}
-        PNL_Style_Comments = (PNL_Style, {
-            "style_type": "PNL",
-            "start_comment": ".*",
-            "end_comment": "*",
-            "start_column": 1,
-            "end_column": end_column
-        })
-
-        Comment_Styles = [C_Style_Comments, SQL_Style_Comments, COBOL_Style_Comments, PNL_Style_Comments]
-
-        for style_set, style_dict in Comment_Styles:
+        for style_set, style_dict in COMMENT_STYLES:
             if member_extension in style_set:
 
                 start_comment = style_dict["start_comment"]

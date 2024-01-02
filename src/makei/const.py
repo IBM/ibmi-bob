@@ -139,3 +139,43 @@ FILE_MAX_EXT_LENGTH = max(
 
 # This is the number of lines to check in source file for member text as a comment.
 MEMBER_TEXT_LINES = 15
+
+_start_column = 7
+_end_column = 72
+C_STYLE_COMMENTS = (
+    {"CMDSRC", "C", "CPP", "CLLE", "SQLC", "SQLCPP", "PGM.C", "PGM.CLLE", "BND",
+            "ILESRVPGM", "BNDDIR", "DTAARA", "SYSTRG", "MSGF"},{
+    "style_type": "C",
+    "start_comment": "/*",
+    "end_comment": "*/",
+    "start_column": _start_column,
+    "end_column": _end_column
+})
+
+SQL_STYLE_COMMENTS = ({"TABLE", "VIEW", "SQLUDT", "SQLALIAS", "SQLSEQ", "SQLPRC", "SQLTRG", "SQLUDF", "SQL"}, {
+    "style_type": "SQL",
+    "start_comment": "--",
+    "end_comment": "*",
+    "start_column": _start_column,
+    "end_column": _end_column
+})
+
+COBOL_STYLE_COMMENTS = ({"DSPF", "LF", "PF", "PRTF", "RPGLE", "SQLRPGLE", "CBLLE", "SQLCBLLE", "PGM.RPGLE",
+                "PGM.SQLRPGLE", "CBL", "PGM.CBLLE", "PGM.SQLCBLLE", "RPG"}, {
+    "style_type": "COBOL",
+    "start_comment": "*",
+    "end_comment": "*",
+    "start_column": _start_column,
+    "end_column": _end_column
+})
+
+PNL_STYLE_COMMENTS = ({"PNLGRPSRC", "MENUSRC"}, {
+    "style_type": "PNL",
+    "start_comment": ".*",
+    "end_comment": "*",
+    "start_column": 1,
+    "end_column": _end_column
+})
+
+COMMENT_STYLES = [C_STYLE_COMMENTS, SQL_STYLE_COMMENTS, COBOL_STYLE_COMMENTS, PNL_STYLE_COMMENTS]
+
