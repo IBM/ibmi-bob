@@ -251,6 +251,7 @@ class RulesMk:
         if recipe_env:
             rules.append(MKRule.from_str(recipe_str, containing_dir, include_dirs))
 
+        # Defines variables declared in Rules.mk
         for target, variableList in variables.items():
             matched_rules = filter(lambda rule: rule.target == target, rules)
             for rule in matched_rules:
@@ -259,9 +260,14 @@ class RulesMk:
         for rule in rules:
             if rule.is_source_file:
                 source_location = dir_path.joinpath(rule.source_file.rsplit("/", 1)[-1])
-                does_text_exist = RulesMk._find_source_member_text(source_location)
+                is_text_defined = RulesMk._find_source_member_text(source_location)
+                
+                # Overrides member text defined in Rules.mk if comment at top of source
+                if is_text_defined is not None:
+                    rule.variables.append('TEXT = ' + is_text_defined)
 
         return RulesMk(subdir, rules, containing_dir)
+    
     
     @classmethod
     def _remove_comment_identifier(cls, source_extension: str, text: str, file_path: Path) -> str:
@@ -288,8 +294,7 @@ class RulesMk:
                 if text_line is not None:
                     source_extension = get_file_extension(file_path)
                     text = RulesMk._remove_comment_identifier(source_extension, text_line, file_path)
-                    print(text)
-                    return text_line
+                    return text
             
         return None
             

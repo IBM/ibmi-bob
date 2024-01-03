@@ -87,7 +87,7 @@ class BuildEnv:
         for rules_mk_path in rules_mk_paths:
             rules_mk = RulesMk.from_file(rules_mk_path,  self.src_dir, map(Path, self.iproj_json.include_path))
             rules_mk.build_context = self
-            rules_mk_build_path = rules_mk_path.parent / ".Rules.mk.build" #CHANGE THE TEXT BEING PUT IN THIS FILE
+            rules_mk_build_path = rules_mk_path.parent / ".Rules.mk.build"
             rules_mk_build_path.write_text(str(rules_mk))
             self.tmp_files.append(rules_mk_build_path)
 
