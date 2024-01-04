@@ -196,9 +196,6 @@ endif
 ifndef TYPE
 TYPE := 
 endif
-ifndef TGTCCSID
-TGTCCSID = $(TGTCCSID_$(d)) 
-endif
 ifndef TGTRLS
 TGTRLS :=  
 endif
@@ -388,6 +385,9 @@ SRVPGM_STGMDL := $(STGMDL)
 SRVPGM_TGTRLS := $(TGTRLS)
 SRVPGM_OPTION :=
 WSCST_AUT := $(AUT)
+
+# TGTCCSID can be overwritted with each directory
+TGTCCSID = $(TGTCCSID_$($@_d)) 
 
 # Creation command parameters with variables (the ones listed at the top) for the most common ones.
 CRTCLMODFLAGS = AUT($(AUT)) DBGVIEW($(DBGVIEW)) OPTIMIZE($(OPTIMIZE)) OPTION($(OPTION)) TEXT('$(TEXT)') TGTRLS($(TGTRLS)) INCDIR($(INCDIR))
