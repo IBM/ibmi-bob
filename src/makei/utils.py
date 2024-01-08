@@ -10,6 +10,7 @@ import json
 import os
 import subprocess
 import sys
+import copy
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
@@ -17,7 +18,7 @@ from shutil import move, copymode
 from tempfile import mkstemp, gettempdir
 from typing import Callable, List, Optional, Tuple, Union
 
-from makei.const import FILE_MAX_EXT_LENGTH, FILE_TARGET_MAPPING
+from makei.const import FILE_MAX_EXT_LENGTH, FILE_TARGET_MAPPING, COMMENT_STYLES
 
 
 class Colors(str, Enum):
@@ -431,6 +432,20 @@ def get_file_extension(file_path: Path) -> str:
     if extension.upper() == ".SRC":
         extension = ".PF"
     return extension
+
+def get_style_dict(file_path: Path) -> dict:
+    source_extension = get_file_extension(file_path)
+
+    for style_set, style_dict in COMMENT_STYLES:
+        if source_extension.upper() in style_set:
+            return_dict = copy.deepcopy(style_dict)
+            if return_dict["style_type"] == "COBOL":
+                if check_keyword_in_file(file_path, 'FREE', 1):
+                    return_dict["start_comment"] = "//"
+                    return_dict["end_comment"] = "*"
+            return return_dict
+    
+    return None
 
 if __name__ == "__main__":
     import doctest

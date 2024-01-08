@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Callable, Dict, List, Optional, TYPE_CHECKING
 
 from makei.const import FILE_TARGETGROUPS_MAPPING, TARGET_GROUPS, TARGET_TARGETGROUPS_MAPPING, MEMBER_TEXT_LINES, COMMENT_STYLES, METADATA_HEADER, TEXT_HEADER
-from makei.utils import decompose_filename, is_source_file, check_keyword_in_file, get_file_extension, get_line
+from makei.utils import decompose_filename, is_source_file, check_keyword_in_file, get_file_extension, get_line, get_style_dict
 
 if TYPE_CHECKING:
     from makei.build import BuildEnv
@@ -270,17 +270,12 @@ class RulesMk:
     
     
     @classmethod
-    def _remove_comment_identifier(cls, source_extension: str, text: str, file_path: Path) -> str:
-        for style_set, style_dict in COMMENT_STYLES:
-            if source_extension.upper() in style_set:
-                start_comment = style_dict["start_comment"]
-                end_comment = style_dict["end_comment"]
-
-                if style_dict["style_type"] == "COBOL":
-                    if check_keyword_in_file(file_path, 'FREE', 1):
-                        start_comment = "//"
-                        end_comment = "*"
-                text = text.strip(" " + start_comment).strip(end_comment).strip(TEXT_HEADER).strip()
+    def _remove_comment_identifier(cls, text: str, file_path: Path) -> str:
+        style_dict = get_style_dict(file_path)
+        if style_dict is not None:
+            start_comment = style_dict["start_comment"]
+            end_comment = style_dict["end_comment"]
+            text = text.strip(" " + start_comment).strip(end_comment).strip(TEXT_HEADER).strip()
         return text
             
     # Will Return the member text if it exists, otherwise 
@@ -292,8 +287,7 @@ class RulesMk:
             if text_comment_exists and text_comment_exists > metadata_comment_exists:
                 text_line = get_line(file_path, text_comment_exists)
                 if text_line is not None:
-                    source_extension = get_file_extension(file_path)
-                    text = RulesMk._remove_comment_identifier(source_extension, text_line, file_path)
+                    text = RulesMk._remove_comment_identifier(text_line, file_path)
                     return text
             
         return None
