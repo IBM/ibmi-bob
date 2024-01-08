@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import List, Optional, Tuple
 
 from makei.ibm_job import IBMJob
-from makei.utils import create_ibmi_json, objlib_to_path, validate_ccsid, check_keyword_in_file
+from makei.utils import create_ibmi_json, objlib_to_path, validate_ccsid, check_keyword_in_file, get_style_dict
 from makei.const import MEMBER_TEXT_LINES, COMMENT_STYLES, METADATA_HEADER, METADATA_FOOTER, TEXT_HEADER
 
 
@@ -64,7 +64,7 @@ class CvtSrcPf:
         except BaseException:
             return False
 
-    def import_member_text(self, file_path: str, member_text: str, member_extension: str) -> bool:
+    def import_member_text(self, file_path: str, member_text: str) -> bool:
         # Check if member text exists
         metadata_comment_exists = check_keyword_in_file(file_path, METADATA_HEADER, MEMBER_TEXT_LINES)
         if metadata_comment_exists:
@@ -72,30 +72,22 @@ class CvtSrcPf:
             if text_comment_exists and metadata_comment_exists < text_comment_exists:
                 return False
 
-        for style_set, style_dict in COMMENT_STYLES:
-            if member_extension in style_set:
+        style_dict = get_style_dict(file_path)
+        if style_dict is not None:
+            start_comment = style_dict["start_comment"]
+            end_comment = style_dict["end_comment"]
+            start_column = style_dict["start_column"]
+            end_column = end_column = style_dict["end_column"]
+            write_on_line = style_dict["write_on_line"] if "write_on_line" in style_dict else 0
 
-                start_comment = style_dict["start_comment"]
-                end_comment = style_dict["end_comment"]
-                write_on_line = 0
-                start_column = style_dict["start_column"]
-                end_column = end_column = style_dict["end_column"]
-
-                # Checking for free-form RPG
-                if style_dict["style_type"] == "COBOL":
-                    if check_keyword_in_file(file_path, 'FREE', 1):
-                        start_comment = "//"
-                        end_comment = "*"
-                        write_on_line = 1
-
-                first_write = self.insert_line(file_path, METADATA_FOOTER + ' ', start_comment,
+            first_write = self.insert_line(file_path, METADATA_FOOTER + ' ', start_comment,
                                                end_comment, write_on_line, start_column, end_column)
-                second_write = self.insert_line(file_path, ' ' + TEXT_HEADER + ' ' + member_text, start_comment,
-                                                end_comment, write_on_line, start_column, end_column)
-                third_write = self.insert_line(file_path, METADATA_HEADER + ' ', start_comment, end_comment,
-                                               write_on_line, start_column, end_column)
+            second_write = self.insert_line(file_path, ' ' + TEXT_HEADER + ' ' + member_text, start_comment,
+                                            end_comment, write_on_line, start_column, end_column)
+            third_write = self.insert_line(file_path, METADATA_HEADER + ' ', start_comment, end_comment,
+                                            write_on_line, start_column, end_column)
 
-                return first_write + second_write + third_write
+            return first_write + second_write + third_write
 
         return False
 
@@ -126,7 +118,7 @@ class CvtSrcPf:
 
                     # If member has text
                     if member_text is not None:
-                        successfulImport = self.import_member_text(dst_mbr_path, member_text, src_mbr_ext)
+                        successfulImport = self.import_member_text(dst_mbr_path, member_text)
                         if successfulImport:
                             print("Successfully imported member text!")
 

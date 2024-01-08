@@ -439,10 +439,12 @@ def get_style_dict(file_path: Path) -> dict:
     for style_set, style_dict in COMMENT_STYLES:
         if source_extension.upper() in style_set:
             return_dict = copy.deepcopy(style_dict)
+            # Handling free form RPG
             if return_dict["style_type"] == "COBOL":
                 if check_keyword_in_file(file_path, 'FREE', 1):
                     return_dict["start_comment"] = "//"
                     return_dict["end_comment"] = "*"
+                    return_dict["write_on_line"] = 1
             return return_dict
     
     return None
