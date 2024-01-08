@@ -6,7 +6,7 @@ from typing import List, Optional, Tuple
 
 from makei.ibm_job import IBMJob
 from makei.utils import create_ibmi_json, objlib_to_path, validate_ccsid, check_keyword_in_file, get_style_dict
-from makei.const import MEMBER_TEXT_LINES, COMMENT_STYLES, METADATA_HEADER, METADATA_FOOTER, TEXT_HEADER
+from makei.const import MEMBER_TEXT_LINES, METADATA_HEADER, METADATA_FOOTER, TEXT_HEADER
 
 
 class CvtSrcPf:
@@ -40,7 +40,6 @@ class CvtSrcPf:
         self.tolower = tolower
         self.ibmi_json_path = save_path / ".ibmi.json"
         self.store_member_text = text
-        
 
     # for free form rpg, write_on_line = 1
     def insert_line(self, file_path, content, start_comment_characters: str, end_comment_characters: str,
@@ -68,7 +67,8 @@ class CvtSrcPf:
         # Check if member text exists
         metadata_comment_exists = check_keyword_in_file(file_path, METADATA_HEADER, MEMBER_TEXT_LINES)
         if metadata_comment_exists:
-            text_comment_exists = check_keyword_in_file(file_path, TEXT_HEADER, MEMBER_TEXT_LINES, metadata_comment_exists)
+            text_comment_exists = check_keyword_in_file(file_path, TEXT_HEADER, MEMBER_TEXT_LINES,
+                                                        metadata_comment_exists)
             if text_comment_exists and metadata_comment_exists < text_comment_exists:
                 return False
 
@@ -81,11 +81,11 @@ class CvtSrcPf:
             write_on_line = style_dict["write_on_line"] if "write_on_line" in style_dict else 0
 
             first_write = self.insert_line(file_path, METADATA_FOOTER + ' ', start_comment,
-                                               end_comment, write_on_line, start_column, end_column)
+                                           end_comment, write_on_line, start_column, end_column)
             second_write = self.insert_line(file_path, ' ' + TEXT_HEADER + ' ' + member_text, start_comment,
                                             end_comment, write_on_line, start_column, end_column)
             third_write = self.insert_line(file_path, METADATA_HEADER + ' ', start_comment, end_comment,
-                                            write_on_line, start_column, end_column)
+                                           write_on_line, start_column, end_column)
 
             return first_write + second_write + third_write
 

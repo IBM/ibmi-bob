@@ -397,9 +397,10 @@ def make_include_dirs_absolute(job_log_path: str, parameters: str):
     end_of_param_string = parameters[end_of_inc_dir:]
     return start_of_param_string + " ".join(include_path) + end_of_param_string
 
+
 # Returns the line number where the keyword was found at (starting at 1), otherwise 0
 def check_keyword_in_file(file_path: str, keyword: str, lines_to_check: int,
-                            line_start_check: int = 1) -> int:
+                          line_start_check: int = 1) -> int:
     if (line_start_check < 1):
         line_start_check = 1
     lines_counted = 0
@@ -414,6 +415,7 @@ def check_keyword_in_file(file_path: str, keyword: str, lines_to_check: int,
                 return line_number
             lines_counted += 1
     return 0
+
 
 # Returns the line at line_number
 def get_line(file_path: str, line_number: int) -> str:
@@ -433,6 +435,7 @@ def get_file_extension(file_path: Path) -> str:
         extension = ".PF"
     return extension
 
+
 def get_style_dict(file_path: Path) -> dict:
     source_extension = get_file_extension(file_path)
 
@@ -446,8 +449,9 @@ def get_style_dict(file_path: Path) -> dict:
                     return_dict["end_comment"] = "*"
                     return_dict["write_on_line"] = 1
             return return_dict
-    
+
     return None
+
 
 if __name__ == "__main__":
     import doctest

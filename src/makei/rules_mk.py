@@ -7,8 +7,9 @@ import sys
 from pathlib import Path
 from typing import Callable, Dict, List, Optional, TYPE_CHECKING
 
-from makei.const import FILE_TARGETGROUPS_MAPPING, TARGET_GROUPS, TARGET_TARGETGROUPS_MAPPING, MEMBER_TEXT_LINES, COMMENT_STYLES, METADATA_HEADER, TEXT_HEADER
-from makei.utils import decompose_filename, is_source_file, check_keyword_in_file, get_file_extension, get_line, get_style_dict
+from makei.const import (FILE_TARGETGROUPS_MAPPING, TARGET_GROUPS, TARGET_TARGETGROUPS_MAPPING, MEMBER_TEXT_LINES,
+                         METADATA_HEADER, TEXT_HEADER)
+from makei.utils import decompose_filename, is_source_file, check_keyword_in_file, get_line, get_style_dict
 
 if TYPE_CHECKING:
     from makei.build import BuildEnv
@@ -209,7 +210,7 @@ class RulesMk:
 
         recipe_env = False
         recipe_str = ""
-        dir_path = src_dir.joinpath(containing_dir) # directory with the source code 
+        dir_path = src_dir.joinpath(containing_dir)  # directory with the source code
 
         for line in rules_mk_str.split('\n'):
             if recipe_env:
@@ -256,19 +257,18 @@ class RulesMk:
             matched_rules = filter(lambda rule: rule.target == target, rules)
             for rule in matched_rules:
                 rule.variables = variableList
-        
+
         for rule in rules:
             if rule.is_source_file:
                 source_location = dir_path.joinpath(rule.source_file.rsplit("/", 1)[-1])
                 is_text_defined = RulesMk._find_source_member_text(source_location)
-                
+
                 # Overrides member text defined in Rules.mk if comment at top of source
                 if is_text_defined is not None:
                     rule.variables.append('TEXT = ' + is_text_defined)
 
         return RulesMk(subdir, rules, containing_dir)
-    
-    
+
     @classmethod
     def _remove_comment_identifier(cls, text: str, file_path: Path) -> str:
         style_dict = get_style_dict(file_path)
@@ -277,22 +277,21 @@ class RulesMk:
             end_comment = style_dict["end_comment"]
             text = text.strip(" " + start_comment).strip(end_comment).strip(TEXT_HEADER).strip()
         return text
-            
-    # Will Return the member text if it exists, otherwise 
+
+    # Will Return the member text if it exists, otherwise
     @classmethod
     def _find_source_member_text(cls, file_path: Path) -> str:
         metadata_comment_exists = check_keyword_in_file(file_path, METADATA_HEADER, MEMBER_TEXT_LINES)
         if metadata_comment_exists:
-            text_comment_exists = check_keyword_in_file(file_path, TEXT_HEADER, MEMBER_TEXT_LINES, metadata_comment_exists)
+            text_comment_exists = check_keyword_in_file(file_path, TEXT_HEADER, MEMBER_TEXT_LINES,
+                                                        metadata_comment_exists)
             if text_comment_exists and text_comment_exists > metadata_comment_exists:
                 text_line = get_line(file_path, text_comment_exists)
                 if text_line is not None:
                     text = RulesMk._remove_comment_identifier(text_line, file_path)
                     return text
-            
+
         return None
-            
-        
 
     def __str__(self, rules_middleware: Callable[[MKRule], MKRule] = lambda rule: rule) -> str:
         """Returns a string representation of the RulesMk object
