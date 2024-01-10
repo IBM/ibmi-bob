@@ -7,9 +7,9 @@ data_dir = DATA_PATH / "rules_mks"
 def test_from_file():
     # Test loading from a valid file
     rules_mk = RulesMk.from_file(data_dir / "a.rules.mk", data_dir)
-    expected_targets = {'TRGs': [], 'DTAARAs': [], 'SQLs': [], 'BNDDs': [], 'PFs': [], 'LFs': [], 'DSPFs': [],
-                        'PRTFs': [], 'CMDs': [], 'MODULEs': ['VAT300.MODULE'], 'SRVPGMs': [], 'PGMs': [], 'MENUs': [],
-                        'PNLGRPs': [], 'QMQRYs': [], 'WSCSTs': [], 'MSGs': []}
+    expected_targets = {'TRGs': [], 'DTAARAs': [], 'DTAQs': [], 'SQLs': [], 'BNDDs': [], 'PFs': [], 'LFs': [],
+                        'DSPFs': [], 'PRTFs': [], 'CMDs': [], 'MODULEs': ['VAT300.MODULE'], 'SRVPGMs': [], 'PGMs': [],
+                        'MENUs': [], 'PNLGRPs': [], 'QMQRYs': [], 'WSCSTs': [], 'MSGs': []}
     variables1 = ['private DFTACTGRP = *NO', 'private TEXT := Andy is cool', 'private VARSHELL ?= SHELL',
                   'private VARAPPEND += TOAPPEND', 'private VARAPPEND+=APPEND2 # we support end of line comments',
                   'private VARIMMED ::= IMMED', 'private VARESCAPE :::= ESCAPE']
@@ -52,8 +52,8 @@ VAT300.MODULE: private VARESCAPE :::= ESCAPE
 def test_custom_recipe():
     # Test loading from a valid file
     rules_mk = RulesMk.from_file(data_dir / "custom.rules.mk", data_dir)
-    expected_targets = {'TRGs': [], 'DTAARAs': [], 'SQLs': [], 'BNDDs': [], 'PFs': ['CRTSBSD.FILE'], 'LFs': [],
-                        'DSPFs': [], 'PRTFs': [], 'CMDs': [], 'MODULEs': [], 'SRVPGMs': [], 'PGMs': [],
+    expected_targets = {'TRGs': [], 'DTAARAs': [], 'DTAQs': [], 'SQLs': [], 'BNDDs': [], 'PFs': ['CRTSBSD.FILE'],
+                        'LFs': [], 'DSPFs': [], 'PRTFs': [], 'CMDs': [], 'MODULEs': [], 'SRVPGMs': [], 'PGMs': [],
                         'MENUs': [], 'PNLGRPs': [], 'QMQRYs': [], 'WSCSTs': [], 'MSGs': []}
     commands0 = ['@$(call echo_cmd,=== Creating [CRTSBSD.FILE] from custom recipe)',
                  'system -i "CRTSBSD SBSD(BATCHWL/BATCHSBSD) POOLS((1 *SHRPOOL3 *N *MB))"',
@@ -86,8 +86,8 @@ CRTSBSD.FILE : \n\t@$(call echo_cmd,=== Creating [CRTSBSD.FILE] from custom reci
 def test_dtaara_recipe():
     # Test loading from a valid file
     rules_mk = RulesMk.from_file(data_dir / "dtaara.rules.mk", data_dir)
-    expected_targets = {'TRGs': [], 'DTAARAs': ['LASTORDNO.DTAARA'], 'SQLs': [], 'BNDDs': [], 'PFs': [], 'LFs': [],
-                        'DSPFs': [], 'PRTFs': [], 'CMDs': [], 'MODULEs': [], 'SRVPGMs': [], 'PGMs': [],
+    expected_targets = {'TRGs': [], 'DTAARAs': ['LASTORDNO.DTAARA'], 'DTAQs': [], 'SQLs': [], 'BNDDs': [], 'PFs': [],
+                        'LFs': [], 'DSPFs': [], 'PRTFs': [], 'CMDs': [], 'MODULEs': [], 'SRVPGMs': [], 'PGMs': [],
                         'MENUs': [], 'PNLGRPs': [], 'QMQRYs': [], 'WSCSTs': [], 'MSGs': []}
 
     assert rules_mk.containing_dir == data_dir
@@ -109,10 +109,36 @@ LASTORDNO.DTAARA_RECIPE=DTAARA_TO_DTAARA_RECIPE
 '''
 
 
+def test_dtaq_recipe():
+    # Test loading from a valid file
+    rules_mk = RulesMk.from_file(data_dir / "dtaq.rules.mk")
+    expected_targets = {'TRGs': [], 'DTAARAs': [], 'DTAQs': ['ORDERS.DTAQ'], 'SQLs': [], 'BNDDs': [], 'PFs': [],
+                        'LFs': [], 'DSPFs': [], 'PRTFs': [], 'CMDs': [], 'MODULEs': [], 'SRVPGMs': [],
+                        'PGMs': [], 'MENUs': [], 'PNLGRPs': [], 'QMQRYs': [], 'WSCSTs': [], 'MSGs': []}
+
+    assert rules_mk.containing_dir == data_dir
+    assert rules_mk.subdirs == []
+    assert rules_mk.targets == expected_targets
+    assert rules_mk.rules[0].variables == []
+    assert rules_mk.rules[0].commands == []
+    assert rules_mk.rules[0].dependencies == []
+    assert rules_mk.rules[0].include_dirs == []
+    assert rules_mk.rules[0].target == 'ORDERS.DTAQ'
+    assert rules_mk.rules[0].source_file == 'ORDERS.DTAQ'
+    assert str(rules_mk.rules[0]) == '''ORDERS.DTAQ_SRC=ORDERS.DTAQ
+ORDERS.DTAQ_DEP=
+ORDERS.DTAQ_RECIPE=DTAQ_TO_DTAQ_RECIPE\n'''
+    assert str(rules_mk) == '''DTAQs := ORDERS.DTAQ\n\n
+ORDERS.DTAQ_SRC=ORDERS.DTAQ
+ORDERS.DTAQ_DEP=
+ORDERS.DTAQ_RECIPE=DTAQ_TO_DTAQ_RECIPE
+'''
+
+
 def test_dds_recipe():
     # Test loading from a valid file
     rules_mk = RulesMk.from_file(data_dir / "dds.rules.mk", data_dir)
-    expected_targets = {'TRGs': [], 'DTAARAs': [], 'SQLs': [], 'BNDDs': [], 'PFs': ['ARTICLE.FILE',
+    expected_targets = {'TRGs': [], 'DTAARAs': [], 'DTAQs': [], 'SQLs': [], 'BNDDs': [], 'PFs': ['ARTICLE.FILE',
                         'DETORD.FILE', 'TMPDETORD.FILE'], 'LFs': [], 'DSPFs': ['ART301D.FILE'],
                         'PRTFs': ['ORD500O.FILE'], 'CMDs': [], 'MODULEs': [], 'SRVPGMs': [], 'PGMs': [],
                         'MENUs': [], 'PNLGRPs': [], 'QMQRYs': [], 'WSCSTs': [], 'MSGs': []}
