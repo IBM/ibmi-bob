@@ -85,7 +85,7 @@ class BuildEnv:
         rules_mk_paths = list(Path(".").rglob("Rules.mk"))
         # Create Rules.mk.build for each Rules.mk
         for rules_mk_path in rules_mk_paths:
-            rules_mk = RulesMk.from_file(rules_mk_path, map(Path, self.iproj_json.include_path))
+            rules_mk = RulesMk.from_file(rules_mk_path,  self.src_dir, map(Path, self.iproj_json.include_path))
             rules_mk.build_context = self
             rules_mk_build_path = rules_mk_path.parent / ".Rules.mk.build"
             rules_mk_build_path.write_text(str(rules_mk))

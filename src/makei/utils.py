@@ -10,6 +10,7 @@ import json
 import os
 import subprocess
 import sys
+import copy
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
@@ -17,7 +18,7 @@ from shutil import move, copymode
 from tempfile import mkstemp, gettempdir
 from typing import Callable, List, Optional, Tuple, Union
 
-from makei.const import FILE_MAX_EXT_LENGTH, FILE_TARGET_MAPPING
+from makei.const import FILE_MAX_EXT_LENGTH, FILE_TARGET_MAPPING, COMMENT_STYLES
 
 
 class Colors(str, Enum):
@@ -395,6 +396,61 @@ def make_include_dirs_absolute(job_log_path: str, parameters: str):
     start_of_param_string = parameters[0:start_of_inc_dir + 1]
     end_of_param_string = parameters[end_of_inc_dir:]
     return start_of_param_string + " ".join(include_path) + end_of_param_string
+
+
+# Returns the line number where the keyword was found at (starting at 1), otherwise 0
+def check_keyword_in_file(file_path: str, keyword: str, lines_to_check: int,
+                          line_start_check: int = 1) -> int:
+    if (line_start_check < 1):
+        line_start_check = 1
+    lines_counted = 0
+
+    with open(file_path, 'r') as file:
+        lines = file.readlines()
+
+        for line_number, line in enumerate(lines[line_start_check-1:], start=line_start_check):
+            if lines_counted == lines_to_check:
+                break
+            if keyword.lower() in line.lower():
+                return line_number
+            lines_counted += 1
+    return 0
+
+
+# Returns the line at line_number
+def get_line(file_path: str, line_number: int) -> str:
+    try:
+        with open(file_path, "r") as file:
+            for _ in range(line_number - 1):
+                file.readline()
+            return file.readline().rstrip('\n')
+    except FileNotFoundError:
+        return None
+
+
+# Returns the file extension from a filepath
+def get_file_extension(file_path: Path) -> str:
+    extension = file_path.name.split(".", 1)[1]
+    if extension.upper() == ".SRC":
+        extension = ".PF"
+    return extension
+
+
+def get_style_dict(file_path: Path) -> dict:
+    source_extension = get_file_extension(file_path)
+
+    for style_set, style_dict in COMMENT_STYLES:
+        if source_extension.upper() in style_set:
+            return_dict = copy.deepcopy(style_dict)
+            # Handling free form RPG
+            if return_dict["style_type"] == "COBOL":
+                if check_keyword_in_file(file_path, 'FREE', 1):
+                    return_dict["start_comment"] = "//"
+                    return_dict["end_comment"] = "*"
+                    return_dict["write_on_line"] = 1
+            return return_dict
+
+    return None
 
 
 if __name__ == "__main__":

@@ -6,7 +6,7 @@ data_dir = DATA_PATH / "rules_mks"
 
 def test_from_file():
     # Test loading from a valid file
-    rules_mk = RulesMk.from_file(data_dir / "a.rules.mk")
+    rules_mk = RulesMk.from_file(data_dir / "a.rules.mk", data_dir)
     expected_targets = {'TRGs': [], 'DTAARAs': [], 'DTAQs': [], 'SQLs': [], 'BNDDs': [], 'PFs': [], 'LFs': [],
                         'DSPFs': [], 'PRTFs': [], 'CMDs': [], 'MODULEs': ['VAT300.MODULE'], 'SRVPGMs': [], 'PGMs': [],
                         'MENUs': [], 'PNLGRPs': [], 'QMQRYs': [], 'WSCSTs': [], 'MSGs': []}
@@ -51,7 +51,7 @@ VAT300.MODULE: private VARESCAPE :::= ESCAPE
 
 def test_custom_recipe():
     # Test loading from a valid file
-    rules_mk = RulesMk.from_file(data_dir / "custom.rules.mk")
+    rules_mk = RulesMk.from_file(data_dir / "custom.rules.mk", data_dir)
     expected_targets = {'TRGs': [], 'DTAARAs': [], 'DTAQs': [], 'SQLs': [], 'BNDDs': [], 'PFs': ['CRTSBSD.FILE'],
                         'LFs': [], 'DSPFs': [], 'PRTFs': [], 'CMDs': [], 'MODULEs': [], 'SRVPGMs': [], 'PGMs': [],
                         'MENUs': [], 'PNLGRPs': [], 'QMQRYs': [], 'WSCSTs': [], 'MSGs': []}
@@ -85,7 +85,7 @@ CRTSBSD.FILE : \n\t@$(call echo_cmd,=== Creating [CRTSBSD.FILE] from custom reci
 
 def test_dtaara_recipe():
     # Test loading from a valid file
-    rules_mk = RulesMk.from_file(data_dir / "dtaara.rules.mk")
+    rules_mk = RulesMk.from_file(data_dir / "dtaara.rules.mk", data_dir)
     expected_targets = {'TRGs': [], 'DTAARAs': ['LASTORDNO.DTAARA'], 'DTAQs': [], 'SQLs': [], 'BNDDs': [], 'PFs': [],
                         'LFs': [], 'DSPFs': [], 'PRTFs': [], 'CMDs': [], 'MODULEs': [], 'SRVPGMs': [], 'PGMs': [],
                         'MENUs': [], 'PNLGRPs': [], 'QMQRYs': [], 'WSCSTs': [], 'MSGs': []}
@@ -137,7 +137,7 @@ ORDERS.DTAQ_RECIPE=DTAQ_TO_DTAQ_RECIPE
 
 def test_dds_recipe():
     # Test loading from a valid file
-    rules_mk = RulesMk.from_file(data_dir / "dds.rules.mk")
+    rules_mk = RulesMk.from_file(data_dir / "dds.rules.mk", data_dir)
     expected_targets = {'TRGs': [], 'DTAARAs': [], 'DTAQs': [], 'SQLs': [], 'BNDDs': [], 'PFs': ['ARTICLE.FILE',
                         'DETORD.FILE', 'TMPDETORD.FILE'], 'LFs': [], 'DSPFs': ['ART301D.FILE'],
                         'PRTFs': ['ORD500O.FILE'], 'CMDs': [], 'MODULEs': [], 'SRVPGMs': [], 'PGMs': [],
