@@ -1,3 +1,5 @@
+* Fri Jan 12 2023 John Weirich weirich_j@hotmail.com - 2.4.25
+- Standardize all bash script shebang lines.
 * Thu Dec 28 2023 John Weirich weirich_j@hotmail.com - 2.4.24
 - Add Dtaq to Dtaq
 * Mon Dec 18 2023 Irfan Sharif <IrfanSharif@ibm.com> - 2.4.23
