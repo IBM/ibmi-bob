@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/usr/bin/env bash
 if [[ ! -e /QSYS.LIB/${2}.LIB/${1} ]]; then
    echo "Build not successful for ${2}/${1}"
    if [[ -e /QSYS.LIB/QTEMP.LIB/${1} ]]; then
