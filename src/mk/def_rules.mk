@@ -386,9 +386,6 @@ SRVPGM_TGTRLS := $(TGTRLS)
 SRVPGM_OPTION :=
 WSCST_AUT := $(AUT)
 
-# TGTCCSID can be overwritted with each directory
-TGTCCSID = $(TGTCCSID_$($@_d)) 
-
 # Creation command parameters with variables (the ones listed at the top) for the most common ones.
 CRTCLMODFLAGS = AUT($(AUT)) DBGVIEW($(DBGVIEW)) OPTIMIZE($(OPTIMIZE)) OPTION($(OPTION)) TEXT('$(TEXT)') TGTRLS($(TGTRLS)) INCDIR($(INCDIR))
 CRTCMDFLAGS = PGM($(PGM)) VLDCKR($(VLDCKR)) PMTFILE($(PMTFILE)) HLPPNLGRP($(HLPPNLGRP)) HLPID($(HLPID)) AUT($(AUT)) ALLOW($(ALLOW)) TEXT('$(TEXT)')
@@ -414,22 +411,22 @@ CRTCBLMODFLAGS = AUT($(AUT)) DBGVIEW($(DBGVIEW)) OPTIMIZE($(OPTIMIZE)) OPTION($(
 CRTQMQRYFLAGS = AUT($(AUT)) TEXT('$(TEXT)')
 CRTSQLCIFLAGS = COMMIT($(COMMIT)) OBJTYPE($(OBJTYPE)) OUTPUT(*PRINT) TEXT('$(TEXT)') TGTRLS($(TGTRLS)) DBGVIEW($(DBGVIEW)) \
                 COMPILEOPT('INCDIR($(doublequotedINCDIR)) OPTION($(OPTION)) STGMDL($(STGMDL)) SYSIFCOPT($(SYSIFCOPT)) \
-                           TGTCCSID($(TGTCCSID)) TERASPACE($(TERASPACE)) OPTIMIZE($(OPTIMIZE)) INLINE($(INLINE))') CVTCCSID($(TGTCCSID))
+                           $(TGTCCSID_PARM) TERASPACE($(TERASPACE)) OPTIMIZE($(OPTIMIZE)) INLINE($(INLINE))') CVTCCSID($(TGTCCSID))
 CRTSQLCPPIFLAGS = COMMIT($(COMMIT)) OUTPUT(*PRINT) TEXT('$(TEXT)') TGTRLS($(TGTRLS)) DBGVIEW($(DBGVIEW)) \
 				  CVTCCSID($(TGTCCSID)) OPTION($(OPTION)) \
                   COMPILEOPT('STGMDL($(STGMDL)) SYSIFCOPT($(SYSIFCOPT)) DEFINE($(DEFINE)) OPTIMIZE($(OPTIMIZE)) INLINE($(INLINE)) \
-                  TGTCCSID($(TGTCCSID)) TERASPACE($(TERASPACE)) INCDIR($(doublequotedINCDIR))') 
+                  $(TGTCCSID_PARM) TERASPACE($(TERASPACE)) INCDIR($(doublequotedINCDIR))') 
 CRTSQLRPGIFLAGS = COMMIT($(COMMIT)) OBJTYPE($(OBJTYPE)) OPTION($(OPTION)) OUTPUT(*PRINT) TEXT('$(TEXT)') \
                   TGTRLS($(TGTRLS)) DBGVIEW($(DBGVIEW)) RPGPPOPT($(RPGPPOPT)) \
-                  COMPILEOPT('TGTCCSID($(TGTCCSID)) OPTIMIZE($(OPTIMIZE)) INCDIR($(doublequotedINCDIR))')
+                  COMPILEOPT('$(TGTCCSID_PARM) OPTIMIZE($(OPTIMIZE)) INCDIR($(doublequotedINCDIR))')
 CRTSQLCBLIFLAGS = COMMIT($(COMMIT)) OBJTYPE($(OBJTYPE)) OPTION($(OPTION)) OUTPUT(*PRINT) TEXT('$(TEXT)') \
                   TGTRLS($(TGTRLS)) DBGVIEW($(DBGVIEW)) CVTCCSID($(TGTCCSID)) \
-                  COMPILEOPT('TGTCCSID($(TGTCCSID)) OPTIMIZE($(OPTIMIZE)) INCDIR($(doublequotedINCDIR))')
+                  COMPILEOPT('$(TGTCCSID_PARM) OPTIMIZE($(OPTIMIZE)) INCDIR($(doublequotedINCDIR))')
 CRTSRVPGMFLAGS = ACTGRP($(ACTGRP)) TEXT('$(TEXT)') TGTRLS($(TGTRLS)) AUT($(AUT)) DETAIL($(DETAIL)) STGMDL($(STGMDL)) OPTION($(OPTION))
 CRTWSCSTFLAGS = AUT($(AUT)) TEXT('$(TEXT)')
-CRTBNDRPGFLAGS:= DBGVIEW($(DBGVIEW)) TGTCCSID($(TGTCCSID)) OPTION($(OPTION)) TEXT('$(TEXT)') INCDIR($(INCDIR))
-CRTBNDCBLFLAGS:= DBGVIEW($(DBGVIEW)) TGTCCSID($(TGTCCSID)) OPTION($(OPTION)) TEXT('$(TEXT)') INCDIR($(INCDIR))
-CRTBNDCFLAGS  := DBGVIEW($(DBGVIEW)) TGTCCSID($(TGTCCSID)) OPTION($(OPTION)) TEXT('$(TEXT)') INCDIR($(INCDIR))
+CRTBNDRPGFLAGS:= DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) TEXT('$(TEXT)') INCDIR($(INCDIR))
+CRTBNDCBLFLAGS:= DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) TEXT('$(TEXT)') INCDIR($(INCDIR))
+CRTBNDCFLAGS  := DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) TEXT('$(TEXT)') INCDIR($(INCDIR))
 CRTBNDCLFLAGS = AUT($(AUT)) DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) TEXT('$(TEXT)') TGTRLS($(TGTRLS)) INCDIR($(INCDIR))
 RUNSQLFLAGS:= DBGVIEW(*SOURCE) TGTRLS($(TGTRLS)) OUTPUT(*PRINT) MARGINS(1024) COMMIT($(COMMIT))
 
@@ -1081,12 +1078,13 @@ define MODULE_VARIABLES
 	$(eval STGMDL = $(moduleSTGMDL))\
 	$(eval SYSIFCOPT = $(moduleSYSIFCOPT))\
 	$(eval TERASPACE = $(moduleTERASPACE))\
-	$(eval TGTRLS = $(moduleTGTRLS))
+	$(eval TGTRLS = $(moduleTGTRLS)) \
+	$(eval TGTCCSID = $(TGTCCSID_$($@_d))) \
+	$(eval TGTCCSID_PARM = TGTCCSID($(TGTCCSID_$($@_d))))
 endef
 
 define C_TO_MODULE_RECIPE = 
 	$(MODULE_VARIABLES)
-	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating C module [$(notdir $<)]$(ECHOCCSID)")
 	$(eval crtcmd := crtcmod module($(OBJLIB)/$(basename $(@F))) srcstmf('$<') $(CRTCMODFLAGS) $(ADHOCCRTFLAGS))
 	$(eval logFile := $(LOGPATH)/$(notdir $(basename $<)).splf)
@@ -1100,7 +1098,6 @@ endef
 # spawn a job and lose the ability to get joblog info
 define CPP_TO_MODULE_RECIPE = 
 	$(MODULE_VARIABLES)
-	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating CPP module [$(notdir $<)] Note environment and library list are not set up")
 	$(eval crtcmd := crtcppmod module($(OBJLIB)/$(basename $(@F))) srcstmf('$<') $(CRTCMODFLAGS) $(ADHOCCRTFLAGS))
 	@$(PRESETUP) \
@@ -1111,7 +1108,6 @@ endef
 
 define RPGLE_TO_MODULE_RECIPE = 
 	$(MODULE_VARIABLES)\
-	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating RPG module [$(notdir $<)]$(ECHOCCSID)")
 	$(eval crtcmd := crtrpgmod module($(OBJLIB)/$(basename $(@F))) srcstmf('$<') $(CRTRPGMODFLAGS))
 	$(eval logFile := $(LOGPATH)/$(notdir $(basename $<)).splf)
@@ -1122,7 +1118,6 @@ endef
 
 define CLLE_TO_MODULE_RECIPE = 
 	$(MODULE_VARIABLES)
-	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating CL module [$(notdir $<)]$(ECHOCCSID)")
 	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTCLMOD" -p '"$(CRTCLMODFLAGS)"'")
 	$(eval logFile := $(LOGPATH)/$(notdir $(basename $<)).splf)
@@ -1133,7 +1128,6 @@ endef
 
 define SQLC_TO_MODULE_RECIPE = 
 	$(MODULE_VARIABLES)
-	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating SQLC module [$(notdir $<)]$(ECHOCCSID)")
 	$(eval crtcmd := crtsqlci obj($(OBJLIB)/$(basename $(@F))) srcstmf('$<') $(CRTSQLCIFLAGS))
 	$(eval logFile := $(LOGPATH)/$(notdir $(basename $<)).splf)
@@ -1144,7 +1138,6 @@ endef
 
 define SQLCPP_TO_MODULE_RECIPE = 
 	$(MODULE_VARIABLES)
-	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating SQLCPP module [$(notdir $<)]$(ECHOCCSID)")
 	$(eval crtcmd := crtsqlcppi obj($(OBJLIB)/$(basename $(@F))) srcstmf('$<') $(CRTSQLCPPIFLAGS))
 	$(eval logFile := $(LOGPATH)/$(notdir $(basename $<)).splf)
@@ -1155,7 +1148,6 @@ endef
 
 define SQLRPGLE_TO_MODULE_RECIPE = 
 	$(MODULE_VARIABLES)
-	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating SQLRPGLE module [$(notdir $<)]$(ECHOCCSID)")
 	$(eval crtcmd := crtsqlrpgi obj($(OBJLIB)/$(basename $(@F))) srcstmf('$<') $(CRTSQLRPGIFLAGS))
 	$(eval logFile := $(LOGPATH)/$(notdir $(basename $<)).splf)
@@ -1165,8 +1157,7 @@ define SQLRPGLE_TO_MODULE_RECIPE =
 endef
 
 define CBLLE_TO_MODULE_RECIPE =
-	$(MODULE_VARIABLES)\
-	$(eval d = $($@_d))
+	$(MODULE_VARIABLES)
 	@$(call echo_cmd,"=== Create ILE COBOL module [$(basename $@)] in $(OBJLIB)")
 	$(eval crtcmd := crtcblmod module($(OBJLIB)/$(basename $(@F))) srcstmf('$<') $(CRTCBLMODFLAGS))
 	$(eval logFile := $(LOGPATH)/$(notdir $(basename $<)).splf)
@@ -1177,7 +1168,6 @@ endef
 
 define SQLCBLLE_TO_MODULE_RECIPE = 
 	$(MODULE_VARIABLES)
-	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating SQLCBLLE module [$(notdir $<)]$(ECHOCCSID)")
 	$(eval crtcmd := crtsqlcbli obj($(OBJLIB)/$(basename $(@F))) srcstmf('$<') $(CRTSQLCBLIFLAGS))
 	$(eval logFile := $(LOGPATH)/$(notdir $(basename $<)).splf)
@@ -1194,23 +1184,24 @@ endef
 #                                        |_|              
 
 define PGM_VARIABLES = 
-$(eval ACTGRP = $(programACTGRP))
-$(eval AUT = $(programAUT))
-$(eval DBGVIEW = $(programDBGVIEW))
-$(eval DETAIL = $(programDETAIL))
-$(eval DFTACTGRP = $(programDFTACTGRP))
-$(eval OBJTYPE = $(programOBJTYPE))
-$(eval OPTION = $(programOPTION))
-$(eval RPGPPOPT = $(programRPGPPOPT))
-$(eval STGMDL = $(programSTGMDL))
-$(eval TGTRLS = $(programTGTRLS))
-$(eval INCDIR = $(programINCDIR))
-$(eval BNDSRVPGMPATH = $(basename $(filter %.SRVPGM,$(notdir $^)) $(externalsrvpgms)))
+$(eval ACTGRP = $(programACTGRP)) \
+$(eval AUT = $(programAUT)) \
+$(eval DBGVIEW = $(programDBGVIEW)) \
+$(eval DETAIL = $(programDETAIL)) \
+$(eval DFTACTGRP = $(programDFTACTGRP)) \
+$(eval OBJTYPE = $(programOBJTYPE)) \
+$(eval OPTION = $(programOPTION)) \
+$(eval RPGPPOPT = $(programRPGPPOPT)) \
+$(eval STGMDL = $(programSTGMDL)) \
+$(eval TGTRLS = $(programTGTRLS)) \
+$(eval INCDIR = $(programINCDIR)) \
+$(eval BNDSRVPGMPATH = $(basename $(filter %.SRVPGM,$(notdir $^)) $(externalsrvpgms))) \
+$(eval TGTCCSID = $(TGTCCSID_$($@_d))) \
+$(eval TGTCCSID_PARM = TGTCCSID($(TGTCCSID_$($@_d))))
 endef
 
 define SQLPRC_TO_PGM_RECIPE =
 	$(PGM_VARIABLES)
-	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating SQL PROCEDURE from Sql statement [$(notdir $<)]")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
 	$(eval logFile := $(LOGPATH)/$(notdir $(basename $<)).splf)
@@ -1221,7 +1212,6 @@ endef
 
 define SQLTRG_TO_PGM_RECIPE =
 	$(PGM_VARIABLES)
-	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating SQL TRIGGER in $(CURLIB)from Sql statement [$(notdir $<)]")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
 	$(eval logFile := $(LOGPATH)/$(notdir $(basename $<)).splf)
@@ -1233,9 +1223,8 @@ endef
 
 define PGM.RPGLE_TO_PGM_RECIPE =
 	$(PGM_VARIABLES)
-	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Create Bound RPG Program [$(basename $@)] in $(OBJLIB)")
-	$(eval crtcmd := CRTBNDRPG srcstmf('$<') PGM($(OBJLIB)/$(basename $(@F))) $(CRTBNDRPGFLAGS))
+	$(eval crtcmd := CRTBNDRPG srcstmf('$<') PGM($(OBJLIB)/$(basename $(@F))) $(CRTBNDRPGFLAGS) $(TGTCCSID_PARM))
 	$(eval logFile := $(LOGPATH)/$(notdir $(basename $<)).splf)
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" "$(PRECMD)" "$(POSTCMD)" "$(notdir $@)" "$<" "$(logFile)"> $(logFile) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
@@ -1244,7 +1233,6 @@ endef
 
 define PGM.SQLRPGLE_TO_PGM_RECIPE =
 	$(PGM_VARIABLES)
-	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Create Bound SQLRPGLE Program [$(basename $@)] in $(OBJLIB)")
 	$(eval crtcmd := CRTSQLRPGI srcstmf('$<') OBJ($(OBJLIB)/$(basename $(@F))) $(CRTSQLRPGIFLAGS))
 	$(eval logFile := $(LOGPATH)/$(notdir $(basename $<)).splf)
@@ -1255,9 +1243,8 @@ endef
 
 define PGM.C_TO_PGM_RECIPE =
 	$(PGM_VARIABLES)
-	$(eval d = $($@_d))
-	@$(call echo_cmd,"=== Create Bound RPG Program [$(basename $@)] in $(OBJLIB)")
-	$(eval crtcmd := CRTBNDC srcstmf('$<') PGM($(OBJLIB)/$(basename $(@F))) $(CRTBNDCFLAGS))
+	@$(call echo_cmd,"=== Create Bound C Program [$(basename $@)] in $(OBJLIB) $(TGTCCSID)")
+	$(eval crtcmd := CRTBNDC srcstmf('$<') PGM($(OBJLIB)/$(basename $(@F))) $(CRTBNDCFLAGS) $(TGTCCSID_PARM))
 	$(eval logFile := $(LOGPATH)/$(notdir $(basename $<)).splf)
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" "$(PRECMD)" "$(POSTCMD)" "$(notdir $@)" "$<" "$(logFile)"> $(logFile) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
@@ -1266,7 +1253,6 @@ endef
 
 define CBL_TO_PGM_RECIPE =
 	$(PGM_VARIABLES)
-	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Create COBOL Program [$(basename $@)] in $(OBJLIB)")
 	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID) -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTCBLPGM" -p '"$(CRTCBLPGMFLAGS)"'")
 	$(eval logFile := $(LOGPATH)/$(notdir $(basename $<)).splf)
@@ -1277,9 +1263,8 @@ endef
 
 define PGM.CBLLE_TO_PGM_RECIPE =
 	$(PGM_VARIABLES)
-	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Create COBOL Program [$(basename $@)] in $(OBJLIB)")
-	$(eval crtcmd := CRTBNDCBL srcstmf('$<') PGM($(OBJLIB)/$(basename $(@F))) $(CRTBNDCBLFLAGS))
+	$(eval crtcmd := CRTBNDCBL srcstmf('$<') PGM($(OBJLIB)/$(basename $(@F))) $(CRTBNDCBLFLAGS) $(TGTCCSID_PARM)) 
 	$(eval logFile := $(LOGPATH)/$(notdir $(basename $<)).splf)
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" "$(PRECMD)" "$(POSTCMD)" "$(notdir $@)" "$<" "$(logFile)"> $(logFile) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
@@ -1288,7 +1273,6 @@ endef
 
 define PGM.SQLCBLLE_TO_PGM_RECIPE =
 	$(PGM_VARIABLES)
-	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Create Bound SQLCBLLE Program [$(basename $@)] in $(OBJLIB)")
 	$(eval crtcmd := crtsqlcbli srcstmf('$<') OBJ($(OBJLIB)/$(basename $(@F))) $(CRTSQLCBLIFLAGS))
 	$(eval logFile := $(LOGPATH)/$(notdir $(basename $<)).splf)
@@ -1299,7 +1283,6 @@ endef
 
 define PGM.CLLE_TO_PGM_RECIPE =
 	$(PGM_VARIABLES)
-	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Create ILE CL Program [$(basename $@)]")
 	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTBNDCL" -p '"$(CRTBNDCLFLAGS)"'")
 	$(eval logFile := $(LOGPATH)/$(notdir $(basename $<)).splf)
@@ -1310,7 +1293,6 @@ endef
 
 define RPG_TO_PGM_RECIPE =
 	$(PGM_VARIABLES)
-	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Create RPG Program [$(basename $@)]")
 	$(eval crtcmd := "$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID) -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTRPGPGM" -p '"$(CRTRPGPGMFLAGS)"'")
 	$(eval logFile := $(LOGPATH)/$(notdir $(basename $<)).splf)
@@ -1321,7 +1303,6 @@ endef
 
 define ILEPGM_TO_PGM_RECIPE =
 	$(PGM_VARIABLES)
-	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating program [$(tgt)] from Pseudo Source [$(basename $(notdir $<))]")
 	$(eval crtcmd := $(shell $(SCRIPTSPATH)/extractPseudoSrc $< $(OBJLIB) $(basename $(@F))))
 	@$(PRESETUP) \
@@ -1330,7 +1311,6 @@ endef
 
 define MODULE_TO_PGM_RECIPE =
 	$(PGM_VARIABLES)
-	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating program [$(tgt)] from modules [$(basename $(filter %.MODULE,$(notdir $^)))] and service programs [$(basename $(filter %.SRVPGM,$(notdir $^$|)))]")
 	$(eval externalsrvpgms := $(filter %.SRVPGM,$(subst .LIB,,$(subst /QSYS.LIB/,,$|))))
 	$(eval crtcmd := crtpgm pgm($(OBJLIB)/$(basename $(@F))) module($(basename $(filter %.MODULE,$(notdir $^)))) bndsrvpgm($(if $(BNDSRVPGMPATH),$(BNDSRVPGMPATH),*NONE)) $(CRTPGMFLAGS))
