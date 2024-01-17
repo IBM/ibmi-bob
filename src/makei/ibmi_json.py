@@ -42,6 +42,8 @@ class IBMiJson:
                         tgt_ccsid = build["tgtCcsid"]
                     else:
                         tgt_ccsid = parent_ibm_i_json.build["tgt_ccsid"]
+                    # if tgt_ccsid is None:
+                    #     tgt_ccsid= "*JOB"
                     if "objlib" in build:
                         objlib = parse_all_variables(build["objlib"])
                     else:

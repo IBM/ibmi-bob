@@ -87,8 +87,7 @@ class CvtSrcPf:
             third_write = self.insert_line(file_path, METADATA_HEADER + ' ', start_comment, end_comment,
                                            write_on_line, start_column, end_column)
 
-            return first_write + second_write + third_write
-          
+            return first_write + second_write + third_write          
         return False
 
     def run(self) -> int:
@@ -108,7 +107,7 @@ class CvtSrcPf:
             src_mbr_name = self._get_src_mbr_name(src_mbr)
             src_mbr_ext = self._get_src_mbr_ext(src_mbr)
             dst_mbr_name = self._get_dst_mbr_name(src_mbr_name, src_mbr_ext, self.tolower)
-            dst_mbr_path = self._get_dst_mbr_path(dst_mbr_name, src_mbr_name, src_mbr_ext)
+            dst_mbr_path = self._get_dst_mbr_path(dst_mbr_name, src_mbr_name, src_mbr_ext, self.tolower)
 
             if self._cvr_src_mbr(src_mbr_name, srcpath, dst_mbr_name, dst_mbr_path):
                 cvt_count += 1
@@ -150,13 +149,15 @@ class CvtSrcPf:
             dst_mbr_name = dst_mbr_name.lower()
         return dst_mbr_name
 
-    def _get_dst_mbr_path(self, dst_mbr_name, src_mbr_name, src_mbr_ext) -> str:
+    def _get_dst_mbr_path(self, dst_mbr_name, src_mbr_name, src_mbr_ext, tolower: bool) -> str:
         dst_mbr_path = self.save_path / dst_mbr_name
         dups = 0
         while dst_mbr_path.exists():
             # if dst_mbr_name exists, rename it
             dups += 1
             dst_mbr_name = f"{src_mbr_name}_{dups}.{src_mbr_ext}"
+            if tolower:
+                dst_mbr_name = dst_mbr_name.lower()
             dst_mbr_path = self.save_path / dst_mbr_name
         return dst_mbr_path
 
