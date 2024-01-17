@@ -87,8 +87,7 @@ class CvtSrcPf:
             third_write = self.insert_line(file_path, METADATA_HEADER + ' ', start_comment, end_comment,
                                            write_on_line, start_column, end_column)
 
-            return first_write + second_write + third_write
-          
+            return first_write + second_write + third_write          
         return False
 
     def run(self) -> int:
