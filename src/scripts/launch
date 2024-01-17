@@ -6,7 +6,7 @@ if [ $# -lt 2 ]; then
   echo 1>&2 "$0: not enough arguments"
   echo 1>&2 "Usage: launch path_to_joblog_json command [precmd] [postcmd] Y_if_run_in_spawned_job"
   exit 2
-elif [ $# -gt 8 ]; then
+elif [ $# -gt 9 ]; then
   echo 1>&2 "$0: too many arguments"
   echo 1>&2 "Usage: launch path_to_joblog_json command [precmd] [postcmd] Y_if_run_in_spawned_job"
   exit 2
@@ -20,6 +20,7 @@ object=$5
 source=$6
 output=$7
 spawned_job=$8
+text_command=$9
 
 if [ ! -f "$joblog_json" ]; then
   echo "[]" >"$joblog_json"
@@ -62,6 +63,9 @@ if [ -n "$precmd" ]; then
 fi
 cl $cl_parms "$cmd" 
 exitCode=$?
+if [ -n "$text_command" ]; then
+  cl "$text_command" 
+fi
 if [ -n "$postcmd" ]; then
   echo ">> postcmd: ${postcmd}"
   cl $cl_parms "$postcmd"
