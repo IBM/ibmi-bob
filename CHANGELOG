@@ -1,7 +1,17 @@
-* Fri Jan 12 2023 John Weirich weirich_j@hotmail.com - 2.4.25
-- Standardize all bash script shebang lines.
-* Thu Dec 28 2023 John Weirich weirich_j@hotmail.com - 2.4.24
-- Add Dtaq to Dtaq
+* Tue Jan 16 2023 Edmund Reinhardt <edmund.reinhard@ca.ibm.com> - 2.4.23
+- support importing the member text into %TEXT comments at the top of 
+  the source stream file using `cvtsrcpf` by 
+  Irfan Sharif <IrfanSharif@ibm.com> 
+- support using this member text at the top of the source stream file
+  when compiling by Irfan Sharif <IrfanSharif@ibm.com>
+- `cvtsrcpf` now fully supports lower case parameter
+- add DBGVIEW to CRTBNDC
+- Fix empty TGTCCSID parms causing compile failures and TGTCCSID
+  not being read from `.ibmi.json`
+- Standardize all bash script shebang lines by 
+  John Weirich weirich_j@hotmail.com
+- Add support for DTAQ objects by 
+  John Weirich weirich_j@hotmail.com
 * Mon Dec 18 2023 Irfan Sharif <IrfanSharif@ibm.com> - 2.4.23
 - Fix cvtsrcpf failing to insert line when importing member
   text
