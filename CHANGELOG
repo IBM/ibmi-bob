@@ -1,3 +1,5 @@
+* Tue Jan 16 2024 Edmund Reinhardt <edmund.reinhard@ca.ibm.com> - 2.4.25
+- CRTCBLMOD does not support DEFINE() - removed it from flags
 * Tue Jan 16 2024 Edmund Reinhardt <edmund.reinhard@ca.ibm.com> - 2.4.24
 - support importing the member text into %TEXT comments at the top of 
   the source stream file using `cvtsrcpf` by 
