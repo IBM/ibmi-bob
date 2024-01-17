@@ -1,4 +1,4 @@
-* Tue Jan 16 2023 Edmund Reinhardt <edmund.reinhard@ca.ibm.com> - 2.4.23
+* Tue Jan 16 2023 Edmund Reinhardt <edmund.reinhard@ca.ibm.com> - 2.4.24
 - support importing the member text into %TEXT comments at the top of 
   the source stream file using `cvtsrcpf` by 
   Irfan Sharif <IrfanSharif@ibm.com> 
