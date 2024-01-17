@@ -111,7 +111,7 @@ LASTORDNO.DTAARA_RECIPE=DTAARA_TO_DTAARA_RECIPE
 
 def test_dtaq_recipe():
     # Test loading from a valid file
-    rules_mk = RulesMk.from_file(data_dir / "dtaq.rules.mk")
+    rules_mk = RulesMk.from_file(data_dir / "dtaq.rules.mk", data_dir)
     expected_targets = {'TRGs': [], 'DTAARAs': [], 'DTAQs': ['ORDERS.DTAQ'], 'SQLs': [], 'BNDDs': [], 'PFs': [],
                         'LFs': [], 'DSPFs': [], 'PRTFs': [], 'CMDs': [], 'MODULEs': [], 'SRVPGMs': [],
                         'PGMs': [], 'MENUs': [], 'PNLGRPs': [], 'QMQRYs': [], 'WSCSTs': [], 'MSGs': []}
