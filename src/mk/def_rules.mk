@@ -977,7 +977,7 @@ define TABLE_TO_FILE_RECIPE =
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating SQL TABLE from Sql statement [$(notdir $<)] in $(OBJLIB)")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
-	$(eval mbrtextcmd := CHGPFM FILE($(OBJLIB)/$(basename $(notdir $<))) MBR($(basename $(notdir $<))) TEXT('$(TEXT)'))
+	$(eval mbrtextcmd := CHGOBJD OBJ($(OBJLIB)/$(basename $(notdir $<))) OBJTYPE(*FILE) TEXT('$(TEXT)'))
 	$(eval logFile := $(LOGPATH)/$(notdir $(basename $<)).splf)
 	@$(PRESETUP) \
 	$(SETCURLIBTOOBJLIB) \
@@ -991,7 +991,7 @@ define VIEW_TO_FILE_RECIPE =
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating SQL VIEW from Sql statement [$(notdir $<)] in $(OBJLIB)")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
-	$(eval mbrtextcmd := CHGLFM FILE($(OBJLIB)/$(basename $(notdir $<))) MBR($(basename $(notdir $<))) TEXT('$(TEXT)'))
+	$(eval mbrtextcmd := CHGOBJD OBJ($(OBJLIB)/$(basename $(notdir $<))) OBJTYPE(*FILE) TEXT('$(TEXT)'))
 	$(eval logFile := $(LOGPATH)/$(notdir $(basename $<)).splf)
 	@$(PRESETUP) \
 	$(SETCURLIBTOOBJLIB) \
@@ -1003,7 +1003,7 @@ define SQLUDT_TO_FILE_RECIPE =
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating SQL UDT from Sql statement [$(notdir $<)] in $(OBJLIB)")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
-	$(eval mbrtextcmd := CHGPFM FILE($(OBJLIB)/$(basename $(notdir $<))) MBR($(basename $(notdir $<))) TEXT('$(TEXT)'))
+	$(eval mbrtextcmd := CHGOBJD OBJ($(OBJLIB)/$(basename $(notdir $<))) OBJTYPE(*FILE) TEXT('$(TEXT)'))
 	$(eval logFile := $(LOGPATH)/$(notdir $(basename $<)).splf)
 	@$(PRESETUP) \
 	$(SETCURLIBTOOBJLIB) \
@@ -1015,7 +1015,7 @@ define SQLALIAS_TO_FILE_RECIPE =
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating SQL ALIAS from Sql statement [$(notdir $<)] in $(OBJLIB)")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
-	$(eval mbrtextcmd := CHGPFM FILE($(OBJLIB)/$(basename $(notdir $<))) MBR($(basename $(notdir $<))) TEXT('$(TEXT)'))
+	$(eval mbrtextcmd := CHGOBJD OBJ($(OBJLIB)/$(basename $(notdir $<))) OBJTYPE(*FILE) TEXT('$(TEXT)'))
 	$(eval logFile := $(LOGPATH)/$(notdir $(basename $<)).splf)
 	@$(PRESETUP) \
 	$(SETCURLIBTOOBJLIB) \
@@ -1034,7 +1034,7 @@ define SQLSEQ_TO_DTARRA_RECIPE =
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating SQL SEQUENCE from Sql statement [$(notdir $<)] in $(OBJLIB)")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
-	$(eval mbrtextcmd := CHGPFM FILE($(OBJLIB)/$(basename $(notdir $<))) MBR($(basename $(notdir $<))) TEXT('$(TEXT)'))
+	$(eval mbrtextcmd := CHGOBJD OBJ($(OBJLIB)/$(basename $(notdir $<))) OBJTYPE(*DTAARA) TEXT('$(TEXT)'))
 	$(eval logFile := $(LOGPATH)/$(notdir $(basename $<)).splf)
 	@$(PRESETUP) \
 	$(SETCURLIBTOOBJLIB) \
@@ -1218,7 +1218,7 @@ define SQLPRC_TO_PGM_RECIPE =
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating SQL PROCEDURE from Sql statement [$(notdir $<)]")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
-	$(eval mbrtextcmd := CHGPGM PGM($(OBJLIB)/$(basename $(notdir $<))) TEXT('$(TEXT)'))
+	$(eval mbrtextcmd := CHGOBJD OBJ($(OBJLIB)/$(basename $(notdir $<))) OBJTYPE(*PGM) TEXT('$(TEXT)'))
 	$(eval logFile := $(LOGPATH)/$(notdir $(basename $<)).splf)
 	@$(PRESETUP) \
 	$(SETCURLIBTOOBJLIB) \
@@ -1230,7 +1230,7 @@ define SQLTRG_TO_PGM_RECIPE =
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating SQL TRIGGER in $(CURLIB)from Sql statement [$(notdir $<)]")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
-	$(eval mbrtextcmd := CHGPGM PGM($(OBJLIB)/$(basename $(notdir $<))) TEXT('$(TEXT)'))
+	$(eval mbrtextcmd :=  CHGOBJD OBJ($(OBJLIB)/$(basename $(notdir $<))) OBJTYPE(*PGM) TEXT('$(TEXT)'))
 	$(eval logFile := $(LOGPATH)/$(notdir $(basename $<)).splf)
 	@$(PRESETUP) \
 	$(SETCURLIBTOOBJLIB) \
@@ -1394,7 +1394,7 @@ define SQLUDF_TO_SRVPGM_RECIPE =
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating SQL UDF from Sql statement [$(notdir $<)]")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
-	$(eval mbrtextcmd := CHGPFM FILE($(OBJLIB)/$(basename $(notdir $<))) MBR($(basename $(notdir $<))) TEXT('$(TEXT)'))
+	$(eval mbrtextcmd := CHGOBJD OBJ($(OBJLIB)/$(basename $(notdir $<))) OBJTYPE(*SRVPGM) TEXT('$(TEXT)'))
 	$(eval logFile := $(LOGPATH)/$(notdir $(basename $<)).splf)
 	@$(PRESETUP) \
 	$(SETCURLIBTOOBJLIB) \
