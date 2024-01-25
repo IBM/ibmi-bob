@@ -29,8 +29,18 @@ fi
 tmppipe=$(mktemp)
 exitCode=0
 echo ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+
 [[ ! -z "$curlib" ]] && liblist -c "$curlib"
-[[ ! -z "$preUsrlibl" ]] && liblist -af $preUsrlibl
+
+# Adding preUsrlibl to liblist in reverse to preserve correct order
+if [[ ! -z "$preUsrlibl" ]]; then
+  read -a preUsrliblArray <<< "$preUsrlibl"
+
+  for ((i=${#preUsrliblArray[@]}-1; i>=0; i--)); do
+      liblist -af ${preUsrliblArray[i]}
+  done
+fi
+
 [[ ! -z "$postUsrlibl" ]] && liblist -al $postUsrlibl
 
 if [ ! -z "$tmpCurlib" ]; then
