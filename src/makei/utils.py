@@ -97,10 +97,15 @@ def parse_all_variables(input_str: str) -> str:
     >>> parse_all_variables("&dependency_dir/includes")
     'dep_dir_value/includes'
     """
-    parts = input_str.split("/")
+    slashList = input_str.split("/")
     result = ""
-    for part in parts:
-        result = result + parse_variable(part) + "/"
+    for slashPart in slashList:
+        spaceList = slashPart.split(" ")
+        
+        for spacePart in spaceList:
+            result = result + parse_variable(spacePart) + ' '
+
+        result = result[:-1] + "/"
     result = result[:-1]
     return result
 
