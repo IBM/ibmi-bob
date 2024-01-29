@@ -1,4 +1,4 @@
-* Tue Jan 30 2024 Edmund Reinhardt <edmund.reinhard@ca.ibm.com> - 2.4.26
+* Mon Jan 29 2024 Edmund Reinhardt <edmund.reinhard@ca.ibm.com> - 2.4.26
 * Add support for OPM CL  
 * Support variable replacement in setIBMiEnvCmd in iproj.json
 * Fix reversing of libraries in preUsrlibl in iproj.json
