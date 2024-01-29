@@ -1,3 +1,10 @@
+* Tue Jan 30 2024 Edmund Reinhardt <edmund.reinhard@ca.ibm.com> - 2.4.26
+* Add support for OPM CL  
+* Support variable replacement in setIBMiEnvCmd in iproj.json
+* Fix reversing of libraries in preUsrlibl in iproj.json
+* Respect single quotes on compile for objects using crtfrmstmf
+* Fix remaining issues with TGTCCSID appearing blank
+- CRTCBLMOD does not support DEFINE() - removed it from flags
 * Tue Jan 16 2024 Edmund Reinhardt <edmund.reinhard@ca.ibm.com> - 2.4.25
 - CRTCBLMOD does not support DEFINE() - removed it from flags
 * Tue Jan 16 2024 Edmund Reinhardt <edmund.reinhard@ca.ibm.com> - 2.4.24
