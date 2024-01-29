@@ -101,7 +101,6 @@ def parse_all_variables(input_str: str) -> str:
     result = ""
     for slashPart in slashList:
         spaceList = slashPart.split(" ")
-        
         for spacePart in spaceList:
             result = result + parse_variable(spacePart) + ' '
 
