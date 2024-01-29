@@ -203,10 +203,16 @@ ifndef VLDCKR
 VLDCKR := 
 endif
 
+TGTCCSID = $(TGTCCSID_$($@_d))
+
 # Object-type-specific defaults.  Not used directly, but copied to the standard ones above and then
 # inserted into the compile commands.  Each variable here should also precede its corresponding pattern
 # rule as a pattern-specific variable. Change these to alter compile defaults for an entire type of
 # object.
+BNDC_DBGVIEW := $(DBGVIEW)
+BNDC_INCDIR := $(INCDIR)
+BNDC_OPTION := $(OPTION)
+
 BNDCL_ACTGRP := $(ACTGRP)
 BNDCL_AUT := $(AUT)
 BNDCL_DBGVIEW := $(DBGVIEW)
@@ -411,22 +417,22 @@ CRTCBLMODFLAGS = AUT($(AUT)) DBGVIEW($(DBGVIEW)) OPTIMIZE($(OPTIMIZE)) OPTION($(
 CRTQMQRYFLAGS = AUT($(AUT)) TEXT('$(TEXT)')
 CRTSQLCIFLAGS = COMMIT($(COMMIT)) OBJTYPE($(OBJTYPE)) OUTPUT(*PRINT) TEXT('$(TEXT)') TGTRLS($(TGTRLS)) DBGVIEW($(DBGVIEW)) \
                 COMPILEOPT('INCDIR($(doublequotedINCDIR)) OPTION($(OPTION)) STGMDL($(STGMDL)) SYSIFCOPT($(SYSIFCOPT)) \
-                           $(TGTCCSID_PARM) TERASPACE($(TERASPACE)) OPTIMIZE($(OPTIMIZE)) INLINE($(INLINE))') CVTCCSID($(TGTCCSID))
+                           TGTCCSID($(TGTCCSID))  TERASPACE($(TERASPACE)) OPTIMIZE($(OPTIMIZE)) INLINE($(INLINE))') CVTCCSID($(TGTCCSID))
 CRTSQLCPPIFLAGS = COMMIT($(COMMIT)) OUTPUT(*PRINT) TEXT('$(TEXT)') TGTRLS($(TGTRLS)) DBGVIEW($(DBGVIEW)) \
 				  CVTCCSID($(TGTCCSID)) OPTION($(OPTION)) \
                   COMPILEOPT('STGMDL($(STGMDL)) SYSIFCOPT($(SYSIFCOPT)) DEFINE($(DEFINE)) OPTIMIZE($(OPTIMIZE)) INLINE($(INLINE)) \
-                  $(TGTCCSID_PARM) TERASPACE($(TERASPACE)) INCDIR($(doublequotedINCDIR))') 
+                  TGTCCSID($(TGTCCSID))  TERASPACE($(TERASPACE)) INCDIR($(doublequotedINCDIR))') 
 CRTSQLRPGIFLAGS = COMMIT($(COMMIT)) OBJTYPE($(OBJTYPE)) OPTION($(OPTION)) OUTPUT(*PRINT) TEXT('$(TEXT)') \
                   TGTRLS($(TGTRLS)) DBGVIEW($(DBGVIEW)) RPGPPOPT($(RPGPPOPT)) \
-                  COMPILEOPT('$(TGTCCSID_PARM) OPTIMIZE($(OPTIMIZE)) INCDIR($(doublequotedINCDIR))')
+                  COMPILEOPT('TGTCCSID($(TGTCCSID)) OPTIMIZE($(OPTIMIZE)) INCDIR($(doublequotedINCDIR))')
 CRTSQLCBLIFLAGS = COMMIT($(COMMIT)) OBJTYPE($(OBJTYPE)) OPTION($(OPTION)) OUTPUT(*PRINT) TEXT('$(TEXT)') \
                   TGTRLS($(TGTRLS)) DBGVIEW($(DBGVIEW)) CVTCCSID($(TGTCCSID)) \
-                  COMPILEOPT('$(TGTCCSID_PARM) OPTIMIZE($(OPTIMIZE)) INCDIR($(doublequotedINCDIR))')
+                  COMPILEOPT('TGTCCSID($(TGTCCSID)) OPTIMIZE($(OPTIMIZE)) INCDIR($(doublequotedINCDIR))')
 CRTSRVPGMFLAGS = ACTGRP($(ACTGRP)) TEXT('$(TEXT)') TGTRLS($(TGTRLS)) AUT($(AUT)) DETAIL($(DETAIL)) STGMDL($(STGMDL)) OPTION($(OPTION))
 CRTWSCSTFLAGS = AUT($(AUT)) TEXT('$(TEXT)')
-CRTBNDRPGFLAGS:= DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) TEXT('$(TEXT)') INCDIR($(INCDIR))
-CRTBNDCBLFLAGS:= DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) TEXT('$(TEXT)') INCDIR($(INCDIR))
-CRTBNDCFLAGS  := DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) TEXT('$(TEXT)') INCDIR($(INCDIR))
+CRTBNDRPGFLAGS = TGTCCSID($(TGTCCSID)) DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) TEXT('$(TEXT)') INCDIR($(INCDIR))
+CRTBNDCBLFLAGS = TGTCCSID($(TGTCCSID)) DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) TEXT('$(TEXT)') INCDIR($(INCDIR))
+CRTBNDCFLAGS = TGTCCSID($(TGTCCSID)) DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) TEXT('$(TEXT)') INCDIR($(INCDIR))
 CRTBNDCLFLAGS = AUT($(AUT)) DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) TEXT('$(TEXT)') TGTRLS($(TGTRLS)) INCDIR($(INCDIR))
 RUNSQLFLAGS:= DBGVIEW(*SOURCE) TGTRLS($(TGTRLS)) OUTPUT(*PRINT) MARGINS(1024) COMMIT($(COMMIT))
 
@@ -786,6 +792,8 @@ programAUT = $(strip \
 	$(if $(filter %.module,$<),$(PGM_AUT), \
 	UNKNOWN_FILE_TYPE)))))))))
 programDBGVIEW = $(strip \
+	$(if $(filter %.C,$<),$(BNDC_DBGVIEW), \
+	$(if $(filter %.c,$<),$(BNDC_DBGVIEW), \
 	$(if $(filter %.CLLE,$<),$(BNDCL_DBGVIEW), \
 	$(if $(filter %.clle,$<),$(BNDCL_DBGVIEW), \
 	$(if $(filter %.RPGLE,$<),$(BNDRPG_DBGVIEW), \
@@ -798,7 +806,7 @@ programDBGVIEW = $(strip \
 	$(if $(filter %.sqlrpgle,$<),$(SQLRPGIPGM_DBGVIEW), \
 	$(if $(filter %.SQLCBLLE,$<),$(SQLCBLIPGM_DBGVIEW), \
 	$(if $(filter %.sqlcblle,$<),$(SQLCBLIPGM_DBGVIEW), \
-	UNKNOWN_FILE_TYPE)))))))))))))
+	UNKNOWN_FILE_TYPE)))))))))))))))
 programDETAIL = $(strip \
 	$(if $(filter %.MODULE,$<),$(PGM_DETAIL), \
 	$(if $(filter %.module,$<),$(PGM_DETAIL), \
@@ -820,6 +828,8 @@ programOBJTYPE = $(strip \
 	$(if $(filter %.sqlcblle,$<),$(SQLCBLIPGM_OBJTYPE), \
 	UNKNOWN_FILE_TYPE)))))))
 programOPTION = $(strip \
+	$(if $(filter %.C,$<),$(BNDC_OPTION), \
+	$(if $(filter %.c,$<),$(BNDC_OPTION), \
 	$(if $(filter %.CLLE,$<),$(BNDCL_OPTION), \
 	$(if $(filter %.clle,$<),$(BNDCL_OPTION), \
 	$(if $(filter %.CBLLE,$<),$(BNDCBL_OPTION), \
@@ -838,7 +848,7 @@ programOPTION = $(strip \
 	$(if $(filter %.cbl,$<),$(CBL_OPTION), \
 	$(if $(filter %.RPG,$<),$(RPG_OPTION), \
 	$(if $(filter %.rpg,$<),$(RPG_OPTION), \
-	UNKNOWN_FILE_TYPE)))))))))))))))))))
+	UNKNOWN_FILE_TYPE)))))))))))))))))))))
 programRPGPPOPT = $(strip \
 	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIPGM_RPGPPOPT), \
 	$(if $(filter %.sqlrpgle,$<),$(SQLRPGIPGM_RPGPPOPT), \
@@ -864,6 +874,8 @@ programTGTRLS = $(strip \
 	$(if $(filter %.module,$<),$(PGM_TGTRLS), \
 	UNKNOWN_FILE_TYPE)))))))))))))))
 programINCDIR = $(strip \
+	$(if $(filter %.C,$<),$(BNDC_INCDIR), \
+	$(if $(filter %.c,$<),$(BNDC_INCDIR), \
 	$(if $(filter %.CLLE,$<),$(BNDCL_INCDIR), \
 	$(if $(filter %.clle,$<),$(BNDCL_INCDIR), \
 	$(if $(filter %.RPGLE,$<),$(BNDRPG_INCDIR), \
@@ -874,7 +886,7 @@ programINCDIR = $(strip \
 	$(if $(filter %.sqlc,$<),$(SQLCIPGM_INCDIR), \
 	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIPGM_INCDIR), \
 	$(if $(filter %.sqlrpgle,$<),$(SQLRPGIPGM_INCDIR), \
-	UNKNOWN_FILE_TYPE)))))))))))
+	UNKNOWN_FILE_TYPE)))))))))))))
 
 
 #    ____ __  __ ____    ____           _                 
@@ -1083,9 +1095,7 @@ define MODULE_VARIABLES
 	$(eval STGMDL = $(moduleSTGMDL))\
 	$(eval SYSIFCOPT = $(moduleSYSIFCOPT))\
 	$(eval TERASPACE = $(moduleTERASPACE))\
-	$(eval TGTRLS = $(moduleTGTRLS)) \
-	$(eval TGTCCSID = $(TGTCCSID_$($@_d))) \
-	$(eval TGTCCSID_PARM = TGTCCSID($(TGTCCSID_$($@_d))))
+	$(eval TGTRLS = $(moduleTGTRLS))
 endef
 
 define C_TO_MODULE_RECIPE = 
@@ -1200,9 +1210,7 @@ $(eval RPGPPOPT = $(programRPGPPOPT)) \
 $(eval STGMDL = $(programSTGMDL)) \
 $(eval TGTRLS = $(programTGTRLS)) \
 $(eval INCDIR = $(programINCDIR)) \
-$(eval BNDSRVPGMPATH = $(basename $(filter %.SRVPGM,$(notdir $^)) $(externalsrvpgms))) \
-$(eval TGTCCSID = $(TGTCCSID_$($@_d))) \
-$(eval TGTCCSID_PARM = TGTCCSID($(TGTCCSID_$($@_d))))
+$(eval BNDSRVPGMPATH = $(basename $(filter %.SRVPGM,$(notdir $^)) $(externalsrvpgms)))
 endef
 
 define SQLPRC_TO_PGM_RECIPE =
@@ -1231,7 +1239,7 @@ endef
 define PGM.RPGLE_TO_PGM_RECIPE =
 	$(PGM_VARIABLES)
 	@$(call echo_cmd,"=== Create Bound RPG Program [$(basename $@)] in $(OBJLIB)")
-	$(eval crtcmd := CRTBNDRPG srcstmf('$<') PGM($(OBJLIB)/$(basename $(@F))) $(CRTBNDRPGFLAGS) $(TGTCCSID_PARM))
+	$(eval crtcmd := CRTBNDRPG srcstmf('$<') PGM($(OBJLIB)/$(basename $(@F))) $(CRTBNDRPGFLAGS))
 	$(eval logFile := $(LOGPATH)/$(notdir $(basename $<)).splf)
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" "$(PRECMD)" "$(POSTCMD)" "$(notdir $@)" "$<" "$(logFile)"> $(logFile) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
@@ -1250,8 +1258,8 @@ endef
 
 define PGM.C_TO_PGM_RECIPE =
 	$(PGM_VARIABLES)
-	@$(call echo_cmd,"=== Create Bound C Program [$(basename $@)] in $(OBJLIB) $(TGTCCSID)")
-	$(eval crtcmd := CRTBNDC srcstmf('$<') PGM($(OBJLIB)/$(basename $(@F))) $(CRTBNDCFLAGS) $(TGTCCSID_PARM))
+	@$(call echo_cmd,"=== Create Bound C Program [$(basename $@)] in $(OBJLIB)")
+	$(eval crtcmd := CRTBNDC srcstmf('$<') PGM($(OBJLIB)/$(basename $(@F))) $(CRTBNDCFLAGS))
 	$(eval logFile := $(LOGPATH)/$(notdir $(basename $<)).splf)
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" "$(PRECMD)" "$(POSTCMD)" "$(notdir $@)" "$<" "$(logFile)"> $(logFile) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
@@ -1271,7 +1279,7 @@ endef
 define PGM.CBLLE_TO_PGM_RECIPE =
 	$(PGM_VARIABLES)
 	@$(call echo_cmd,"=== Create COBOL Program [$(basename $@)] in $(OBJLIB)")
-	$(eval crtcmd := CRTBNDCBL srcstmf('$<') PGM($(OBJLIB)/$(basename $(@F))) $(CRTBNDCBLFLAGS) $(TGTCCSID_PARM)) 
+	$(eval crtcmd := CRTBNDCBL srcstmf('$<') PGM($(OBJLIB)/$(basename $(@F))) $(CRTBNDCBLFLAGS)) 
 	$(eval logFile := $(LOGPATH)/$(notdir $(basename $<)).splf)
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" "$(PRECMD)" "$(POSTCMD)" "$(notdir $@)" "$<" "$(logFile)"> $(logFile) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
