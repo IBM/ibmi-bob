@@ -14,6 +14,7 @@ from makei.utils import format_datetime, objlib_to_path, validate_ccsid, make_in
 COMMAND_MAP = {'CRTCMD': 'CMD',
                'CRTBNDCL': 'PGM',
                'CRTCLMOD': 'MODULE',
+               'CRTCLPGM': 'PGM',
                'CRTDSPF': 'FILE',
                'CRTPRTF': 'FILE',
                'CRTLF': 'FILE',
