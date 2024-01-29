@@ -314,6 +314,7 @@ PGM_TGTRLS := $(TGTRLS)
 CBL_OPTION := *SRCDBG
 CBL_INCDIR := $(INCDIR)
 RPG_OPTION := *SRCDBG
+CL_OPTION := *SRCDBG
 
 PRTF_AUT := $(AUT)
 PRTF_OPTION := *EVENTF *SRC *LIST
@@ -434,6 +435,7 @@ CRTBNDRPGFLAGS = TGTCCSID($(TGTCCSID)) DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) TEX
 CRTBNDCBLFLAGS = TGTCCSID($(TGTCCSID)) DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) TEXT('$(TEXT)') INCDIR($(INCDIR))
 CRTBNDCFLAGS = TGTCCSID($(TGTCCSID)) DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) TEXT('$(TEXT)') INCDIR($(INCDIR))
 CRTBNDCLFLAGS = AUT($(AUT)) DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) TEXT('$(TEXT)') TGTRLS($(TGTRLS)) INCDIR($(INCDIR))
+CRTCLPGMFLAGS = OPTION($(OPTION)) TEXT('$(TEXT)')
 RUNSQLFLAGS:= DBGVIEW(*SOURCE) TGTRLS($(TGTRLS)) OUTPUT(*PRINT) MARGINS(1024) COMMIT($(COMMIT))
 
 # Extra command string for adhoc addition of extra parameters to a creation command.
@@ -848,7 +850,9 @@ programOPTION = $(strip \
 	$(if $(filter %.cbl,$<),$(CBL_OPTION), \
 	$(if $(filter %.RPG,$<),$(RPG_OPTION), \
 	$(if $(filter %.rpg,$<),$(RPG_OPTION), \
-	UNKNOWN_FILE_TYPE)))))))))))))))))))))
+	$(if $(filter %.CLP,$<),$(CL_OPTION), \
+	$(if $(filter %.clp,$<),$(CL_OPTION), \
+	UNKNOWN_FILE_TYPE)))))))))))))))))))))))
 programRPGPPOPT = $(strip \
 	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIPGM_RPGPPOPT), \
 	$(if $(filter %.sqlrpgle,$<),$(SQLRPGIPGM_RPGPPOPT), \
@@ -1303,6 +1307,16 @@ define PGM.CLLE_TO_PGM_RECIPE =
 	$(eval logFile := $(LOGPATH)/$(notdir $(basename $<)).splf)
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTBNDCL" -p "$(CRTBNDCLFLAGS)" --save-joblog "$(JOBLOGFILE)" --precmd="$(PRECMD)" --postcmd="$(POSTCMD)" --output="$(logFile)" > $(logFile) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
+	@$(call EVFEVENT_DOWNLOAD,$(basename $(@F)).evfevent)
+endef
+
+define CLP_TO_PGM_RECIPE =
+	$(PGM_VARIABLES)
+	@$(call echo_cmd,"=== Create OPM CL Program [$(basename $@)]")
+	$(eval crtcmd := $(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTCLPGM" -p $(CRTCLPGMFLAGS))
+	$(eval logFile := $(LOGPATH)/$(notdir $(basename $<)).splf)
+	@$(PRESETUP) \
+	$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTCLPGM" -p "$(CRTCLPGMFLAGS)" --save-joblog "$(JOBLOGFILE)" --precmd="$(PRECMD)" --postcmd="$(POSTCMD)" --output="$(logFile)" > $(logFile) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
 	@$(call EVFEVENT_DOWNLOAD,$(basename $(@F)).evfevent)
 endef
 
