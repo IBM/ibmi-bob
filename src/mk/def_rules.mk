@@ -209,6 +209,10 @@ TGTCCSID = $(TGTCCSID_$($@_d))
 # inserted into the compile commands.  Each variable here should also precede its corresponding pattern
 # rule as a pattern-specific variable. Change these to alter compile defaults for an entire type of
 # object.
+BNDC_DBGVIEW := $(DBGVIEW)
+BNDC_INCDIR := $(INCDIR)
+BNDC_OPTION := $(OPTION)
+
 BNDCL_ACTGRP := $(ACTGRP)
 BNDCL_AUT := $(AUT)
 BNDCL_DBGVIEW := $(DBGVIEW)
@@ -428,7 +432,7 @@ CRTSRVPGMFLAGS = ACTGRP($(ACTGRP)) TEXT('$(TEXT)') TGTRLS($(TGTRLS)) AUT($(AUT))
 CRTWSCSTFLAGS = AUT($(AUT)) TEXT('$(TEXT)')
 CRTBNDRPGFLAGS = TGTCCSID($(TGTCCSID)) DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) TEXT('$(TEXT)') INCDIR($(INCDIR))
 CRTBNDCBLFLAGS = TGTCCSID($(TGTCCSID)) DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) TEXT('$(TEXT)') INCDIR($(INCDIR))
-CRTBNDCFLAGS   = TGTCCSID($(TGTCCSID)) DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) TEXT('$(TEXT)') INCDIR($(INCDIR))
+CRTBNDCFLAGS = TGTCCSID($(TGTCCSID)) DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) TEXT('$(TEXT)') INCDIR($(INCDIR))
 CRTBNDCLFLAGS = AUT($(AUT)) DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) TEXT('$(TEXT)') TGTRLS($(TGTRLS)) INCDIR($(INCDIR))
 RUNSQLFLAGS:= DBGVIEW(*SOURCE) TGTRLS($(TGTRLS)) OUTPUT(*PRINT) MARGINS(1024) COMMIT($(COMMIT))
 
@@ -788,6 +792,8 @@ programAUT = $(strip \
 	$(if $(filter %.module,$<),$(PGM_AUT), \
 	UNKNOWN_FILE_TYPE)))))))))
 programDBGVIEW = $(strip \
+	$(if $(filter %.C,$<),$(BNDC_DBGVIEW), \
+	$(if $(filter %.c,$<),$(BNDC_DBGVIEW), \
 	$(if $(filter %.CLLE,$<),$(BNDCL_DBGVIEW), \
 	$(if $(filter %.clle,$<),$(BNDCL_DBGVIEW), \
 	$(if $(filter %.RPGLE,$<),$(BNDRPG_DBGVIEW), \
@@ -800,7 +806,7 @@ programDBGVIEW = $(strip \
 	$(if $(filter %.sqlrpgle,$<),$(SQLRPGIPGM_DBGVIEW), \
 	$(if $(filter %.SQLCBLLE,$<),$(SQLCBLIPGM_DBGVIEW), \
 	$(if $(filter %.sqlcblle,$<),$(SQLCBLIPGM_DBGVIEW), \
-	UNKNOWN_FILE_TYPE)))))))))))))
+	UNKNOWN_FILE_TYPE)))))))))))))))
 programDETAIL = $(strip \
 	$(if $(filter %.MODULE,$<),$(PGM_DETAIL), \
 	$(if $(filter %.module,$<),$(PGM_DETAIL), \
@@ -822,6 +828,8 @@ programOBJTYPE = $(strip \
 	$(if $(filter %.sqlcblle,$<),$(SQLCBLIPGM_OBJTYPE), \
 	UNKNOWN_FILE_TYPE)))))))
 programOPTION = $(strip \
+	$(if $(filter %.C,$<),$(BNDC_OPTION), \
+	$(if $(filter %.c,$<),$(BNDC_OPTION), \
 	$(if $(filter %.CLLE,$<),$(BNDCL_OPTION), \
 	$(if $(filter %.clle,$<),$(BNDCL_OPTION), \
 	$(if $(filter %.CBLLE,$<),$(BNDCBL_OPTION), \
@@ -840,7 +848,7 @@ programOPTION = $(strip \
 	$(if $(filter %.cbl,$<),$(CBL_OPTION), \
 	$(if $(filter %.RPG,$<),$(RPG_OPTION), \
 	$(if $(filter %.rpg,$<),$(RPG_OPTION), \
-	UNKNOWN_FILE_TYPE)))))))))))))))))))
+	UNKNOWN_FILE_TYPE)))))))))))))))))))))
 programRPGPPOPT = $(strip \
 	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIPGM_RPGPPOPT), \
 	$(if $(filter %.sqlrpgle,$<),$(SQLRPGIPGM_RPGPPOPT), \
@@ -866,6 +874,8 @@ programTGTRLS = $(strip \
 	$(if $(filter %.module,$<),$(PGM_TGTRLS), \
 	UNKNOWN_FILE_TYPE)))))))))))))))
 programINCDIR = $(strip \
+	$(if $(filter %.C,$<),$(BNDC_INCDIR), \
+	$(if $(filter %.c,$<),$(BNDC_INCDIR), \
 	$(if $(filter %.CLLE,$<),$(BNDCL_INCDIR), \
 	$(if $(filter %.clle,$<),$(BNDCL_INCDIR), \
 	$(if $(filter %.RPGLE,$<),$(BNDRPG_INCDIR), \
@@ -876,7 +886,7 @@ programINCDIR = $(strip \
 	$(if $(filter %.sqlc,$<),$(SQLCIPGM_INCDIR), \
 	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIPGM_INCDIR), \
 	$(if $(filter %.sqlrpgle,$<),$(SQLRPGIPGM_INCDIR), \
-	UNKNOWN_FILE_TYPE)))))))))))
+	UNKNOWN_FILE_TYPE)))))))))))))
 
 
 #    ____ __  __ ____    ____           _                 
@@ -1248,7 +1258,7 @@ endef
 
 define PGM.C_TO_PGM_RECIPE =
 	$(PGM_VARIABLES)
-	@$(call echo_cmd,"=== Create Bound C Program [$(basename $@)] in $(OBJLIB) $(TGTCCSID)")
+	@$(call echo_cmd,"=== Create Bound C Program [$(basename $@)] in $(OBJLIB)")
 	$(eval crtcmd := CRTBNDC srcstmf('$<') PGM($(OBJLIB)/$(basename $(@F))) $(CRTBNDCFLAGS))
 	$(eval logFile := $(LOGPATH)/$(notdir $(basename $<)).splf)
 	@$(PRESETUP) \
