@@ -155,7 +155,7 @@ MEMBER_TEXT_LINES = 15
 _start_column = 7
 _end_column = 72
 C_STYLE_COMMENTS = (
-    {"CMD","CMDSRC", "C", "CPP", "CLLE", "CLP", "SQLC", "SQLCPP", "PGM.C", "PGM.CLLE", "BND",
+    {"CMD", "CMDSRC", "C", "CPP", "CLLE", "CLP", "SQLC", "SQLCPP", "PGM.C", "PGM.CLLE", "BND",
         "ILESRVPGM", "BNDDIR", "DTAARA", "SYSTRG", "MSGF"},
     {
         "style_type": "C",
