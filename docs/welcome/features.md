@@ -27,7 +27,7 @@ These IBM i source types can be compiled directly from the IFS
 
 | Object Type | File Extension                                                        |
 | :---------- | :-------------------------------------------------------------------- |
-| *CMD        | .CMDSRC                                                               |
+| *CMD        | .CMD                                                                  |
 | *MODULE     | .RPGLE, .CLLE, .C, .SQLC, .CPP, .SQLCPP, .SQLRPGLE, .CBLLE, .SQLCBLLE |
 | *PGM        | .PGM.RPGLE, .PGM.SQLRPGLE, .PGM.C, .PGM.CBLLE, .PGM.SQLCBLLE          |
 | *SRVPGM     | .BND                                                                  |
@@ -44,7 +44,7 @@ These older IBM i source types are compiled directly from the IFS using the CRTF
 | Object Type | File Extension                      |
 | :---------- | :---------------------------------- |
 | *FILE       | .DSPF, .LF, .PF, .PRTF              |
-| *MENU       | .MENU                               |
+| *MENU       | .MENUSRC                            |
 | *MODULE     | .CLLE                               |
 | *PGM        | .RPG, .PGM.CLLE                     |
 | *PNLGRP     | .PNLGRPSRC                          |
