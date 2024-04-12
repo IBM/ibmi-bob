@@ -1,3 +1,8 @@
+* Fri Apr 12 2024 Edmund Reinhardt <edmund.reinhard@ca.ibm.com> - 2.4.27
+- Support .CMD for pseudo-source for command objects as well as .CMDSRC
+- By requiring 3.9 versions of python and the db2 interface, avoid 
+  mismatched level errors.  Using generic python3 was too generic and
+  allowed mismatches between db2 interface and base python
 * Mon Jan 29 2024 Edmund Reinhardt <edmund.reinhard@ca.ibm.com> - 2.4.26
 - Add support for OPM CL  
 - Support variable replacement in setIBMiEnvCmd in iproj.json
