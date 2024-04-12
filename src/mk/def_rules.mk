@@ -915,7 +915,21 @@ define CMDSRC_TO_CMD_RECIPE =
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" "$(PRECMD)" "$(POSTCMD)" "$(notdir $@)" "$<" $(logFile)> $(logFile) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@);
 endef
-
+define CMD_TO_CMD_RECIPE = 
+	$(eval AUT = $(CMD_AUT))
+	$(eval ALLOW = $(CMD_ALLOW))
+	$(eval HLPID = $(CMD_HLPID))
+	$(eval HLPPNLGRP = $(CMD_HLPPNLGRP))
+    $(eval PGM = $(OBJLIB)/$(CMD_PGM))
+	$(eval PMTFILE = $(CMD_PMTFILE))
+	$(eval VLDCKR = $(CMD_VLDCKR))
+	$(eval d = $($@_d))
+	@$(call echo_cmd,"=== Creating command [$(notdir $<)] in $(OBJLIB)")
+	$(eval crtcmd := CRTCMD CMD($(OBJLIB)/$(basename $(@F))) srcstmf('$<') $(CRTCMDFLAGS))
+	$(eval logFile := $(LOGPATH)/$(notdir $(basename $<)).splf)
+	@$(PRESETUP) \
+	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" "$(PRECMD)" "$(POSTCMD)" "$(notdir $@)" "$<" $(logFile)> $(logFile) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@);
+endef
 
 
 

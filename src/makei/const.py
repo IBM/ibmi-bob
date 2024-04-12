@@ -40,6 +40,7 @@ FILE_TARGETGROUPS_MAPPING = {
     "PGM.C": "PGM",
     "PGM.SQLCBLLE": "PGM",
     "CMDSRC": "CMD",
+    "CMD": "CMD",
     "DSPF": "DSPF",
     "LF": "LF",
     "PF": "PF",
@@ -105,6 +106,7 @@ FILE_TARGET_MAPPING = {
     "PGM.CBLLE": "PGM",
     "PGM.SQLCBLLE": "PGM",
     "CMDSRC": "CMD",
+    "CMD": "CMD",
     "DSPF": "FILE",
     "LF": "FILE",
     "PF": "FILE",
@@ -153,7 +155,7 @@ MEMBER_TEXT_LINES = 15
 _start_column = 7
 _end_column = 72
 C_STYLE_COMMENTS = (
-    {"CMDSRC", "C", "CPP", "CLLE", "CLP", "SQLC", "SQLCPP", "PGM.C", "PGM.CLLE", "BND",
+    {"CMD","CMDSRC", "C", "CPP", "CLLE", "CLP", "SQLC", "SQLCPP", "PGM.C", "PGM.CLLE", "BND",
         "ILESRVPGM", "BNDDIR", "DTAARA", "SYSTRG", "MSGF"},
     {
         "style_type": "C",
