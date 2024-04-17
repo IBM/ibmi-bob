@@ -66,5 +66,4 @@ jobs:
         with:
           tag_name: ${{ github.ref }}
           name: Release ${{ github.ref }}
-        files: |
-         bob.rpm
+        files: bob.rpm
