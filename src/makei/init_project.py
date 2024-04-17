@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python39
 
 # Licensed Materials - Property of IBM
 # 57XX-XXX
