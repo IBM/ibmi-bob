@@ -59,23 +59,12 @@ jobs:
       - name: Cleanup remote build dir
         if: always()
         run: $ssh_command "rm -fr $remote_build_dir"
-      - name: Create the release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Rename RPM before attaching
+        run: mv ${{ steps.find_rpm.outputs.RPM_FILE_PATH }} bob.rpm
+      - name: Create the tag and release
+        uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          draft: false
-          prerelease: false
-      - name: Upload RPM file to release
-        id: upload-release-asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ steps.find_rpm.outputs.RPM_FILE_PATH }}
-          asset_name: bob.rpm
-          asset_content_type: application/octet-stream
+          name: Release ${{ github.ref }}
+        files: |
+         bob.rpm
