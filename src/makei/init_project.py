@@ -1,10 +1,6 @@
-#!/usr/bin/env python39
+#!/usr/bin/env python3.9
 
-# Licensed Materials - Property of IBM
-# 57XX-XXX
-# (c) Copyright IBM Corp. 2021
-
-"""This module is """
+"""This module is used to create an iproj.json """
 
 import json
 import re

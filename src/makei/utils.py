@@ -1,8 +1,4 @@
-#!/usr/bin/env python39
-
-# Licensed Materials - Property of IBM
-# 57XX-XXX
-# (c) Copyright IBM Corp. 2021
+#!/usr/bin/env python3.9
 
 """ The utility module"""
 

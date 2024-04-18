@@ -1,8 +1,5 @@
-#!/usr/bin/env python39
+#!/usr/bin/env python3.9
 
-# Licensed Materials - Property of IBM
-# 57XX-XXX
-# (c) Copyright IBM Corp. 2021
 """ The CLI entry for BOB"""
 
 import argparse
