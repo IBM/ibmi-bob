@@ -23,7 +23,10 @@ while read -r line; do
   if [ -n "$cmd" ]; then
     cmd=$(echo "$cmd" | sed "s/&O/$objlib/g" | sed "s/&N/$objname/g")
     "$SCRIPT_DIR"/launch "$joblog_json" "$cmd" </dev/null
-    # echo "Running $cmd"
+    if [ $? -ne 0 ]; then
+      echo "Command failed: $cmd"
+      exit 1
+    fi
     cmd=""
   fi
 done < <(grep "" $pseudoSrcFile)
