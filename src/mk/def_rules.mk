@@ -1348,8 +1348,9 @@ define ILEPGM_TO_PGM_RECIPE =
 	$(PGM_VARIABLES)
 	@$(call echo_cmd,"=== Creating program [$(tgt)] from Pseudo Source [$(basename $(notdir $<))]")
 	$(eval crtcmd := $(shell $(SCRIPTSPATH)/extractPseudoSrc $< $(OBJLIB) $(basename $(@F))))
+	$(eval logFile := $(LOGPATH)/$(notdir $(basename $<)).splf)
 	@$(PRESETUP) \
-	$(SCRIPTSPATH)/extractAndLaunch "$(JOBLOGFILE)" "$<" $(OBJLIB) $(basename $(@F)) >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
+	$(SCRIPTSPATH)/extractAndLaunch "$(JOBLOGFILE)" "$<" $(OBJLIB) $(basename $(@F)) "$(PRECMD)" "$(POSTCMD)" "$(notdir $@)" "$<" "$(logFile)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
 endef
 
 define MODULE_TO_PGM_RECIPE =
@@ -1433,8 +1434,9 @@ define ILESRVPGM_TO_SRVPGM_RECIPE =
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating service program [$(tgt)] from [$(notdir $<)]")
 	$(eval crtcmd := $(shell $(SCRIPTSPATH)/extractPseudoSrc $< $(OBJLIB) $(basename $(@F))))
+	$(eval logFile := $(LOGPATH)/$(notdir $(basename $<)).splf)
 	@$(PRESETUP) \
-	$(SCRIPTSPATH)/extractAndLaunch "$(JOBLOGFILE)" "$<" $(OBJLIB) $(basename $(@F)) >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
+	$(SCRIPTSPATH)/extractAndLaunch "$(JOBLOGFILE)" "$<" $(OBJLIB) $(basename $(@F)) "$(PRECMD)" "$(POSTCMD)" "$(notdir $@)" "$<" "$(logFile)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
 endef
 
 #    ___ _____ _   _ _____ ____    ____           _                 
@@ -1449,24 +1451,27 @@ define BNDDIR_TO_BNDDIR_RECIPE =
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating BND from [$(notdir $<)]")
 	$(eval crtcmd := $(shell $(SCRIPTSPATH)/extractPseudoSrc $< $(OBJLIB) $(basename $(@F))))
+	$(eval logFile := $(LOGPATH)/$(notdir $(basename $<)).splf)
 	@$(PRESETUP) \
-	$(SCRIPTSPATH)/extractAndLaunch "$(JOBLOGFILE)" "$<" $(OBJLIB) $(basename $(@F)) >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
+	$(SCRIPTSPATH)/extractAndLaunch "$(JOBLOGFILE)" "$<" $(OBJLIB) $(basename $(@F)) "$(PRECMD)" "$(POSTCMD)" "$(notdir $@)" "$<" "$(logFile)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
 endef
 
 define DTAARA_TO_DTAARA_RECIPE =
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating DTAARA from [$(notdir $<)]")
 	$(eval crtcmd := $(shell $(SCRIPTSPATH)/extractPseudoSrc $< $(OBJLIB) $(basename $(@F))))
+	$(eval logFile := $(LOGPATH)/$(notdir $(basename $<)).splf)
 	@$(PRESETUP) \
-	$(SCRIPTSPATH)/extractAndLaunch "$(JOBLOGFILE)" "$<" $(OBJLIB) $(basename $(@F)) >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
+	$(SCRIPTSPATH)/extractAndLaunch "$(JOBLOGFILE)" "$<" $(OBJLIB) $(basename $(@F)) "$(PRECMD)" "$(POSTCMD)" "$(notdir $@)" "$<" "$(logFile)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
 endef
 
 define DTAQ_TO_DTAQ_RECIPE =
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating DTAQ from [$(notdir $<)]")
 	$(eval crtcmd := $(shell $(SCRIPTSPATH)/extractPseudoSrc $< $(OBJLIB) $(basename $(@F))))
+	$(eval logFile := $(LOGPATH)/$(notdir $(basename $<)).splf)
 	@$(PRESETUP) \
-	$(SCRIPTSPATH)/extractAndLaunch "$(JOBLOGFILE)" "$<" $(OBJLIB) $(basename $(@F)) >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
+	$(SCRIPTSPATH)/extractAndLaunch "$(JOBLOGFILE)" "$<" $(OBJLIB) $(basename $(@F)) "$(PRECMD)" "$(POSTCMD)" "$(notdir $@)" "$<" "$(logFile)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
 endef
 
 
@@ -1474,8 +1479,9 @@ define SYSTRG_TO_TRG_RECIPE =
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating System TRG from [$(notdir $<)]")
 	$(eval crtcmd := $(shell $(SCRIPTSPATH)/extractPseudoSrc $< $(OBJLIB) $(basename $(@F))))
+	$(eval logFile := $(LOGPATH)/$(notdir $(basename $<)).splf)
 	@$(PRESETUP) \
-	$(SCRIPTSPATH)/extractAndLaunch "$(JOBLOGFILE)" "$<" $(OBJLIB) $(basename $(@F)) >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
+	$(SCRIPTSPATH)/extractAndLaunch "$(JOBLOGFILE)" "$<" $(OBJLIB) $(basename $(@F)) "$(PRECMD)" "$(POSTCMD)" "$(notdir $@)" "$<" "$(logFile)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
 endef
 
 define SQL_RECIPE =
@@ -1492,8 +1498,9 @@ define MSGF_RECIPE =
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating Message from [$(notdir $<)]")
 	$(eval crtcmd := $(shell $(SCRIPTSPATH)/extractPseudoSrc $< $(OBJLIB) $(basename $(@F))))
+	$(eval logFile := $(LOGPATH)/$(notdir $(basename $<)).splf)
 	@$(PRESETUP) \
-	$(SCRIPTSPATH)/extractAndLaunch "$(JOBLOGFILE)" "$<" $(OBJLIB) $(basename $(@F)) >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
+	$(SCRIPTSPATH)/extractAndLaunch "$(JOBLOGFILE)" "$<" $(OBJLIB) $(basename $(@F)) "$(PRECMD)" "$(POSTCMD)" "$(notdir $@)" "$<" "$(logFile)" >> $(LOGFILE) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
 endef
 
 define WSCST_VARIABLES =
