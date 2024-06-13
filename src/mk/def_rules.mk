@@ -194,7 +194,7 @@ ifndef TERASPACE
 TERASPACE := 
 endif
 ifndef TEXT
-TEXT = $(shell $(extractTextDescriptor)) 
+TEXT=$(shell $(extractTextDescriptor))
 endif
 ifndef TYPE
 TYPE := 
