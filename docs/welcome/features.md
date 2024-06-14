@@ -59,7 +59,14 @@ Note:
 
 The following object types are supported as pseudo-source.  
 The CL command to create the object is stored in a file with the given extension.  
+
 Note that for *MSGF and *BNDDIR, the CL commands should include the delete of the MSGF and BNDDIR before creating the new one in order to avoid the timestamp getting old and breaking the make processing.
+
+Normal processing of commands will continue until an error is reached unless prefixed with a `!` in front of the command. 
+
+Usage the prefix of `!` will ignore any errors for the command. 
+ex. `!DLTBNDDIR XXXX/YYYYY` will then ignore the error if the Binding Directory does not exist and continue processing. 
+
 
 | Object Type | File Extension | CL Command        |
 | :---------- | :------------- | :---------------- |
@@ -74,6 +81,7 @@ Note that for *MSGF and *BNDDIR, the CL commands should include the delete of th
 Note:
 
 * this provides a second way of creating programs and service programs using the .ILEPGM and .ILESRVPGM file types.  This gives a high degree of customization in that you can specify any and all parameters on the command and even additional commands.  But it is more work than the simple dependency line needed when building from binder source.
+
 
 ## Support SQL pseudo-source
 
