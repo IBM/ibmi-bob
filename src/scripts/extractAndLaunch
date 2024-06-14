@@ -33,7 +33,7 @@ while read -r line; do
   if [ -n "$cmd" ]; then
     cmd=$(echo "$cmd" | sed "s/&O/$objlib/g" | sed "s/&N/$objname/g")
     "$SCRIPT_DIR"/launch "$joblog_json" "$cmd" "$precmd" "$postcmd" "$object" "$source" "$output" </dev/null
-    if [[ $? -ne 0 && suppressError -ne "Y" ]]; then
+    if [[ $? -ne 0 && "$suppressError" != "Y" ]]; then
       echo "Command failed: $cmd"
       exit 1
     fi
