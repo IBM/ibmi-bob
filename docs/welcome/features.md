@@ -65,7 +65,7 @@ Note that for *MSGF and *BNDDIR, the CL commands should include the delete of th
 Normal processing of commands will continue until an error is reached unless prefixed with a `!` in front of the command. 
 
 Usage the prefix of `!` will ignore any errors for the command. 
-ex. `!DLTBNDDIR XXXX/YYYYY` will then ignore the error if the Binding Directory doesnt exist and continue processing. 
+ex. `!DLTBNDDIR XXXX/YYYYY` will then ignore the error if the Binding Directory does not exist and continue processing. 
 
 
 | Object Type | File Extension | CL Command        |
