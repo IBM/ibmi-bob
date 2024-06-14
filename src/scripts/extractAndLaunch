@@ -5,7 +5,11 @@ joblog_json=$1
 pseudoSrcFile=$2
 objlib=$3
 objname=$4
-
+precmd=$5
+postcmd=$6
+object=$7
+source=$8
+output=$9
 cmd=""
 suppressError=""
 
@@ -28,7 +32,7 @@ while read -r line; do
   cmd+=$line
   if [ -n "$cmd" ]; then
     cmd=$(echo "$cmd" | sed "s/&O/$objlib/g" | sed "s/&N/$objname/g")
-    "$SCRIPT_DIR"/launch "$joblog_json" "$cmd" </dev/null
+    "$SCRIPT_DIR"/launch "$joblog_json" "$cmd" "$precmd" "$postcmd" "$object" "$source" "$output" </dev/null
     if [ $? -ne 0 && suppressError -ne "Y"]; then
       echo "Command failed: $cmd"
       exit 1
