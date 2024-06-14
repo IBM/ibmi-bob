@@ -1,4 +1,4 @@
-* Fri Jun 14 2024 Irfan Sharif <IrfanSharif@ibm.com> - 2.4.28
+* Fri Jun 14 2024 Irfan Sharif <IrfanSharif@ibm.com> - 2.4.29
 - Fix of a correct error return code when compilation fails
 - Fix stripping of TEXT parameter from filenames
 - Fix empty joblog attributes 
