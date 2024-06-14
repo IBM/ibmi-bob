@@ -62,9 +62,12 @@ endef
 define extractName = 
 echo '$(notdir $<)' | awk -F- '{ print $$1 }'
 endef
+
+# Explanation of how extractTextDescriptor works
+# removes directory from target filename | substring before the first '.' | substring after the first '-' | replace underscores with spaces
 define extractTextDescriptor =
 if [[ "$(notdir $<)" == *"-"* ]]; then
-	echo '$(notdir $<)' | awk -F- '{ i = index($$0,"-");print substr($$0,i+1)}' | sed -e 's/\.[^.]*$$//' -e 's/_/\ /g';
+	echo '$(notdir $<)' | awk -F. '{print $$1}' | awk -F- '{ i = index($$0,"-");print substr($$0,i+1)}' | sed -e 's/_/ /g';
 fi
 endef
 
@@ -191,7 +194,7 @@ ifndef TERASPACE
 TERASPACE := 
 endif
 ifndef TEXT
-TEXT = $(shell $(extractTextDescriptor)) 
+TEXT=$(shell $(extractTextDescriptor))
 endif
 ifndef TYPE
 TYPE := 
