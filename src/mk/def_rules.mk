@@ -387,6 +387,10 @@ SQLCBLIPGM_OBJTYPE := *PGM
 SQLCBLIPGM_OPTION := $(OPTION)
 SQLCBLIPGM_TGTRLS := $(TGTRLS)
 
+SQLPRC_TGTRLS := $(TGTRLS)
+
+SQLTRG_TGTRLS := $(TGTRLS)
+
 SRVPGM_ACTGRP := *CALLER
 SRVPGM_AUT := $(AUT)
 SRVPGM_BNDDIR := *NONE
@@ -439,7 +443,7 @@ CRTBNDCBLFLAGS = TGTCCSID($(TGTCCSID)) DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) TEX
 CRTBNDCFLAGS = TGTCCSID($(TGTCCSID)) DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) TEXT('$(TEXT)') INCDIR($(INCDIR))
 CRTBNDCLFLAGS = AUT($(AUT)) DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) TEXT('$(TEXT)') TGTRLS($(TGTRLS)) INCDIR($(INCDIR))
 CRTCLPGMFLAGS = OPTION($(OPTION)) TEXT('$(TEXT)')
-RUNSQLFLAGS:= DBGVIEW(*SOURCE) TGTRLS($(TGTRLS)) OUTPUT(*PRINT) MARGINS(1024) COMMIT($(COMMIT))
+RUNSQLFLAGS = DBGVIEW(*SOURCE) TGTRLS($(TGTRLS)) OUTPUT(*PRINT) MARGINS(1024) COMMIT($(COMMIT))
 
 # Extra command string for adhoc addition of extra parameters to a creation command.
 ADHOCCRTFLAGS =
@@ -877,9 +881,13 @@ programTGTRLS = $(strip \
 	$(if $(filter %.sqlcblle,$<),$(SQLCBLIPGM_TGTRLS), \
 	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIPGM_TGTRLS), \
 	$(if $(filter %.sqlrpgle,$<),$(SQLRPGIPGM_TGTRLS), \
+	$(if $(filter %.SQLPRC,$<),$(SQLPRC_TGTRLS), \
+	$(if $(filter %.sqlprc,$<),$(SQLPRC_TGTRLS), \
+	$(if $(filter %.SQLTRG,$<),$(SQLTRG_TGTRLS), \
+	$(if $(filter %.sqltrg,$<),$(SQLTRG_TGTRLS), \
 	$(if $(filter %.MODULE,$<),$(PGM_TGTRLS), \
 	$(if $(filter %.module,$<),$(PGM_TGTRLS), \
-	UNKNOWN_FILE_TYPE)))))))))))))))
+	UNKNOWN_FILE_TYPE)))))))))))))))))))
 programINCDIR = $(strip \
 	$(if $(filter %.C,$<),$(BNDC_INCDIR), \
 	$(if $(filter %.c,$<),$(BNDC_INCDIR), \
