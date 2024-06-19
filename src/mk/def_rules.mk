@@ -346,50 +346,42 @@ SQLCIMOD_INCDIR := $(INCDIR)
 SQLCIMOD_STGMDL := $(CMOD_STGMDL)
 SQLCIMOD_SYSIFCOPT := $(CMOD_SYSIFCOPT)
 SQLCIMOD_TERASPACE := *YES *TSIFC
-SQLCIMOD_TGTRLS := $(TGTRLS)
 
 SQLCPPIMOD_DBGVIEW := *SOURCE
 SQLCPPIMOD_DEFINE := $(DEFINE)
 SQLCPPIMOD_INCDIR := $(INCDIR)
 SQLCPPIMOD_OBJTYPE := *MODULE
 SQLCPPIMOD_OPTION := $(CPPMOD_OPTION)
-SQLCPPIMOD_TGTRLS := $(TGTRLS)
 
 SQLCIPGM_DBGVIEW := *SOURCE
 SQLCIPGM_INCDIR := $(INCDIR)
 SQLCIPGM_OBJTYPE := *PGM
 SQLCIPGM_OPTION := $(OPTION)
-SQLCIPGM_TGTRLS := $(TGTRLS)
 
 SQLRPGIMOD_DBGVIEW := *SOURCE
 SQLRPGIMOD_INCDIR := $(INCDIR)
 SQLRPGIMOD_OBJTYPE := *MODULE
 SQLRPGIMOD_OPTION := $(RPGMOD_OPTION)
 SQLRPGIMOD_RPGPPOPT := *LVL2
-SQLRPGIMOD_TGTRLS := $(TGTRLS)
 
 SQLCBLIMOD_DBGVIEW := *SOURCE
 SQLCBLIMOD_INCDIR := $(INCDIR)
 SQLCBLIMOD_OBJTYPE := *MODULE
 SQLCBLIMOD_OPTION := $(OPTION)
-SQLCBLIMOD_TGTRLS := $(TGTRLS)
 
 SQLRPGIPGM_DBGVIEW := *SOURCE
 SQLRPGIPGM_INCDIR := $(INCDIR)
 SQLRPGIPGM_OBJTYPE := *PGM
 SQLRPGIPGM_OPTION := $(OPTION)
 SQLRPGIPGM_RPGPPOPT := *LVL2
-SQLRPGIPGM_TGTRLS := $(TGTRLS)
 
 SQLCBLIPGM_DBGVIEW := *SOURCE
 SQLCBLIPGM_INCDIR := $(INCDIR)
 SQLCBLIPGM_OBJTYPE := *PGM
 SQLCBLIPGM_OPTION := $(OPTION)
-SQLCBLIPGM_TGTRLS := $(TGTRLS)
 
-SQLPRC_TGTRLS := $(TGTRLS)
+SQL_TGTRLS := $(TGTRLS)
 
-SQLTRG_TGTRLS := $(TGTRLS)
 
 SRVPGM_ACTGRP := *CALLER
 SRVPGM_AUT := $(AUT)
@@ -769,14 +761,14 @@ moduleTGTRLS = $(strip \
 	$(if $(filter %.rpgle,$<),$(RPGMOD_TGTRLS), \
 	$(if $(filter %.CBLLE,$<),$(CBLMOD_TGTRLS), \
 	$(if $(filter %.cblle,$<),$(CBLMOD_TGTRLS), \
-	$(if $(filter %.SQLC,$<),$(SQLCIMOD_TGTRLS), \
-	$(if $(filter %.sqlc,$<),$(SQLCIMOD_TGTRLS), \
-	$(if $(filter %.SQLCPP,$<),$(SQLCPPIMOD_TGTRLS), \
-	$(if $(filter %.sqlcpp,$<),$(SQLCPPMOD_TGTRLS), \
-	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIMOD_TGTRLS), \
-	$(if $(filter %.sqlrpgle,$<),$(SQLRPGIMOD_TGTRLS), \
-	$(if $(filter %.SQLCBLLE,$<),$(SQLCBLIMOD_TGTRLS), \
-	$(if $(filter %.sqlcblle,$<),$(SQLCBLIMOD_TGTRLS), \
+	$(if $(filter %.SQLC,$<),$(SQL_TGTRLS), \
+	$(if $(filter %.sqlc,$<),$(SQL_TGTRLS), \
+	$(if $(filter %.SQLCPP,$<),$(SQL_TGTRLS), \
+	$(if $(filter %.sqlcpp,$<),$(SQL_TGTRLS), \
+	$(if $(filter %.SQLRPGLE,$<),$(SQL_TGTRLS), \
+	$(if $(filter %.sqlrpgle,$<),$(SQL_TGTRLS), \
+	$(if $(filter %.SQLCBLLE,$<),$(SQL_TGTRLS), \
+	$(if $(filter %.sqlcblle,$<),$(SQL_TGTRLS), \
 	UNKNOWN_FILE_TYPE)))))))))))))))))))
 
 # Determine default settings for the various source types that can make a program object.
@@ -875,16 +867,16 @@ programTGTRLS = $(strip \
 	$(if $(filter %.cblle,$<),$(BNDCBL_TGTRLS), \
 	$(if $(filter %.RPGLE,$<),$(BNDRPG_TGTRLS), \
 	$(if $(filter %.rpgle,$<),$(BNDRPG_TGTRLS), \
-	$(if $(filter %.SQLC,$<),$(SQLCIPGM_TGTRLS), \
-	$(if $(filter %.sqlc,$<),$(SQLCIPGM_TGTRLS), \
-	$(if $(filter %.SQLCBLLE,$<),$(SQLCBLIPGM_TGTRLS), \
-	$(if $(filter %.sqlcblle,$<),$(SQLCBLIPGM_TGTRLS), \
-	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIPGM_TGTRLS), \
-	$(if $(filter %.sqlrpgle,$<),$(SQLRPGIPGM_TGTRLS), \
-	$(if $(filter %.SQLPRC,$<),$(SQLPRC_TGTRLS), \
-	$(if $(filter %.sqlprc,$<),$(SQLPRC_TGTRLS), \
-	$(if $(filter %.SQLTRG,$<),$(SQLTRG_TGTRLS), \
-	$(if $(filter %.sqltrg,$<),$(SQLTRG_TGTRLS), \
+	$(if $(filter %.SQLC,$<),$(SQL_TGTRLS), \
+	$(if $(filter %.sqlc,$<),$(SQL_TGTRLS), \
+	$(if $(filter %.SQLCBLLE,$<),$(SQL_TGTRLS), \
+	$(if $(filter %.sqlcblle,$<),$(SQL_TGTRLS), \
+	$(if $(filter %.SQLRPGLE,$<),$(SQL_TGTRLS), \
+	$(if $(filter %.sqlrpgle,$<),$(SQL_TGTRLS), \
+	$(if $(filter %.SQLPRC,$<),$(SQL_TGTRLS), \
+	$(if $(filter %.sqlprc,$<),$(SQL_TGTRLS), \
+	$(if $(filter %.SQLTRG,$<),$(SQL_TGTRLS), \
+	$(if $(filter %.sqltrg,$<),$(SQL_TGTRLS), \
 	$(if $(filter %.MODULE,$<),$(PGM_TGTRLS), \
 	$(if $(filter %.module,$<),$(PGM_TGTRLS), \
 	UNKNOWN_FILE_TYPE)))))))))))))))))))
