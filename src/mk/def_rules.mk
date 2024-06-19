@@ -584,6 +584,16 @@ fileSIZE = $(strip \
 	$(if $(filter %.PF,$<),$(PF_SIZE), \
 	$(if $(filter %.pf,$<),$(PF_SIZE), \
 	UNKNOWN_FILE_TYPE)))
+fileTGTRLS = $(strip \
+	$(if $(filter %.table,$<),$(SQL_TGTRLS), \
+	$(if $(filter %.TABLE,$<),$(SQL_TGTRLS), \
+	$(if $(filter %.view,$<),$(SQL_TGTRLS), \
+	$(if $(filter %.VIEW,$<),$(SQL_TGTRLS), \
+	$(if $(filter %.sqludt,$<),$(SQL_TGTRLS), \
+	$(if $(filter %.SQLUDT,$<),$(SQL_TGTRLS), \
+	$(if $(filter %.sqlalias,$<),$(SQL_TGTRLS), \
+	$(if $(filter %.SQLALIAS,$<),$(SQL_TGTRLS), \
+	UNKNOWN_FILE_TYPE)))))))))
 
 # Determine default settings for the various source types that can make a module object.
 moduleAUT = $(strip \
@@ -951,6 +961,7 @@ define FILE_VARIABLES =
 	$(eval REUSEDLT = $(fileREUSEDLT))\
 	$(eval RSTDSP = $(fileRSTDSP))\
 	$(eval SIZE = $(fileSIZE))\
+	$(eval TGTRLS = $(fileTGTRLS))\
 	$(eval TYPEDEF = $(if $(filter YES,$(CREATE_TYPEDEF)),$(SCRIPTSPATH)/crttypedef "$<" "$@" "$(OBJPATH)",))
 endef
 
