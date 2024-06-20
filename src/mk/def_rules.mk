@@ -1084,7 +1084,7 @@ define DTAARA_VARIABLES =
 	$(eval TGTRLS = $(SQL_TGTRLS))
 endef
 
-define SQLSEQ_TO_DTARRA_RECIPE =
+define SQLSEQ_TO_DTAARA_RECIPE =
 	$(DTAARA_VARIABLES)
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating SQL SEQUENCE from Sql statement [$(notdir $<)] in $(OBJLIB)")
