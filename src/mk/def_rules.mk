@@ -905,6 +905,15 @@ programINCDIR = $(strip \
 	$(if $(filter %.sqlrpgle,$<),$(SQLRPGIPGM_INCDIR), \
 	UNKNOWN_FILE_TYPE)))))))))))))
 
+# Determine default settings for the various source types that can make a srvpgm object.
+srvpgmTGTRLS = $(strip \
+	$(if $(filter %.BND,$<),$(SRVPGM_TGTRLS), \
+	$(if $(filter %.bnd,$<),$(SRVPGM_TGTRLS), \
+	$(if $(filter %.ILESRVPGM,$<),$(SRVPGM_TGTRLS), \
+	$(if $(filter %.ilesrvpgm,$<),$(SRVPGM_TGTRLS), \
+	$(if $(filter %.SQLUDF,$<),$(SQL_TGTRLS), \
+	$(if $(filter %.sqludf,$<),$(SQL_TGTRLS), \
+	UNKNOWN_FILE_TYPE)))))))
 
 #    ____ __  __ ____    ____           _                 
 #   / ___|  \/  |  _ \  |  _ \ ___  ___(_)_ __   ___  ___ 
@@ -1415,7 +1424,7 @@ define SRVPGM_VARIABLES =
 	$(eval AUT = $(SRVPGM_AUT))\
 	$(eval DETAIL = $(SRVPGM_DETAIL))\
 	$(eval STGMDL = $(SRVPGM_STGMDL))\
-	$(eval TGTRLS = $(SRVPGM_TGTRLS))\
+	$(eval TGTRLS = $(srvpgmTGTRLS))\
 	$(eval OPTION = $(SRVPGM_OPTION))\
 	$(eval BNDSRVPGMPATH = $(basename $(filter %.SRVPGM,$(notdir $^)) $(externalsrvpgms)))
 endef
