@@ -346,46 +346,42 @@ SQLCIMOD_INCDIR := $(INCDIR)
 SQLCIMOD_STGMDL := $(CMOD_STGMDL)
 SQLCIMOD_SYSIFCOPT := $(CMOD_SYSIFCOPT)
 SQLCIMOD_TERASPACE := *YES *TSIFC
-SQLCIMOD_TGTRLS := $(TGTRLS)
 
 SQLCPPIMOD_DBGVIEW := *SOURCE
 SQLCPPIMOD_DEFINE := $(DEFINE)
 SQLCPPIMOD_INCDIR := $(INCDIR)
 SQLCPPIMOD_OBJTYPE := *MODULE
 SQLCPPIMOD_OPTION := $(CPPMOD_OPTION)
-SQLCPPIMOD_TGTRLS := $(TGTRLS)
 
 SQLCIPGM_DBGVIEW := *SOURCE
 SQLCIPGM_INCDIR := $(INCDIR)
 SQLCIPGM_OBJTYPE := *PGM
 SQLCIPGM_OPTION := $(OPTION)
-SQLCIPGM_TGTRLS := $(TGTRLS)
 
 SQLRPGIMOD_DBGVIEW := *SOURCE
 SQLRPGIMOD_INCDIR := $(INCDIR)
 SQLRPGIMOD_OBJTYPE := *MODULE
 SQLRPGIMOD_OPTION := $(RPGMOD_OPTION)
 SQLRPGIMOD_RPGPPOPT := *LVL2
-SQLRPGIMOD_TGTRLS := $(TGTRLS)
 
 SQLCBLIMOD_DBGVIEW := *SOURCE
 SQLCBLIMOD_INCDIR := $(INCDIR)
 SQLCBLIMOD_OBJTYPE := *MODULE
 SQLCBLIMOD_OPTION := $(OPTION)
-SQLCBLIMOD_TGTRLS := $(TGTRLS)
 
 SQLRPGIPGM_DBGVIEW := *SOURCE
 SQLRPGIPGM_INCDIR := $(INCDIR)
 SQLRPGIPGM_OBJTYPE := *PGM
 SQLRPGIPGM_OPTION := $(OPTION)
 SQLRPGIPGM_RPGPPOPT := *LVL2
-SQLRPGIPGM_TGTRLS := $(TGTRLS)
 
 SQLCBLIPGM_DBGVIEW := *SOURCE
 SQLCBLIPGM_INCDIR := $(INCDIR)
 SQLCBLIPGM_OBJTYPE := *PGM
 SQLCBLIPGM_OPTION := $(OPTION)
-SQLCBLIPGM_TGTRLS := $(TGTRLS)
+
+SQL_TGTRLS := $(TGTRLS)
+
 
 SRVPGM_ACTGRP := *CALLER
 SRVPGM_AUT := $(AUT)
@@ -439,7 +435,7 @@ CRTBNDCBLFLAGS = TGTCCSID($(TGTCCSID)) DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) TEX
 CRTBNDCFLAGS = TGTCCSID($(TGTCCSID)) DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) TEXT('$(TEXT)') INCDIR($(INCDIR))
 CRTBNDCLFLAGS = AUT($(AUT)) DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) TEXT('$(TEXT)') TGTRLS($(TGTRLS)) INCDIR($(INCDIR))
 CRTCLPGMFLAGS = OPTION($(OPTION)) TEXT('$(TEXT)')
-RUNSQLFLAGS:= DBGVIEW(*SOURCE) TGTRLS($(TGTRLS)) OUTPUT(*PRINT) MARGINS(1024) COMMIT($(COMMIT))
+RUNSQLFLAGS = DBGVIEW(*SOURCE) TGTRLS($(TGTRLS)) OUTPUT(*PRINT) MARGINS(1024) COMMIT($(COMMIT))
 
 # Extra command string for adhoc addition of extra parameters to a creation command.
 ADHOCCRTFLAGS =
@@ -588,6 +584,16 @@ fileSIZE = $(strip \
 	$(if $(filter %.PF,$<),$(PF_SIZE), \
 	$(if $(filter %.pf,$<),$(PF_SIZE), \
 	UNKNOWN_FILE_TYPE)))
+fileTGTRLS = $(strip \
+	$(if $(filter %.table,$<),$(SQL_TGTRLS), \
+	$(if $(filter %.TABLE,$<),$(SQL_TGTRLS), \
+	$(if $(filter %.view,$<),$(SQL_TGTRLS), \
+	$(if $(filter %.VIEW,$<),$(SQL_TGTRLS), \
+	$(if $(filter %.sqludt,$<),$(SQL_TGTRLS), \
+	$(if $(filter %.SQLUDT,$<),$(SQL_TGTRLS), \
+	$(if $(filter %.sqlalias,$<),$(SQL_TGTRLS), \
+	$(if $(filter %.SQLALIAS,$<),$(SQL_TGTRLS), \
+	UNKNOWN_FILE_TYPE)))))))))
 
 # Determine default settings for the various source types that can make a module object.
 moduleAUT = $(strip \
@@ -765,14 +771,14 @@ moduleTGTRLS = $(strip \
 	$(if $(filter %.rpgle,$<),$(RPGMOD_TGTRLS), \
 	$(if $(filter %.CBLLE,$<),$(CBLMOD_TGTRLS), \
 	$(if $(filter %.cblle,$<),$(CBLMOD_TGTRLS), \
-	$(if $(filter %.SQLC,$<),$(SQLCIMOD_TGTRLS), \
-	$(if $(filter %.sqlc,$<),$(SQLCIMOD_TGTRLS), \
-	$(if $(filter %.SQLCPP,$<),$(SQLCPPIMOD_TGTRLS), \
-	$(if $(filter %.sqlcpp,$<),$(SQLCPPMOD_TGTRLS), \
-	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIMOD_TGTRLS), \
-	$(if $(filter %.sqlrpgle,$<),$(SQLRPGIMOD_TGTRLS), \
-	$(if $(filter %.SQLCBLLE,$<),$(SQLCBLIMOD_TGTRLS), \
-	$(if $(filter %.sqlcblle,$<),$(SQLCBLIMOD_TGTRLS), \
+	$(if $(filter %.SQLC,$<),$(CMOD_TGTRLS), \
+	$(if $(filter %.sqlc,$<),$(CMOD_TGTRLS), \
+	$(if $(filter %.SQLCPP,$<),$(CPPMOD_TGTRLS), \
+	$(if $(filter %.sqlcpp,$<),$(CPPMOD_TGTRLS), \
+	$(if $(filter %.SQLRPGLE,$<),$(RPGMOD_TGTRLS), \
+	$(if $(filter %.sqlrpgle,$<),$(RPGMOD_TGTRLS), \
+	$(if $(filter %.SQLCBLLE,$<),$(CBLMOD_TGTRLS), \
+	$(if $(filter %.sqlcblle,$<),$(CBLMOD_TGTRLS), \
 	UNKNOWN_FILE_TYPE)))))))))))))))))))
 
 # Determine default settings for the various source types that can make a program object.
@@ -871,15 +877,19 @@ programTGTRLS = $(strip \
 	$(if $(filter %.cblle,$<),$(BNDCBL_TGTRLS), \
 	$(if $(filter %.RPGLE,$<),$(BNDRPG_TGTRLS), \
 	$(if $(filter %.rpgle,$<),$(BNDRPG_TGTRLS), \
-	$(if $(filter %.SQLC,$<),$(SQLCIPGM_TGTRLS), \
-	$(if $(filter %.sqlc,$<),$(SQLCIPGM_TGTRLS), \
-	$(if $(filter %.SQLCBLLE,$<),$(SQLCBLIPGM_TGTRLS), \
-	$(if $(filter %.sqlcblle,$<),$(SQLCBLIPGM_TGTRLS), \
-	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIPGM_TGTRLS), \
-	$(if $(filter %.sqlrpgle,$<),$(SQLRPGIPGM_TGTRLS), \
+	$(if $(filter %.SQLC,$<),$(SQL_TGTRLS), \
+	$(if $(filter %.sqlc,$<),$(SQL_TGTRLS), \
+	$(if $(filter %.SQLCBLLE,$<),$(SQL_TGTRLS), \
+	$(if $(filter %.sqlcblle,$<),$(SQL_TGTRLS), \
+	$(if $(filter %.SQLRPGLE,$<),$(SQL_TGTRLS), \
+	$(if $(filter %.sqlrpgle,$<),$(SQL_TGTRLS), \
+	$(if $(filter %.SQLPRC,$<),$(SQL_TGTRLS), \
+	$(if $(filter %.sqlprc,$<),$(SQL_TGTRLS), \
+	$(if $(filter %.SQLTRG,$<),$(SQL_TGTRLS), \
+	$(if $(filter %.sqltrg,$<),$(SQL_TGTRLS), \
 	$(if $(filter %.MODULE,$<),$(PGM_TGTRLS), \
 	$(if $(filter %.module,$<),$(PGM_TGTRLS), \
-	UNKNOWN_FILE_TYPE)))))))))))))))
+	UNKNOWN_FILE_TYPE)))))))))))))))))))
 programINCDIR = $(strip \
 	$(if $(filter %.C,$<),$(BNDC_INCDIR), \
 	$(if $(filter %.c,$<),$(BNDC_INCDIR), \
@@ -895,6 +905,15 @@ programINCDIR = $(strip \
 	$(if $(filter %.sqlrpgle,$<),$(SQLRPGIPGM_INCDIR), \
 	UNKNOWN_FILE_TYPE)))))))))))))
 
+# Determine default settings for the various source types that can make a srvpgm object.
+srvpgmTGTRLS = $(strip \
+	$(if $(filter %.BND,$<),$(SRVPGM_TGTRLS), \
+	$(if $(filter %.bnd,$<),$(SRVPGM_TGTRLS), \
+	$(if $(filter %.ILESRVPGM,$<),$(SRVPGM_TGTRLS), \
+	$(if $(filter %.ilesrvpgm,$<),$(SRVPGM_TGTRLS), \
+	$(if $(filter %.SQLUDF,$<),$(SQL_TGTRLS), \
+	$(if $(filter %.sqludf,$<),$(SQL_TGTRLS), \
+	UNKNOWN_FILE_TYPE)))))))
 
 #    ____ __  __ ____    ____           _                 
 #   / ___|  \/  |  _ \  |  _ \ ___  ___(_)_ __   ___  ___ 
@@ -951,6 +970,7 @@ define FILE_VARIABLES =
 	$(eval REUSEDLT = $(fileREUSEDLT))\
 	$(eval RSTDSP = $(fileRSTDSP))\
 	$(eval SIZE = $(fileSIZE))\
+	$(eval TGTRLS = $(fileTGTRLS))\
 	$(eval TYPEDEF = $(if $(filter YES,$(CREATE_TYPEDEF)),$(SCRIPTSPATH)/crttypedef "$<" "$@" "$(OBJPATH)",))
 endef
 
@@ -1060,7 +1080,12 @@ endef
 #  |____/ |_/_/   \_\/_/   \_\_| \_\/_/   \_\ |_| \_\___|\___|_| .__/ \___||___/
 #                                                              |_|              
 
+define DTAARA_VARIABLES = 
+	$(eval TGTRLS = $(SQL_TGTRLS))
+endef
+
 define SQLSEQ_TO_DTARRA_RECIPE =
+	$(DTAARA_VARIABLES)
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating SQL SEQUENCE from Sql statement [$(notdir $<)] in $(OBJLIB)")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
@@ -1404,7 +1429,7 @@ define SRVPGM_VARIABLES =
 	$(eval AUT = $(SRVPGM_AUT))\
 	$(eval DETAIL = $(SRVPGM_DETAIL))\
 	$(eval STGMDL = $(SRVPGM_STGMDL))\
-	$(eval TGTRLS = $(SRVPGM_TGTRLS))\
+	$(eval TGTRLS = $(srvpgmTGTRLS))\
 	$(eval OPTION = $(SRVPGM_OPTION))\
 	$(eval BNDSRVPGMPATH = $(basename $(filter %.SRVPGM,$(notdir $^)) $(externalsrvpgms)))
 endef
