@@ -1080,7 +1080,12 @@ endef
 #  |____/ |_/_/   \_\/_/   \_\_| \_\/_/   \_\ |_| \_\___|\___|_| .__/ \___||___/
 #                                                              |_|              
 
+define DTAARA_VARIABLES = 
+	$(eval TGTRLS = $(SQL_TGTRLS))
+endef
+
 define SQLSEQ_TO_DTARRA_RECIPE =
+	$(DTAARA_VARIABLES)
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating SQL SEQUENCE from Sql statement [$(notdir $<)] in $(OBJLIB)")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
