@@ -771,14 +771,14 @@ moduleTGTRLS = $(strip \
 	$(if $(filter %.rpgle,$<),$(RPGMOD_TGTRLS), \
 	$(if $(filter %.CBLLE,$<),$(CBLMOD_TGTRLS), \
 	$(if $(filter %.cblle,$<),$(CBLMOD_TGTRLS), \
-	$(if $(filter %.SQLC,$<),$(SQL_TGTRLS), \
-	$(if $(filter %.sqlc,$<),$(SQL_TGTRLS), \
-	$(if $(filter %.SQLCPP,$<),$(SQL_TGTRLS), \
-	$(if $(filter %.sqlcpp,$<),$(SQL_TGTRLS), \
-	$(if $(filter %.SQLRPGLE,$<),$(SQL_TGTRLS), \
-	$(if $(filter %.sqlrpgle,$<),$(SQL_TGTRLS), \
-	$(if $(filter %.SQLCBLLE,$<),$(SQL_TGTRLS), \
-	$(if $(filter %.sqlcblle,$<),$(SQL_TGTRLS), \
+	$(if $(filter %.SQLC,$<),$(CMOD_TGTRLS), \
+	$(if $(filter %.sqlc,$<),$(CMOD_TGTRLS), \
+	$(if $(filter %.SQLCPP,$<),$(CPPMOD_TGTRLS), \
+	$(if $(filter %.sqlcpp,$<),$(CPPMOD_TGTRLS), \
+	$(if $(filter %.SQLRPGLE,$<),$(RPGMOD_TGTRLS), \
+	$(if $(filter %.sqlrpgle,$<),$(RPGMOD_TGTRLS), \
+	$(if $(filter %.SQLCBLLE,$<),$(CBLMOD_TGTRLS), \
+	$(if $(filter %.sqlcblle,$<),$(CBLMOD_TGTRLS), \
 	UNKNOWN_FILE_TYPE)))))))))))))))))))
 
 # Determine default settings for the various source types that can make a program object.
