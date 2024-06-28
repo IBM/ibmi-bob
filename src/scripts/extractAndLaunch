@@ -10,8 +10,19 @@ postcmd=$6
 object=$7
 source=$8
 output=$9
+VPATH=${10}
 cmd=""
 suppressError=""
+objectExists="false"
+shouldProcess="true"
+
+IFS=":"
+for dir in $VPATH;
+do
+  if [[ -e "$dir/$object" ]]; then
+    objectExists="true"
+  fi
+done
 
 while read -r line; do
   line=$(echo "$line" | sed 's/\r//')
@@ -28,16 +39,31 @@ while read -r line; do
     continue
 
   fi
-
-  cmd+=$line
-  if [ -n "$cmd" ]; then
-    cmd=$(echo "$cmd" | sed "s/&O/$objlib/g" | sed "s/&N/$objname/g")
-    "$SCRIPT_DIR"/launch "$joblog_json" "$cmd" "$precmd" "$postcmd" "$object" "$source" "$output" </dev/null
-    if [[ $? -ne 0 && "$suppressError" != "Y" ]]; then
-      echo "Command failed: $cmd"
-      exit 1
+  if [[ $line == *"{"* ]]; then
+    if [[ "$objectExists" = "false" ]]; then
+      shouldProcess="false"
+    fi 
+    continue
+  elif [[ $line == *"}"* ]]; then
+    if [[ "$objectExists" = "false" ]]; then
+      shouldProcess="true"
+      continue
+    else
+      break
     fi
-    suppressError=""
-    cmd=""
+  fi
+
+  if [[ "$shouldProcess" = "true" ]]; then
+    cmd+=$line
+    if [ -n "$cmd" ]; then
+      cmd=$(echo "$cmd" | sed "s/&O/$objlib/g" | sed "s/&N/$objname/g")
+      "$SCRIPT_DIR"/launch "$joblog_json" "$cmd" "$precmd" "$postcmd" "$object" "$source" "$output" </dev/null
+      if [[ $? -ne 0 && "$suppressError" != "Y" ]]; then
+        echo "Command failed: $cmd"
+        exit 1
+      fi
+      suppressError=""
+      cmd=""
+    fi
   fi
 done < <(grep "" $pseudoSrcFile)
