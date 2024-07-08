@@ -92,6 +92,7 @@ The set of SQL commands to create the object is stored in a file with the given 
 | :-------- | :---------- | :------------- | :-------------------------- |
 | TABLE     | *FILE       | .TABLE         | CREATE OR REPLACE TABLE     |
 | VIEW      | *FILE       | .VIEW          | CREATE OR REPLACE VIEW      |
+| INDEX     | *FILE       | .INDEX         | CREATE INDEX                |
 | PROCEDURE | *PGM        | .SQLPRC        | CREATE OR REPLACE PROCEDURE |
 | FUNCTION  | *SRVPGM     | .SQLUDF        | CREATE OR REPLACE FUNCTION  |
 | FUNCTION  | *SRVPGM     | .SQLUDT        | CREATE DISTINCT TYPE        |
