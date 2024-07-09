@@ -593,11 +593,13 @@ fileTGTRLS = $(strip \
 	$(if $(filter %.TABLE,$<),$(SQL_TGTRLS), \
 	$(if $(filter %.view,$<),$(SQL_TGTRLS), \
 	$(if $(filter %.VIEW,$<),$(SQL_TGTRLS), \
+	$(if $(filter %.index,$<),$(SQL_TGTRLS), \
+	$(if $(filter %.INDEX,$<),$(SQL_TGTRLS), \
 	$(if $(filter %.sqludt,$<),$(SQL_TGTRLS), \
 	$(if $(filter %.SQLUDT,$<),$(SQL_TGTRLS), \
 	$(if $(filter %.sqlalias,$<),$(SQL_TGTRLS), \
 	$(if $(filter %.SQLALIAS,$<),$(SQL_TGTRLS), \
-	UNKNOWN_FILE_TYPE)))))))))
+	UNKNOWN_FILE_TYPE)))))))))))
 
 # Determine default settings for the various source types that can make a module object.
 moduleAUT = $(strip \
@@ -1037,6 +1039,17 @@ define VIEW_TO_FILE_RECIPE =
 	$(FILE_VARIABLES)
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating SQL VIEW from Sql statement [$(notdir $<)] in $(OBJLIB)")
+	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
+	$(eval mbrtextcmd := CHGOBJD OBJ($(OBJLIB)/$(basename $(notdir $<))) OBJTYPE(*FILE) TEXT('$(TEXT)'))
+	@$(PRESETUP) \
+	$(SETCURLIBTOOBJLIB) \
+	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" "$(PRECMD)" "$(POSTCMD)" "$(notdir $@)" "$<" $(logFile) "" "$(mbrtextcmd)"> $(logFile) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
+endef
+
+define INDEX_TO_FILE_RECIPE = 
+	$(FILE_VARIABLES)
+	$(eval d = $($@_d))
+	@$(call echo_cmd,"=== Creating SQL INDEX from Sql statement [$(notdir $<)] in $(OBJLIB)")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
 	$(eval mbrtextcmd := CHGOBJD OBJ($(OBJLIB)/$(basename $(notdir $<))) OBJTYPE(*FILE) TEXT('$(TEXT)'))
 	@$(PRESETUP) \
