@@ -100,3 +100,15 @@ The set of SQL commands to create the object is stored in a file with the given 
 | SEQUENCE  | *DTAARA     | .SQLSEQ        | CREATE OR REPLACE SEQUENCE  |
 
 Generic SQL statements with file extension .SQL are executed using RUNSQLSTM
+
+### Incremental SQL pseudo-source
+
+If you want different source to run if your object is already built, but want to maintain your code in the same file, write that SQL pseudo-source in the incremental block. Only if the object exists in your library list, will the incremental pseudo-source run. Otherwise, source outside of the block will be the one which runs.
+
+```
+incremental {
+ ALTER TABLE ADD COLUMN ...
+}
+
+CREATE OR REPLACE TABLE ...
+```
