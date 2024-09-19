@@ -205,6 +205,7 @@ class RulesMk:
         rules_mk_str = rules_mk_str.strip().replace("\\\n", "")
 
         rules = []
+        rules_mk_variables = {}
         variables = {}
         subdir = []
 
@@ -232,14 +233,30 @@ class RulesMk:
                 subdir = line.strip().split('=')[1].split()
                 continue
             elif ':' in line:
+                # rules_mk variable definition
+                line_split_by_space = line.strip().split()
+                if len(line_split_by_space) == 3 and line_split_by_space[1] == ':=':
+                    rules_mk_var = line_split_by_space[0].strip()
+                    rules_mk_var_value = line_split_by_space[2].strip()
+                    rules_mk_variables[rules_mk_var] = rules_mk_var_value
+
                 # Recipe declaration
-                if '=' in line:
+                elif '=' in line:
                     # private variable definition
                     target, variable = line.strip().split(':', 1)
                     key = target.strip()
+                    variable = variable.strip()
                     if key not in variables:
                         variables[key] = []
-                    variables[key].append(variable.strip())
+                    # Replace instances of rules_mk variables with their actual values
+                    var_split = variable.split()
+                    if var_split[-1].startswith("$(") and var_split[-1].endswith(")"):
+                        rules_mk_var = var_split[-1][2:-1] # Remove leading $( and trailing )
+                        if rules_mk_var in rules_mk_variables:
+                            var_split[-1] = rules_mk_variables[rules_mk_var]
+                            variable = " ".join(var_split)
+
+                    variables[key].append(variable)
                 else:
                     # recipe
                     recipe_env = True
