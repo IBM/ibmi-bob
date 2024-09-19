@@ -132,6 +132,20 @@ JB001.FILE: private TEXT = Jumbo test file
 JB001.FILE: private CREATE_TYPEDEF = YES
 JB001.FILE: JB001.PF
 ```
+#### Variables
+
+If you have multiple targets with compile setttings to override, you can declare them as a variable with the syntax `MY_VAR := VAL`.
+
+```
+PROJECT_TGTRLS := *PRV
+
+PRO200.MODULE: private TGTRLS := $(PROJECT_TGTRLS)
+PRO200.MODULE: PRO200.RPGLE
+
+VAT.MODULE: private TGTRLS := $(PROJECT_TGTRLS)
+VAT.MODULE: VAT.RPGLE
+
+```
 
 ## Further reading
 
