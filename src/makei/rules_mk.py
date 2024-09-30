@@ -207,7 +207,9 @@ class RulesMk:
         rules = []
         rules_mk_variables = {}
         variables = {}
+        wildcard_variables = {}
         subdir = []
+        targets = []
 
         recipe_env = False
         recipe_str = ""
@@ -219,6 +221,7 @@ class RulesMk:
                     recipe_str += line + '\n'
                     continue
 
+                targets.append(recipe_str.split(":")[0])
                 rules.append(MKRule.from_str(recipe_str, containing_dir, include_dirs))
                 recipe_env = False
                 recipe_str = ""
@@ -244,10 +247,15 @@ class RulesMk:
                 elif '=' in line:
                     # private variable definition
                     target, variable = line.strip().split(':', 1)
+                    if target.startswith("%."):
+                        variables_to_process = wildcard_variables
+                    else:
+                        variables_to_process = variables
+
                     key = target.strip()
                     variable = variable.strip()
-                    if key not in variables:
-                        variables[key] = []
+                    if key not in variables_to_process:
+                        variables_to_process[key] = []
                     # Replace instances of rules_mk variables with their actual values
                     var_split = variable.split()
                     if var_split[-1].startswith("$(") and var_split[-1].endswith(")"):
@@ -256,7 +264,7 @@ class RulesMk:
                             var_split[-1] = rules_mk_variables[rules_mk_var]
                             variable = " ".join(var_split)
 
-                    variables[key].append(variable)
+                    variables_to_process[key].append(variable)
                 else:
                     # recipe
                     recipe_env = True
@@ -267,7 +275,20 @@ class RulesMk:
                 continue
 
         if recipe_env:
+            targets.append(recipe_str.split(":")[0])
             rules.append(MKRule.from_str(recipe_str, containing_dir, include_dirs))
+
+        # Updates variables with wildcard values
+        for wildcard, var in wildcard_variables.items():
+            stripped_wildcard = wildcard.strip("%.")
+
+            matched_targets = list(filter(lambda target: target.split(".")[1] == stripped_wildcard, targets))
+            targets = list(filter(lambda target: target.split(".")[1] != stripped_wildcard, targets))
+
+            for target in matched_targets:
+                if target not in variables:
+                    variables[target] = []
+                variables[target] = var + variables[target]
 
         # Defines variables declared in Rules.mk
         for target, variableList in variables.items():
