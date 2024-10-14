@@ -210,6 +210,7 @@ class RulesMk:
         wildcard_variables = {}
         subdir = []
         targets = []
+        wildcard_targets=[]
 
         recipe_env = False
         recipe_str = ""
@@ -266,9 +267,17 @@ class RulesMk:
 
                     variables_to_process[key].append(variable)
                 else:
-                    # recipe
-                    recipe_env = True
-                    recipe_str = line + '\n'
+                    # Wildcard %.TARGET: %.SOURCE DEP1 DEP2
+                    if line_split_by_space[0].startswith("%.") and line_split_by_space[1].startswith("%."):
+                        wildcard_targets.append(
+                            (line_split_by_space[0].strip("%.").strip(":").lower(), 
+                             line_split_by_space[1].strip("%.").lower(),
+                             ' '.join(line_split_by_space[2:]) if len(line_split_by_space) > 2 else '')
+                             )
+                    else:
+                        # recipe
+                        recipe_env = True
+                        recipe_str = line + '\n'
                 continue
             else:
                 # print(f"Skipped line {line}")
@@ -278,12 +287,24 @@ class RulesMk:
             targets.append(recipe_str.split(":")[0])
             rules.append(MKRule.from_str(recipe_str, containing_dir, include_dirs))
 
+        # Create all the rules for the wildcard rule declaration
+        for target_ext, object_ext, dependencies in wildcard_targets:
+            for filename in os.listdir(dir_path):
+                recipe_str = ''
+                filename_split = filename.split('.', 1)
+    
+                if filename_split[-1].lower() == object_ext:
+                    if (filename_split[0] + "." + target_ext).lower() not in (target.lower() for target in targets):
+                        recipe_str = (filename_split[0] + "." + target_ext + ": " + filename_split[0] + "." + object_ext + " " + dependencies).strip() + '\n'
+                        rules.append(MKRule.from_str(recipe_str, containing_dir, include_dirs))
+                        targets.append(filename_split[0] + "." + target_ext) 
+
         # Updates variables with wildcard values
         for wildcard, var in wildcard_variables.items():
-            stripped_wildcard = wildcard.strip("%.")
+            stripped_wildcard = wildcard.strip("%.").lower()
+            matched_targets = list(filter(lambda target: target.split(".")[1].lower() == stripped_wildcard, targets))
+            targets = list(filter(lambda target: target.split(".")[1].lower() != stripped_wildcard, targets))
 
-            matched_targets = list(filter(lambda target: target.split(".")[1] == stripped_wildcard, targets))
-            targets = list(filter(lambda target: target.split(".")[1] != stripped_wildcard, targets))
 
             for target in matched_targets:
                 if target not in variables:
@@ -292,7 +313,7 @@ class RulesMk:
 
         # Defines variables declared in Rules.mk
         for target, variableList in variables.items():
-            matched_rules = filter(lambda rule: rule.target == target, rules)
+            matched_rules = filter(lambda rule: rule.target.lower() == target.lower(), rules)
             for rule in matched_rules:
                 rule.variables = variableList
 
