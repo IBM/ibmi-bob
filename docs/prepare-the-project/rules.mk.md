@@ -147,6 +147,59 @@ VAT.MODULE: VAT.RPGLE
 
 ```
 
+### Wildcarding
+
+If you have multiple source that creates objects of the same type, you can make use of wildcarding.
+
+#### Without Wildcarding
+```
+FILE_TEXT := SAMPLE1
+MOD_TEXT := SAMPLE2
+
+TEST1.FILE: private TEXT := $(FILE_TEXT)
+TEST1.FILE: TEST1.TABLE DEP1.FILE DEP2.FILE
+
+TEST2.FILE: private TEXT := $(FILE_TEXT)
+TEST2.FILE: TEST2.TABLE DEP1.FILE DEP2.FILE
+
+TEST1.MODULE: private TEXT := $(MOD_TEXT)
+TEST1.MODULE: TEST1.RPGLE
+```
+
+#### With Wildcarding
+```
+FILE_TEXT := SAMPLE1
+MOD_TEXT := SAMPLE2
+
+%.FILE: private TEXT := $(FILE_TEXT)
+%.MODULE: private TEXT := $(MOD_TEXT)
+
+%.FILE: %.TABLE DEP1.FILE DEP2.FILE
+%.MODULE: %.RPGLE
+```
+The above two examples are equivalent. Note the use of wildcards for overriding compile settings for objects of the same type.
+
+When you include wildcarding in your Rules.mk, BOB will locate your source files  in the directory of your Rules.mk and create the respective objects.
+
+
+### Overriding with Wildcards
+If you have objects you need to build which are outside the wildcard case, you can explicity set them, and this will take precedence over wildcarding.
+
+```
+FILE_TEXT := SAMPLE1
+MOD_TEXT := SAMPLE2
+
+%.FILE: private TEXT := $(FILE_TEXT)
+%.MODULE: private TEXT := $(MOD_TEXT)
+
+%.FILE: %.TABLE DEP1 DEP2
+%.MODULE: %.RPGLE
+
+EMP.MODULE: private TEXT := OUTLIER
+EMP.MODULE: EMP.RPGLE A.TABLE
+```
+
+
 ## Further reading
 
 To learn more about makefile syntax, see the official [GNU Make documentation](https://www.gnu.org/software/make/manual/make.html).  Just remember that every object referenced in a Bob makefile must have an IFS file suffix (`.PGM`, `.FILE`, etc.) and be written in upper case.
