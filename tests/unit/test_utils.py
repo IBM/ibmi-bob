@@ -54,3 +54,5 @@ def test_joblob_not_found():
 def test_compile_targets_from_filenames():
     expected = ['TEST.DTAARA']
     assert get_compile_targets_from_filenames(['test.DTAARA']) == expected
+    expected = ['TEST.FILE']
+    assert get_compile_targets_from_filenames(['test.index']) == expected
