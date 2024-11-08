@@ -108,7 +108,7 @@ makei build [-h] [-t <target> | -d <subdir>] [-o <options>] [--bob-path <path>]
 
 
 ```
-makei cvtsrcpf [-h] [-c <CCSID>] <file> <library>
+makei cvtsrcpf [-h] [-c <ccsid>] [-l] [-t] <file> <library>
 ```
 
 Converts all members in a source physical file to properly-named (Bob-compatible), UTF-8 encoded, LF-terminated source files in the current directory in the IFS. Generally speaking, the source member type will become the filename extension.
@@ -138,7 +138,15 @@ It is likely that the same destination directory will contain converted members 
 
 - **-c, --ccsid**
 
-  An optional CCSID for the SRC-PF. See the description above for more details.
+  An optional CCSID to use as `TGTCCSID` on compiles if the SRC-PF CCSID being migrated is 65535. See above for in-depth description.
+
+- **-l, --tolower**
+
+  The generated source file name will be in lowercase.
+
+- **-t, --text**
+
+  The generated source file will include the member text as a comment. Note that besides the EBCDIC CCSID, the member text is the only other piece of metadata associated with a SRC-PF member outside of its contents. Build tools like BOB and Arcad Builder know how to extract this text description and specify it on the appropriate compile command so that the resultant object has the same description.
 
 #### Example
 
