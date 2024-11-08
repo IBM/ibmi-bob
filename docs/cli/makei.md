@@ -138,7 +138,7 @@ It is likely that the same destination directory will contain converted members 
 
 - **-c, --ccsid**
 
-  An optional CCSID for the SRC-PF. See the description above for more details.
+  An optional CCSID to use as `TGTCCSID` on compiles if the SRC-PF CCSID being migrated is 65535. See above for in-depth description.
 
 - **-l, --tolower**
 
@@ -146,7 +146,7 @@ It is likely that the same destination directory will contain converted members 
 
 - **-t, --text**
 
-  The generated source file will include the member text as a comment.
+  The generated source file will include the member text as a comment. Note that besides the EBCDIC CCSID, the member text is the only other piece of metadata associated with a SRC-PF member outside of its contents. Build tools like BOB and Arcad Builder know how to extract this text description and specify it on the appropriate compile command so that the resultant object has the same description.
 
 #### Example
 
