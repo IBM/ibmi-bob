@@ -288,15 +288,15 @@ class RulesMk:
             rules.append(MKRule.from_str(recipe_str, containing_dir, include_dirs))
 
         # Create all the rules for the wildcard rule declaration
-        for target_ext, object_ext, dependencies in wildcard_targets:
+        for target_ext, source_ext, dependencies in wildcard_targets:
             for filename in os.listdir(dir_path):
                 recipe_str = ''
                 filename_split = filename.split('.', 1)
     
-                if filename_split[-1].lower() == object_ext:
+                if filename_split[-1].lower() == source_ext:
                     target_object = (filename_split[0] + "." + target_ext).upper()
                     if  target_object not in targets:
-                        recipe_str = (filename_split[0] + "." + target_ext + ": " + filename_split[0] + "." + object_ext + " " + dependencies).strip() + '\n'
+                        recipe_str = (target_object + ": " + filename_split[0] + "." + source_ext + " " + dependencies).strip() + '\n'
                         rules.append(MKRule.from_str(recipe_str, containing_dir, include_dirs))
                         targets.append(target_object)
 
@@ -304,7 +304,7 @@ class RulesMk:
         for wildcard, var in wildcard_variables.items():
             stripped_wildcard = wildcard.strip("%.").upper()
             matched_targets = list(filter(lambda target: target.split(".")[1] == stripped_wildcard, targets))
-            targets = list(filter(lambda target: target.split(".")[1].lower() != stripped_wildcard, targets))
+            targets = list(filter(lambda target: target.split(".")[1] != stripped_wildcard, targets))
 
 
             for target in matched_targets:
