@@ -3,6 +3,49 @@ from tests.lib.const import DATA_PATH
 
 data_dir = DATA_PATH / "rules_mks"
 
+# Test use %.MODULE wildcards and variables
+# TGTVER := *PRV
+# CURRENT:=V7R5
+# HEADER := some
+
+# # test base wildcard with variables
+# %.MODULE: %.rpgle $(HEADER).rpgleinc
+# # test case sensitivity and overriding
+# Foo.MODULE: TGTVER=$(CURRENT)
+# # override different var
+# %.MODULE: TEXT := hardcoded TEXT
+# foo.MODULE: private TEXT := foo is better
+# foo.MODULE: TGTVER := V7R2
+# # now support multi line dependencies
+# %.PGM: %.pgm.rpgle \
+#        DB1.FILE
+def test_wildcard_recipes_variables():
+    # Test loading from a valid file
+    test_dir = data_dir / "wildcard"
+    rules_mk = RulesMk.from_file(test_dir / "wildcard.rules.mk", test_dir)
+    expected_targets = {'TRGs': [], 'DTAARAs': [], 'DTAQs': [], 'SQLs': [], 'BNDDs': [], 'PFs': [],
+                        'LFs': [], 'DSPFs': [], 'PRTFs': [], 'CMDs': [], 'MODULEs': ['FOO.MODULE'], 'SRVPGMs': [], 'PGMs': [],
+                        'MENUs': [], 'PNLGRPs': [], 'QMQRYs': [], 'WSCSTs': [], 'MSGs': []}
+
+    assert rules_mk.containing_dir == test_dir
+    assert rules_mk.subdirs == []
+    assert rules_mk.targets == expected_targets
+    assert rules_mk.rules[0].variables == ['TEXT := hardcoded TEXT','TGTVER=$(CURRENT)']
+    assert rules_mk.rules[0].commands == []
+    assert rules_mk.rules[0].dependencies == ['$(HEADER).rpgleinc']
+    assert rules_mk.rules[0].include_dirs == []
+    assert rules_mk.rules[0].target == 'FOO.MODULE'
+    assert rules_mk.rules[0].source_file == '$(d)/foo.rpgle'
+    assert str(rules_mk.rules[0]) == '''FOO.MODULE_SRC=$(d)/foo.rpgle
+FOO.MODULE_DEP=$(HEADER).rpgleinc
+FOO.MODULE_RECIPE=RPGLE_TO_MODULE_RECIPE
+FOO.MODULE: TGTVER=$(CURRENT)\n'''
+    assert str(rules_mk) == '''MODULEs := FOO.MODULE\n\n
+FOO.MODULE_SRC=$(d)/foo.rpgle
+FOO.MODULE_DEP=$(HEADER).rpgleinc
+FOO.MODULE_RECIPE=RPGLE_TO_MODULE_RECIPE
+FOO.MODULE: TGTVER=$(CURRENT)
+'''
 
 def test_from_file():
     # Test loading from a valid file
