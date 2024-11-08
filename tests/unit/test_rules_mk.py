@@ -39,11 +39,13 @@ def test_wildcard_recipes_variables():
     assert str(rules_mk.rules[0]) == '''FOO.MODULE_SRC=$(d)/foo.rpgle
 FOO.MODULE_DEP=$(HEADER).rpgleinc
 FOO.MODULE_RECIPE=RPGLE_TO_MODULE_RECIPE
+.MODULE: TEXT := hardcoded TEXT
 FOO.MODULE: TGTVER=$(CURRENT)\n'''
     assert str(rules_mk) == '''MODULEs := FOO.MODULE\n\n
 FOO.MODULE_SRC=$(d)/foo.rpgle
 FOO.MODULE_DEP=$(HEADER).rpgleinc
 FOO.MODULE_RECIPE=RPGLE_TO_MODULE_RECIPE
+.MODULE: TEXT := hardcoded TEXT
 FOO.MODULE: TGTVER=$(CURRENT)
 '''
 

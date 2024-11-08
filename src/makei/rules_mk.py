@@ -253,17 +253,17 @@ class RulesMk:
                     else:
                         variables_to_process = variables
 
-                    key = target.strip()
+                    key = target.strip().upper()
                     variable = variable.strip()
                     if key not in variables_to_process:
                         variables_to_process[key] = []
                     # Replace instances of rules_mk variables with their actual values
-                    var_split = variable.split()
+                    var_split = variable.split('=')
                     if var_split[-1].startswith("$(") and var_split[-1].endswith(")"):
                         rules_mk_var = var_split[-1][2:-1] # Remove leading $( and trailing )
                         if rules_mk_var in rules_mk_variables:
                             var_split[-1] = rules_mk_variables[rules_mk_var]
-                            variable = " ".join(var_split)
+                            variable = "=".join(var_split)
 
                     variables_to_process[key].append(variable)
                 else:
