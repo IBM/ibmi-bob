@@ -30,7 +30,8 @@ def test_wildcard_recipes_variables():
     assert rules_mk.containing_dir == test_dir
     assert rules_mk.subdirs == []
     assert rules_mk.targets == expected_targets
-    assert rules_mk.rules[0].variables == ['TEXT := hardcoded TEXT','TGTVER=V7R5']
+    assert rules_mk.rules[0].variables == ['TEXT := hardcoded for all mod','TGTVER=V7R5','private TEXT := foo is better','TGTVER := V7R2']
+#    assert rules_mk.rules[0].variables == ['TEXT := hardcoded TEXT','private TEXT := foo is better','TGTVER=V7R5']
     assert rules_mk.rules[0].commands == []
     assert rules_mk.rules[0].dependencies == ['$(HEADER).rpgleinc']
     assert rules_mk.rules[0].include_dirs == []
@@ -39,14 +40,18 @@ def test_wildcard_recipes_variables():
     assert str(rules_mk.rules[0]) == '''FOO.MODULE_SRC=$(d)/foo.rpgle
 FOO.MODULE_DEP=$(HEADER).rpgleinc
 FOO.MODULE_RECIPE=RPGLE_TO_MODULE_RECIPE
-FOO.MODULE: TEXT := hardcoded TEXT
-FOO.MODULE: TGTVER=V7R5\n'''
+FOO.MODULE: TEXT := hardcoded for all mod
+FOO.MODULE: TGTVER=V7R5
+FOO.MODULE: private TEXT := foo is better
+FOO.MODULE: TGTVER := V7R2\n'''
     assert str(rules_mk) == '''MODULEs := FOO.MODULE\n\n
 FOO.MODULE_SRC=$(d)/foo.rpgle
 FOO.MODULE_DEP=$(HEADER).rpgleinc
 FOO.MODULE_RECIPE=RPGLE_TO_MODULE_RECIPE
-FOO.MODULE: TEXT := hardcoded TEXT
+FOO.MODULE: TEXT := hardcoded for all mod
 FOO.MODULE: TGTVER=V7R5
+FOO.MODULE: private TEXT := foo is better
+FOO.MODULE: TGTVER := V7R2
 '''
 
 def test_from_file():
