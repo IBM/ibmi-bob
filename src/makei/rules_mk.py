@@ -216,7 +216,24 @@ class RulesMk:
         recipe_str = ""
         dir_path = src_dir.joinpath(containing_dir)  # directory with the source code
 
-        for line in rules_mk_str.split('\n'):
+        # Handle multiline continuation lines that end in a backslash ('\')
+        lines = []
+        current_line = ""
+        for line in rules_mk_str.splitlines():
+            stripped_line = line.strip()  # Strip leading and trailing whitespace
+            if stripped_line.startswith("#"):
+                # Comment lines
+                continue
+            if stripped_line.endswith("\\"):
+                # Continuation line
+                current_line += stripped_line.rstrip("\\").strip() + " "
+            else:
+                # Single line or last line of a continuation line
+                current_line += stripped_line
+                lines.append(current_line)
+                current_line = ""
+
+        for line in lines:
             if recipe_env:
                 if re.match(r'\s', line):
                     recipe_str += line + '\n'

@@ -12,7 +12,8 @@ Foo.MODULE: TGTVER=$(CURRENT)
 foo.MODule: private TEXT := foo is better
 foo.MODULE: TGTVER := V7R2
 # # now support multi line dependencies
-# %.PGM: %.pgm.rpgle \
-#        DB1.FILE
+%.PGM: %.pgm.rpgle \
+# This comment should not impact this rule \
+       DB1.FILE
 
 
