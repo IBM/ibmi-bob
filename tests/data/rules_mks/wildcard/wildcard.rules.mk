@@ -7,13 +7,12 @@ HEADER := some
 %.MODULE: %.rpgle $(HEADER).rpgleinc
 # test case sensitivity and overriding
 Foo.MODULE: TGTVER=$(CURRENT)
-# # override different var
+# override different var
 %.MODULE: TEXT := hardcoded for all mod
 foo.MODule: private TEXT := foo is better
 foo.MODULE: TGTVER := V7R2
-# # now support multi line dependencies
-%.PGM: %.pgm.rpgle \
-# This comment should not impact this rule \
-       DB1.FILE
+# support multi line dependencies
+bar.MODULE: bar.rpgle \
+			bar.TABLE \
 
 

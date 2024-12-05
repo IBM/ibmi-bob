@@ -202,7 +202,6 @@ class RulesMk:
 
         if include_dirs is None:
             include_dirs = []
-        rules_mk_str = rules_mk_str.strip().replace("\\\n", "")
 
         rules = []
         rules_mk_variables = {}
@@ -219,11 +218,8 @@ class RulesMk:
         # Handle multiline continuation lines that end in a backslash ('\')
         lines = []
         current_line = ""
-        for line in rules_mk_str.splitlines():
-            stripped_line = line.strip()  # Strip leading and trailing whitespace
-            if stripped_line.startswith("#"):
-                # Comment lines
-                continue
+        for line in rules_mk_str.split('\n'):
+            stripped_line = line.strip()
             if stripped_line.endswith("\\"):
                 # Continuation line
                 current_line += stripped_line.rstrip("\\").strip() + " "
@@ -244,8 +240,8 @@ class RulesMk:
                 recipe_env = False
                 recipe_str = ""
 
-            if line.startswith('#'):
-                # Comment line
+            if line.startswith('#') or line == '':
+                # Comment line or empty line
                 continue
 
             # pylint: disable=no-else-continue
@@ -255,7 +251,7 @@ class RulesMk:
                 subdir = line.strip().split('=')[1].split()
                 continue
             elif pattern.match(line):
-                # rules_mk variable definition
+                # rules_mk variable definition (ie. var := value)
                 line_split_by_equal = line.strip().split('=')
                 if len(line_split_by_equal) == 2:
                     rules_mk_var = line_split_by_equal[0].rstrip(" :")
