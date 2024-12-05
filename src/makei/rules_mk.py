@@ -219,13 +219,16 @@ class RulesMk:
         lines = []
         current_line = ""
         for line in rules_mk_str.split('\n'):
-            stripped_line = line.strip()
+            stripped_line = line.rstrip()
             if stripped_line.endswith("\\"):
                 # Continuation line
-                current_line += stripped_line.rstrip("\\").strip() + " "
+                current_line += stripped_line.rstrip(" \\") + " "
             else:
                 # Single line or last line of a continuation line
-                current_line += stripped_line
+                if(current_line == ""):
+                    current_line += stripped_line
+                else:
+                    current_line += stripped_line.lstrip()
                 lines.append(current_line)
                 current_line = ""
 

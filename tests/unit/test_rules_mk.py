@@ -232,8 +232,7 @@ ART301D.FILE_DEP=ARTICLE.FILE VATDEF.FILE\nART301D.FILE_RECIPE=DSPF_TO_FILE_RECI
 
     assert rules_mk.rules[4].variables == []
     assert rules_mk.rules[4].commands == ['@$(call echo_cmd,=== Creating [TMPDETORD.FILE] from custom recipe)',
-                                          'system -i "CPYF FROMFILE($(OBJLIB)/DETORD) TOFILE($(OBJLIB)/TMPDETORD) \\',
-                                          'CRTFILE(*YES)"',
+                                          'system -i "CPYF FROMFILE($(OBJLIB)/DETORD) TOFILE($(OBJLIB)/TMPDETORD) CRTFILE(*YES)"',
                                           '@$(call echo_success_cmd,End of creating TMPDETORD.FILE)']
     assert rules_mk.rules[4].dependencies == []
     assert rules_mk.rules[4].include_dirs == []
@@ -241,8 +240,8 @@ ART301D.FILE_DEP=ARTICLE.FILE VATDEF.FILE\nART301D.FILE_RECIPE=DSPF_TO_FILE_RECI
     assert rules_mk.rules[4].source_file is None
     assert str(rules_mk.rules[4]) == '''TMPDETORD.FILE_CUSTOM_RECIPE=true
 TMPDETORD.FILE : \n\t@$(call echo_cmd,=== Creating [TMPDETORD.FILE] from custom recipe)
-\tsystem -i "CPYF FROMFILE($(OBJLIB)/DETORD) TOFILE($(OBJLIB)/TMPDETORD) \\
-\tCRTFILE(*YES)"\n\t@$(call echo_success_cmd,End of creating TMPDETORD.FILE)\n'''
+\tsystem -i "CPYF FROMFILE($(OBJLIB)/DETORD) TOFILE($(OBJLIB)/TMPDETORD) CRTFILE(*YES)"
+\t@$(call echo_success_cmd,End of creating TMPDETORD.FILE)\n'''
 
     assert str(rules_mk) == '''PFs := ARTICLE.FILE DETORD.FILE TMPDETORD.FILE
 DSPFs := ART301D.FILE
@@ -257,7 +256,6 @@ DETORD.FILE_RECIPE=PF_TO_FILE_RECIPE\nORD500O.FILE_SRC=ORD500O.PRTF
 ORD500O.FILE_DEP=ORDER.FILE CUSTOMER.FILE DETORD.FILE ARTICLE.FILE
 ORD500O.FILE_RECIPE=PRTF_TO_FILE_RECIPE\nTMPDETORD.FILE_CUSTOM_RECIPE=true
 TMPDETORD.FILE : \n\t@$(call echo_cmd,=== Creating [TMPDETORD.FILE] from custom recipe)
-\tsystem -i "CPYF FROMFILE($(OBJLIB)/DETORD) TOFILE($(OBJLIB)/TMPDETORD) \\
-\tCRTFILE(*YES)"
+\tsystem -i "CPYF FROMFILE($(OBJLIB)/DETORD) TOFILE($(OBJLIB)/TMPDETORD) CRTFILE(*YES)"
 \t@$(call echo_success_cmd,End of creating TMPDETORD.FILE)
 '''
