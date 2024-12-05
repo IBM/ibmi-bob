@@ -209,7 +209,7 @@ class RulesMk:
         wildcard_variables = {}
         subdir = []
         targets = []
-        wildcard_targets=[]
+        wildcard_targets = []
 
         recipe_env = False
         recipe_str = ""
@@ -225,7 +225,7 @@ class RulesMk:
                 current_line += stripped_line.rstrip(" \\") + " "
             else:
                 # Single line or last line of a continuation line
-                if(current_line == ""):
+                if current_line == "":
                     current_line += stripped_line
                 else:
                     current_line += stripped_line.lstrip()
@@ -277,7 +277,7 @@ class RulesMk:
                     # Replace instances of rules_mk variables with their actual values
                     var_split = variable.split('=')
                     if var_split[-1].startswith("$(") and var_split[-1].endswith(")"):
-                        rules_mk_var = var_split[-1][2:-1] # Remove leading $( and trailing )
+                        rules_mk_var = var_split[-1][2:-1]  # Remove leading $( and trailing )
                         if rules_mk_var in rules_mk_variables:
                             var_split[-1] = rules_mk_variables[rules_mk_var]
                             variable = "=".join(var_split)
@@ -288,7 +288,7 @@ class RulesMk:
                     line_split_by_space = line.strip().split()
                     if line_split_by_space[0].startswith("%.") and line_split_by_space[1].startswith("%."):
                         wildcard_targets.append(
-                            (line_split_by_space[0].strip("%.").strip(":").upper(), 
+                            (line_split_by_space[0].strip("%.").strip(":").upper(),
                              line_split_by_space[1].strip("%.").lower(),
                              ' '.join(line_split_by_space[2:]) if len(line_split_by_space) > 2 else '')
                              )
@@ -310,11 +310,13 @@ class RulesMk:
             for filename in os.listdir(dir_path):
                 recipe_str = ''
                 filename_split = filename.split('.', 1)
-    
+
                 if filename_split[-1].lower() == source_ext:
                     target_object = (filename_split[0] + "." + target_ext).upper()
-                    if  target_object not in targets:
-                        recipe_str = (target_object + ": " + filename_split[0] + "." + source_ext + " " + dependencies).strip() + '\n'
+                    if target_object not in targets:
+                        recipe_str = (
+                            target_object + ": " + filename_split[0] + "." + source_ext + " " + dependencies
+                        ).strip() + '\n'
                         rules.append(MKRule.from_str(recipe_str, containing_dir, include_dirs))
                         targets.append(target_object)
 
@@ -323,7 +325,6 @@ class RulesMk:
             stripped_wildcard = wildcard.strip("%.").upper()
             matched_targets = list(filter(lambda target: target.split(".")[1] == stripped_wildcard, targets))
             targets = list(filter(lambda target: target.split(".")[1] != stripped_wildcard, targets))
-
 
             for target in matched_targets:
                 if target not in variables:
