@@ -232,20 +232,21 @@ class RulesMk:
                 continue
 
             # pylint: disable=no-else-continue
+            pattern = re.compile(r'^[^:]*(:=|=).*')
             if line.strip().startswith('SUBDIRS'):
                 # Subdir definition
                 subdir = line.strip().split('=')[1].split()
                 continue
-            elif ':' in line:
+            elif pattern.match(line):
                 # rules_mk variable definition
-                line_split_by_space = line.strip().split()
-                if len(line_split_by_space) == 3 and line_split_by_space[1] == ':=':
-                    rules_mk_var = line_split_by_space[0].strip()
-                    rules_mk_var_value = line_split_by_space[2].strip()
+                line_split_by_equal = line.strip().split('=')
+                if len(line_split_by_equal) == 2:
+                    rules_mk_var = line_split_by_equal[0].rstrip(" :")
+                    rules_mk_var_value = line_split_by_equal[1].strip()
                     rules_mk_variables[rules_mk_var] = rules_mk_var_value
-
+            elif ':' in line:
                 # Recipe declaration
-                elif '=' in line:
+                if '=' in line:
                     # private variable definition
                     target, variable = line.strip().split(':', 1)
                     if target.startswith("%."):
@@ -268,6 +269,7 @@ class RulesMk:
                     variables_to_process[key].append(variable)
                 else:
                     # Wildcard %.TARGET: %.SOURCE DEP1 DEP2
+                    line_split_by_space = line.strip().split()
                     if line_split_by_space[0].startswith("%.") and line_split_by_space[1].startswith("%."):
                         wildcard_targets.append(
                             (line_split_by_space[0].strip("%.").strip(":").upper(), 

@@ -1,6 +1,6 @@
 TGTVER := *PRV
 # need to support when no blanks delimiting the equals
-CURRENT := V7R5
+CURRENT:=V7R5
 HEADER := some
 
 # test base wildcard with variables
