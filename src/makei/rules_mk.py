@@ -278,7 +278,7 @@ class RulesMk:
                         variables_to_process[key] = []
                     # Replace instances of rules_mk variables with their actual values
                     var_split = variable.split('=')
-                    wrapped_var_key = var_split[-1].strip(" ") # Potential variable key wrapped in "$(" and ")"
+                    wrapped_var_key = var_split[-1].strip(" ")  # Potential variable key wrapped in "$(" and ")"
                     if wrapped_var_key.startswith("$(") and wrapped_var_key.endswith(")"):
                         rules_mk_var = wrapped_var_key[2:-1]  # Remove leading $( and trailing )
                         if rules_mk_var in rules_mk_variables:
