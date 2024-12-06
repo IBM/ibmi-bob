@@ -202,59 +202,142 @@ class RulesMk:
 
         if include_dirs is None:
             include_dirs = []
-        rules_mk_str = rules_mk_str.strip().replace("\\\n", "")
 
         rules = []
+        rules_mk_variables = {}
         variables = {}
+        wildcard_variables = {}
         subdir = []
+        targets = []
+        wildcard_targets = []
 
         recipe_env = False
         recipe_str = ""
         dir_path = src_dir.joinpath(containing_dir)  # directory with the source code
 
+        # Handle multiline continuation lines that end in a backslash ('\')
+        lines = []
+        current_line = ""
         for line in rules_mk_str.split('\n'):
+            stripped_line = line.rstrip()
+            if stripped_line.endswith("\\"):
+                # Continuation line
+                current_line += stripped_line.rstrip(" \\") + " "
+            else:
+                # Single line or last line of a continuation line
+                if current_line == "":
+                    current_line += stripped_line
+                else:
+                    current_line += stripped_line.lstrip()
+                lines.append(current_line)
+                current_line = ""
+
+        for line in lines:
             if recipe_env:
                 if re.match(r'\s', line):
                     recipe_str += line + '\n'
                     continue
 
+                targets.append(recipe_str.split(":")[0].upper())
                 rules.append(MKRule.from_str(recipe_str, containing_dir, include_dirs))
                 recipe_env = False
                 recipe_str = ""
 
-            if line.startswith('#'):
-                # Comment line
+            if line.startswith('#') or line == '':
+                # Comment line or empty line
                 continue
 
             # pylint: disable=no-else-continue
+            # Match strings that start with any sequence of characters (except ':'),
+            # followed by either ':=' or '=', and then any characters afterwards
+            pattern = re.compile(r'^[^:]*(:=|=).*')
             if line.strip().startswith('SUBDIRS'):
                 # Subdir definition
                 subdir = line.strip().split('=')[1].split()
                 continue
+            elif pattern.match(line):
+                # rules_mk variable definition (ie. var := value)
+                line_split_by_equal = line.strip().split('=')
+                if len(line_split_by_equal) == 2:
+                    rules_mk_var = line_split_by_equal[0].rstrip(" :")
+                    rules_mk_var_value = line_split_by_equal[1].strip()
+                    rules_mk_variables[rules_mk_var] = rules_mk_var_value
             elif ':' in line:
                 # Recipe declaration
                 if '=' in line:
                     # private variable definition
                     target, variable = line.strip().split(':', 1)
-                    key = target.strip()
-                    if key not in variables:
-                        variables[key] = []
-                    variables[key].append(variable.strip())
+                    if target.startswith("%."):
+                        variables_to_process = wildcard_variables
+                    else:
+                        variables_to_process = variables
+
+                    key = target.strip().upper()
+                    variable = variable.strip()
+                    if key not in variables_to_process:
+                        variables_to_process[key] = []
+                    # Replace instances of rules_mk variables with their actual values
+                    var_split = variable.split('=')
+                    wrapped_var_key = var_split[-1].strip(" ") # Potential variable key wrapped in "$(" and ")"
+                    if wrapped_var_key.startswith("$(") and wrapped_var_key.endswith(")"):
+                        rules_mk_var = wrapped_var_key[2:-1]  # Remove leading $( and trailing )
+                        if rules_mk_var in rules_mk_variables:
+                            var_split[0] = var_split[0].rstrip()
+                            var_split[-1] = rules_mk_variables[rules_mk_var]
+                            variable = "=".join(var_split)
+
+                    variables_to_process[key].append(variable)
                 else:
-                    # recipe
-                    recipe_env = True
-                    recipe_str = line + '\n'
+                    # Wildcard %.TARGET: %.SOURCE DEP1 DEP2
+                    line_split_by_space = line.strip().split()
+                    if line_split_by_space[0].startswith("%.") and line_split_by_space[1].startswith("%."):
+                        wildcard_targets.append(
+                            (line_split_by_space[0].strip("%.").strip(":").upper(),
+                             line_split_by_space[1].strip("%.").lower(),
+                             ' '.join(line_split_by_space[2:]) if len(line_split_by_space) > 2 else '')
+                             )
+                    else:
+                        # recipe
+                        recipe_env = True
+                        recipe_str = line + '\n'
                 continue
             else:
                 # print(f"Skipped line {line}")
                 continue
 
         if recipe_env:
+            targets.append(recipe_str.split(":")[0].upper())
             rules.append(MKRule.from_str(recipe_str, containing_dir, include_dirs))
+
+        # Create all the rules for the wildcard rule declaration
+        for target_ext, source_ext, dependencies in wildcard_targets:
+            for filename in os.listdir(dir_path):
+                recipe_str = ''
+                filename_split = filename.split('.', 1)
+
+                if filename_split[-1].lower() == source_ext:
+                    target_object = (filename_split[0] + "." + target_ext).upper()
+                    if target_object not in targets:
+                        recipe_str = (
+                            target_object + ": " + filename_split[0] + "." + source_ext + " " + dependencies
+                        ).strip() + '\n'
+                        rules.append(MKRule.from_str(recipe_str, containing_dir, include_dirs))
+                        targets.append(target_object)
+
+        # Updates variables with wildcard values
+        for wildcard, var in wildcard_variables.items():
+            stripped_wildcard = wildcard.strip("%.").upper()
+            matched_targets = list(filter(lambda target: target.split(".")[1] == stripped_wildcard, targets))
+            targets = list(filter(lambda target: target.split(".")[1] != stripped_wildcard, targets))
+
+            for target in matched_targets:
+                if target not in variables:
+                    variables[target] = []
+                variables[target] = var + variables[target]
 
         # Defines variables declared in Rules.mk
         for target, variableList in variables.items():
-            matched_rules = filter(lambda rule: rule.target == target, rules)
+            matched_rules = filter(lambda rule: rule.target.upper() == target, rules)
             for rule in matched_rules:
                 rule.variables = variableList
 

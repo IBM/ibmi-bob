@@ -3,6 +3,81 @@ from tests.lib.const import DATA_PATH
 
 data_dir = DATA_PATH / "rules_mks"
 
+# Test use %.MODULE wildcards and variables
+# TGTVER := *PRV
+# CURRENT:=V7R5
+# HEADER := some
+
+# # test base wildcard with variables
+# %.MODULE: %.rpgle $(HEADER).rpgleinc
+# # test case sensitivity and overriding
+# Foo.MODULE: TGTVER=$(CURRENT)
+# # override different var
+# %.MODULE: TEXT := hardcoded TEXT
+# foo.MODULE: private TEXT := foo is better
+# foo.MODULE: TGTVER := V7R2
+# # now support multi line dependencies
+# %.PGM: %.pgm.rpgle \
+#        DB1.FILE
+
+
+def test_wildcard_recipes_variables():
+    # Test loading from a valid file
+    test_dir = data_dir / "wildcard"
+    rules_mk = RulesMk.from_file(test_dir / "wildcard.rules.mk", test_dir)
+    expected_targets = {'TRGs': [], 'DTAARAs': [], 'DTAQs': [], 'SQLs': [], 'BNDDs': [],
+                        'PFs': [], 'LFs': [], 'DSPFs': [], 'PRTFs': [], 'CMDs': [],
+                        'MODULEs': ['BAR.MODULE', 'FOO.MODULE'], 'SRVPGMs': [], 'PGMs': [],
+                        'MENUs': [], 'PNLGRPs': [], 'QMQRYs': [], 'WSCSTs': [], 'MSGs': []}
+    assert rules_mk.containing_dir == test_dir
+    assert rules_mk.subdirs == []
+    assert rules_mk.targets == expected_targets
+
+    assert rules_mk.rules[0].variables == ['TEXT := hardcoded for all mod', 'COMMIT=*NONE', 'TGTVER:=V7R3']
+    assert rules_mk.rules[0].commands == []
+    assert rules_mk.rules[0].dependencies == ['bar.TABLE']
+    assert rules_mk.rules[0].include_dirs == []
+    assert rules_mk.rules[0].target == 'BAR.MODULE'
+    assert rules_mk.rules[0].source_file == '$(d)/bar.rpgle'
+    assert str(rules_mk.rules[0]) == '''BAR.MODULE_SRC=$(d)/bar.rpgle
+BAR.MODULE_DEP=bar.TABLE
+BAR.MODULE_RECIPE=RPGLE_TO_MODULE_RECIPE
+BAR.MODULE: TEXT := hardcoded for all mod
+BAR.MODULE: COMMIT=*NONE
+BAR.MODULE: TGTVER:=V7R3
+'''
+
+    assert rules_mk.rules[1].variables == ['TEXT := hardcoded for all mod', 'TGTVER=V7R5',
+                                           'private TEXT := foo is better', 'TGTVER := V7R2']
+    assert rules_mk.rules[1].commands == []
+    assert rules_mk.rules[1].dependencies == ['$(HEADER).rpgleinc']
+    assert rules_mk.rules[1].include_dirs == []
+    assert rules_mk.rules[1].target == 'FOO.MODULE'
+    assert rules_mk.rules[1].source_file == '$(d)/foo.rpgle'
+    assert str(rules_mk.rules[1]) == '''FOO.MODULE_SRC=$(d)/foo.rpgle
+FOO.MODULE_DEP=$(HEADER).rpgleinc
+FOO.MODULE_RECIPE=RPGLE_TO_MODULE_RECIPE
+FOO.MODULE: TEXT := hardcoded for all mod
+FOO.MODULE: TGTVER=V7R5
+FOO.MODULE: private TEXT := foo is better
+FOO.MODULE: TGTVER := V7R2\n'''
+
+    assert str(rules_mk) == '''MODULEs := BAR.MODULE FOO.MODULE\n\n
+BAR.MODULE_SRC=$(d)/bar.rpgle
+BAR.MODULE_DEP=bar.TABLE
+BAR.MODULE_RECIPE=RPGLE_TO_MODULE_RECIPE
+BAR.MODULE: TEXT := hardcoded for all mod
+BAR.MODULE: COMMIT=*NONE
+BAR.MODULE: TGTVER:=V7R3
+FOO.MODULE_SRC=$(d)/foo.rpgle
+FOO.MODULE_DEP=$(HEADER).rpgleinc
+FOO.MODULE_RECIPE=RPGLE_TO_MODULE_RECIPE
+FOO.MODULE: TEXT := hardcoded for all mod
+FOO.MODULE: TGTVER=V7R5
+FOO.MODULE: private TEXT := foo is better
+FOO.MODULE: TGTVER := V7R2
+'''
+
 
 def test_from_file():
     # Test loading from a valid file
@@ -165,18 +240,19 @@ ARTICLE.FILE_RECIPE=PF_TO_FILE_RECIPE\n'''
 ART301D.FILE_DEP=ARTICLE.FILE VATDEF.FILE\nART301D.FILE_RECIPE=DSPF_TO_FILE_RECIPE\n'''
 
     assert rules_mk.rules[4].variables == []
-    assert rules_mk.rules[4].commands == ['@$(call echo_cmd,=== Creating [TMPDETORD.FILE] from custom recipe)',
-                                          'system -i "CPYF FROMFILE($(OBJLIB)/DETORD) TOFILE($(OBJLIB)/TMPDETORD) \\',
-                                          'CRTFILE(*YES)"',
-                                          '@$(call echo_success_cmd,End of creating TMPDETORD.FILE)']
+    assert rules_mk.rules[4].commands == [
+        '@$(call echo_cmd,=== Creating [TMPDETORD.FILE] from custom recipe)',
+        'system -i "CPYF FROMFILE($(OBJLIB)/DETORD) TOFILE($(OBJLIB)/TMPDETORD) CRTFILE(*YES)"',
+        '@$(call echo_success_cmd,End of creating TMPDETORD.FILE)'
+    ]
     assert rules_mk.rules[4].dependencies == []
     assert rules_mk.rules[4].include_dirs == []
     assert rules_mk.rules[4].target == 'TMPDETORD.FILE'
     assert rules_mk.rules[4].source_file is None
     assert str(rules_mk.rules[4]) == '''TMPDETORD.FILE_CUSTOM_RECIPE=true
 TMPDETORD.FILE : \n\t@$(call echo_cmd,=== Creating [TMPDETORD.FILE] from custom recipe)
-\tsystem -i "CPYF FROMFILE($(OBJLIB)/DETORD) TOFILE($(OBJLIB)/TMPDETORD) \\
-\tCRTFILE(*YES)"\n\t@$(call echo_success_cmd,End of creating TMPDETORD.FILE)\n'''
+\tsystem -i "CPYF FROMFILE($(OBJLIB)/DETORD) TOFILE($(OBJLIB)/TMPDETORD) CRTFILE(*YES)"
+\t@$(call echo_success_cmd,End of creating TMPDETORD.FILE)\n'''
 
     assert str(rules_mk) == '''PFs := ARTICLE.FILE DETORD.FILE TMPDETORD.FILE
 DSPFs := ART301D.FILE
@@ -191,7 +267,6 @@ DETORD.FILE_RECIPE=PF_TO_FILE_RECIPE\nORD500O.FILE_SRC=ORD500O.PRTF
 ORD500O.FILE_DEP=ORDER.FILE CUSTOMER.FILE DETORD.FILE ARTICLE.FILE
 ORD500O.FILE_RECIPE=PRTF_TO_FILE_RECIPE\nTMPDETORD.FILE_CUSTOM_RECIPE=true
 TMPDETORD.FILE : \n\t@$(call echo_cmd,=== Creating [TMPDETORD.FILE] from custom recipe)
-\tsystem -i "CPYF FROMFILE($(OBJLIB)/DETORD) TOFILE($(OBJLIB)/TMPDETORD) \\
-\tCRTFILE(*YES)"
+\tsystem -i "CPYF FROMFILE($(OBJLIB)/DETORD) TOFILE($(OBJLIB)/TMPDETORD) CRTFILE(*YES)"
 \t@$(call echo_success_cmd,End of creating TMPDETORD.FILE)
 '''
