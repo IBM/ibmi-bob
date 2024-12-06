@@ -92,7 +92,6 @@ jobs:
             --cmd "echo Clean up..." \
             --ignore --cl "DLTLIB $(so -bl ${GITHUB_HEAD_REF}_${{ matrix.project.name }})" \
             --rcwd "../../../github_ci/" \
-            --ignore --cl "rm -rf '${GITHUB_SHA}'"
         env:
           IBMI_HOST: ${{ secrets.IBMI_HOST }}
           IBMI_USER: ${{ secrets.IBMI_USER }}
