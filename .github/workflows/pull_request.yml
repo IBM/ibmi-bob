@@ -1,0 +1,67 @@
+name: Run python build and build sample projects
+
+on:
+  workflow_dispatch:
+
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  lint-and-python-tests:
+    name: Run Linter and Python Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set Up Python 3.9
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"
+      - name: Install nox
+        run: python -m pip install nox
+      - name: Run Linter
+        run: nox -s lint
+      - name: Run Python Tests
+        run: nox -s tests
+
+  bob-recursive-example:
+    name: Build bob-recursive-example
+    runs-on: ubuntu-latest
+    environment: COMMON1
+    steps:
+      - name: Checkout ibmi-bob
+        uses: actions/checkout@v4
+        with:
+          path: ibmi-bob
+      - name: Checkout bob-recursive-example
+        uses: actions/checkout@v4
+        with:
+          repository: IBM/bob-recursive-example
+          path: bob-recursive-example
+      - name: Set up Node.js 20.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20.x
+      - name: Install ibmi-ci
+        run: npm i -g @ibm/ibmi-ci
+      - name: Deploy to IBM i
+        run: | 
+          ici \
+            --cmd "mkdir -p '~/builds/github_ci${GITHUB_HEAD_REF}/ibmi_bob'" \
+            --rcwd "~/builds/github_ci/${GITHUB_HEAD_REF}/ibmi_bob" \
+            --push "~/ibmi-bob" \
+            --cmd "export BOBPATH=${HOME}/builds/github_ci/${GITHUB_HEAD_REF}/ibmi_bob"
+            --cmd "export PATH=${BOBPATH}/bin:$PATH"
+            --cmd "echo $PATH"
+            --cmd "chmod +x ${BOBPATH}/bin/makei"
+            --cmd "which makei"
+            --cmd "mkdir -p '~/builds/github_ci/${GITHUB_HEAD_REF}/bob-recursive-example'" \
+            --rcwd "~/builds/github_ci/${GITHUB_HEAD_REF}/bob-recursive-example" \
+            --push "./bob-recursive-example" \
+            --ignore --cl "CRTLIB $(so -bl ${GITHUB_HEAD_REF})" \
+            --cmd "makei b -e lib1=$(so -bl ${GITHUB_HEAD_REF})"
+        env:
+          IBMI_HOST: ${{ secrets.IBMI_HOST }}
+          IBMI_USER: ${{ secrets.IBMI_USER }}
+          IBMI_PASSWORD: ${{ secrets.IBMI_PASSWORD }}
+          IBMI_SSH_PORT: ${{ secrets.IBMI_SSH_PORT }}
