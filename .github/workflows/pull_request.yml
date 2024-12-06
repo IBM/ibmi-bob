@@ -1,4 +1,4 @@
-name: Run python build and build sample projects
+name: Pull Request Review
 
 on:
   workflow_dispatch:
