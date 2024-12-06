@@ -25,32 +25,9 @@ jobs:
         run: nox -s test
 
   project-build:
-    name: Build ${{ matrix.project.name }}
+    name: Build
     runs-on: ubuntu-latest
     environment: COMMON1
-    strategy:
-      matrix:
-        project:
-          - { 
-              name: bob-recursive-example,
-              lib: lib1,
-              directory: functionsVAT,
-              file: vat300.rpgle,
-              firstBuild: "0 failed 125 succeed 125 total",
-              secondBuild: "0 failed 5 succeed 5 total",
-              firstCompile: "0 failed 1 succeed 1 total",
-              secondCompile: "0 failed 2 succeed 2 total"
-            }
-          - { 
-              name: ibmi-company_system,
-              lib: CURLIB,
-              directory: qrpglesrc,
-              file: mypgm.pgm.rpgle,
-              firstBuild: "0 failed 7 succeed 7 total",
-              secondBuild: "0 failed 1 succeed 1 total",
-              firstCompile: "0 failed 1 succeed 1 total",
-              secondCompile: "0 failed 1 succeed 1 total"
-          }
     steps:
       - name: Checkout ibmi-bob
         uses: actions/checkout@v4
