@@ -52,9 +52,9 @@ jobs:
             --cmd "echo Building ${{ matrix.project }}..." \
             --cmd "git clone https://github.com/IBM/${{ matrix.project }}.git ../${{ matrix.project }}" \
             --rcwd "../${{ matrix.project }}" \
-            --ignore --cl "CRTLIB $(so -bl ${GITHUB_HEAD_REF})" \
-            --cmd "../ibmi_bob/bin/makei b -e lib1=$(so -bl ${GITHUB_HEAD_REF})" \
-            --ignore --cl "DLTLIB $(so -bl ${GITHUB_HEAD_REF})" \
+            --ignore --cl "CRTLIB $(so -bl ${GITHUB_HEAD_REF}_${{ matrix.project }})" \
+            --cmd "../ibmi_bob/bin/makei b -e lib1=$(so -bl ${GITHUB_HEAD_REF}_${{ matrix.project }})" \
+            --ignore --cl "DLTLIB $(so -bl ${GITHUB_HEAD_REF}_${{ matrix.project }})" \
         env:
           IBMI_HOST: ${{ secrets.IBMI_HOST }}
           IBMI_USER: ${{ secrets.IBMI_USER }}
