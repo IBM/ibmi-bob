@@ -31,13 +31,6 @@ jobs:
     steps:
       - name: Checkout ibmi-bob
         uses: actions/checkout@v4
-        with:
-          path: ibmi-bob
-      - name: Checkout bob-recursive-example
-        uses: actions/checkout@v4
-        with:
-          repository: IBM/bob-recursive-example
-          path: bob-recursive-example
       - name: Set up Node.js 20.x
         uses: actions/setup-node@v3
         with:
@@ -52,7 +45,7 @@ jobs:
             --cmd "echo Setting up bob..." \
             --cmd "mkdir -p './builds/github_ci/${GITHUB_SHA}/ibmi_bob'" \
             --rcwd "./builds/github_ci/${GITHUB_SHA}/ibmi_bob" \
-            --push "./ibmi-bob/." \
+            --push "." \
             --cmd "export BOBPATH=${HOME}/builds/github_ci/${GITHUB_SHA}/ibmi_bob" \
             --cmd "export PATH=${BOBPATH}/bin:$PATH" \
             --cmd "echo $PATH" \
@@ -61,7 +54,7 @@ jobs:
             --cmd "echo Building bob-recursive-example..." \
             --cmd "mkdir -p '../bob-recursive-example'" \
             --rcwd "../bob-recursive-example" \
-            --push "./bob-recursive-example/." \
+            --cmd "git clone https://github.com/IBM/bob-recursive-example.git"
         env:
           IBMI_HOST: ${{ secrets.IBMI_HOST }}
           IBMI_USER: ${{ secrets.IBMI_USER }}
