@@ -248,6 +248,8 @@ class RulesMk:
                 continue
 
             # pylint: disable=no-else-continue
+            # Match strings that start with any sequence of characters (except ':'),
+            # followed by either ':=' or '=', and then any characters afterwards
             pattern = re.compile(r'^[^:]*(:=|=).*')
             if line.strip().startswith('SUBDIRS'):
                 # Subdir definition
@@ -276,9 +278,11 @@ class RulesMk:
                         variables_to_process[key] = []
                     # Replace instances of rules_mk variables with their actual values
                     var_split = variable.split('=')
-                    if var_split[-1].startswith("$(") and var_split[-1].endswith(")"):
-                        rules_mk_var = var_split[-1][2:-1]  # Remove leading $( and trailing )
+                    wrapped_var_key = var_split[-1].strip(" ") # Potential variable key wrapped in "$(" and ")"
+                    if wrapped_var_key.startswith("$(") and wrapped_var_key.endswith(")"):
+                        rules_mk_var = wrapped_var_key[2:-1]  # Remove leading $( and trailing )
                         if rules_mk_var in rules_mk_variables:
+                            var_split[0] = var_split[0].rstrip()
                             var_split[-1] = rules_mk_variables[rules_mk_var]
                             variable = "=".join(var_split)
 

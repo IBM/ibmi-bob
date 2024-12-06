@@ -33,7 +33,7 @@ def test_wildcard_recipes_variables():
     assert rules_mk.subdirs == []
     assert rules_mk.targets == expected_targets
 
-    assert rules_mk.rules[0].variables == ['TEXT := hardcoded for all mod']
+    assert rules_mk.rules[0].variables == ['TEXT := hardcoded for all mod', 'COMMIT=*NONE', 'TGTVER:=V7R3']
     assert rules_mk.rules[0].commands == []
     assert rules_mk.rules[0].dependencies == ['bar.TABLE']
     assert rules_mk.rules[0].include_dirs == []
@@ -43,6 +43,8 @@ def test_wildcard_recipes_variables():
 BAR.MODULE_DEP=bar.TABLE
 BAR.MODULE_RECIPE=RPGLE_TO_MODULE_RECIPE
 BAR.MODULE: TEXT := hardcoded for all mod
+BAR.MODULE: COMMIT=*NONE
+BAR.MODULE: TGTVER:=V7R3
 '''
 
     assert rules_mk.rules[1].variables == ['TEXT := hardcoded for all mod', 'TGTVER=V7R5',
@@ -65,6 +67,8 @@ BAR.MODULE_SRC=$(d)/bar.rpgle
 BAR.MODULE_DEP=bar.TABLE
 BAR.MODULE_RECIPE=RPGLE_TO_MODULE_RECIPE
 BAR.MODULE: TEXT := hardcoded for all mod
+BAR.MODULE: COMMIT=*NONE
+BAR.MODULE: TGTVER:=V7R3
 FOO.MODULE_SRC=$(d)/foo.rpgle
 FOO.MODULE_DEP=$(HEADER).rpgleinc
 FOO.MODULE_RECIPE=RPGLE_TO_MODULE_RECIPE
