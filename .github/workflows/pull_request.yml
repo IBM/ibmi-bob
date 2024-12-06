@@ -47,8 +47,11 @@ jobs:
             --rcwd "./builds/github_ci/${GITHUB_SHA}/ibmi_bob" \
             --push "." \
             --cmd "echo Building bob-recursive-example..." \
-            --rcwd ".." \
-            --cmd "git clone https://github.com/IBM/bob-recursive-example.git"
+            --cmd "git clone https://github.com/IBM/bob-recursive-example.git .."
+            --rcwd "../bob-recursive-example" \
+            --ignore --cl "CRTLIB $(so -bl ${GITHUB_HEAD_REF})" \
+            --cmd "../ibmi_bob/bin/makei b -e lib1=$(so -bl ${GITHUB_HEAD_REF})" \
+            --ignore --cl "CLTLIB $(so -bl ${GITHUB_HEAD_REF})" \
         env:
           IBMI_HOST: ${{ secrets.IBMI_HOST }}
           IBMI_USER: ${{ secrets.IBMI_USER }}
