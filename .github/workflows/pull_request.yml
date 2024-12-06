@@ -65,6 +65,7 @@ jobs:
       - name: Deploy to IBM i
         run: | 
           ici \
+            --cmd "exit 1" \
             --cmd "echo Setting up bob..." \
             --cmd "mkdir -p './builds/github_ci/${GITHUB_SHA}/ibmi_bob'" \
             --rcwd "./builds/github_ci/${GITHUB_SHA}/ibmi_bob" \
