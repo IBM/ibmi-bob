@@ -1038,7 +1038,7 @@ endef
 define VIEW_TO_FILE_RECIPE = 
 	$(FILE_VARIABLES)
 	$(eval d = $($@_d))
-	@$(call echo_cmd,"=== Creating SQL VIEW from Sql statement [$(notdir $<)] in $(OBJLIB)")
+	@$(call echo_cmd,"=== Creating SQL VIEW $(OBJLIB)/$(basename $(notdir $@)) from Sql statement [$(notdir $<)]")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
 	$(eval mbrtextcmd := CHGOBJD OBJ($(OBJLIB)/$(basename $(notdir $@))) OBJTYPE(*FILE) TEXT('$(TEXT)'))
 	@$(PRESETUP) \
@@ -1049,7 +1049,7 @@ endef
 define INDEX_TO_FILE_RECIPE = 
 	$(FILE_VARIABLES)
 	$(eval d = $($@_d))
-	@$(call echo_cmd,"=== Creating SQL INDEX from Sql statement [$(notdir $<)] in $(OBJLIB)")
+	@$(call echo_cmd,"=== Creating SQL INDEX $(OBJLIB)/$(basename $(notdir $@)) from Sql statement [$(notdir $<)]")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
 	$(eval mbrtextcmd := CHGOBJD OBJ($(OBJLIB)/$(basename $(notdir $@))) OBJTYPE(*FILE) TEXT('$(TEXT)'))
 	@$(PRESETUP) \
@@ -1060,7 +1060,7 @@ endef
 define SQLUDT_TO_FILE_RECIPE = 
 	$(FILE_VARIABLES)
 	$(eval d = $($@_d))
-	@$(call echo_cmd,"=== Creating SQL UDT from Sql statement [$(notdir $<)] in $(OBJLIB)")
+	@$(call echo_cmd,"=== Creating SQL UDT $(OBJLIB)/$(basename $(notdir $@)) from Sql statement [$(notdir $<)]")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
 	$(eval mbrtextcmd := CHGOBJD OBJ($(OBJLIB)/$(basename $(notdir $@))) OBJTYPE(*FILE) TEXT('$(TEXT)'))
 	@$(PRESETUP) \
@@ -1071,7 +1071,7 @@ endef
 define SQLALIAS_TO_FILE_RECIPE =
 	$(FILE_VARIABLES)
 	$(eval d = $($@_d))
-	@$(call echo_cmd,"=== Creating SQL ALIAS from Sql statement [$(notdir $<)] in $(OBJLIB)")
+	@$(call echo_cmd,"=== Creating SQL ALIAS $(OBJLIB)/$(basename $(notdir $@)) from Sql statement [$(notdir $<)]")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
 	$(eval mbrtextcmd := CHGOBJD OBJ($(OBJLIB)/$(basename $(notdir $@))) OBJTYPE(*FILE) TEXT('$(TEXT)'))
 	@$(PRESETUP) \
@@ -1094,7 +1094,7 @@ endef
 define SQLSEQ_TO_DTAARA_RECIPE =
 	$(DTAARA_VARIABLES)
 	$(eval d = $($@_d))
-	@$(call echo_cmd,"=== Creating SQL SEQUENCE from Sql statement [$(notdir $<)] in $(OBJLIB)")
+	@$(call echo_cmd,"=== Creating SQL SEQUENCE $(OBJLIB)/$(basename $(notdir $@)) from Sql statement [$(notdir $<)]")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
 	$(eval mbrtextcmd := CHGOBJD OBJ($(OBJLIB)/$(basename $(notdir $@))) OBJTYPE(*DTAARA) TEXT('$(TEXT)'))
 	@$(PRESETUP) \
@@ -1258,7 +1258,7 @@ endef
 
 define SQLPRC_TO_PGM_RECIPE =
 	$(PGM_VARIABLES)
-	@$(call echo_cmd,"=== Creating SQL PROCEDURE from Sql statement [$(notdir $<)]")
+	@$(call echo_cmd,"=== Creating SQL PROCEDURE $(OBJLIB)/$(basename $(notdir $@)) from Sql statement [$(notdir $<)]")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
 	$(eval mbrtextcmd := CHGOBJD OBJ($(OBJLIB)/$(basename $(notdir $@))) OBJTYPE(*PGM) TEXT('$(TEXT)'))
 	@$(PRESETUP) \
@@ -1268,7 +1268,7 @@ endef
 
 define SQLTRG_TO_PGM_RECIPE =
 	$(PGM_VARIABLES)
-	@$(call echo_cmd,"=== Creating SQL TRIGGER in $(CURLIB)from Sql statement [$(notdir $<)]")
+	@$(call echo_cmd,"=== Creating SQL TRIGGER $(OBJLIB)/$(basename $(notdir $@)) from Sql statement [$(notdir $<)]")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
 	$(eval mbrtextcmd :=  CHGOBJD OBJ($(OBJLIB)/$(basename $(notdir $@))) OBJTYPE(*PGM) TEXT('$(TEXT)'))
 	@$(PRESETUP) \
@@ -1420,7 +1420,7 @@ endef
 define SQLUDF_TO_SRVPGM_RECIPE = 
 	$(SRVPGM_VARIABLES)
 	$(eval d = $($@_d))
-	@$(call echo_cmd,"=== Creating SQL UDF from Sql statement [$(notdir $<)]")
+	@$(call echo_cmd,"=== Creating SQL UDF $(OBJLIB)/$(basename $(notdir $@)) from Sql statement [$(notdir $<)]")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
 	$(eval mbrtextcmd := CHGOBJD OBJ($(OBJLIB)/$(basename $(notdir $@))) OBJTYPE(*SRVPGM) TEXT('$(TEXT)'))
 	@$(PRESETUP) \
