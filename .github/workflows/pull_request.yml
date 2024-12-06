@@ -46,10 +46,10 @@ jobs:
             --cmd "mkdir -p './builds/github_ci/${GITHUB_SHA}/ibmi_bob'" \
             --rcwd "./builds/github_ci/${GITHUB_SHA}/ibmi_bob" \
             --push "." \
-            --cmd "export BOBPATH=${HOME}/builds/github_ci/${GITHUB_SHA}/ibmi_bob" \
-            --cmd "export PATH=${BOBPATH}/bin:$PATH" \
+            --cmd "export BOBPATH=$HOME/builds/github_ci/${GITHUB_SHA}/ibmi_bob" \
+            --cmd "export PATH=$BOBPATH/bin:$PATH" \
             --cmd "echo $PATH" \
-            --cmd "chmod +x ${BOBPATH}/bin/makei" \
+            --cmd "chmod +x $BOBPATH/bin/makei" \
             --cmd "which makei" \
             --cmd "echo Building bob-recursive-example..." \
             --cmd "mkdir -p '../bob-recursive-example'" \
