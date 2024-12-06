@@ -31,8 +31,8 @@ jobs:
     strategy:
       matrix:
         project:
-          - { name: bob-recursive-example, lib: lib1 }
-          - { name: ibmi-company_system, lib: CURLIB }
+          - { name: bob-recursive-example, lib: lib1, directory: functionsVAT, file: vat300.rpgle }
+          - { name: ibmi-company_system, lib: CURLIB, directory: qrpglesrc, file: mypgm.pgm.rpgle }
     steps:
       - name: Checkout ibmi-bob
         uses: actions/checkout@v4
@@ -51,11 +51,20 @@ jobs:
             --cmd "mkdir -p './builds/github_ci/${GITHUB_SHA}/ibmi_bob'" \
             --rcwd "./builds/github_ci/${GITHUB_SHA}/ibmi_bob" \
             --push "." \
-            --cmd "echo Building ${{ matrix.project.name }}..." \
+            --cmd "echo Full build..." \
             --cmd "git clone https://github.com/IBM/${{ matrix.project.name }}.git ../${{ matrix.project.name }}" \
             --rcwd "../${{ matrix.project.name }}" \
             --ignore --cl "CRTLIB $(so -bl ${GITHUB_HEAD_REF}_${{ matrix.project.name }})" \
             --cmd "../ibmi_bob/bin/makei b -e ${{ matrix.project.lib }}=$(so -bl ${GITHUB_HEAD_REF}_${{ matrix.project.name }})" \
+            --cmd "echo Touch one file and full build..." \
+            --cmd "touch ${{ matrix.project.directory }}/${{ matrix.project.file }}" \
+            --cmd "../ibmi_bob/bin/makei b -e ${{ matrix.project.lib }}=$(so -bl ${GITHUB_HEAD_REF}_${{ matrix.project.name }})" \
+            --cmd "echo Touch one file and compile it..." \
+            --cmd "touch ${{ matrix.project.directory }}/${{ matrix.project.file }}" \
+            --cmd "../ibmi_bob/bin/makei c -f ${{ matrix.project.directory }}/${{ matrix.project.file }} -e ${{ matrix.project.lib }}=$(so -bl ${GITHUB_HEAD_REF}_${{ matrix.project.name }})" \
+            --cmd "echo Touch one file and compile directory..." \
+            --cmd "touch ${{ matrix.project.directory }}/${{ matrix.project.file }}" \
+            --cmd "../ibmi_bob/bin/makei c -f ${{ matrix.project.directory }} -e ${{ matrix.project.lib }}=$(so -bl ${GITHUB_HEAD_REF}_${{ matrix.project.name }})" \
             --ignore --cl "DLTLIB $(so -bl ${GITHUB_HEAD_REF}_${{ matrix.project.name }})" \
         env:
           IBMI_HOST: ${{ secrets.IBMI_HOST }}
