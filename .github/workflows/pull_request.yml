@@ -1,4 +1,4 @@
-name: Pull Request Review
+name: PR Review
 
 on:
   workflow_dispatch:
@@ -49,7 +49,7 @@ jobs:
       - name: Deploy to IBM i
         run: | 
           ici \
-            --cmd "echo Setting up bob..."
+            --cmd "echo Setting up bob..." \
             --cmd "mkdir -p './builds/github_ci/${GITHUB_HEAD_REF}/ibmi_bob'" \
             --rcwd "./builds/github_ci/${GITHUB_HEAD_REF}/ibmi_bob" \
             --push "./ibmi-bob" \
