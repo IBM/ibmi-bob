@@ -22,7 +22,7 @@ jobs:
       - name: Run Linter
         run: nox -s lint
       - name: Run Python Tests
-        run: nox -s tests
+        run: nox -s test
 
   bob-recursive-example:
     name: Build bob-recursive-example
