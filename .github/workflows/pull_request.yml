@@ -47,16 +47,18 @@ jobs:
       - name: Deploy to IBM i
         run: | 
           ici \
-            --cmd "mkdir -p '~/builds/github_ci${GITHUB_HEAD_REF}/ibmi_bob'" \
-            --rcwd "~/builds/github_ci/${GITHUB_HEAD_REF}/ibmi_bob" \
-            --push "~/ibmi-bob" \
-            --cmd "export BOBPATH=${HOME}/builds/github_ci/${GITHUB_HEAD_REF}/ibmi_bob"
-            --cmd "export PATH=${BOBPATH}/bin:$PATH"
-            --cmd "echo $PATH"
-            --cmd "chmod +x ${BOBPATH}/bin/makei"
-            --cmd "which makei"
-            --cmd "mkdir -p '~/builds/github_ci/${GITHUB_HEAD_REF}/bob-recursive-example'" \
-            --rcwd "~/builds/github_ci/${GITHUB_HEAD_REF}/bob-recursive-example" \
+            --cmd "echo Setting up bob..."
+            --cmd "mkdir -p './builds/github_ci/${GITHUB_HEAD_REF}/ibmi_bob'" \
+            --rcwd "./builds/github_ci/${GITHUB_HEAD_REF}/ibmi_bob" \
+            --push "./ibmi-bob" \
+            --cmd "export BOBPATH=${HOME}/builds/github_ci/${GITHUB_HEAD_REF}/ibmi_bob" \
+            --cmd "export PATH=${BOBPATH}/bin:$PATH" \
+            --cmd "echo $PATH" \
+            --cmd "chmod +x ${BOBPATH}/bin/makei" \
+            --cmd "which makei" \
+            --cmd "echo Building bob-recursive-example..." \
+            --cmd "mkdir -p '../bob-recursive-example'" \
+            --rcwd "../bob-recursive-example" \
             --push "./bob-recursive-example" \
             --ignore --cl "CRTLIB $(so -bl ${GITHUB_HEAD_REF})" \
             --cmd "makei b -e lib1=$(so -bl ${GITHUB_HEAD_REF})"
