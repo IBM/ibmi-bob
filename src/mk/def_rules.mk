@@ -1025,9 +1025,9 @@ endef
 define TABLE_TO_FILE_RECIPE = 
 	$(FILE_VARIABLES)
 	$(eval d = $($@_d))
-	@$(call echo_cmd,"=== Creating SQL TABLE from Sql statement [$(notdir $<)] in $(OBJLIB)")
+	@$(call echo_cmd,"=== Creating SQL TABLE $(OBJLIB)/$(basename $(notdir $@)) from Sql statement [$(notdir $<)]")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
-	$(eval mbrtextcmd := CHGOBJD OBJ($(OBJLIB)/$(basename $(notdir $<))) OBJTYPE(*FILE) TEXT('$(TEXT)'))
+	$(eval mbrtextcmd := CHGOBJD OBJ($(OBJLIB)/$(basename $(notdir $@))) OBJTYPE(*FILE) TEXT('$(TEXT)'))
 	@$(PRESETUP) \
 	$(SETCURLIBTOOBJLIB) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" "$(PRECMD)" "$(POSTCMD)" "$(notdir $@)" "$<" $(logFile) "" "$(mbrtextcmd)"> $(logFile) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
@@ -1038,9 +1038,9 @@ endef
 define VIEW_TO_FILE_RECIPE = 
 	$(FILE_VARIABLES)
 	$(eval d = $($@_d))
-	@$(call echo_cmd,"=== Creating SQL VIEW from Sql statement [$(notdir $<)] in $(OBJLIB)")
+	@$(call echo_cmd,"=== Creating SQL VIEW $(OBJLIB)/$(basename $(notdir $@)) from Sql statement [$(notdir $<)]")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
-	$(eval mbrtextcmd := CHGOBJD OBJ($(OBJLIB)/$(basename $(notdir $<))) OBJTYPE(*FILE) TEXT('$(TEXT)'))
+	$(eval mbrtextcmd := CHGOBJD OBJ($(OBJLIB)/$(basename $(notdir $@))) OBJTYPE(*FILE) TEXT('$(TEXT)'))
 	@$(PRESETUP) \
 	$(SETCURLIBTOOBJLIB) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" "$(PRECMD)" "$(POSTCMD)" "$(notdir $@)" "$<" $(logFile) "" "$(mbrtextcmd)"> $(logFile) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
@@ -1049,9 +1049,9 @@ endef
 define INDEX_TO_FILE_RECIPE = 
 	$(FILE_VARIABLES)
 	$(eval d = $($@_d))
-	@$(call echo_cmd,"=== Creating SQL INDEX from Sql statement [$(notdir $<)] in $(OBJLIB)")
+	@$(call echo_cmd,"=== Creating SQL INDEX $(OBJLIB)/$(basename $(notdir $@)) from Sql statement [$(notdir $<)]")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
-	$(eval mbrtextcmd := CHGOBJD OBJ($(OBJLIB)/$(basename $(notdir $<))) OBJTYPE(*FILE) TEXT('$(TEXT)'))
+	$(eval mbrtextcmd := CHGOBJD OBJ($(OBJLIB)/$(basename $(notdir $@))) OBJTYPE(*FILE) TEXT('$(TEXT)'))
 	@$(PRESETUP) \
 	$(SETCURLIBTOOBJLIB) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" "$(PRECMD)" "$(POSTCMD)" "$(notdir $@)" "$<" $(logFile) "" "$(mbrtextcmd)"> $(logFile) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
@@ -1060,9 +1060,9 @@ endef
 define SQLUDT_TO_FILE_RECIPE = 
 	$(FILE_VARIABLES)
 	$(eval d = $($@_d))
-	@$(call echo_cmd,"=== Creating SQL UDT from Sql statement [$(notdir $<)] in $(OBJLIB)")
+	@$(call echo_cmd,"=== Creating SQL UDT $(OBJLIB)/$(basename $(notdir $@)) from Sql statement [$(notdir $<)]")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
-	$(eval mbrtextcmd := CHGOBJD OBJ($(OBJLIB)/$(basename $(notdir $<))) OBJTYPE(*FILE) TEXT('$(TEXT)'))
+	$(eval mbrtextcmd := CHGOBJD OBJ($(OBJLIB)/$(basename $(notdir $@))) OBJTYPE(*FILE) TEXT('$(TEXT)'))
 	@$(PRESETUP) \
 	$(SETCURLIBTOOBJLIB) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" "$(PRECMD)" "$(POSTCMD)" "$(notdir $@)" "$<" $(logFile) "" "$(mbrtextcmd)"> $(logFile) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
@@ -1071,9 +1071,9 @@ endef
 define SQLALIAS_TO_FILE_RECIPE =
 	$(FILE_VARIABLES)
 	$(eval d = $($@_d))
-	@$(call echo_cmd,"=== Creating SQL ALIAS from Sql statement [$(notdir $<)] in $(OBJLIB)")
+	@$(call echo_cmd,"=== Creating SQL ALIAS $(OBJLIB)/$(basename $(notdir $@)) from Sql statement [$(notdir $<)]")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
-	$(eval mbrtextcmd := CHGOBJD OBJ($(OBJLIB)/$(basename $(notdir $<))) OBJTYPE(*FILE) TEXT('$(TEXT)'))
+	$(eval mbrtextcmd := CHGOBJD OBJ($(OBJLIB)/$(basename $(notdir $@))) OBJTYPE(*FILE) TEXT('$(TEXT)'))
 	@$(PRESETUP) \
 	$(SETCURLIBTOOBJLIB) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" "$(PRECMD)" "$(POSTCMD)" "$(notdir $@)" "$<" $(logFile) "" "$(mbrtextcmd)"> $(logFile) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
@@ -1094,9 +1094,9 @@ endef
 define SQLSEQ_TO_DTAARA_RECIPE =
 	$(DTAARA_VARIABLES)
 	$(eval d = $($@_d))
-	@$(call echo_cmd,"=== Creating SQL SEQUENCE from Sql statement [$(notdir $<)] in $(OBJLIB)")
+	@$(call echo_cmd,"=== Creating SQL SEQUENCE $(OBJLIB)/$(basename $(notdir $@)) from Sql statement [$(notdir $<)]")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
-	$(eval mbrtextcmd := CHGOBJD OBJ($(OBJLIB)/$(basename $(notdir $<))) OBJTYPE(*DTAARA) TEXT('$(TEXT)'))
+	$(eval mbrtextcmd := CHGOBJD OBJ($(OBJLIB)/$(basename $(notdir $@))) OBJTYPE(*DTAARA) TEXT('$(TEXT)'))
 	@$(PRESETUP) \
 	$(SETCURLIBTOOBJLIB) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" "$(PRECMD)" "$(POSTCMD)" "$(notdir $@)" "$<" $(logFile) "" "$(mbrtextcmd)"> $(logFile) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
@@ -1218,7 +1218,7 @@ endef
 
 define CBLLE_TO_MODULE_RECIPE =
 	$(MODULE_VARIABLES)
-	@$(call echo_cmd,"=== Create ILE COBOL module [$(basename $@)] in $(OBJLIB)")
+	@$(call echo_cmd,"=== Creating ILE COBOL module [$(basename $@)] in $(OBJLIB)")
 	$(eval crtcmd := crtcblmod module($(OBJLIB)/$(basename $(@F))) srcstmf('$<') $(CRTCBLMODFLAGS))
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" "$(PRECMD)" "$(POSTCMD)" "$(notdir $@)" "$<" "$(logFile)"> $(logFile) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
@@ -1258,9 +1258,9 @@ endef
 
 define SQLPRC_TO_PGM_RECIPE =
 	$(PGM_VARIABLES)
-	@$(call echo_cmd,"=== Creating SQL PROCEDURE from Sql statement [$(notdir $<)]")
+	@$(call echo_cmd,"=== Creating SQL PROCEDURE $(OBJLIB)/$(basename $(notdir $@)) from Sql statement [$(notdir $<)]")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
-	$(eval mbrtextcmd := CHGOBJD OBJ($(OBJLIB)/$(basename $(notdir $<))) OBJTYPE(*PGM) TEXT('$(TEXT)'))
+	$(eval mbrtextcmd := CHGOBJD OBJ($(OBJLIB)/$(basename $(notdir $@))) OBJTYPE(*PGM) TEXT('$(TEXT)'))
 	@$(PRESETUP) \
 	$(SETCURLIBTOOBJLIB) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" "$(PRECMD)" "$(POSTCMD)" "$(notdir $@)" "$<" "$(logFile)" "" "$(mbrtextcmd)"> $(logFile) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
@@ -1268,9 +1268,9 @@ endef
 
 define SQLTRG_TO_PGM_RECIPE =
 	$(PGM_VARIABLES)
-	@$(call echo_cmd,"=== Creating SQL TRIGGER in $(CURLIB)from Sql statement [$(notdir $<)]")
+	@$(call echo_cmd,"=== Creating SQL TRIGGER $(OBJLIB)/$(basename $(notdir $@)) from Sql statement [$(notdir $<)]")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
-	$(eval mbrtextcmd :=  CHGOBJD OBJ($(OBJLIB)/$(basename $(notdir $<))) OBJTYPE(*PGM) TEXT('$(TEXT)'))
+	$(eval mbrtextcmd :=  CHGOBJD OBJ($(OBJLIB)/$(basename $(notdir $@))) OBJTYPE(*PGM) TEXT('$(TEXT)'))
 	@$(PRESETUP) \
 	$(SETCURLIBTOOBJLIB) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" "$(PRECMD)" "$(POSTCMD)" "$(notdir $@)" "$<" "$(logFile)" "" "$(mbrtextcmd)"> $(logFile) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
@@ -1279,7 +1279,7 @@ endef
 
 define PGM.RPGLE_TO_PGM_RECIPE =
 	$(PGM_VARIABLES)
-	@$(call echo_cmd,"=== Create Bound RPG Program [$(basename $@)] in $(OBJLIB)")
+	@$(call echo_cmd,"=== Creating Bound RPG Program [$(basename $@)] in $(OBJLIB)")
 	$(eval crtcmd := CRTBNDRPG srcstmf('$<') PGM($(OBJLIB)/$(basename $(@F))) $(CRTBNDRPGFLAGS))
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" "$(PRECMD)" "$(POSTCMD)" "$(notdir $@)" "$<" "$(logFile)"> $(logFile) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
@@ -1288,7 +1288,7 @@ endef
 
 define PGM.SQLRPGLE_TO_PGM_RECIPE =
 	$(PGM_VARIABLES)
-	@$(call echo_cmd,"=== Create Bound SQLRPGLE Program [$(basename $@)] in $(OBJLIB)")
+	@$(call echo_cmd,"=== Creating Bound SQLRPGLE Program [$(basename $@)] in $(OBJLIB)")
 	$(eval crtcmd := CRTSQLRPGI srcstmf('$<') OBJ($(OBJLIB)/$(basename $(@F))) $(CRTSQLRPGIFLAGS))
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" "$(PRECMD)" "$(POSTCMD)" "$(notdir $@)" "$<" "$(logFile)"> $(logFile) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
@@ -1297,7 +1297,7 @@ endef
 
 define PGM.C_TO_PGM_RECIPE =
 	$(PGM_VARIABLES)
-	@$(call echo_cmd,"=== Create Bound C Program [$(basename $@)] in $(OBJLIB)")
+	@$(call echo_cmd,"=== Creating Bound C Program [$(basename $@)] in $(OBJLIB)")
 	$(eval crtcmd := CRTBNDC srcstmf('$<') PGM($(OBJLIB)/$(basename $(@F))) $(CRTBNDCFLAGS))
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" "$(PRECMD)" "$(POSTCMD)" "$(notdir $@)" "$<" "$(logFile)"> $(logFile) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
@@ -1306,7 +1306,7 @@ endef
 
 define CBL_TO_PGM_RECIPE =
 	$(PGM_VARIABLES)
-	@$(call echo_cmd,"=== Create COBOL Program [$(basename $@)] in $(OBJLIB)")
+	@$(call echo_cmd,"=== Creating COBOL Program [$(basename $@)] in $(OBJLIB)")
 	$(eval crtcmd := $(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID) -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTCBLPGM" -p $(CRTCBLPGMFLAGS))
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTCBLPGM" -p "$(CRTCBLPGMFLAGS)" --save-joblog "$(JOBLOGFILE)" --precmd="$(PRECMD)" --postcmd="$(POSTCMD)" --output="$(logFile)" > $(logFile) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
@@ -1315,7 +1315,7 @@ endef
 
 define PGM.CBLLE_TO_PGM_RECIPE =
 	$(PGM_VARIABLES)
-	@$(call echo_cmd,"=== Create COBOL Program [$(basename $@)] in $(OBJLIB)")
+	@$(call echo_cmd,"=== Creating COBOL Program [$(basename $@)] in $(OBJLIB)")
 	$(eval crtcmd := CRTBNDCBL srcstmf('$<') PGM($(OBJLIB)/$(basename $(@F))) $(CRTBNDCBLFLAGS)) 
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" "$(PRECMD)" "$(POSTCMD)" "$(notdir $@)" "$<" "$(logFile)"> $(logFile) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
@@ -1324,7 +1324,7 @@ endef
 
 define PGM.SQLCBLLE_TO_PGM_RECIPE =
 	$(PGM_VARIABLES)
-	@$(call echo_cmd,"=== Create Bound SQLCBLLE Program [$(basename $@)] in $(OBJLIB)")
+	@$(call echo_cmd,"=== Creating Bound SQLCBLLE Program [$(basename $@)] in $(OBJLIB)")
 	$(eval crtcmd := crtsqlcbli srcstmf('$<') OBJ($(OBJLIB)/$(basename $(@F))) $(CRTSQLCBLIFLAGS))
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" "$(PRECMD)" "$(POSTCMD)" "$(notdir $@)" "$<" "$(logFile)"> $(logFile) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
@@ -1333,7 +1333,7 @@ endef
 
 define PGM.CLLE_TO_PGM_RECIPE =
 	$(PGM_VARIABLES)
-	@$(call echo_cmd,"=== Create ILE CL Program [$(basename $@)]")
+	@$(call echo_cmd,"=== Creating ILE CL Program [$(basename $@)]")
 	$(eval crtcmd := $(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTBNDCL" -p $(CRTBNDCLFLAGS))
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTBNDCL" -p "$(CRTBNDCLFLAGS)" --save-joblog "$(JOBLOGFILE)" --precmd="$(PRECMD)" --postcmd="$(POSTCMD)" --output="$(logFile)" > $(logFile) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
@@ -1342,7 +1342,7 @@ endef
 
 define CLP_TO_PGM_RECIPE =
 	$(PGM_VARIABLES)
-	@$(call echo_cmd,"=== Create OPM CL Program [$(basename $@)]")
+	@$(call echo_cmd,"=== Creating OPM CL Program [$(basename $@)]")
 	$(eval crtcmd := $(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTCLPGM" -p $(CRTCLPGMFLAGS))
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTCLPGM" -p "$(CRTCLPGMFLAGS)" --save-joblog "$(JOBLOGFILE)" --precmd="$(PRECMD)" --postcmd="$(POSTCMD)" --output="$(logFile)" > $(logFile) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
@@ -1351,7 +1351,7 @@ endef
 
 define RPG_TO_PGM_RECIPE =
 	$(PGM_VARIABLES)
-	@$(call echo_cmd,"=== Create RPG Program [$(basename $@)]")
+	@$(call echo_cmd,"=== Creating RPG Program [$(basename $@)]")
 	$(eval crtcmd := $(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID) -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTRPGPGM" -p $(CRTRPGPGMFLAGS))
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTRPGPGM" -p "$(CRTRPGPGMFLAGS)" --save-joblog "$(JOBLOGFILE)" --precmd="$(PRECMD)" --postcmd="$(POSTCMD)" --output="$(logFile)" > $(logFile) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
@@ -1392,7 +1392,7 @@ define PNLGRPSRC_TO_PNLGRP_RECIPE =
 	$(PNLGRP_VARIABLES)
 	$(eval d = $($@_d))
 	$(eval RCDLEN = 268)
-	@$(call echo_cmd,"=== Create panel group [$(basename $@)]")
+	@$(call echo_cmd,"=== Creating panel group [$(basename $@)]")
 	$(eval crtcmd := $(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTPNLGRP" -r $(RCDLEN) -p $(CRTPNLGRPFLAGS))
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID) -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTPNLGRP" -r $(RCDLEN) -p "$(CRTPNLGRPFLAGS)" --save-joblog "$(JOBLOGFILE)" --precmd="$(PRECMD)" --postcmd="$(POSTCMD)" --output="$(logFile)" > $(logFile) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
@@ -1420,9 +1420,9 @@ endef
 define SQLUDF_TO_SRVPGM_RECIPE = 
 	$(SRVPGM_VARIABLES)
 	$(eval d = $($@_d))
-	@$(call echo_cmd,"=== Creating SQL UDF from Sql statement [$(notdir $<)]")
+	@$(call echo_cmd,"=== Creating SQL UDF $(OBJLIB)/$(basename $(notdir $@)) from Sql statement [$(notdir $<)]")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
-	$(eval mbrtextcmd := CHGOBJD OBJ($(OBJLIB)/$(basename $(notdir $<))) OBJTYPE(*SRVPGM) TEXT('$(TEXT)'))
+	$(eval mbrtextcmd := CHGOBJD OBJ($(OBJLIB)/$(basename $(notdir $@))) OBJTYPE(*SRVPGM) TEXT('$(TEXT)'))
 	@$(PRESETUP) \
 	$(SETCURLIBTOOBJLIB) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" "$(PRECMD)" "$(POSTCMD)" "$(notdir $@)" "$<" "$(logFile)" "" "$(mbrtextcmd)"> $(logFile) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
@@ -1524,7 +1524,7 @@ endef
 define SQL_TO_QMQRY_RECIPE =
 	$(QMQRY_VARIABLES)
 	$(eval d = $($@_d))
-	@$(call echo_cmd,"=== Create QM query [$(basename $@)]")
+	@$(call echo_cmd,"=== Creating QM query [$(basename $@)]")
 	$(eval crtcmd := $(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID) -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTQMQRY" -p $(CRTQMQRYFLAGS))
 	$(PRESETUP) \
 	$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID) -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTQMQRY" -p "$(CRTQMQRYFLAGS)" --save-joblog "$(JOBLOGFILE)" --precmd="$(PRECMD)" --postcmd="$(POSTCMD)" --output="$(logFile)" > $(logFile) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
