@@ -46,17 +46,12 @@ jobs:
             --cmd "mkdir -p './builds/github_ci/${GITHUB_SHA}/ibmi_bob'" \
             --rcwd "./builds/github_ci/${GITHUB_SHA}/ibmi_bob" \
             --push "." \
-            --cmd "export BOBPATH=$HOME/builds/github_ci/${GITHUB_SHA}/ibmi_bob" \
-            --cmd "export PATH=$BOBPATH/bin:$PATH" \
-            --cmd "echo $PATH" \
-            --cmd "chmod +x $BOBPATH/bin/makei" \
-            --cmd "which makei" \
             --cmd "echo Building bob-recursive-example..." \
-            --cmd "mkdir -p '../bob-recursive-example'" \
-            --rcwd "../bob-recursive-example" \
+            --rcwd ".." \
             --cmd "git clone https://github.com/IBM/bob-recursive-example.git"
         env:
           IBMI_HOST: ${{ secrets.IBMI_HOST }}
           IBMI_USER: ${{ secrets.IBMI_USER }}
           IBMI_PASSWORD: ${{ secrets.IBMI_PASSWORD }}
           IBMI_SSH_PORT: ${{ secrets.IBMI_SSH_PORT }}
+          BOBPATH:
