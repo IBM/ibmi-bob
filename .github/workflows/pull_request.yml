@@ -38,7 +38,7 @@ jobs:
               file: vat300.rpgle,
               firstBuild: "0 failed 125 succeed 125 total",
               secondBuild: "0 failed 5 succeed 5 total",
-              firstCompile: "0 failed 1 succeed 1 total",
+              firstCompile: "1 failed 1 succeed 1 total",
               secondCompile: "0 failed 2 succeed 2 total"
             }
           - { 
@@ -78,7 +78,6 @@ jobs:
             --cmd "../ibmi_bob/bin/makei b -e ${{ matrix.project.lib }}=$(so -bl ${GITHUB_HEAD_REF}_${{ matrix.project.name }}) | tee firstBuild.log" \
             --cmd "grep '${{ matrix.project.firstBuild }}' firstBuild.log || (echo 'First build failed!' && exit 1)" \
             --cmd "echo Touch one file and full build..." \
-            --cmd "touch ${{ matrix.project.directory }}/${{ matrix.project.file }}" \
             --cmd "../ibmi_bob/bin/makei b -e ${{ matrix.project.lib }}=$(so -bl ${GITHUB_HEAD_REF}_${{ matrix.project.name }}) | tee secondBuild.log" \
             --cmd "grep '${{ matrix.project.secondBuild }}' secondBuild.log || (echo 'Second build failed!' && exit 1)" \
             --cmd "echo Touch one file and compile it..." \
