@@ -52,7 +52,7 @@ jobs:
             --cmd "echo Setting up bob..." \
             --cmd "mkdir -p './builds/github_ci/${GITHUB_SHA}/ibmi_bob'" \
             --rcwd "./builds/github_ci/${GITHUB_SHA}/ibmi_bob" \
-            --push "./ibmi-bob" \
+            --push "./ibmi-bob/." \
             --cmd "export BOBPATH=${HOME}/builds/github_ci/${GITHUB_SHA}/ibmi_bob" \
             --cmd "export PATH=${BOBPATH}/bin:$PATH" \
             --cmd "echo $PATH" \
@@ -61,9 +61,7 @@ jobs:
             --cmd "echo Building bob-recursive-example..." \
             --cmd "mkdir -p '../bob-recursive-example'" \
             --rcwd "../bob-recursive-example" \
-            --push "./bob-recursive-example" \
-            --ignore --cl "CRTLIB $(so -bl ${GITHUB_SHA})" \
-            --cmd "makei b -e lib1=$(so -bl ${GITHUB_SHA})"
+            --push "./bob-recursive-example/." \
         env:
           IBMI_HOST: ${{ secrets.IBMI_HOST }}
           IBMI_USER: ${{ secrets.IBMI_USER }}
