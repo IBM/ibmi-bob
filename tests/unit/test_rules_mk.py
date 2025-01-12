@@ -230,14 +230,14 @@ def test_dds_recipe():
     assert str(rules_mk.rules[0]) == '''ARTICLE.FILE_SRC=ARTICLE-Article_File.PF\nARTICLE.FILE_DEP=SAMREF.FILE
 ARTICLE.FILE_RECIPE=PF_TO_FILE_RECIPE\n'''
 
-    assert rules_mk.rules[1].variables == []
+    assert rules_mk.rules[1].variables == ['DFRWRT = *NO', 'ENHDSP = *NO']
     assert rules_mk.rules[1].commands == []
     assert rules_mk.rules[1].dependencies == ['ARTICLE.FILE', 'VATDEF.FILE']
     assert rules_mk.rules[1].include_dirs == []
     assert rules_mk.rules[1].target == 'ART301D.FILE'
     assert rules_mk.rules[1].source_file == 'ART301D-Function_Select_an_article.DSPF'
     assert str(rules_mk.rules[1]) == '''ART301D.FILE_SRC=ART301D-Function_Select_an_article.DSPF
-ART301D.FILE_DEP=ARTICLE.FILE VATDEF.FILE\nART301D.FILE_RECIPE=DSPF_TO_FILE_RECIPE\n'''
+ART301D.FILE_DEP=ARTICLE.FILE VATDEF.FILE\nART301D.FILE_RECIPE=DSPF_TO_FILE_RECIPE\nART301D.FILE: DFRWRT = *NO\nART301D.FILE: ENHDSP = *NO\n'''
 
     assert rules_mk.rules[4].variables == []
     assert rules_mk.rules[4].commands == [
@@ -261,7 +261,8 @@ ARTICLE.FILE_SRC=ARTICLE-Article_File.PF\nARTICLE.FILE_DEP=SAMREF.FILE
 ARTICLE.FILE_RECIPE=PF_TO_FILE_RECIPE
 ART301D.FILE_SRC=ART301D-Function_Select_an_article.DSPF
 ART301D.FILE_DEP=ARTICLE.FILE VATDEF.FILE
-ART301D.FILE_RECIPE=DSPF_TO_FILE_RECIPE\nDETORD.FILE_SRC=DETORD.PF
+ART301D.FILE_RECIPE=DSPF_TO_FILE_RECIPE\nART301D.FILE: DFRWRT = *NO\nART301D.FILE: ENHDSP = *NO
+DETORD.FILE_SRC=DETORD.PF
 DETORD.FILE_DEP=SAMREF.FILE
 DETORD.FILE_RECIPE=PF_TO_FILE_RECIPE\nORD500O.FILE_SRC=ORD500O.PRTF
 ORD500O.FILE_DEP=ORDER.FILE CUSTOMER.FILE DETORD.FILE ARTICLE.FILE
