@@ -1,4 +1,6 @@
-# How source is compiled from the IFS
+# Compiler Specific Requirements
+
+## How source is compiled from the IFS
 
 | Language    | Compile from IFS                | Specify EBCDIC encoding |
 | :---------- | :------------------------------ | :---------------------- |
@@ -15,7 +17,7 @@ The value for the EBCDIC CCSID used to compile is derived from the [.ibmi.json](
 <b id="fn1">1</b>: Modern ILE compilers support the `SRCSTMF(ifs/path)` parameter to compile directly from the 
 IFS file system.  There are not issues with line length etc.[↩](#a1)
 
-<b id="fn2">2</b>: Modern compilers support the `TGTCCSID(ebcdic-ccsid)` parameter to specify the CCSID that the UTF-8 IFS source should be transformed to before compiling.  This allows national characters in stirng literals etc. to be preserved. [↩](#a2)
+<b id="fn2">2</b>: Modern compilers support the `TGTCCSID(ebcdic-ccsid)` parameter to specify the CCSID that the UTF-8 IFS source should be transformed to before compiling.  This allows national characters in string literals etc. to be preserved. [↩](#a2)
 
 
 <b id="fn3">3</b>: The ILE RPG TGTCCSID() parameter was added in V7R4. For IBM i 7.3 please make sure the PTF `SI74590` in product `5770WDS` is applied.  Otherwise the compile will fail because the TGTCCSID parameter will not be recognized.  BOB is not supported on IBM i 7.2 and earlier.
