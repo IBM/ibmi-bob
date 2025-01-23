@@ -17,6 +17,7 @@
     - [.ibmi.json](prepare-the-project/ibmi-json)
     - [User/Workspace Settings](prepare-the-project/user-workspace-settings)
   - [Defining Targets using Rules.mk](prepare-the-project/rules.mk.md)
+  - [Compiler Specific Requirements](prepare-the-project/compiler-specific.md)
 - Integration
   - [Client Tools](integration/client-tools.md) 
   - [RDi](integration/rdi.md)
