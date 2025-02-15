@@ -237,7 +237,8 @@ ARTICLE.FILE_RECIPE=PF_TO_FILE_RECIPE\n'''
     assert rules_mk.rules[1].target == 'ART301D.FILE'
     assert rules_mk.rules[1].source_file == 'ART301D-Function_Select_an_article.DSPF'
     assert str(rules_mk.rules[1]) == '''ART301D.FILE_SRC=ART301D-Function_Select_an_article.DSPF
-ART301D.FILE_DEP=ARTICLE.FILE VATDEF.FILE\nART301D.FILE_RECIPE=DSPF_TO_FILE_RECIPE\nART301D.FILE: DFRWRT = *NO\nART301D.FILE: ENHDSP = *NO\n'''
+ART301D.FILE_DEP=ARTICLE.FILE VATDEF.FILE\nART301D.FILE_RECIPE=DSPF_TO_FILE_RECIPE
+ART301D.FILE: DFRWRT = *NO\nART301D.FILE: ENHDSP = *NO\n'''
 
     assert rules_mk.rules[4].variables == []
     assert rules_mk.rules[4].commands == [
