@@ -127,6 +127,9 @@ endif
 ifndef DEFINE
 DEFINE := 
 endif
+ifndef DFRWRT
+DFRWRT := *YES
+endif
 ifndef DETAIL
 DETAIL := *EXTENDED 
 endif
@@ -135,6 +138,9 @@ DFTACTGRP := *NO
 endif
 ifndef DLTPCT
 DLTPCT := *NONE 
+endif
+ifndef ENHDSP
+ENHDSP := *YES
 endif
 ifndef HLPID
 HLPID = 
@@ -286,6 +292,8 @@ CLMOD_INCDIR := $(INCDIR)
 CLMOD_TGTRLS := $(TGTRLS)
 
 DSPF_AUT := $(AUT)
+DSPF_DFRWRT := $(DFRWRT)
+DSPF_ENHDSP := $(ENHDSP)
 DSPF_OPTION := *EVENTF *SRC *LIST
 DSPF_RSTDSP := *YES
 
@@ -401,7 +409,7 @@ CRTCMODFLAGS = TERASPACE($(TERASPACE)) STGMDL($(STGMDL)) OUTPUT(*PRINT) OPTION($
 CRTCPPMODFLAGS = TERASPACE($(TERASPACE)) STGMDL($(STGMDL)) OUTPUT(*PRINT) OPTION($(OPTION)) DBGVIEW($(DBGVIEW)) OPTIMIZE($(OPTIMIZE)) \
                  SYSIFCOPT($(SYSIFCOPT)) AUT($(AUT)) TEXT('$(TEXT)') TGTCCSID($(TGTCCSID)) TGTRLS($(TGTRLS)) INLINE($(INLINE)) INCDIR($(INCDIR)) \
                  LOCALETYPE($(LOCALETYPE)) DEFINE($(DEFINE))
-CRTDSPFFLAGS = ENHDSP(*YES) RSTDSP($(RSTDSP)) DFRWRT(*YES) AUT($(AUT)) OPTION($(OPTION)) TEXT('$(TEXT)')
+CRTDSPFFLAGS = ENHDSP($(ENHDSP)) RSTDSP($(RSTDSP)) DFRWRT($(DFRWRT)) AUT($(AUT)) OPTION($(OPTION)) TEXT('$(TEXT)')
 CRTLFFLAGS = AUT($(AUT)) OPTION($(OPTION)) TEXT('$(TEXT)')
 CRTMNUFLAGS = AUT($(AUT)) OPTION($(OPTION)) CURLIB($(CURLIB)) PRDLIB($(PRDLIB)) TEXT('$(TEXT)') TYPE($(TYPE))
 CRTPFFLAGS = AUT($(AUT)) DLTPCT($(DLTPCT)) OPTION($(OPTION)) REUSEDLT($(REUSEDLT)) SIZE($(SIZE)) TEXT('$(TEXT)')
@@ -558,6 +566,14 @@ fileAUT = $(strip \
 	$(if $(filter %.PRTF,$<),$(PRTF_AUT), \
 	$(if $(filter %.prtf,$<),$(PRTF_AUT), \
 	UNKNOWN_FILE_TYPE)))))))))
+fileDFRWRT = $(strip \
+	$(if $(filter %.DSPF,$<),$(DSPF_DFRWRT), \
+	$(if $(filter %.dspf,$<),$(DSPF_DFRWRT), \
+	UNKNOWN_FILE_TYPE)))
+fileENHDSP = $(strip \
+	$(if $(filter %.DSPF,$<),$(DSPF_ENHDSP), \
+	$(if $(filter %.dspf,$<),$(DSPF_ENHDSP), \
+	UNKNOWN_FILE_TYPE)))
 fileDLTPCT = $(strip \
 	$(if $(filter %.PF,$<),$(PF_DLTPCT), \
 	$(if $(filter %.pf,$<),$(PF_DLTPCT), \
@@ -968,7 +984,9 @@ endef
                                             
 define FILE_VARIABLES = 
 	$(eval AUT = $(fileAUT))\
+	$(eval DFRWRT = $(fileDFRWRT))\
 	$(eval DLTPCT = $(fileDLTPCT))\
+	$(eval ENHDSP = $(fileENHDSP))\
 	$(eval OPTION = $(fileOPTION))\
 	$(eval PAGESIZE = $(filePAGESIZE))\
 	$(eval REUSEDLT = $(fileREUSEDLT))\
