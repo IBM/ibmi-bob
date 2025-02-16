@@ -215,6 +215,7 @@ TGTCCSID = $(TGTCCSID_$($@_d))
 BNDC_DBGVIEW := $(DBGVIEW)
 BNDC_INCDIR := $(INCDIR)
 BNDC_OPTION := $(OPTION)
+BNDC_TGTRLS := $(TGTRLS)
 
 BNDCL_ACTGRP := $(ACTGRP)
 BNDCL_AUT := $(AUT)
@@ -316,8 +317,11 @@ PGM_TGTRLS := $(TGTRLS)
 
 CBL_OPTION := *SRCDBG
 CBL_INCDIR := $(INCDIR)
+CBL_TGTRLS := $(TGTRLS)
 RPG_OPTION := *SRCDBG
+RPG_TGTRLS := $(TGTRLS)
 CL_OPTION := *SRCDBG
+CL_TGTRLS := $(TGTRLS)
 
 PRTF_AUT := $(AUT)
 PRTF_OPTION := *EVENTF *SRC *LIST
@@ -877,6 +881,8 @@ programSTGMDL = $(strip \
 	$(if $(filter %.module,$<),$(PGM_STGMDL), \
 	UNKNOWN_FILE_TYPE)))
 programTGTRLS = $(strip \
+	$(if $(filter %.C,$<),$(BNDC_TGTRLS), \
+	$(if $(filter %.c,$<),$(BNDC_TGTRLS), \
 	$(if $(filter %.CLLE,$<),$(BNDCL_TGTRLS), \
 	$(if $(filter %.clle,$<),$(BNDCL_TGTRLS), \
 	$(if $(filter %.CBLLE,$<),$(BNDCBL_TGTRLS), \
@@ -895,7 +901,13 @@ programTGTRLS = $(strip \
 	$(if $(filter %.sqltrg,$<),$(SQL_TGTRLS), \
 	$(if $(filter %.MODULE,$<),$(PGM_TGTRLS), \
 	$(if $(filter %.module,$<),$(PGM_TGTRLS), \
-	UNKNOWN_FILE_TYPE)))))))))))))))))))
+	$(if $(filter %.CBL,$<),$(CBL_TGTRLS), \
+	$(if $(filter %.cbl,$<),$(CBL_TGTRLS), \
+	$(if $(filter %.RPG,$<),$(RPG_TGTRLS), \
+	$(if $(filter %.rpg,$<),$(RPG_TGTRLS), \
+	$(if $(filter %.CLP,$<),$(CL_TGTRLS), \
+	$(if $(filter %.clp,$<),$(CL_TGTRLS), \
+	UNKNOWN_FILE_TYPE)))))))))))))))))))))))))))
 programINCDIR = $(strip \
 	$(if $(filter %.C,$<),$(BNDC_INCDIR), \
 	$(if $(filter %.c,$<),$(BNDC_INCDIR), \
