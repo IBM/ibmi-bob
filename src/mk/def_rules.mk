@@ -59,7 +59,7 @@ endef
 # The extractName and extractTextDescriptor are used to decompose the long filename into module name and
 # the text descriptor.
 # e.g. CUSTOME1-Customer_file.LF has `CUSTOME1` as the module name and `Customer file` as the text descriptor
-define extractName = 
+define extractName =
 echo '$(notdir $<)' | awk -F- '{ print $$1 }'
 endef
 
@@ -103,113 +103,113 @@ endif
 ifndef ACTGRP
 ACTGRP :=
 endif
-ifndef ALLOW 
+ifndef ALLOW
 ALLOW :=
 endif
 ifndef AUT
-AUT := 
+AUT :=
 endif
 ifndef BNDDIR
-BNDDIR := 
+BNDDIR :=
 endif
 ifndef COMMIT
-COMMIT := *NONE 
+COMMIT := *NONE
 endif
 ifndef COMPILEOPT
-COMPILEOPT := 
+COMPILEOPT :=
 endif
 ifndef CURLIB
-CURLIB := 
+CURLIB :=
 endif
 ifndef DBGVIEW
-DBGVIEW := *ALL 
+DBGVIEW := *ALL
 endif
 ifndef DEFINE
-DEFINE := 
+DEFINE :=
 endif
 ifndef DFRWRT
 DFRWRT := *YES
 endif
 ifndef DETAIL
-DETAIL := *EXTENDED 
+DETAIL := *EXTENDED
 endif
 ifndef DFTACTGRP
-DFTACTGRP := *NO 
+DFTACTGRP := *NO
 endif
 ifndef DLTPCT
-DLTPCT := *NONE 
+DLTPCT := *NONE
 endif
 ifndef ENHDSP
 ENHDSP := *YES
 endif
 ifndef HLPID
-HLPID = 
+HLPID =
 endif
 ifndef HLPPNLGRP
-HLPPNLGRP = 
+HLPPNLGRP =
 endif
 ifndef INLINE
-INLINE := 
+INLINE :=
 endif
 ifndef LOCALETYPE
-LOCALETYPE := 
+LOCALETYPE :=
 endif
 ifndef OBJTYPE
-OBJTYPE := 
+OBJTYPE :=
 endif
 ifndef OPTIMIZE
-OPTIMIZE :=  
+OPTIMIZE :=
 endif
 ifndef OPTION
-OPTION := *EVENTF 
+OPTION := *EVENTF
 endif
 ifndef PAGESIZE
-PAGESIZE := 
+PAGESIZE :=
 endif
 ifndef PGM
-PGM := 
+PGM :=
 endif
 ifndef PMTFILE
-PMTFILE := 
+PMTFILE :=
 endif
 ifndef PRDLIB
-PRDLIB := 
+PRDLIB :=
 endif
 ifndef RCDLEN
-RCDLEN :=  
+RCDLEN :=
 endif
 ifndef REUSEDLT
-REUSEDLT := *NO 
+REUSEDLT := *NO
 endif
 ifndef RPGPPOPT
-RPGPPOPT := 
+RPGPPOPT :=
 endif
 ifndef RSTDSP
-RSTDSP := 
+RSTDSP :=
 endif
 ifndef SIZE
-SIZE := 
+SIZE :=
 endif
 ifndef STGMDL
-STGMDL := *SNGLVL 
+STGMDL := *SNGLVL
 endif
 ifndef SYSIFCOPT
-SYSIFCOPT := 
+SYSIFCOPT :=
 endif
 ifndef TERASPACE
-TERASPACE := 
+TERASPACE :=
 endif
 ifndef TEXT
 TEXT=$(shell $(extractTextDescriptor))
 endif
 ifndef TYPE
-TYPE := 
+TYPE :=
 endif
 ifndef TGTRLS
-TGTRLS :=  
+TGTRLS :=
 endif
 ifndef VLDCKR
-VLDCKR := 
+VLDCKR :=
 endif
 
 TGTCCSID = $(TGTCCSID_$($@_d))
@@ -221,6 +221,7 @@ TGTCCSID = $(TGTCCSID_$($@_d))
 BNDC_DBGVIEW := $(DBGVIEW)
 BNDC_INCDIR := $(INCDIR)
 BNDC_OPTION := $(OPTION)
+BNDC_TGTRLS := $(TGTRLS)
 
 BNDCL_ACTGRP := $(ACTGRP)
 BNDCL_AUT := $(AUT)
@@ -324,8 +325,11 @@ PGM_TGTRLS := $(TGTRLS)
 
 CBL_OPTION := *SRCDBG
 CBL_INCDIR := $(INCDIR)
+CBL_TGTRLS := $(TGTRLS)
 RPG_OPTION := *SRCDBG
+RPG_TGTRLS := $(TGTRLS)
 CL_OPTION := *SRCDBG
+CL_TGTRLS := $(TGTRLS)
 
 PRTF_AUT := $(AUT)
 PRTF_OPTION := *EVENTF *SRC *LIST
@@ -415,8 +419,8 @@ CRTMNUFLAGS = AUT($(AUT)) OPTION($(OPTION)) CURLIB($(CURLIB)) PRDLIB($(PRDLIB)) 
 CRTPFFLAGS = AUT($(AUT)) DLTPCT($(DLTPCT)) OPTION($(OPTION)) REUSEDLT($(REUSEDLT)) SIZE($(SIZE)) TEXT('$(TEXT)')
 CRTPGMFLAGS = ACTGRP($(ACTGRP)) USRPRF(*USER) TGTRLS($(TGTRLS)) AUT($(AUT)) DETAIL($(DETAIL)) OPTION($(CRTPGM_OPTION)) STGMDL($(STGMDL)) TEXT('$(TEXT)')
 CRTPNLGRPFLAGS = AUT($(AUT)) OPTION($(OPTION)) TEXT('$(TEXT)')
-CRTRPGPGMFLAGS = OPTION($(OPTION)) TEXT('$(TEXT)')
-CRTCBLPGMFLAGS = OPTION($(OPTION)) TEXT('$(TEXT)')
+CRTRPGPGMFLAGS = OPTION($(OPTION)) TEXT('$(TEXT)') TGTRLS($(TGTRLS))
+CRTCBLPGMFLAGS = OPTION($(OPTION)) TEXT('$(TEXT)') TGTRLS($(TGTRLS))
 CRTPRTFFLAGS = AUT($(AUT)) OPTION($(OPTION)) PAGESIZE($(PAGESIZE)) TEXT('$(TEXT)')
 CRTRPGMODFLAGS = AUT($(AUT)) DBGVIEW($(DBGVIEW)) OPTIMIZE($(OPTIMIZE)) OPTION($(OPTION)) OUTPUT(*PRINT) TEXT('$(TEXT)') \
                  TGTCCSID($(TGTCCSID)) TGTRLS($(TGTRLS)) INCDIR($(INCDIR)) DEFINE($(DEFINE))
@@ -429,7 +433,7 @@ CRTSQLCIFLAGS = COMMIT($(COMMIT)) OBJTYPE($(OBJTYPE)) OUTPUT(*PRINT) TEXT('$(TEX
 CRTSQLCPPIFLAGS = COMMIT($(COMMIT)) OUTPUT(*PRINT) TEXT('$(TEXT)') TGTRLS($(TGTRLS)) DBGVIEW($(DBGVIEW)) \
 				  CVTCCSID($(TGTCCSID)) OPTION($(OPTION)) \
                   COMPILEOPT('STGMDL($(STGMDL)) SYSIFCOPT($(SYSIFCOPT)) DEFINE($(DEFINE)) OPTIMIZE($(OPTIMIZE)) INLINE($(INLINE)) \
-                  TGTCCSID($(TGTCCSID))  TERASPACE($(TERASPACE)) INCDIR($(doublequotedINCDIR))') 
+                  TGTCCSID($(TGTCCSID))  TERASPACE($(TERASPACE)) INCDIR($(doublequotedINCDIR))')
 CRTSQLRPGIFLAGS = COMMIT($(COMMIT)) OBJTYPE($(OBJTYPE)) OPTION($(OPTION)) OUTPUT(*PRINT) TEXT('$(TEXT)') \
                   TGTRLS($(TGTRLS)) DBGVIEW($(DBGVIEW)) RPGPPOPT($(RPGPPOPT)) \
                   COMPILEOPT('TGTCCSID($(TGTCCSID)) OPTIMIZE($(OPTIMIZE)) INCDIR($(doublequotedINCDIR))')
@@ -438,11 +442,11 @@ CRTSQLCBLIFLAGS = COMMIT($(COMMIT)) OBJTYPE($(OBJTYPE)) OPTION($(OPTION)) OUTPUT
                   COMPILEOPT('TGTCCSID($(TGTCCSID)) OPTIMIZE($(OPTIMIZE)) INCDIR($(doublequotedINCDIR))')
 CRTSRVPGMFLAGS = ACTGRP($(ACTGRP)) TEXT('$(TEXT)') TGTRLS($(TGTRLS)) AUT($(AUT)) DETAIL($(DETAIL)) STGMDL($(STGMDL)) OPTION($(OPTION))
 CRTWSCSTFLAGS = AUT($(AUT)) TEXT('$(TEXT)')
-CRTBNDRPGFLAGS = TGTCCSID($(TGTCCSID)) DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) TEXT('$(TEXT)') INCDIR($(INCDIR))
-CRTBNDCBLFLAGS = TGTCCSID($(TGTCCSID)) DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) TEXT('$(TEXT)') INCDIR($(INCDIR))
-CRTBNDCFLAGS = TGTCCSID($(TGTCCSID)) DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) TEXT('$(TEXT)') INCDIR($(INCDIR))
+CRTBNDRPGFLAGS = TGTCCSID($(TGTCCSID)) DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) TEXT('$(TEXT)') TGTRLS($(TGTRLS)) INCDIR($(INCDIR))
+CRTBNDCBLFLAGS = TGTCCSID($(TGTCCSID)) DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) TEXT('$(TEXT)') TGTRLS($(TGTRLS)) INCDIR($(INCDIR))
+CRTBNDCFLAGS = TGTCCSID($(TGTCCSID)) DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) TEXT('$(TEXT)') TGTRLS($(TGTRLS)) INCDIR($(INCDIR))
 CRTBNDCLFLAGS = AUT($(AUT)) DBGVIEW($(DBGVIEW)) OPTION($(OPTION)) TEXT('$(TEXT)') TGTRLS($(TGTRLS)) INCDIR($(INCDIR))
-CRTCLPGMFLAGS = OPTION($(OPTION)) TEXT('$(TEXT)')
+CRTCLPGMFLAGS = OPTION($(OPTION)) TEXT('$(TEXT)') TGTRLS($(TGTRLS))
 RUNSQLFLAGS = DBGVIEW(*SOURCE) TGTRLS($(TGTRLS)) OUTPUT(*PRINT) MARGINS(1024) COMMIT($(COMMIT))
 
 # Extra command string for adhoc addition of extra parameters to a creation command.
@@ -482,7 +486,7 @@ CURLIBPATH = $(call getLibPath,$(curlib))
 VPATH = $(subst $(space),:,$(strip $(call uniq,$(strip $(unquotedINCDIR)) $(PREUSRLIBLPATH) $(CURLIBPATH) $(POSTUSRLIBLPATH) $(OBJPATH) $(SRCPATH))))
 
 
-define PRESETUP = 
+define PRESETUP =
 echo -e "$(crtcmd)"; \
 curlib="$(curlib)" \
 preUsrlibl="$(preUsrlibl)" \
@@ -494,7 +498,7 @@ $(eval file := $(subst .,_,$(notdir $<))) \
 $(eval logFile := $(LOGPATH)/$(directory)$(file).splf)
 endef
 
-define SETCURLIBTOOBJLIB = 
+define SETCURLIBTOOBJLIB =
 tmpCurlib="${OBJLIB}"
 endef
 
@@ -747,7 +751,7 @@ moduleLOCALETYPE = $(strip \
 	$(if $(filter %.c,$<),    $(CMOD_LOCALETYPE), \
 	$(if $(filter %.CPP,$<),  $(CPPMOD_LOCALETYPE), \
 	$(if $(filter %.cpp,$<),  $(CPPMOD_LOCALETYPE), \
-	UNKNOWN_FILE_TYPE)))))			
+	UNKNOWN_FILE_TYPE)))))
 moduleRPGPPOPT = $(strip \
 	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIMOD_RPGPPOPT), \
 	$(if $(filter %.sqlrpgle,$<),$(SQLRPGIMOD_RPGPPOPT), \
@@ -893,6 +897,8 @@ programSTGMDL = $(strip \
 	$(if $(filter %.module,$<),$(PGM_STGMDL), \
 	UNKNOWN_FILE_TYPE)))
 programTGTRLS = $(strip \
+	$(if $(filter %.C,$<),$(BNDC_TGTRLS), \
+	$(if $(filter %.c,$<),$(BNDC_TGTRLS), \
 	$(if $(filter %.CLLE,$<),$(BNDCL_TGTRLS), \
 	$(if $(filter %.clle,$<),$(BNDCL_TGTRLS), \
 	$(if $(filter %.CBLLE,$<),$(BNDCBL_TGTRLS), \
@@ -911,7 +917,13 @@ programTGTRLS = $(strip \
 	$(if $(filter %.sqltrg,$<),$(SQL_TGTRLS), \
 	$(if $(filter %.MODULE,$<),$(PGM_TGTRLS), \
 	$(if $(filter %.module,$<),$(PGM_TGTRLS), \
-	UNKNOWN_FILE_TYPE)))))))))))))))))))
+	$(if $(filter %.CBL,$<),$(CBL_TGTRLS), \
+	$(if $(filter %.cbl,$<),$(CBL_TGTRLS), \
+	$(if $(filter %.RPG,$<),$(RPG_TGTRLS), \
+	$(if $(filter %.rpg,$<),$(RPG_TGTRLS), \
+	$(if $(filter %.CLP,$<),$(CL_TGTRLS), \
+	$(if $(filter %.clp,$<),$(CL_TGTRLS), \
+	UNKNOWN_FILE_TYPE)))))))))))))))))))))))))))
 programINCDIR = $(strip \
 	$(if $(filter %.C,$<),$(BNDC_INCDIR), \
 	$(if $(filter %.c,$<),$(BNDC_INCDIR), \
@@ -937,14 +949,14 @@ srvpgmTGTRLS = $(strip \
 	$(if $(filter %.sqludf,$<),$(SQL_TGTRLS), \
 	UNKNOWN_FILE_TYPE)))))))
 
-#    ____ __  __ ____    ____           _                 
-#   / ___|  \/  |  _ \  |  _ \ ___  ___(_)_ __   ___  ___ 
+#    ____ __  __ ____    ____           _
+#   / ___|  \/  |  _ \  |  _ \ ___  ___(_)_ __   ___  ___
 #  | |   | |\/| | | | | | |_) / _ \/ __| | '_ \ / _ \/ __|
 #  | |___| |  | | |_| | |  _ <  __/ (__| | |_) |  __/\__ \
 #   \____|_|  |_|____/  |_| \_\___|\___|_| .__/ \___||___/
-#                                        |_|              
+#                                        |_|
 
-define CMDSRC_TO_CMD_RECIPE = 
+define CMDSRC_TO_CMD_RECIPE =
 	$(eval AUT = $(CMD_AUT))
 	$(eval ALLOW = $(CMD_ALLOW))
 	$(eval HLPID = $(CMD_HLPID))
@@ -958,7 +970,7 @@ define CMDSRC_TO_CMD_RECIPE =
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" "$(PRECMD)" "$(POSTCMD)" "$(notdir $@)" "$<" $(logFile)> $(logFile) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@);
 endef
-define CMD_TO_CMD_RECIPE = 
+define CMD_TO_CMD_RECIPE =
 	$(eval AUT = $(CMD_AUT))
 	$(eval ALLOW = $(CMD_ALLOW))
 	$(eval HLPID = $(CMD_HLPID))
@@ -975,14 +987,14 @@ endef
 
 
 
-#   _____ ___ _     _____   ____           _                 
-#  |  ___|_ _| |   | ____| |  _ \ ___  ___(_)_ __   ___  ___ 
+#   _____ ___ _     _____   ____           _
+#  |  ___|_ _| |   | ____| |  _ \ ___  ___(_)_ __   ___  ___
 #  | |_   | || |   |  _|   | |_) / _ \/ __| | '_ \ / _ \/ __|
 #  |  _|  | || |___| |___  |  _ <  __/ (__| | |_) |  __/\__ \
 #  |_|   |___|_____|_____| |_| \_\___|\___|_| .__/ \___||___/
-#                                           |_|              
-                                            
-define FILE_VARIABLES = 
+#                                           |_|
+
+define FILE_VARIABLES =
 	$(eval AUT = $(fileAUT))\
 	$(eval DFRWRT = $(fileDFRWRT))\
 	$(eval DLTPCT = $(fileDLTPCT))\
@@ -1027,7 +1039,7 @@ define PF_TO_FILE_RECIPE =
 	@$(TYPEDEF)
 endef
 
-define PRTF_TO_FILE_RECIPE = 
+define PRTF_TO_FILE_RECIPE =
 	$(FILE_VARIABLES)
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating PRTF [$(notdir $<)] in $(OBJLIB)$(ECHOCCSID)")
@@ -1040,7 +1052,7 @@ endef
 
 # @$(TOOLSPATH)/checkObjectAlreadyExists $@ $(OBJLIB)
 # @$(TOOLSPATH)/checkIfBuilt $@ $(OBJLIB)
-define TABLE_TO_FILE_RECIPE = 
+define TABLE_TO_FILE_RECIPE =
 	$(FILE_VARIABLES)
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating SQL TABLE $(OBJLIB)/$(basename $(notdir $@)) from Sql statement [$(notdir $<)]")
@@ -1053,7 +1065,7 @@ endef
 
 # @$(TOOLSPATH)/checkObjectAlreadyExists $@ $(OBJLIB)
 # @$(TOOLSPATH)/checkIfBuilt $@ $(OBJLIB)
-define VIEW_TO_FILE_RECIPE = 
+define VIEW_TO_FILE_RECIPE =
 	$(FILE_VARIABLES)
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating SQL VIEW $(OBJLIB)/$(basename $(notdir $@)) from Sql statement [$(notdir $<)]")
@@ -1064,7 +1076,7 @@ define VIEW_TO_FILE_RECIPE =
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" "$(PRECMD)" "$(POSTCMD)" "$(notdir $@)" "$<" $(logFile) "" "$(mbrtextcmd)"> $(logFile) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
 endef
 
-define INDEX_TO_FILE_RECIPE = 
+define INDEX_TO_FILE_RECIPE =
 	$(FILE_VARIABLES)
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating SQL INDEX $(OBJLIB)/$(basename $(notdir $@)) from Sql statement [$(notdir $<)]")
@@ -1075,7 +1087,7 @@ define INDEX_TO_FILE_RECIPE =
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" "$(PRECMD)" "$(POSTCMD)" "$(notdir $@)" "$<" $(logFile) "" "$(mbrtextcmd)"> $(logFile) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
 endef
 
-define SQLUDT_TO_FILE_RECIPE = 
+define SQLUDT_TO_FILE_RECIPE =
 	$(FILE_VARIABLES)
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating SQL UDT $(OBJLIB)/$(basename $(notdir $@)) from Sql statement [$(notdir $<)]")
@@ -1098,14 +1110,14 @@ define SQLALIAS_TO_FILE_RECIPE =
 endef
 
 
-#   ____ _____  _        _    ____      _      ____           _                 
-#  |  _ \_   _|/ \      / \  |  _ \    / \    |  _ \ ___  ___(_)_ __   ___  ___ 
+#   ____ _____  _        _    ____      _      ____           _
+#  |  _ \_   _|/ \      / \  |  _ \    / \    |  _ \ ___  ___(_)_ __   ___  ___
 #  | | | || | / _ \    / _ \ | |_) |  / _ \   | |_) / _ \/ __| | '_ \ / _ \/ __|
 #  | |_| || |/ ___ \  / ___ \|  _ <  / ___ \  |  _ <  __/ (__| | |_) |  __/\__ \
 #  |____/ |_/_/   \_\/_/   \_\_| \_\/_/   \_\ |_| \_\___|\___|_| .__/ \___||___/
-#                                                              |_|              
+#                                                              |_|
 
-define DTAARA_VARIABLES = 
+define DTAARA_VARIABLES =
 	$(eval TGTRLS = $(SQL_TGTRLS))
 endef
 
@@ -1120,12 +1132,12 @@ define SQLSEQ_TO_DTAARA_RECIPE =
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" "$(PRECMD)" "$(POSTCMD)" "$(notdir $@)" "$<" $(logFile) "" "$(mbrtextcmd)"> $(logFile) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
 endef
 
-#   __  __ _____ _   _ _   _   ____           _                 
-#  |  \/  | ____| \ | | | | | |  _ \ ___  ___(_)_ __   ___  ___ 
+#   __  __ _____ _   _ _   _   ____           _
+#  |  \/  | ____| \ | | | | | |  _ \ ___  ___(_)_ __   ___  ___
 #  | |\/| |  _| |  \| | | | | | |_) / _ \/ __| | '_ \ / _ \/ __|
 #  | |  | | |___| |\  | |_| | |  _ <  __/ (__| | |_) |  __/\__ \
 #  |_|  |_|_____|_| \_|\___/  |_| \_\___|\___|_| .__/ \___||___/
-#                                              |_|              
+#                                              |_|
 
 define MENU_VARIABLES =
 	$(eval AUT = $(MNU_AUT))
@@ -1146,12 +1158,12 @@ define MENUSRC_TO_MENU_RECIPE =
 	@$(call EVFEVENT_DOWNLOAD,$(basename $(@F)).evfevent)
 endef
 
-#   __  __  ___  ____  _   _ _     _____   ____           _                 
-#  |  \/  |/ _ \|  _ \| | | | |   | ____| |  _ \ ___  ___(_)_ __   ___  ___ 
+#   __  __  ___  ____  _   _ _     _____   ____           _
+#  |  \/  |/ _ \|  _ \| | | | |   | ____| |  _ \ ___  ___(_)_ __   ___  ___
 #  | |\/| | | | | | | | | | | |   |  _|   | |_) / _ \/ __| | '_ \ / _ \/ __|
 #  | |  | | |_| | |_| | |_| | |___| |___  |  _ <  __/ (__| | |_) |  __/\__ \
 #  |_|  |_|\___/|____/ \___/|_____|_____| |_| \_\___|\___|_| .__/ \___||___/
-#                                                          |_|              
+#                                                          |_|
 
 define MODULE_VARIABLES
 	$(eval AUT = $(moduleAUT))\
@@ -1167,7 +1179,7 @@ define MODULE_VARIABLES
 	$(eval TGTRLS = $(moduleTGTRLS))
 endef
 
-define C_TO_MODULE_RECIPE = 
+define C_TO_MODULE_RECIPE =
 	$(MODULE_VARIABLES)
 	@$(call echo_cmd,"=== Creating C module [$(notdir $<)]$(ECHOCCSID)")
 	$(eval crtcmd := crtcmod module($(OBJLIB)/$(basename $(@F))) srcstmf('$<') $(CRTCMODFLAGS) $(ADHOCCRTFLAGS))
@@ -1177,9 +1189,9 @@ define C_TO_MODULE_RECIPE =
 	@$(POSTCCOMPILE)
 endef
 
-# CRTCPPMOD is special because it launches PASE and can't be run in a PASE job so we 
+# CRTCPPMOD is special because it launches PASE and can't be run in a PASE job so we
 # spawn a job and lose the ability to get joblog info
-define CPP_TO_MODULE_RECIPE = 
+define CPP_TO_MODULE_RECIPE =
 	$(MODULE_VARIABLES)
 	@$(call echo_cmd,"=== Creating CPP module [$(notdir $<)] Note environment and library list are not set up")
 	$(eval crtcmd := crtcppmod module($(OBJLIB)/$(basename $(@F))) srcstmf('$<') $(CRTCMODFLAGS) $(ADHOCCRTFLAGS))
@@ -1189,7 +1201,7 @@ define CPP_TO_MODULE_RECIPE =
 	@$(POSTCCOMPILE)
 endef
 
-define RPGLE_TO_MODULE_RECIPE = 
+define RPGLE_TO_MODULE_RECIPE =
 	$(MODULE_VARIABLES)\
 	@$(call echo_cmd,"=== Creating RPG module [$(notdir $<)]$(ECHOCCSID)")
 	$(eval crtcmd := crtrpgmod module($(OBJLIB)/$(basename $(@F))) srcstmf('$<') $(CRTRPGMODFLAGS))
@@ -1198,7 +1210,7 @@ define RPGLE_TO_MODULE_RECIPE =
 	@$(call EVFEVENT_DOWNLOAD,$(basename $(@F)).evfevent)
 endef
 
-define CLLE_TO_MODULE_RECIPE = 
+define CLLE_TO_MODULE_RECIPE =
 	$(MODULE_VARIABLES)
 	@$(call echo_cmd,"=== Creating CL module [$(notdir $<)]$(ECHOCCSID)")
 	$(eval crtcmd := $(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID)  -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTCLMOD" -p $(CRTCLMODFLAGS))
@@ -1207,7 +1219,7 @@ define CLLE_TO_MODULE_RECIPE =
 	@$(call EVFEVENT_DOWNLOAD,$(basename $(@F)).evfevent)
 endef
 
-define SQLC_TO_MODULE_RECIPE = 
+define SQLC_TO_MODULE_RECIPE =
 	$(MODULE_VARIABLES)
 	@$(call echo_cmd,"=== Creating SQLC module [$(notdir $<)]$(ECHOCCSID)")
 	$(eval crtcmd := crtsqlci obj($(OBJLIB)/$(basename $(@F))) srcstmf('$<') $(CRTSQLCIFLAGS))
@@ -1216,7 +1228,7 @@ define SQLC_TO_MODULE_RECIPE =
 	@($(call EVFEVENT_DOWNLOAD,$(basename $(@F)).evfevent); ret=$$?; rm $(DEPDIR)/$*.Td 2>/dev/null;  exit $$ret)
 endef
 
-define SQLCPP_TO_MODULE_RECIPE = 
+define SQLCPP_TO_MODULE_RECIPE =
 	$(MODULE_VARIABLES)
 	@$(call echo_cmd,"=== Creating SQLCPP module [$(notdir $<)]$(ECHOCCSID)")
 	$(eval crtcmd := crtsqlcppi obj($(OBJLIB)/$(basename $(@F))) srcstmf('$<') $(CRTSQLCPPIFLAGS))
@@ -1225,7 +1237,7 @@ define SQLCPP_TO_MODULE_RECIPE =
 	@($(call EVFEVENT_DOWNLOAD,$(basename $(@F)).evfevent); ret=$$?; rm $(DEPDIR)/$*.Td 2>/dev/null;  exit $$ret)
 endef
 
-define SQLRPGLE_TO_MODULE_RECIPE = 
+define SQLRPGLE_TO_MODULE_RECIPE =
 	$(MODULE_VARIABLES)
 	@$(call echo_cmd,"=== Creating SQLRPGLE module [$(notdir $<)]$(ECHOCCSID)")
 	$(eval crtcmd := crtsqlrpgi obj($(OBJLIB)/$(basename $(@F))) srcstmf('$<') $(CRTSQLRPGIFLAGS))
@@ -1243,7 +1255,7 @@ define CBLLE_TO_MODULE_RECIPE =
 	@$(call EVFEVENT_DOWNLOAD,$(basename $(@F)).evfevent)
 endef
 
-define SQLCBLLE_TO_MODULE_RECIPE = 
+define SQLCBLLE_TO_MODULE_RECIPE =
 	$(MODULE_VARIABLES)
 	@$(call echo_cmd,"=== Creating SQLCBLLE module [$(notdir $<)]$(ECHOCCSID)")
 	$(eval crtcmd := crtsqlcbli obj($(OBJLIB)/$(basename $(@F))) srcstmf('$<') $(CRTSQLCBLIFLAGS))
@@ -1252,14 +1264,14 @@ define SQLCBLLE_TO_MODULE_RECIPE =
 	@$(call EVFEVENT_DOWNLOAD,$(notdir $<).evfevent)
 endef
 
-#   ____   ____ __  __   ____           _                 
-#  |  _ \ / ___|  \/  | |  _ \ ___  ___(_)_ __   ___  ___ 
+#   ____   ____ __  __   ____           _
+#  |  _ \ / ___|  \/  | |  _ \ ___  ___(_)_ __   ___  ___
 #  | |_) | |  _| |\/| | | |_) / _ \/ __| | '_ \ / _ \/ __|
 #  |  __/| |_| | |  | | |  _ <  __/ (__| | |_) |  __/\__ \
 #  |_|    \____|_|  |_| |_| \_\___|\___|_| .__/ \___||___/
-#                                        |_|              
+#                                        |_|
 
-define PGM_VARIABLES = 
+define PGM_VARIABLES =
 $(eval ACTGRP = $(programACTGRP)) \
 $(eval AUT = $(programAUT)) \
 $(eval DBGVIEW = $(programDBGVIEW)) \
@@ -1334,7 +1346,7 @@ endef
 define PGM.CBLLE_TO_PGM_RECIPE =
 	$(PGM_VARIABLES)
 	@$(call echo_cmd,"=== Creating COBOL Program [$(basename $@)] in $(OBJLIB)")
-	$(eval crtcmd := CRTBNDCBL srcstmf('$<') PGM($(OBJLIB)/$(basename $(@F))) $(CRTBNDCBLFLAGS)) 
+	$(eval crtcmd := CRTBNDCBL srcstmf('$<') PGM($(OBJLIB)/$(basename $(@F))) $(CRTBNDCBLFLAGS))
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" "$(PRECMD)" "$(POSTCMD)" "$(notdir $@)" "$<" "$(logFile)"> $(logFile) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
 	@$(call EVFEVENT_DOWNLOAD,$(basename $(@F)).PGM.evfevent)
@@ -1394,14 +1406,14 @@ define MODULE_TO_PGM_RECIPE =
 	@$(call EVFEVENT_DOWNLOAD,$(tgt).PGM.evfevent)
 endef
 
-#   ____  _   _ _     ____ ____  ____    ____           _                 
-#  |  _ \| \ | | |   / ___|  _ \|  _ \  |  _ \ ___  ___(_)_ __   ___  ___ 
+#   ____  _   _ _     ____ ____  ____    ____           _
+#  |  _ \| \ | | |   / ___|  _ \|  _ \  |  _ \ ___  ___(_)_ __   ___  ___
 #  | |_) |  \| | |  | |  _| |_) | |_) | | |_) / _ \/ __| | '_ \ / _ \/ __|
 #  |  __/| |\  | |__| |_| |  _ <|  __/  |  _ <  __/ (__| | |_) |  __/\__ \
 #  |_|   |_| \_|_____\____|_| \_\_|     |_| \_\___|\___|_| .__/ \___||___/
-#                                                        |_|              
+#                                                        |_|
 
-define PNLGRP_VARIABLES = 
+define PNLGRP_VARIABLES =
 	$(eval AUT = $(PNLGRP_AUT))
 	$(eval OPTION = $(PNLGRP_OPTION))
 endef
@@ -1418,14 +1430,14 @@ endef
 
 
 
-#   ____  ______     ______   ____ __  __   ____           _                 
-#  / ___||  _ \ \   / /  _ \ / ___|  \/  | |  _ \ ___  ___(_)_ __   ___  ___ 
+#   ____  ______     ______   ____ __  __   ____           _
+#  / ___||  _ \ \   / /  _ \ / ___|  \/  | |  _ \ ___  ___(_)_ __   ___  ___
 #  \___ \| |_) \ \ / /| |_) | |  _| |\/| | | |_) / _ \/ __| | '_ \ / _ \/ __|
 #   ___) |  _ < \ V / |  __/| |_| | |  | | |  _ <  __/ (__| | |_) |  __/\__ \
 #  |____/|_| \_\ \_/  |_|    \____|_|  |_| |_| \_\___|\___|_| .__/ \___||___/
-#                                                           |_|              
+#                                                           |_|
 
-define SRVPGM_VARIABLES = 
+define SRVPGM_VARIABLES =
 	$(eval ACTGRP = $(SRVPGM_ACTGRP))\
 	$(eval AUT = $(SRVPGM_AUT))\
 	$(eval DETAIL = $(SRVPGM_DETAIL))\
@@ -1435,7 +1447,7 @@ define SRVPGM_VARIABLES =
 	$(eval BNDSRVPGMPATH = $(basename $(filter %.SRVPGM,$(notdir $^)) $(externalsrvpgms)))
 endef
 
-define SQLUDF_TO_SRVPGM_RECIPE = 
+define SQLUDF_TO_SRVPGM_RECIPE =
 	$(SRVPGM_VARIABLES)
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating SQL UDF $(OBJLIB)/$(basename $(notdir $@)) from Sql statement [$(notdir $<)]")
@@ -1465,12 +1477,12 @@ define ILESRVPGM_TO_SRVPGM_RECIPE =
 	$(SCRIPTSPATH)/extractAndLaunch "$(JOBLOGFILE)" "$<" $(OBJLIB) $(basename $(@F)) "$(PRECMD)" "$(POSTCMD)" "$(notdir $@)" "$<" "$(logFile)" > $(logFile) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
 endef
 
-#    ___ _____ _   _ _____ ____    ____           _                 
-#   / _ \_   _| | | | ____|  _ \  |  _ \ ___  ___(_)_ __   ___  ___ 
+#    ___ _____ _   _ _____ ____    ____           _
+#   / _ \_   _| | | | ____|  _ \  |  _ \ ___  ___(_)_ __   ___  ___
 #  | | | || | | |_| |  _| | |_) | | |_) / _ \/ __| | '_ \ / _ \/ __|
 #  | |_| || | |  _  | |___|  _ <  |  _ <  __/ (__| | |_) |  __/\__ \
 #   \___/ |_| |_| |_|_____|_| \_\ |_| \_\___|\___|_| .__/ \___||___/
-#                                                  |_|              
+#                                                  |_|
 
 
 define BNDDIR_TO_BNDDIR_RECIPE =
@@ -1553,7 +1565,7 @@ endef
 
 # The *.rebuild file is used as a way of controlling the rebuild of items whose
 # rebuild scripts are external to Make.
-# Example: 
+# Example:
 #    THIRDPARTY.SRVPGM: $(DEPDIR)/THIRDPARTY.SRVPGM.rebuild
 #        build_thirdparty.sh
 #    MYPGM.PGM: MYPGM.MODULE THIRDPARTY.SRVPGM
