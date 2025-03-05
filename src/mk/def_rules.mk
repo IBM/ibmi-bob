@@ -441,7 +441,7 @@ SRVPGM_DETAIL := *BASIC
 SRVPGM_STGMDL := $(STGMDL)
 SRVPGM_TGTRLS := $(TGTRLS)
 SRVPGM_OPTION :=
-SRVPGM_ALWRINZ := ($ALWRINZ)
+SRVPGM_ALWRINZ := $(ALWRINZ)
 WSCST_AUT := $(AUT)
 
 # Creation command parameters with variables (the ones listed at the top) for the most common ones.
