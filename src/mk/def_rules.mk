@@ -348,6 +348,7 @@ PGM_OPTION := *EVENTF
 PGM_STGMDL := *SNGLVL
 PGM_TGTRLS := $(TGTRLS)
 PGM_ALWRINZ := $(ALWRINZ)
+PGM_USRPRF := $(USRPRF)
 
 CBL_OPTION := *SRCDBG
 CBL_INCDIR := $(INCDIR)
@@ -935,7 +936,9 @@ programUSRPRF = $(strip \
 	$(if $(filter %.sqlrpgle,$<),$(SQLRPGIPGM_USRPRF), \
 	$(if $(filter %.SQLCBLLE,$<),$(SQLCBLIPGM_USRPRF), \
 	$(if $(filter %.sqlcblle,$<),$(SQLCBLIPGM_USRPRF), \
-	UNKNOWN_FILE_TYPE)))))))))))))))
+	$(if $(filter %.MODULE,$<),$(PGM_USRPRF), \
+	$(if $(filter %.module,$<),$(PGM_USRPRF), \
+	UNKNOWN_FILE_TYPE)))))))))))))))))
 programDETAIL = $(strip \
 	$(if $(filter %.MODULE,$<),$(PGM_DETAIL), \
 	$(if $(filter %.module,$<),$(PGM_DETAIL), \
