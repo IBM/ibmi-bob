@@ -357,6 +357,7 @@ RPG_OPTION := *SRCDBG
 RPG_TGTRLS := $(TGTRLS)
 CL_OPTION := *SRCDBG
 CL_TGTRLS := $(TGTRLS)
+CL_USRPRF := $(USRPRF)
 
 PRTF_AUT := $(AUT)
 PRTF_OPTION := *EVENTF *SRC *LIST
@@ -437,6 +438,7 @@ SQL_TGTRLS := $(TGTRLS)
 SRVPGM_ACTGRP := *CALLER
 SRVPGM_ALWUPD := $(ALWUPD)
 SRVPGM_AUT := $(AUT)
+SRVPGM_USRPRF := $(USRPRF)
 SRVPGM_BNDDIR := *NONE
 SRVPGM_DETAIL := *BASIC
 SRVPGM_STGMDL := $(STGMDL)
@@ -488,7 +490,7 @@ CRTBNDCBLFLAGS = TGTCCSID($(TGTCCSID)) DBGVIEW($(DBGVIEW)) DBGENCKEY($(DBGENCKEY
 CRTBNDCFLAGS = TGTCCSID($(TGTCCSID)) DBGVIEW($(DBGVIEW)) DBGENCKEY($(DBGENCKEY)) USRPRF($(USRPRF)) OPTION($(OPTION)) TEXT('$(TEXT)') TGTRLS($(TGTRLS)) INCDIR($(INCDIR))
 CRTBNDCLFLAGS = AUT($(AUT)) DBGVIEW($(DBGVIEW)) DBGENCKEY($(DBGENCKEY)) USRPRF($(USRPRF)) OPTION($(OPTION)) TEXT('$(TEXT)') TGTRLS($(TGTRLS)) INCDIR($(INCDIR))
 CRTCLPGMFLAGS = OPTION($(OPTION)) TEXT('$(TEXT)') TGTRLS($(TGTRLS)) USRPRF($(USRPRF))
-RUNSQLFLAGS = DBGVIEW(*SOURCE) DBGENCKEY($(DBGENCKEY)) TGTRLS($(TGTRLS)) OUTPUT(*PRINT) MARGINS(1024) COMMIT($(COMMIT))
+RUNSQLFLAGS = DBGVIEW(*SOURCE) TGTRLS($(TGTRLS)) OUTPUT(*PRINT) MARGINS(1024) COMMIT($(COMMIT))
 
 # Extra command string for adhoc addition of extra parameters to a creation command.
 ADHOCCRTFLAGS =
@@ -938,7 +940,11 @@ programUSRPRF = $(strip \
 	$(if $(filter %.sqlcblle,$<),$(SQLCBLIPGM_USRPRF), \
 	$(if $(filter %.MODULE,$<),$(PGM_USRPRF), \
 	$(if $(filter %.module,$<),$(PGM_USRPRF), \
-	UNKNOWN_FILE_TYPE)))))))))))))))))
+	$(if $(filter %.RPG,$<),$(PGM_USRPRF), \
+	$(if $(filter %.rpg,$<),$(PGM_USRPRF), \
+	$(if $(filter %.CLP,$<),$(CL_USRPRF), \
+	$(if $(filter %.clp,$<),$(CL_USRPRF), \
+	UNKNOWN_FILE_TYPE)))))))))))))))))))))
 programDETAIL = $(strip \
 	$(if $(filter %.MODULE,$<),$(PGM_DETAIL), \
 	$(if $(filter %.module,$<),$(PGM_DETAIL), \
@@ -1263,7 +1269,7 @@ endef
 define MODULE_VARIABLES
 	$(eval AUT = $(moduleAUT))\
 	$(eval DBGVIEW = $(moduleDBGVIEW))\
-	$(eval USRPRF = $(moduleDBGENCKEY))\
+	$(eval DBGENCKEY = $(moduleDBGENCKEY))\
 	$(eval OBJTYPE = $(moduleOBJTYPE))\
 	$(eval OPTION = $(moduleOPTION))\
 	$(eval OPTIMIZE = $(moduleOPTIMIZE))\
@@ -1540,6 +1546,7 @@ endef
 define SRVPGM_VARIABLES =
 	$(eval ACTGRP = $(SRVPGM_ACTGRP))\
 	$(eval AUT = $(SRVPGM_AUT))\
+	$(eval USRPRF = $(SRVPGM_USRPRF))\
 	$(eval DETAIL = $(SRVPGM_DETAIL))\
 	$(eval ALWUPD = $(SRVPGM_ALWUPD))\
 	$(eval STGMDL = $(SRVPGM_STGMDL))\
