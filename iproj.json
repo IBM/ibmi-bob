@@ -1,3 +1,4 @@
 {
-  "description": "Better Object Build (BOB) builds IBM i source in a dependency aware manner.  It is based on top of gmake"
+  "description": "Better Object Build (BOB) builds IBM i source in a dependency aware manner.  It is based on top of gmake",
+  "buildCommand": "makei build"
 }
