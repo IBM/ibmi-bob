@@ -881,6 +881,10 @@ programACTGRP = $(strip \
 	$(if $(filter %.MODULE,$<),$(PGM_ACTGRP), \
 	$(if $(filter %.module,$<),$(PGM_ACTGRP), \
 	UNKNOWN_FILE_TYPE)))))))))
+programALWUPD = $(strip \
+	$(if $(filter %.MODULE,$<),$(PGM_ALWUPD), \
+	$(if $(filter %.module,$<),$(PGM_ALWUPD), \
+	UNKNOWN_FILE_TYPE)))
 programAUT = $(strip \
 	$(if $(filter %.CLLE,$<),$(BNDCL_AUT), \
 	$(if $(filter %.clle,$<),$(BNDCL_AUT), \
