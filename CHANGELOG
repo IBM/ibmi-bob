@@ -1,3 +1,6 @@
+* Fri Mar 14 2025 Irfan Sharif <IrfanSharif@ibm.com> - 2.4.32
+- Add TGTRLS parameter missing from some commands
+- Add support for setting DFRWRT and ENHDSP parameter values of CRTDSPF command
 * Fri Dec 06 2024 Sanjula Ganepola <Sanjula.Ganepola@ibm.com> - 2.4.31
 - Update RUNSQLFLAGS to recursive assignment from simple to allow for overridden TGTRLS
 - Fix SQLSEQ_TO_DTAARA recipe name
