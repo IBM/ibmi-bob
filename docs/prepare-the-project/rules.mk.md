@@ -126,7 +126,7 @@ Setting `CREATE_TYPEDEF` to `YES` for a *FILE object (LF, PF, PRTF) results in a
 
 _Example:_
 
-```
+```makefile
 # JB001.FILE -- CRTPF
 JB001.FILE: private TEXT = Jumbo test file
 JB001.FILE: private CREATE_TYPEDEF = YES
@@ -137,7 +137,7 @@ JB001.FILE: JB001.PF
 
 If you have multiple targets with compile setttings to override, you can declare them as a variable with the syntax `MY_VAR := VAL`.
 
-```
+```makefile
 PROJECT_TGTRLS := *PRV
 
 PRO200.MODULE: private TGTRLS := $(PROJECT_TGTRLS)
@@ -152,7 +152,8 @@ VAT.MODULE: VAT.RPGLE
 If you have multiple source that creates objects of the same type, you can make use of wildcarding.
 
 #### Without Wildcarding
-```
+
+```makefile
 FILE_TGTRLS = V7R3M0
 MOD_TGTRLS = V7R3M0
 
@@ -167,7 +168,8 @@ TEST1.MODULE: TEST1.RPGLE
 ```
 
 #### With Wildcarding
-```
+
+```makefile
 FILE_TGTRLS = V7R3M0
 MOD_TGTRLS = V7R3M0
 
@@ -177,14 +179,16 @@ MOD_TGTRLS = V7R3M0
 %.FILE: %.TABLE DEP1.FILE DEP2.FILE
 %.MODULE: %.RPGLE
 ```
+
 The above two examples are equivalent. Note the use of wildcards for overriding compile settings for objects of the same type.
 
 When you include wildcarding in your Rules.mk, BOB will locate your source files in the directory of your Rules.mk and create the respective objects.
 
 ### Overriding with Wildcards
+
 If you have objects you need to build which are outside the wildcard case, you can explicity set them, and this will take precedence over wildcarding.
 
-```
+```makefile
 FILE_TGTRLS = V7R3M0
 MOD_TGTRLS = V7R3M0
 
