@@ -1,6 +1,8 @@
 name: IBM i build new release
 on:
   push:
+    branches:
+      - debug_release_workflow
     # Sequence of patterns matched against refs/tags
     tags:
       - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
@@ -47,23 +49,26 @@ jobs:
         run: |
           echo "short_sha=$(echo ${{ github.sha }} | head -c 7)" >> $GITHUB_ENV
           cat $GITHUB_ENV
+      - name: Ensure executable permissions for brp-rm-libtool-control-files
+        run: |
+          $ssh_command "ls -l /QOpenSys/pkgs/lib/rpm/brp-rm-libtool-control-files"
       - name: Perform remote RPM build
         id: remote_build
         run: |
           $ssh_command "cd $remote_build_dir && PATH=/QOpenSys/pkgs/bin:/QOpenSys/usr/bin:/usr/bin time /QOpenSys/pkgs/bin/rpmbuild -ba --define '_topdir $remote_build_dir/rpmbuild' rpmbuild/SPECS/bob.spec"
-      - name: Find RPM file
-        id: find_rpm
-        run: |
-          $scp_dist_command
-          echo "RPM_FILE_PATH=$(find . -name '*.rpm' -print -quit)" >> $GITHUB_OUTPUT
+      # - name: Find RPM file
+      #   id: find_rpm
+      #   run: |
+      #     $scp_dist_command
+      #     echo "RPM_FILE_PATH=$(find . -name '*.rpm' -print -quit)" >> $GITHUB_OUTPUT
       - name: Cleanup remote build dir
         if: always()
         run: $ssh_command "rm -fr $remote_build_dir"
-      - name: Rename RPM before attaching
-        run: mv ${{ steps.find_rpm.outputs.RPM_FILE_PATH }} bob.rpm
-      - name: Create the tag and release
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: ${{ github.ref }}
-          name: Release ${{ steps.get_version.outputs.VERSION }}
-          files: bob.rpm
+      # - name: Rename RPM before attaching
+      #   run: mv ${{ steps.find_rpm.outputs.RPM_FILE_PATH }} bob.rpm
+      # - name: Create the tag and release
+      #   uses: softprops/action-gh-release@v1
+      #   with:
+      #     tag_name: ${{ github.ref }}
+      #     name: Release ${{ steps.get_version.outputs.VERSION }}
+      #     files: bob.rpm
