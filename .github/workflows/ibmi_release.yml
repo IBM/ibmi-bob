@@ -54,7 +54,7 @@ jobs:
           $ssh_command "ls -l /QOpenSys/pkgs/lib/rpm/brp-rm-libtool-control-files"
       - name: Verify PATH working correctly
         run: |
-          $ssh_command "cd $remote_build_dir && PATH=/QOpenSys/pkgs/bin:/QOpenSys/usr/bin:/usr/bin && echo $PATH"
+          $ssh_command "PATH=/QOpenSys/pkgs/bin:/QOpenSys/usr/bin:/usr/bin && echo \$PATH"
       - name: Perform remote RPM build
         id: remote_build
         run: |
