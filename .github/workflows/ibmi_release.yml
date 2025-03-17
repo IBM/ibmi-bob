@@ -58,6 +58,10 @@ jobs:
       - name: Verify PATH and shell
         run: |
           $ssh_command "PATH=/QOpenSys/pkgs/bin:/QOpenSys/usr/bin:/usr/bin && echo \$PATH && echo \$0"
+      - name: Check disk space
+        run: |
+          df -h
+          df -i
       - name: Perform remote RPM build
         id: remote_build
         run: |
