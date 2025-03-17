@@ -55,13 +55,13 @@ jobs:
       - name: Ensure executable permissions for rpm
         run: |
             $ssh_command "ls -l /QOpenSys/pkgs/lib | grep rpm"
-      - name: Verify PATH working correctly
+      - name: Verify PATH and shell
         run: |
-          $ssh_command "PATH=/QOpenSys/pkgs/bin:/QOpenSys/usr/bin:/usr/bin && echo \$PATH"
+          $ssh_command "PATH=/QOpenSys/pkgs/bin:/QOpenSys/usr/bin:/usr/bin && echo \$PATH && echo \$0"
       - name: Perform remote RPM build
         id: remote_build
         run: |
-          $ssh_command "bash -c 'cd $remote_build_dir && PATH=/QOpenSys/pkgs/bin:/QOpenSys/usr/bin:/usr/bin time /QOpenSys/pkgs/bin/rpmbuild -ba -vv --define '_topdir $remote_build_dir/rpmbuild' rpmbuild/SPECS/bob.spec'"
+          $ssh_command "cd $remote_build_dir && PATH=/QOpenSys/pkgs/bin:/QOpenSys/usr/bin:/usr/bin time /QOpenSys/pkgs/bin/rpmbuild -ba -vv --define '_topdir $remote_build_dir/rpmbuild' rpmbuild/SPECS/bob.spec"
       # - name: Find RPM file
       #   id: find_rpm
       #   run: |
