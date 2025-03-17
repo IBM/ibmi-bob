@@ -52,6 +52,9 @@ jobs:
       - name: Ensure permissions for brp-rm-libtool-control-files
         run: |
           $ssh_command "ls -l /QOpenSys/pkgs/lib/rpm/brp-rm-libtool-control-files"
+      - name: Give executable permissions for brp-rm-libtool-control-files
+        run: |
+            $ssh_command "sudo chmod u+x /QOpenSys/pkgs/lib/rpm/brp-rm-libtool-control-files"
       - name: Ensure executable permissions for rpm
         run: |
             $ssh_command "ls -l /QOpenSys/pkgs/lib | grep rpm"
