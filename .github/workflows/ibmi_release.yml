@@ -24,7 +24,7 @@ jobs:
       - name: Get version from tag
         id: get_version
         run: |
-          echo VERSION=${GITHUB_REF#refs/tags/v} >> $GITHUB_OUTPUT
+          echo VERSION=2.4.32 >> $GITHUB_OUTPUT
       - name: Install private key
         run: |
           mkdir -p ~/.ssh
