@@ -63,7 +63,6 @@ In summary, for the rules section, simply specify each object, followed by its s
 
 ---
 
-
 > [!TIP]
 >
 > In order to determine if an object is out-of-date and needs to be built, BOB looks within the library list (using VPATH for gmake gurus).  This library list consists of the current library list for your user profile that is updated via the iproj.json at the root of the project.  See [iproj.json documentation](iproj-json.md) for details.
@@ -85,35 +84,36 @@ Above, module `JB110` will be compiled at a target release of `V7R1M0`.  The `pr
 
 The current list of overrideable compile attributes is:
 
-* ACTGRP
-* AUT
-* BNDDIR
-* COMMIT
-* CURLIB
-* DBGVIEW
-* DETAIL
-* DFTACTGRP
-* DLTPCT
-* HLPID
-* HLPPNLGRP
-* OBJTYPE
-* OPTION
-* PAGESIZE
-* PGM
-* PMTFILE
-* PRDLIB
-* REUSEDLT
-* RPGPPOPT
-* RSTDSP
-* SIZE
-* STGMDL
-* SYSIFCOPT
-* TERASPACE
-* TEXT
-* TYPE
-* TGTCCSID
-* TGTRLS
-* VLDCKR
+- ACTGRP
+- AUT
+- BNDDIR
+- COMMIT
+- CURLIB
+- DBGVIEW
+- DETAIL
+- DFTACTGRP
+- DLTPCT
+- HLPID
+- HLPPNLGRP
+- OBJTYPE
+- OPTION
+- PAGESIZE
+- PGM
+- PMTFILE
+- PRDLIB
+- REUSEDLT
+- RPGPPOPT
+- RSTDSP
+- SIZE
+- STGMDL
+- SYSIFCOPT
+- TERASPACE
+- TEXT
+- TYPE
+- TGTCCSID
+- TGTRLS
+- USRPRF
+- VLDCKR
 
 #### Switches and options
 
@@ -122,21 +122,23 @@ Bob's functionality and behavior can be adjusted by setting the values of certai
 Following are the available makefile options.
 
 ##### CREATE_TYPEDEF
+
 Setting `CREATE_TYPEDEF` to `YES` for a *FILE object (LF, PF, PRTF) results in a separate include-ready source file being generated that contains a typedef structure for the file object's record formats.  This feature is useful for C code that can no longer rely on `#pragma mapinc`, which doesn't work with IFS source code.  The generated file is named after the original source file, but with `.H` appended (source file `JB001.PF` results in include file `JB001.PF.H`)  Under the covers, the GENCSRC command is called.  Note that in the resulting struct, Bob changes `int` to `long int` to work with the SQL C compiler.
 
 _Example:_
 
-```
+```text
 # JB001.FILE -- CRTPF
 JB001.FILE: private TEXT = Jumbo test file
 JB001.FILE: private CREATE_TYPEDEF = YES
 JB001.FILE: JB001.PF
 ```
+
 #### Variables
 
 If you have multiple targets with compile setttings to override, you can declare them as a variable with the syntax `MY_VAR := VAL`.
 
-```
+```text
 PROJECT_TGTRLS := *PRV
 
 PRO200.MODULE: private TGTRLS := $(PROJECT_TGTRLS)
@@ -152,7 +154,8 @@ VAT.MODULE: VAT.RPGLE
 If you have multiple source that creates objects of the same type, you can make use of wildcarding.
 
 #### Without Wildcarding
-```
+
+```text
 FILE_TEXT := SAMPLE1
 MOD_TEXT := SAMPLE2
 
@@ -167,7 +170,8 @@ TEST1.MODULE: TEST1.RPGLE
 ```
 
 #### With Wildcarding
-```
+
+```text
 FILE_TEXT := SAMPLE1
 MOD_TEXT := SAMPLE2
 
@@ -177,15 +181,16 @@ MOD_TEXT := SAMPLE2
 %.FILE: %.TABLE DEP1.FILE DEP2.FILE
 %.MODULE: %.RPGLE
 ```
+
 The above two examples are equivalent. Note the use of wildcards for overriding compile settings for objects of the same type.
 
 When you include wildcarding in your Rules.mk, BOB will locate your source files  in the directory of your Rules.mk and create the respective objects.
 
-
 ### Overriding with Wildcards
+
 If you have objects you need to build which are outside the wildcard case, you can explicity set them, and this will take precedence over wildcarding.
 
-```
+```text
 FILE_TEXT := SAMPLE1
 MOD_TEXT := SAMPLE2
 
@@ -198,7 +203,6 @@ MOD_TEXT := SAMPLE2
 EMP.MODULE: private TEXT := OUTLIER
 EMP.MODULE: EMP.RPGLE A.TABLE
 ```
-
 
 ## Further reading
 
