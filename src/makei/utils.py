@@ -228,6 +228,8 @@ def decompose_filename(filename: str) -> Tuple[str, Optional[str], str, str]:
     ('verifysql', None, 'SQLCBLLE', '')
     >>> decompose_filename("anbenei1.index")
     ('anbenei1', None, 'INDEX', '')
+    >>> decompose_filename("booking1.pfsql")
+    ('booking1', None, 'PFSQL', '')
     """
     if not filename:
         raise ValueError()
