@@ -73,6 +73,7 @@ FILE_TARGETGROUPS_MAPPING = {
     "SYSTRG": "TRG",
     "SQLPRC": "SQL",
     "TABLE": "SQL",
+    "PFSQL": "SQL",
     "VIEW": "SQL",
     "INDEX": "SQL",
     "SQLSEQ": "SQL",
@@ -139,6 +140,7 @@ FILE_TARGET_MAPPING = {
     "SYSTRG": "PGM",
     "SQLPRC": "PGM",
     "TABLE": "FILE",
+    "PFSQL": "FILE",
     "VIEW": "FILE",
     "INDEX": "FILE",
     "SQLSEQ": "DTAARA",
@@ -150,6 +152,8 @@ FILE_TARGET_MAPPING = {
 # This is the maximum number of dot seperated parts in the file extensions defined above.
 FILE_MAX_EXT_LENGTH = max(
     map(lambda ext: len(ext.split('.')), FILE_TARGET_MAPPING.keys()))
+print(FILE_TARGET_MAPPING.keys(),"keys")
+print(FILE_MAX_EXT_LENGTH,"FILE_MAX_EXT_LENGTH")
 
 # This is the number of lines to check in source file for member text as a comment.
 MEMBER_TEXT_LINES = 15
@@ -169,7 +173,7 @@ C_STYLE_COMMENTS = (
 )
 
 SQL_STYLE_COMMENTS = (
-    {"TABLE", "VIEW", "SQLUDT", "SQLALIAS", "SQLSEQ", "SQLPRC", "SQLTRG", "SQLUDF", "SQL", "INDEX"},
+    {"TABLE", "PFSQL", "VIEW", "SQLUDT", "SQLALIAS", "SQLSEQ", "SQLPRC", "SQLTRG", "SQLUDF", "SQL", "INDEX"},
     {
         "style_type": "SQL",
         "start_comment": "--",

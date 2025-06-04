@@ -247,7 +247,7 @@ def decompose_filename(filename: str) -> Tuple[str, Optional[str], str, str]:
             return name, text_attribute, ext, os.path.dirname(filename)
         ext_len -= 1
     if ext_len == 0:
-        raise ValueError(f"Cannot decompose filename: {filename} as {ext} is not a recognized file extension")
+        raise ValueError(f"Cannot decompose filename: {filename} as {ext}is not a recognized file extension")
 
 
 def is_source_file(filename: str) -> bool:
