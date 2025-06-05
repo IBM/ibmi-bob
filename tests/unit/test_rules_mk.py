@@ -209,6 +209,36 @@ ORDERS.DTAQ_DEP=
 ORDERS.DTAQ_RECIPE=DTAQ_TO_DTAQ_RECIPE
 '''
 
+def test_pfsql_recipe():
+    # Test loading from a valid file
+    rules_mk = RulesMk.from_file(data_dir / "pfsql.rules.mk", data_dir)
+    expected_targets = {'TRGs': [], 'DTAARAs': [], 'DTAQs': [], 'SQLs': ['BOOKING1.FILE', 'BOOKING.FILE', 'LOWER.FILE'], 'BNDDs': [], 'PFs': [],
+                        'LFs': [], 'DSPFs': [], 'PRTFs': [], 'CMDs': [], 'MODULEs': [], 'SRVPGMs': [],
+                        'PGMs': [], 'MENUs': [], 'PNLGRPs': [], 'QMQRYs': [], 'WSCSTs': [], 'MSGs': []}
+
+    assert rules_mk.containing_dir == data_dir
+    assert rules_mk.subdirs == []
+    assert rules_mk.targets == expected_targets
+    assert rules_mk.rules[0].variables == []
+    assert rules_mk.rules[0].commands == []
+    assert rules_mk.rules[0].dependencies == []
+    assert rules_mk.rules[0].include_dirs == []
+    assert rules_mk.rules[0].target == 'BOOKING1.FILE'
+    assert rules_mk.rules[0].source_file == 'BOOKING1.PFSQL'
+    assert str(rules_mk.rules[0]) == '''BOOKING1.FILE_SRC=BOOKING1.PFSQL
+BOOKING1.FILE_DEP=
+BOOKING1.FILE_RECIPE=PFSQL_TO_FILE_RECIPE\n'''
+    assert str(rules_mk) == '''SQLs := BOOKING1.FILE BOOKING.FILE LOWER.FILE\n\n
+BOOKING1.FILE_SRC=BOOKING1.PFSQL
+BOOKING1.FILE_DEP=
+BOOKING1.FILE_RECIPE=PFSQL_TO_FILE_RECIPE
+BOOKING.FILE_SRC=BOOKING.TABLE
+BOOKING.FILE_DEP=
+BOOKING.FILE_RECIPE=TABLE_TO_FILE_RECIPE
+LOWER.FILE_SRC=lower.pfsql
+LOWER.FILE_DEP=
+LOWER.FILE_RECIPE=PFSQL_TO_FILE_RECIPE
+'''
 
 def test_dds_recipe():
     # Test loading from a valid file
