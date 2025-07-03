@@ -152,8 +152,6 @@ FILE_TARGET_MAPPING = {
 # This is the maximum number of dot seperated parts in the file extensions defined above.
 FILE_MAX_EXT_LENGTH = max(
     map(lambda ext: len(ext.split('.')), FILE_TARGET_MAPPING.keys()))
-print(FILE_TARGET_MAPPING.keys(),"keys")
-print(FILE_MAX_EXT_LENGTH,"FILE_MAX_EXT_LENGTH")
 
 # This is the number of lines to check in source file for member text as a comment.
 MEMBER_TEXT_LINES = 15
