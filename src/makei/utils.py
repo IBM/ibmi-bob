@@ -228,8 +228,8 @@ def decompose_filename(filename: str) -> Tuple[str, Optional[str], str, str]:
     ('verifysql', None, 'SQLCBLLE', '')
     >>> decompose_filename("anbenei1.index")
     ('anbenei1', None, 'INDEX', '')
-    >>> decompose_filename("booking1.pfsql")
-    ('booking1', None, 'PFSQL', '')
+    >>> decompose_filename("custinfo1.pfsql")
+    ('custinfo1', None, 'PFSQL', '')
     """
     if not filename:
         raise ValueError()
@@ -249,7 +249,7 @@ def decompose_filename(filename: str) -> Tuple[str, Optional[str], str, str]:
             return name, text_attribute, ext, os.path.dirname(filename)
         ext_len -= 1
     if ext_len == 0:
-        raise ValueError(f"Cannot decompose filename: {filename} as {ext}is not a recognized file extension")
+        raise ValueError(f"Cannot decompose filename: {filename} as {ext} is not a recognized file extension")
 
 
 def is_source_file(filename: str) -> bool:
