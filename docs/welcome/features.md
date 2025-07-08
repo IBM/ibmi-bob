@@ -91,6 +91,7 @@ The set of SQL commands to create the object is stored in a file with the given 
 | SQL Type  | QSYS Object | File Extension | SQL COMMAND                 |
 | :-------- | :---------- | :------------- | :-------------------------- |
 | TABLE     | *FILE       | .TABLE         | CREATE OR REPLACE TABLE     |
+| PFSQL     | *FILE       | .PFSQL         | CREATE OR REPLACE PFSQL     |
 | VIEW      | *FILE       | .VIEW          | CREATE OR REPLACE VIEW      |
 | INDEX     | *FILE       | .INDEX         | CREATE INDEX                |
 | PROCEDURE | *PGM        | .SQLPRC        | CREATE OR REPLACE PROCEDURE |
