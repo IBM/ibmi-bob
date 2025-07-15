@@ -143,11 +143,16 @@ class RulesMk:
     targets: Dict[str, List[str]]
     rules: List[MKRule]
     build_context: Optional['BuildEnv'] = None
+    src_obj_mapping: Dict[str, str]
 
     def __init__(self, subdirs: List[str], rules: List[MKRule], containing_dir: Path) -> None:
         self.targets = {tgt_group + 's': [] for tgt_group in TARGET_GROUPS}
+        self.src_obj_mapping = {}
         for rule in rules:
             if rule.source_file is not None:
+                decomposed_src = decompose_filename(rule.source_file)
+                src = f"{decomposed_src[0].upper()}.{decomposed_src[2].upper()}"
+                self.src_obj_mapping[src] = rule.target
                 tgt_group = FILE_TARGETGROUPS_MAPPING[decompose_filename(rule.source_file)[-2]]
                 self.targets[tgt_group + 's'].append(rule.target)
             else:

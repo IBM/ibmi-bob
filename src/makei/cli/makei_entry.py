@@ -6,6 +6,7 @@ import argparse
 import os
 import sys
 
+from pathlib import Path
 from makei import __version__
 from makei import init_project
 from makei.build import BuildEnv
@@ -219,7 +220,8 @@ def handle_compile(args):
     if args.file:
         filenames = [args.file]
     elif args.files:
-        filenames = map(os.path.basename, args.files.split(':'))
+        # Ensures all paths are relative to the project root
+        filenames = map(lambda f: (str(Path(f).resolve().relative_to(Path.cwd()))), args.files.split(':'))
     else:
         filenames = []
     targets = []
@@ -231,9 +233,12 @@ def handle_compile(args):
             source_names.append(name)
     # print("source:"+' '.join(source_names))
     # print("compile targets:"+' '.join(get_compile_targets_from_filenames(source_names)))
-    targets.extend(get_compile_targets_from_filenames(source_names))
-    print(colored("targets: " + ' '.join(targets), Colors.OKBLUE))
+    targets.extend(source_names)
     build_env = BuildEnv(targets, args.make_options, get_override_vars(args))
+    targets = build_env.targets
+    print(colored("targets: " + ' '.join(targets), Colors.OKBLUE))
+
+    
     if build_env.make():
         sys.exit(0)
     else:
