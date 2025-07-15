@@ -279,30 +279,6 @@ def get_target_from_filename(filename: str) -> str:
     return f'{name.upper()}.{FILE_TARGET_MAPPING[ext]}'
 
 
-def get_compile_targets_from_filenames(filenames: List[str]) -> List[str]:
-    """ Returns the possible target name for the given filename
-
-    >>> get_compile_targets_from_filenames(["test.PGM.RPGLE"])
-    ['TEST.PGM']
-    >>> get_compile_targets_from_filenames(["test.pgm.rpgle"])
-    ['TEST.PGM']
-    >>> get_compile_targets_from_filenames(["test.RPGLE"])
-    ['TEST.MODULE']
-    >>> get_compile_targets_from_filenames(["vat300.rpgle"])
-    ['VAT300.MODULE']
-    >>> get_compile_targets_from_filenames(["functionsVAT/VAT300.RPGLE", "test.RPGLE"])
-    ['VAT300.MODULE', 'TEST.MODULE']
-    >>> get_compile_targets_from_filenames(["ART200-Work_with_article.PGM.SQLRPGLE", "SGSMSGF.MSGF"])
-    ['ART200.PGM', 'SGSMSGF.MSGF']
-    >>> get_compile_targets_from_filenames(["SAMPLE.BNDDIR"])
-    ['SAMPLE.BNDDIR']
-    """
-    result = []
-    for filename in filenames:
-        result.append(get_target_from_filename(filename))
-    return result
-
-
 def format_datetime(d: datetime) -> str:
     # 2022-03-25-09.33.34.064676
     return d.strftime("%Y-%m-%d-%H.%M.%S.%f")

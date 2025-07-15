@@ -11,7 +11,7 @@ from makei import __version__
 from makei import init_project
 from makei.build import BuildEnv
 from makei.cvtsrcpf import CvtSrcPf
-from makei.utils import Colors, colored, get_compile_targets_from_filenames
+from makei.utils import Colors, colored
 
 
 def cli():
@@ -238,7 +238,6 @@ def handle_compile(args):
     targets = build_env.targets
     print(colored("targets: " + ' '.join(targets), Colors.OKBLUE))
 
-    
     if build_env.make():
         sys.exit(0)
     else:
