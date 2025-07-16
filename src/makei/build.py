@@ -102,7 +102,7 @@ class BuildEnv:
 
                         # Target exist in the current Rules.mk and target's rule exists
                         if tgt_dir == str(rules_mk.containing_dir) and tgt.upper() in rules_mk_src_obj_mapping:
-                            real_targets.append(rules_mk_src_obj_mapping.pop(tgt.upper()))
+                            real_targets.extend(rules_mk_src_obj_mapping.pop(tgt.upper()))
             rules_mk.build_context = self
             rules_mk_build_path = rules_mk_path.parent / ".Rules.mk.build"
             rules_mk_build_path.write_text(str(rules_mk))
