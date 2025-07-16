@@ -12,7 +12,7 @@ from enum import Enum
 from pathlib import Path
 from shutil import move, copymode
 from tempfile import mkstemp, gettempdir
-from typing import Callable, List, Optional, Tuple, Union
+from typing import Callable, Optional, Tuple, Union
 
 from makei.const import FILE_MAX_EXT_LENGTH, FILE_TARGET_MAPPING, COMMENT_STYLES
 
