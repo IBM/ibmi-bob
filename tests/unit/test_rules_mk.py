@@ -209,10 +209,12 @@ ORDERS.DTAQ_DEP=
 ORDERS.DTAQ_RECIPE=DTAQ_TO_DTAQ_RECIPE
 '''
 
+
 def test_pfsql_recipe():
     # Test loading from a valid file
     rules_mk = RulesMk.from_file(data_dir / "pfsql.rules.mk", data_dir)
-    expected_targets = {'TRGs': [], 'DTAARAs': [], 'DTAQs': [], 'SQLs': ['CUSTINFO1.FILE', 'CUSTINFO.FILE', 'LOWER.FILE'], 'BNDDs': [], 'PFs': [],
+    expected_targets = {'TRGs': [], 'DTAARAs': [], 'DTAQs': [], 'SQLs': ['CUSTINFO1.FILE', 'CUSTINFO.FILE',
+                        'LOWER.FILE'], 'BNDDs': [], 'PFs': [],
                         'LFs': [], 'DSPFs': [], 'PRTFs': [], 'CMDs': [], 'MODULEs': [], 'SRVPGMs': [],
                         'PGMs': [], 'MENUs': [], 'PNLGRPs': [], 'QMQRYs': [], 'WSCSTs': [], 'MSGs': []}
 
@@ -239,6 +241,7 @@ LOWER.FILE_SRC=lower.pfsql
 LOWER.FILE_DEP=
 LOWER.FILE_RECIPE=PFSQL_TO_FILE_RECIPE
 '''
+
 
 def test_dds_recipe():
     # Test loading from a valid file
