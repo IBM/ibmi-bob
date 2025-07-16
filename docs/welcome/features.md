@@ -88,16 +88,16 @@ Note:
 The following SQL types are supported as pseudo-source.
 The set of SQL commands to create the object is stored in a file with the given extension. Typically it is just the CREATE OR REPLACE command, but for example for TABLE, you would also want to include any ALTER TABLE commands as well.  Other ancillary commands needed to complete creation like LABEL ON should also be in the same source file. 
 
-| SQL Type  | QSYS Object | File Extension | SQL COMMAND                 |
-| :-------- | :---------- | :------------- | :-------------------------- |
-| TABLE     | *FILE       | .TABLE         | CREATE OR REPLACE TABLE     |
-| VIEW      | *FILE       | .VIEW          | CREATE OR REPLACE VIEW      |
-| INDEX     | *FILE       | .INDEX         | CREATE INDEX                |
-| PROCEDURE | *PGM        | .SQLPRC        | CREATE OR REPLACE PROCEDURE |
-| FUNCTION  | *SRVPGM     | .SQLUDF        | CREATE OR REPLACE FUNCTION  |
-| FUNCTION  | *SRVPGM     | .SQLUDT        | CREATE DISTINCT TYPE        |
-| TRIGGER   | *PGM        | .SQLTRG        | CREATE OR REPLACE TRIGGER   |
-| ALIAS     | *FILE       | .SQLALIAS      | CREATE OR REPLACE ALIAS     |
-| SEQUENCE  | *DTAARA     | .SQLSEQ        | CREATE OR REPLACE SEQUENCE  |
+| SQL Type  | QSYS Object | File Extension  | SQL COMMAND                 |
+| :-------- | :---------- | :-------------- | :-------------------------- |
+| TABLE     | *FILE       | .TABLE or .PFSQL| CREATE OR REPLACE TABLE     |
+| VIEW      | *FILE       | .VIEW           | CREATE OR REPLACE VIEW      |
+| INDEX     | *FILE       | .INDEX          | CREATE INDEX                |
+| PROCEDURE | *PGM        | .SQLPRC         | CREATE OR REPLACE PROCEDURE |
+| FUNCTION  | *SRVPGM     | .SQLUDF         | CREATE OR REPLACE FUNCTION  |
+| FUNCTION  | *SRVPGM     | .SQLUDT         | CREATE DISTINCT TYPE        |
+| TRIGGER   | *PGM        | .SQLTRG         | CREATE OR REPLACE TRIGGER   |
+| ALIAS     | *FILE       | .SQLALIAS       | CREATE OR REPLACE ALIAS     |
+| SEQUENCE  | *DTAARA     | .SQLSEQ         | CREATE OR REPLACE SEQUENCE  |
 
 Generic SQL statements with file extension .SQL are executed using RUNSQLSTM
