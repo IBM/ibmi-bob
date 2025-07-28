@@ -343,7 +343,7 @@ class RulesMk:
         # Updates variables with wildcard values
         for wildcard, var in wildcard_variables.items():
             stripped_wildcard = wildcard.strip("%.").upper()
-            matched_targets = list(filter(lambda target: target.split(".")[1] == stripped_wildcard, targets))
+            matched_targets = [target for target in targets if target.endswith(f".{stripped_wildcard}")]
             targets = list(filter(lambda target: target.split(".")[1] != stripped_wildcard, targets))
 
             for target in matched_targets:
