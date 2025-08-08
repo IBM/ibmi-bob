@@ -153,8 +153,6 @@ class RulesMk:
         for rule in rules:
             if rule.source_file is not None:
                 decomposed_src = decompose_filename(rule.source_file)
-                src = f"{decomposed_src[0].upper()}.{decomposed_src[2].upper()}"
-                self.src_obj_mapping[src] = rule.target
                 
                 tgt_group_list = FILE_TARGETGROUPS_MAPPING[decomposed_src[-2].upper()]
 
