@@ -224,17 +224,17 @@ def handle_compile(args):
         filenames = map(lambda f: (str(Path(f).resolve().relative_to(Path.cwd()))), args.files.split(':'))
     else:
         filenames = []
-    targets = []
+    # targets = []
     source_names = []
     for name in filenames:
         if os.path.isdir(name):
-            targets.append(make_dir_target(name))
+            source_names.append(make_dir_target(name))
         else:
             source_names.append(name)
     # print("source:"+' '.join(source_names))
     # print("compile targets:"+' '.join(get_compile_targets_from_filenames(source_names)))
-    targets.extend(source_names)
-    build_env = BuildEnv(targets, args.make_options, get_override_vars(args))
+    # targets.extend(source_names)
+    build_env = BuildEnv(source_names, args.make_options, get_override_vars(args))
     targets = build_env.targets
     print(colored("targets: " + ' '.join(targets), Colors.OKBLUE))
 
