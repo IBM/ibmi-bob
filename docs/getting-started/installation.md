@@ -12,10 +12,17 @@
 > Make sure you have installed the IBM i package repositories `ibmi-repos`.
 >
 > If not, run `yum install ibmi-repos` before installing `bob`.
+> if `ibmi-repos` is present but the `bob` package is not found in it then do the follwoing in order to update the repository.
+> ```bash
+> yum upgrade yum ibmi-repos
+> yum upgrade ibmi-repos
+> ```
+
 ```bash
  # Install bob
 yum install bob
 ```
+
 
 ## Verify Bob is installed correctly
 
