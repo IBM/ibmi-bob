@@ -73,6 +73,7 @@ FILE_TARGETGROUPS_MAPPING = {
     "SYSTRG": {"TRG"},
     "SQLPRC": {"SQL"},
     "TABLE": {"SQL"},
+    "PFSQL": {"SQL"},
     "VIEW": {"SQL"},
     "INDEX": {"SQL"},
     "SQLSEQ": {"SQL"},
