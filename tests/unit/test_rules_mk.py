@@ -90,6 +90,8 @@ def test_from_file():
                   'private VARIMMED ::= IMMED', 'private VARESCAPE :::= ESCAPE']
     mkrule1 = MKRule('VAT300.MODULE', ['vat300.rpgle', 'some.rpgleinc'], [], variables1, data_dir, [])
     expected_rules = [mkrule1]
+
+    assert rules_mk.src_obj_mapping['VAT300.RPGLE'] == ['VAT300.MODULE']
     assert rules_mk.containing_dir == data_dir
     assert rules_mk.subdirs == ['adir', 'bdir']
     assert rules_mk.targets == expected_targets
@@ -165,9 +167,11 @@ def test_dtaara_recipe():
                         'LFs': [], 'DSPFs': [], 'PRTFs': [], 'CMDs': [], 'MODULEs': [], 'SRVPGMs': [], 'PGMs': [],
                         'MENUs': [], 'PNLGRPs': [], 'QMQRYs': [], 'WSCSTs': [], 'MSGs': []}
 
+    assert rules_mk.src_obj_mapping['LASTORDNO.DTAARA'] == ['LASTORDNO.DTAARA']
     assert rules_mk.containing_dir == data_dir
     assert rules_mk.subdirs == []
     assert rules_mk.targets == expected_targets
+
     assert rules_mk.rules[0].variables == []
     assert rules_mk.rules[0].commands == []
     assert rules_mk.rules[0].dependencies == []
@@ -191,9 +195,11 @@ def test_dtaq_recipe():
                         'LFs': [], 'DSPFs': [], 'PRTFs': [], 'CMDs': [], 'MODULEs': [], 'SRVPGMs': [],
                         'PGMs': [], 'MENUs': [], 'PNLGRPs': [], 'QMQRYs': [], 'WSCSTs': [], 'MSGs': []}
 
+    assert rules_mk.src_obj_mapping['ORDERS.DTAQ'] == ['ORDERS.DTAQ']
     assert rules_mk.containing_dir == data_dir
     assert rules_mk.subdirs == []
     assert rules_mk.targets == expected_targets
+
     assert rules_mk.rules[0].variables == []
     assert rules_mk.rules[0].commands == []
     assert rules_mk.rules[0].dependencies == []
@@ -250,7 +256,10 @@ def test_dds_recipe():
                         'DETORD.FILE', 'TMPDETORD.FILE'], 'LFs': [], 'DSPFs': ['ART301D.FILE'],
                         'PRTFs': ['ORD500O.FILE'], 'CMDs': [], 'MODULEs': [], 'SRVPGMs': [], 'PGMs': [],
                         'MENUs': [], 'PNLGRPs': [], 'QMQRYs': [], 'WSCSTs': [], 'MSGs': []}
-
+    assert rules_mk.src_obj_mapping['ARTICLE.PF'] == ['ARTICLE.FILE']
+    assert rules_mk.src_obj_mapping['ART301D.DSPF'] == ['ART301D.FILE']
+    assert rules_mk.src_obj_mapping['DETORD.PF'] == ['DETORD.FILE']
+    assert rules_mk.src_obj_mapping['ORD500O.PRTF'] == ['ORD500O.FILE']
     assert rules_mk.containing_dir == data_dir
     assert rules_mk.subdirs == []
     assert rules_mk.targets == expected_targets
@@ -305,3 +314,52 @@ TMPDETORD.FILE : \n\t@$(call echo_cmd,=== Creating [TMPDETORD.FILE] from custom 
 \tsystem -i "CPYF FROMFILE($(OBJLIB)/DETORD) TOFILE($(OBJLIB)/TMPDETORD) CRTFILE(*YES)"
 \t@$(call echo_success_cmd,End of creating TMPDETORD.FILE)
 '''
+
+
+def test_src_obj_mapping():
+    rules_mk = RulesMk.from_file(data_dir / "mapping.rules.mk", data_dir)
+    expected_targets = {'TRGs': [], 'DTAARAs': [], 'DTAQs': [], 'SQLs': [], 'BNDDs': [], 'PFs': [], 'LFs': [],
+                        'DSPFs': [], 'PRTFs': [], 'CMDs': [], 'MODULEs': ['OBSCURE.MODULE', 'HELLO.MODULE'],
+                        'SRVPGMs': [], 'PGMs': ['HELLO.PGM', 'WORLD.PGM'], 'MENUs': [], 'PNLGRPs': [],
+                        'QMQRYs': [], 'WSCSTs': [], 'MSGs': []}
+    assert rules_mk.src_obj_mapping['LONGSOURCEFILENAME.RPGLE'] == ['OBSCURE.MODULE']
+    assert rules_mk.src_obj_mapping['HELLO.RPGLE'] == ['HELLO.PGM', 'HELLO.MODULE']
+    assert rules_mk.src_obj_mapping['WORLD.PGM.RPGLE'] == ['WORLD.PGM']
+    assert rules_mk.containing_dir == data_dir
+    assert rules_mk.subdirs == []
+    assert rules_mk.targets == expected_targets
+
+    assert rules_mk.rules[0].variables == []
+    assert rules_mk.rules[0].commands == []
+    assert rules_mk.rules[0].dependencies == []
+    assert rules_mk.rules[0].include_dirs == []
+    assert rules_mk.rules[0].target == 'OBSCURE.MODULE'
+    assert rules_mk.rules[0].source_file == 'LONGSOURCEFILENAME.RPGLE'
+    assert str(rules_mk.rules[0]) == '''OBSCURE.MODULE_SRC=LONGSOURCEFILENAME.RPGLE
+OBSCURE.MODULE_DEP=\nOBSCURE.MODULE_RECIPE=RPGLE_TO_MODULE_RECIPE\n'''
+
+    assert rules_mk.rules[1].variables == []
+    assert rules_mk.rules[1].commands == []
+    assert rules_mk.rules[1].dependencies == []
+    assert rules_mk.rules[1].include_dirs == []
+    assert rules_mk.rules[1].target == 'HELLO.PGM'
+    assert rules_mk.rules[1].source_file == 'HELLO.RPGLE'
+    # assert str(rules_mk.rules[1]) == '''HELLO.PGM_SRC=HELLO.RPGLE\nHELLO.PGM_DEP=
+# HELLO.PGM_RECIPE=PGM.RPGLE_TO_PGM_RECIPE\n'''
+    assert rules_mk.rules[2].variables == []
+    assert rules_mk.rules[2].commands == []
+    assert rules_mk.rules[2].dependencies == []
+    assert rules_mk.rules[2].include_dirs == []
+    assert rules_mk.rules[2].target == 'HELLO.MODULE'
+    assert rules_mk.rules[2].source_file == 'HELLO.RPGLE'
+    assert str(rules_mk.rules[2]) == '''HELLO.MODULE_SRC=HELLO.RPGLE\nHELLO.MODULE_DEP=
+HELLO.MODULE_RECIPE=RPGLE_TO_MODULE_RECIPE\n'''
+
+    assert rules_mk.rules[3].variables == []
+    assert rules_mk.rules[3].commands == []
+    assert rules_mk.rules[3].dependencies == []
+    assert rules_mk.rules[3].include_dirs == []
+    assert rules_mk.rules[3].target == 'WORLD.PGM'
+    assert rules_mk.rules[3].source_file == 'WORLD.PGM.RPGLE'
+    assert str(rules_mk.rules[3]) == '''WORLD.PGM_SRC=WORLD.PGM.RPGLE\nWORLD.PGM_DEP=
+WORLD.PGM_RECIPE=PGM.RPGLE_TO_PGM_RECIPE\n'''
