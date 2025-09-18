@@ -161,8 +161,8 @@ COLOR_TTY := {'true' if self.color else 'false'}
         return not self.failed_targets
 
     def _post_make(self):
-        for tmp_file in self.tmp_files:
-            tmp_file.unlink()
+        # for tmp_file in self.tmp_files:
+        #     tmp_file.unlink()
         print(colored("Objects:            ", Colors.BOLD), colored(f"{len(self.failed_targets)} failed", Colors.FAIL),
               colored(f"{len(self.success_targets)} succeed", Colors.OKGREEN),
               f"{len(self.success_targets) + len(self.failed_targets)} total")
