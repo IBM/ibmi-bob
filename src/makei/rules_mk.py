@@ -150,20 +150,7 @@ class RulesMk:
         self.src_obj_mapping = {}
         for rule in rules:
             if rule.source_file is not None:
-                decomposed_src = decompose_filename(rule.source_file)
-                src = f"{decomposed_src[0].upper()}.{decomposed_src[2].upper()}"
-                if src not in self.src_obj_mapping:
-                    self.src_obj_mapping[src] = [rule.target]
-                else:
-                    self.src_obj_mapping[src].append(rule.target)
-                tgt_group_list = FILE_TARGETGROUPS_MAPPING[decomposed_src[-2].upper()]
-
-                # If only 1 target mapping exists, use it, otherwise use target's extension
-                tgt_group = next(iter(tgt_group_list)).upper() if len(tgt_group_list) == 1 \
-                    else rule.target.split('.')[-1].upper()
-                if tgt_group not in TARGET_GROUPS:
-                    print(f"Warning: Target '{rule.target}' is not supported")
-                    sys.exit(1)
+                tgt_group = FILE_TARGETGROUPS_MAPPING[decompose_filename(rule.source_file)[-2]]
 
                 self.targets[tgt_group + 's'].append(rule.target)
             else:

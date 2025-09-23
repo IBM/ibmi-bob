@@ -2,7 +2,6 @@
 
 """ The module used to build a project"""
 import sys
-import os
 from pathlib import Path
 from tempfile import mkstemp
 from typing import Any, Dict, List, Optional
@@ -81,33 +80,13 @@ class BuildEnv:
         target_file_path = self.build_vars_path
 
         rules_mk_paths = list(Path(".").rglob("Rules.mk"))
-        real_targets = []
         # Create Rules.mk.build for each Rules.mk
         for rules_mk_path in rules_mk_paths:
             rules_mk = RulesMk.from_file(rules_mk_path,  self.src_dir, map(Path, self.iproj_json.include_path))
-            rules_mk_src_obj_mapping = rules_mk.src_obj_mapping.copy()
-            if self.targets and self.targets[0] != "all":
-                for target in self.targets:
-                    if target.startswith("dir_") and target not in real_targets:
-                        real_targets.append(target)
-                    else:
-                        # Target is relative path. i.e. QRPGLESRC/TEST.RPGLE
-                        if len(Path(target).parts) > 1:
-                            tgt_dir = os.path.dirname(target)
-                            tgt = os.path.basename(target)
-                        # Target is a file name
-                        else:
-                            tgt_dir = "."
-                            tgt = target
-
-                        # Target exist in the current Rules.mk and target's rule exists
-                        if tgt_dir == str(rules_mk.containing_dir) and tgt.upper() in rules_mk_src_obj_mapping:
-                            real_targets.extend(rules_mk_src_obj_mapping.pop(tgt.upper()))
             rules_mk.build_context = self
             rules_mk_build_path = rules_mk_path.parent / ".Rules.mk.build"
             rules_mk_build_path.write_text(str(rules_mk))
             self.tmp_files.append(rules_mk_build_path)
-        self.targets = real_targets if real_targets else self.targets
 
         subdirs = list(map(lambda x: x.parents[0], rules_mk_paths))
 
