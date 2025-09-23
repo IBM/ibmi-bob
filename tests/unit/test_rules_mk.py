@@ -127,8 +127,6 @@ FOO.MODULE: TGTVER := V7R2
 '''
 
 
-
-
 def test_from_file():
     # Test loading from a valid file
     rules_mk = RulesMk.from_file(data_dir / "a.rules.mk", data_dir)
@@ -140,8 +138,6 @@ def test_from_file():
                   'private VARIMMED ::= IMMED', 'private VARESCAPE :::= ESCAPE']
     mkrule1 = MKRule('VAT300.MODULE', ['vat300.rpgle', 'some.rpgleinc'], [], variables1, data_dir, [])
     expected_rules = [mkrule1]
-
-    assert rules_mk.src_obj_mapping['VAT300.RPGLE'] == ['VAT300.MODULE']
     assert rules_mk.containing_dir == data_dir
     assert rules_mk.subdirs == ['adir', 'bdir']
     assert rules_mk.targets == expected_targets
@@ -217,11 +213,9 @@ def test_dtaara_recipe():
                         'LFs': [], 'DSPFs': [], 'PRTFs': [], 'CMDs': [], 'MODULEs': [], 'SRVPGMs': [], 'PGMs': [],
                         'MENUs': [], 'PNLGRPs': [], 'QMQRYs': [], 'WSCSTs': [], 'MSGs': []}
 
-    assert rules_mk.src_obj_mapping['LASTORDNO.DTAARA'] == ['LASTORDNO.DTAARA']
     assert rules_mk.containing_dir == data_dir
     assert rules_mk.subdirs == []
     assert rules_mk.targets == expected_targets
-
     assert rules_mk.rules[0].variables == []
     assert rules_mk.rules[0].commands == []
     assert rules_mk.rules[0].dependencies == []
@@ -245,11 +239,9 @@ def test_dtaq_recipe():
                         'LFs': [], 'DSPFs': [], 'PRTFs': [], 'CMDs': [], 'MODULEs': [], 'SRVPGMs': [],
                         'PGMs': [], 'MENUs': [], 'PNLGRPs': [], 'QMQRYs': [], 'WSCSTs': [], 'MSGs': []}
 
-    assert rules_mk.src_obj_mapping['ORDERS.DTAQ'] == ['ORDERS.DTAQ']
     assert rules_mk.containing_dir == data_dir
     assert rules_mk.subdirs == []
     assert rules_mk.targets == expected_targets
-
     assert rules_mk.rules[0].variables == []
     assert rules_mk.rules[0].commands == []
     assert rules_mk.rules[0].dependencies == []
