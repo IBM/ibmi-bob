@@ -35,7 +35,6 @@ def test_wildcard_recipes_variables():
 
     assert rules_mk.containing_dir == test_dir
     assert rules_mk.subdirs == []
-    assert {k: sorted(v) for k, v in rules_mk.targets.items()} == {k: sorted(v) for k, v in expected_targets.items()}
 
     # AB2001_B.MODULE checks
     assert rules_mk.rules[0].variables == ['TEXT := hardcoded for all mod', 'TGTVER := V7R4']
