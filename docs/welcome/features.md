@@ -29,12 +29,15 @@ These IBM i source types can be compiled directly from the IFS
 | :---------- | :-------------------------------------------------------------------- |
 | *CMD        | .CMD                                                                  |
 | *MODULE     | .RPGLE, .CLLE, .C, .SQLC, .CPP, .SQLCPP, .SQLRPGLE, .CBLLE, .SQLCBLLE |
-| *PGM        | .PGM.RPGLE, .PGM.SQLRPGLE, .PGM.C, .PGM.CBLLE, .PGM.SQLCBLLE          |
+| *PGM        | .PGM.RPGLE, .PGM.SQLRPGLE, .PGM.C, .PGM.CBLLE, .PGM.SQLCBLLE, .RPGLE, .SQLRPGLE          |
 | *SRVPGM     | .BND                                                                  |
 
 Note:
 
 * to make it unambiguous whether a source file is to be compiled into a PGM or MODULE, the PGM source has .PGM.<srctype> as its file extension
+  * Support now exists to build a PGM directly from a RPGLE or SQLRPGLE source file.
+  The decision to build a MODULE or a PGM will be specified in Rules.mk 
+  * Eg: CUSTOMER.PGM.RPGLE and CUSTOMER.RPGLE can create a PGM
 * it is very easy to build SRVPGM using binder source.  Simply have a rule like
   * CUSTOMER.SRVPGM: $(d)/CUSTOMER.BND A.MODULE B.MODULE
 
