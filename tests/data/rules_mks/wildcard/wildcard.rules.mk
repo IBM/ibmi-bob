@@ -1,4 +1,5 @@
 TGTVER := *PRV
+TGTRLS := *PRV
 # need to support when no blanks delimiting the equals
 CURRENT :=V7R5
 HEADER := some
@@ -12,10 +13,10 @@ VERSION :=V7R3
 %.MODULE: TEXT := hardcoded for all mod
 
 AB2001_B.MODULE: AB2001_B.rpgle
-AB2001_B.MODULE: TGTVER := V7R4
+AB2001_B.MODULE: TGTRLS := $(TGTRLS)
 
 AB2001.B.MODULE: AB2001.B.rpgle
-AB2001.B.MODULE: TGTVER := V7R4
+AB2001.B.MODULE: TGTRLS := $(TGTRLS)
 
 bar.MODULE: COMMIT :=$(COMMIT)
 bar.MODULE: TGTVER :=$(VERSION)

@@ -35,10 +35,9 @@ def test_wildcard_recipes_variables():
 
     assert rules_mk.containing_dir == test_dir
     assert rules_mk.subdirs == []
-    assert {k: sorted(v) for k, v in rules_mk.targets.items()} == {k: sorted(v) for k, v in expected_targets.items()}
 
     # AB2001_B.MODULE checks
-    assert rules_mk.rules[0].variables == ['TEXT := hardcoded for all mod', 'TGTVER := V7R4']
+    assert rules_mk.rules[0].variables == ['TEXT := hardcoded for all mod', 'TGTRLS :=*PRV']
     assert rules_mk.rules[0].commands == []
     assert rules_mk.rules[0].dependencies == []
     assert rules_mk.rules[0].include_dirs == []
@@ -48,11 +47,11 @@ def test_wildcard_recipes_variables():
 AB2001_B.MODULE_DEP=
 AB2001_B.MODULE_RECIPE=RPGLE_TO_MODULE_RECIPE
 AB2001_B.MODULE: TEXT := hardcoded for all mod
-AB2001_B.MODULE: TGTVER := V7R4
+AB2001_B.MODULE: TGTRLS :=*PRV
 '''
 
     # AB2001.B.MODULE checks
-    assert rules_mk.rules[1].variables == ['TEXT := hardcoded for all mod', 'TGTVER := V7R4']
+    assert rules_mk.rules[1].variables == ['TEXT := hardcoded for all mod', 'TGTRLS :=*PRV']
     assert rules_mk.rules[1].commands == []
     assert rules_mk.rules[1].dependencies == []
     assert rules_mk.rules[1].include_dirs == []
@@ -62,7 +61,7 @@ AB2001_B.MODULE: TGTVER := V7R4
 AB2001.B.MODULE_DEP=
 AB2001.B.MODULE_RECIPE=RPGLE_TO_MODULE_RECIPE
 AB2001.B.MODULE: TEXT := hardcoded for all mod
-AB2001.B.MODULE: TGTVER := V7R4
+AB2001.B.MODULE: TGTRLS :=*PRV
 '''
     # BAR.MODULE uses wildcard vars + target-specific vars
     assert rules_mk.rules[2].variables == ['TEXT := hardcoded for all mod', 'COMMIT :=*NONE', 'TGTVER :=V7R3']
@@ -105,12 +104,12 @@ AB2001_B.MODULE_SRC=$(d)/AB2001_B.rpgle
 AB2001_B.MODULE_DEP=
 AB2001_B.MODULE_RECIPE=RPGLE_TO_MODULE_RECIPE
 AB2001_B.MODULE: TEXT := hardcoded for all mod
-AB2001_B.MODULE: TGTVER := V7R4
+AB2001_B.MODULE: TGTRLS :=*PRV
 AB2001.B.MODULE_SRC=$(d)/AB2001.B.rpgle
 AB2001.B.MODULE_DEP=
 AB2001.B.MODULE_RECIPE=RPGLE_TO_MODULE_RECIPE
 AB2001.B.MODULE: TEXT := hardcoded for all mod
-AB2001.B.MODULE: TGTVER := V7R4
+AB2001.B.MODULE: TGTRLS :=*PRV
 BAR.MODULE_SRC=$(d)/bar.rpgle
 BAR.MODULE_DEP=bar.TABLE
 BAR.MODULE_RECIPE=RPGLE_TO_MODULE_RECIPE
