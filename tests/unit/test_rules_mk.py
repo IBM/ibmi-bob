@@ -210,6 +210,39 @@ ORDERS.DTAQ_RECIPE=DTAQ_TO_DTAQ_RECIPE
 '''
 
 
+def test_pfsql_recipe():
+    # Test loading from a valid file
+    rules_mk = RulesMk.from_file(data_dir / "pfsql.rules.mk", data_dir)
+    expected_targets = {'TRGs': [], 'DTAARAs': [], 'DTAQs': [], 'SQLs': ['CUSTINFO1.FILE', 'CUSTINFO.FILE',
+                        'LOWER.FILE'], 'BNDDs': [], 'PFs': [],
+                        'LFs': [], 'DSPFs': [], 'PRTFs': [], 'CMDs': [], 'MODULEs': [], 'SRVPGMs': [],
+                        'PGMs': [], 'MENUs': [], 'PNLGRPs': [], 'QMQRYs': [], 'WSCSTs': [], 'MSGs': []}
+
+    assert rules_mk.containing_dir == data_dir
+    assert rules_mk.subdirs == []
+    assert rules_mk.targets == expected_targets
+    assert rules_mk.rules[0].variables == []
+    assert rules_mk.rules[0].commands == []
+    assert rules_mk.rules[0].dependencies == []
+    assert rules_mk.rules[0].include_dirs == []
+    assert rules_mk.rules[0].target == 'CUSTINFO1.FILE'
+    assert rules_mk.rules[0].source_file == 'CUSTINFO1.PFSQL'
+    assert str(rules_mk.rules[0]) == '''CUSTINFO1.FILE_SRC=CUSTINFO1.PFSQL
+CUSTINFO1.FILE_DEP=
+CUSTINFO1.FILE_RECIPE=PFSQL_TO_FILE_RECIPE\n'''
+    assert str(rules_mk) == '''SQLs := CUSTINFO1.FILE CUSTINFO.FILE LOWER.FILE\n\n
+CUSTINFO1.FILE_SRC=CUSTINFO1.PFSQL
+CUSTINFO1.FILE_DEP=
+CUSTINFO1.FILE_RECIPE=PFSQL_TO_FILE_RECIPE
+CUSTINFO.FILE_SRC=CUSTINFO.TABLE
+CUSTINFO.FILE_DEP=
+CUSTINFO.FILE_RECIPE=TABLE_TO_FILE_RECIPE
+LOWER.FILE_SRC=lower.pfsql
+LOWER.FILE_DEP=
+LOWER.FILE_RECIPE=PFSQL_TO_FILE_RECIPE
+'''
+
+
 def test_dds_recipe():
     # Test loading from a valid file
     rules_mk = RulesMk.from_file(data_dir / "dds.rules.mk", data_dir)
@@ -271,4 +304,69 @@ ORD500O.FILE_RECIPE=PRTF_TO_FILE_RECIPE\nTMPDETORD.FILE_CUSTOM_RECIPE=true
 TMPDETORD.FILE : \n\t@$(call echo_cmd,=== Creating [TMPDETORD.FILE] from custom recipe)
 \tsystem -i "CPYF FROMFILE($(OBJLIB)/DETORD) TOFILE($(OBJLIB)/TMPDETORD) CRTFILE(*YES)"
 \t@$(call echo_success_cmd,End of creating TMPDETORD.FILE)
+'''
+
+def test_pgm_recipe():
+    # Test loading from a valid file
+    rules_mk = RulesMk.from_file(data_dir / "pgm.rules.mk", data_dir)
+    expected_targets = {'TRGs': [], 'DTAARAs': [], 'DTAQs': [], 'SQLs': [], 'BNDDs': [], 'PFs': [],
+                        'LFs': [], 'DSPFs': [], 'PRTFs': [], 'CMDs': [], 'MODULEs': ['HELLO.MODULE'], 'SRVPGMs': [],
+                        'PGMs': ['HELLO.PGM','HELLOSQL.PGM','HELLOP.PGM'], 'MENUs': [], 'PNLGRPs': [], 'QMQRYs': [], 'WSCSTs': [], 'MSGs': []}
+    assert rules_mk.containing_dir == data_dir
+    assert rules_mk.subdirs == []
+    assert rules_mk.targets == expected_targets
+    assert rules_mk.rules[0].variables == []
+    assert rules_mk.rules[0].commands == []
+    assert rules_mk.rules[0].dependencies == []
+    assert rules_mk.rules[0].include_dirs == []
+    assert rules_mk.rules[0].target == 'HELLO.MODULE'
+    assert rules_mk.rules[0].source_file == 'HELLO.RPGLE'
+    assert str(rules_mk.rules[0]) == '''HELLO.MODULE_SRC=HELLO.RPGLE
+HELLO.MODULE_DEP=
+HELLO.MODULE_RECIPE=RPGLE_TO_MODULE_RECIPE\n'''
+
+    assert rules_mk.rules[1].variables == []
+    assert rules_mk.rules[1].commands == []
+    assert rules_mk.rules[1].dependencies == []
+    assert rules_mk.rules[1].include_dirs == []
+    assert rules_mk.rules[1].target == 'HELLO.PGM'
+    assert rules_mk.rules[1].source_file == 'HELLO.RPGLE'
+    assert str(rules_mk.rules[1]) == '''HELLO.PGM_SRC=HELLO.RPGLE
+HELLO.PGM_DEP=
+HELLO.PGM_RECIPE=PGM.RPGLE_TO_PGM_RECIPE\n'''
+
+    assert rules_mk.rules[2].variables == []
+    assert rules_mk.rules[2].commands == []
+    assert rules_mk.rules[2].dependencies == []
+    assert rules_mk.rules[2].include_dirs == []
+    assert rules_mk.rules[2].target == 'HELLOSQL.PGM'
+    assert rules_mk.rules[2].source_file == 'HELLO.SQLRPGLE'
+    assert str(rules_mk.rules[2]) == '''HELLOSQL.PGM_SRC=HELLO.SQLRPGLE
+HELLOSQL.PGM_DEP=
+HELLOSQL.PGM_RECIPE=PGM.SQLRPGLE_TO_PGM_RECIPE\n'''
+
+    assert rules_mk.rules[3].variables == []
+    assert rules_mk.rules[3].commands == []
+    assert rules_mk.rules[3].dependencies == []
+    assert rules_mk.rules[3].include_dirs == []
+    assert rules_mk.rules[3].target == 'HELLOP.PGM'
+    assert rules_mk.rules[3].source_file == 'HELLO.PGM.RPGLE'
+    assert str(rules_mk.rules[3]) == '''HELLOP.PGM_SRC=HELLO.PGM.RPGLE
+HELLOP.PGM_DEP=
+HELLOP.PGM_RECIPE=PGM.RPGLE_TO_PGM_RECIPE\n'''
+
+    assert str(rules_mk) == '''MODULEs := HELLO.MODULE
+PGMs := HELLO.PGM HELLOSQL.PGM HELLOP.PGM\n\n
+HELLO.MODULE_SRC=HELLO.RPGLE
+HELLO.MODULE_DEP=
+HELLO.MODULE_RECIPE=RPGLE_TO_MODULE_RECIPE
+HELLO.PGM_SRC=HELLO.RPGLE
+HELLO.PGM_DEP=
+HELLO.PGM_RECIPE=PGM.RPGLE_TO_PGM_RECIPE
+HELLOSQL.PGM_SRC=HELLO.SQLRPGLE
+HELLOSQL.PGM_DEP=
+HELLOSQL.PGM_RECIPE=PGM.SQLRPGLE_TO_PGM_RECIPE
+HELLOP.PGM_SRC=HELLO.PGM.RPGLE
+HELLOP.PGM_DEP=
+HELLOP.PGM_RECIPE=PGM.RPGLE_TO_PGM_RECIPE
 '''

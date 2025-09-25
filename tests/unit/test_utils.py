@@ -1,4 +1,4 @@
-from makei.utils import make_include_dirs_absolute, get_compile_targets_from_filenames
+from makei.utils import make_include_dirs_absolute, get_compile_targets_from_filenames,decompose_filename
 
 
 # flake8: noqa: E501
@@ -56,3 +56,9 @@ def test_compile_targets_from_filenames():
     assert get_compile_targets_from_filenames(['test.DTAARA']) == expected
     expected = ['TEST.FILE']
     assert get_compile_targets_from_filenames(['test.index']) == expected
+
+def test_decompose_filename():
+    expected = ('custinfo1', None, 'PFSQL', '')
+    assert decompose_filename("custinfo1.pfsql") == expected
+    expected = ('CUSTINFO1', None, 'PFSQL', '')
+    assert decompose_filename("CUSTINFO1.pfsql") == expected
