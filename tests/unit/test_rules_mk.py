@@ -330,4 +330,58 @@ HELLO.MODULE_RECIPE=RPGLE_TO_MODULE_RECIPE\n'''
     assert rules_mk.rules[3].source_file == 'WORLD.PGM.RPGLE'
     assert str(rules_mk.rules[3]) == '''WORLD.PGM_SRC=WORLD.PGM.RPGLE\nWORLD.PGM_DEP=
 WORLD.PGM_RECIPE=PGM.RPGLE_TO_PGM_RECIPE\n'''
-test_src_obj_mapping()
+
+
+def test_from_root_folder():
+    # Test loading from a valid file
+    test_dir = data_dir / "bobtest_pgm"
+    rules_mk = RulesMk.from_file(test_dir / "Rules.mk", test_dir)
+    expected_targets = {'TRGs': [], 'DTAARAs': [], 'DTAQs': [], 'SQLs': [], 'BNDDs': [],
+                        'PFs': [], 'LFs': [], 'DSPFs': [], 'PRTFs': [], 'CMDs': [],
+                        'MODULEs': ['HELLO.MODULE'], 'SRVPGMs': [], 'PGMs': [],
+                        'MENUs': [], 'PNLGRPs': [], 'QMQRYs': [], 'WSCSTs': [], 'MSGs': []}
+    assert rules_mk.src_obj_mapping['HELLOP.RPGLE'] == ['HELLO.MODULE']
+    assert rules_mk.containing_dir == test_dir
+    assert rules_mk.subdirs == ['input']
+    assert rules_mk.targets == expected_targets
+
+    assert rules_mk.rules[0].variables == []
+    assert rules_mk.rules[0].commands == []
+    assert rules_mk.rules[0].dependencies == []
+    assert rules_mk.rules[0].include_dirs == []
+    assert rules_mk.rules[0].target == 'HELLO.MODULE'
+    assert str(rules_mk) == '''SUBDIRS := input
+
+MODULEs := HELLO.MODULE
+
+
+HELLO.MODULE_SRC=$(d)/HELLOP.RPGLE
+HELLO.MODULE_DEP=
+HELLO.MODULE_RECIPE=RPGLE_TO_MODULE_RECIPE
+'''
+
+def test_from_subfolder():
+    # Test loading from a valid file
+    test_dir = data_dir / "bobtest_pgm" / "input"
+    rules_mk = RulesMk.from_file(test_dir / "Rules.mk", test_dir)
+    expected_targets = {'TRGs': [], 'DTAARAs': [], 'DTAQs': [], 'SQLs': [], 'BNDDs': [],
+                        'PFs': [], 'LFs': [], 'DSPFs': [], 'PRTFs': [], 'CMDs': [],
+                        'MODULEs': ['TESTX.MODULE'], 'SRVPGMs': [], 'PGMs': [],
+                        'MENUs': [], 'PNLGRPs': [], 'QMQRYs': [], 'WSCSTs': [], 'MSGs': []}
+    assert rules_mk.src_obj_mapping['TEST.SQLRPGLE'] == ['TESTX.MODULE']
+    assert rules_mk.containing_dir == test_dir
+    assert rules_mk.subdirs == []
+    assert rules_mk.targets == expected_targets
+
+    assert rules_mk.rules[0].variables == []
+    assert rules_mk.rules[0].commands == []
+    assert rules_mk.rules[0].dependencies == []
+    assert rules_mk.rules[0].include_dirs == []
+    assert rules_mk.rules[0].target == 'TESTX.MODULE'
+    assert str(rules_mk) == '''MODULEs := TESTX.MODULE
+
+
+TESTX.MODULE_SRC=$(d)/TEST.SQLRPGLE
+TESTX.MODULE_DEP=
+TESTX.MODULE_RECIPE=SQLRPGLE_TO_MODULE_RECIPE
+'''
