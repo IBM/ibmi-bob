@@ -494,7 +494,7 @@ postUsrlibl="$(postUsrlibl)" \
 IBMiEnvCmd="$(IBMiEnvCmd)" \
 $(eval directory := $(subst /,_,$(patsubst $(SRCPATH)/%,%,$(dir $<)))) \
 $(eval directory := $(if $(filter ._,$(directory)),,$(directory))) \
-$(eval file := $(subst .,_,$(notdir $<))) \
+$(eval file := $(subst .,_,$(notdir $@))) \
 $(eval logFile := $(LOGPATH)/$(directory)$(file).splf)
 endef
 
