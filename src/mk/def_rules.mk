@@ -494,12 +494,7 @@ postUsrlibl="$(postUsrlibl)" \
 IBMiEnvCmd="$(IBMiEnvCmd)" \
 $(eval directory := $(subst /,_,$(patsubst $(SRCPATH)/%,%,$(dir $<)))) \
 $(eval directory := $(if $(filter ._,$(directory)),,$(directory))) \
-\
-$(if $($@_PRESETUP_CONTEXT), \
-  $(eval file := $(subst .,_,$(notdir $<))_$(subst .,,$(suffix $(notdir $@)))), \
-  $(eval file := $(subst .,_,$(notdir $<))) \
-) \
-\
+$(eval file := $(subst .,_,$(notdir $@))) \
 $(eval logFile := $(LOGPATH)/$(directory)$(file).splf)
 endef
 
@@ -1222,14 +1217,12 @@ define CPP_TO_MODULE_RECIPE =
 endef
 
 define RPGLE_TO_MODULE_RECIPE =
-	$(eval $@_PRESETUP_CONTEXT := 1)
 	$(MODULE_VARIABLES)\
 	@$(call echo_cmd,"=== Creating RPG module [$(notdir $<)]$(ECHOCCSID)")
 	$(eval crtcmd := crtrpgmod module($(OBJLIB)/$(basename $(@F))) srcstmf('$<') $(CRTRPGMODFLAGS))
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" "$(PRECMD)" "$(POSTCMD)" "$(notdir $@)" "$<" "$(logFile)"> $(logFile) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
 	@$(call EVFEVENT_DOWNLOAD,$(basename $(@F)).evfevent)
-	$(eval $@_PRESETUP_CONTEXT :=)
 endef
 
 define CLLE_TO_MODULE_RECIPE =
@@ -1260,14 +1253,12 @@ define SQLCPP_TO_MODULE_RECIPE =
 endef
 
 define SQLRPGLE_TO_MODULE_RECIPE =
-	$(eval $@_PRESETUP_CONTEXT := 1)
 	$(MODULE_VARIABLES)
 	@$(call echo_cmd,"=== Creating SQLRPGLE module [$(notdir $<)]$(ECHOCCSID)")
 	$(eval crtcmd := crtsqlrpgi obj($(OBJLIB)/$(basename $(@F))) srcstmf('$<') $(CRTSQLRPGIFLAGS))
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" "$(PRECMD)" "$(POSTCMD)" "$(notdir $@)" "$<" "$(logFile)"> $(logFile) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
 	@$(call EVFEVENT_DOWNLOAD,$(notdir $<).evfevent)
-	$(eval $@_PRESETUP_CONTEXT :=)
 endef
 
 define CBLLE_TO_MODULE_RECIPE =
@@ -1332,25 +1323,21 @@ endef
 
 
 define PGM.RPGLE_TO_PGM_RECIPE =
-	$(eval $@_PRESETUP_CONTEXT := 1)
 	$(PGM_VARIABLES)
 	@$(call echo_cmd,"=== Creating Bound RPG Program [$(basename $@)] in $(OBJLIB)")
 	$(eval crtcmd := CRTBNDRPG srcstmf('$<') PGM($(OBJLIB)/$(basename $(@F))) $(CRTBNDRPGFLAGS))
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" "$(PRECMD)" "$(POSTCMD)" "$(notdir $@)" "$<" "$(logFile)"> $(logFile) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
 	@$(call EVFEVENT_DOWNLOAD,$(basename $@).PGM.evfevent)
-	$(eval $@_PRESETUP_CONTEXT :=)
 endef
 
 define PGM.SQLRPGLE_TO_PGM_RECIPE =
-	$(eval $@_PRESETUP_CONTEXT := 1)
 	$(PGM_VARIABLES)
 	@$(call echo_cmd,"=== Creating Bound SQLRPGLE Program [$(basename $@)] in $(OBJLIB)")
 	$(eval crtcmd := CRTSQLRPGI srcstmf('$<') OBJ($(OBJLIB)/$(basename $(@F))) $(CRTSQLRPGIFLAGS))
 	@$(PRESETUP) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" "$(PRECMD)" "$(POSTCMD)" "$(notdir $@)" "$<" "$(logFile)"> $(logFile) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
 	@$(call EVFEVENT_DOWNLOAD,$(basename $@).PGM.evfevent)
-	$(eval $@_PRESETUP_CONTEXT :=)
 endef
 
 define PGM.C_TO_PGM_RECIPE =
