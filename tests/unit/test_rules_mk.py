@@ -25,66 +25,56 @@ def test_wildcard_recipes_variables():
     # Test loading from a valid file
     test_dir = data_dir / "wildcard"
     rules_mk = RulesMk.from_file(test_dir / "wildcard.rules.mk", test_dir)
-
-    expected_targets = {
-        'TRGs': [], 'DTAARAs': [], 'DTAQs': [], 'SQLs': [], 'BNDDs': [],
-        'PFs': [], 'LFs': [], 'DSPFs': [], 'PRTFs': [], 'CMDs': [],
-        'MODULEs': ['AB2001_B.MODULE', 'AB2001.B.MODULE','BAR.MODULE','FOO.MODULE'], 'SRVPGMs': [], 'PGMs': [],
-        'MENUs': [], 'PNLGRPs': [], 'QMQRYs': [], 'WSCSTs': [], 'MSGs': []
-    }
-
+    expected_targets = {'TRGs': [], 'DTAARAs': [], 'DTAQs': [], 'SQLs': [], 'BNDDs': [],
+                        'PFs': [], 'LFs': [], 'DSPFs': [], 'PRTFs': [], 'CMDs': [],
+                        'MODULEs': ['BAR.MODULE', 'AB2001_B.MODULE', 'AB2001.B.MODULE', 'FOO.MODULE'], 'SRVPGMs': [], 'PGMs': [],
+                        'MENUs': [], 'PNLGRPs': [], 'QMQRYs': [], 'WSCSTs': [], 'MSGs': []}
     assert rules_mk.containing_dir == test_dir
     assert rules_mk.subdirs == []
     assert rules_mk.targets == expected_targets
 
-    # AB2001_B.MODULE checks
-    assert rules_mk.rules[0].variables == ['TEXT := hardcoded for all mod', 'TGTRLS :=*PRV']
+    assert rules_mk.rules[0].variables == ['TEXT := hardcoded for all mod', 'COMMIT=*NONE', 'TGTVER:=V7R3']
     assert rules_mk.rules[0].commands == []
-    assert rules_mk.rules[0].dependencies == []
+    assert rules_mk.rules[0].dependencies == ['bar.TABLE']
     assert rules_mk.rules[0].include_dirs == []
-    assert rules_mk.rules[0].target == 'AB2001_B.MODULE'
-    assert rules_mk.rules[0].source_file == '$(d)/AB2001_B.rpgle'
-    assert str(rules_mk.rules[0]) == '''AB2001_B.MODULE_SRC=$(d)/AB2001_B.rpgle
+    assert rules_mk.rules[0].target == 'BAR.MODULE'
+    assert rules_mk.rules[0].source_file == '$(d)/bar.rpgle'
+    assert str(rules_mk.rules[0]) == '''BAR.MODULE_SRC=$(d)/bar.rpgle
+BAR.MODULE_DEP=bar.TABLE
+BAR.MODULE_RECIPE=RPGLE_TO_MODULE_RECIPE
+BAR.MODULE: TEXT := hardcoded for all mod
+BAR.MODULE: COMMIT=*NONE
+BAR.MODULE: TGTVER:=V7R3
+'''
+
+    assert rules_mk.rules[1].variables == ['TEXT := hardcoded for all mod' , 'TGTRLS :=*PRV']
+    assert rules_mk.rules[1].commands == []
+    assert rules_mk.rules[1].dependencies == []
+    assert rules_mk.rules[1].include_dirs == []
+    assert rules_mk.rules[1].target == 'AB2001_B.MODULE'
+    assert rules_mk.rules[1].source_file == '$(d)/AB2001_B.rpgle'
+    assert str(rules_mk.rules[1]) == '''AB2001_B.MODULE_SRC=$(d)/AB2001_B.rpgle
 AB2001_B.MODULE_DEP=
 AB2001_B.MODULE_RECIPE=RPGLE_TO_MODULE_RECIPE
 AB2001_B.MODULE: TEXT := hardcoded for all mod
 AB2001_B.MODULE: TGTRLS :=*PRV
 '''
 
-    # AB2001.B.MODULE checks
-    assert rules_mk.rules[1].variables == ['TEXT := hardcoded for all mod', 'TGTRLS :=*PRV']
-    assert rules_mk.rules[1].commands == []
-    assert rules_mk.rules[1].dependencies == []
-    assert rules_mk.rules[1].include_dirs == []
-    assert rules_mk.rules[1].target == 'AB2001.B.MODULE'
-    assert rules_mk.rules[1].source_file == '$(d)/AB2001.B.rpgle'
-    assert str(rules_mk.rules[1]) == '''AB2001.B.MODULE_SRC=$(d)/AB2001.B.rpgle
+    assert rules_mk.rules[2].variables == ['TEXT := hardcoded for all mod' , 'TGTRLS :=*PRV']
+    assert rules_mk.rules[2].commands == []
+    assert rules_mk.rules[2].dependencies == []
+    assert rules_mk.rules[2].include_dirs == []
+    assert rules_mk.rules[2].target == 'AB2001.B.MODULE'
+    assert rules_mk.rules[2].source_file == '$(d)/AB2001.B.rpgle'
+    assert str(rules_mk.rules[2]) == '''AB2001.B.MODULE_SRC=$(d)/AB2001.B.rpgle
 AB2001.B.MODULE_DEP=
 AB2001.B.MODULE_RECIPE=RPGLE_TO_MODULE_RECIPE
 AB2001.B.MODULE: TEXT := hardcoded for all mod
 AB2001.B.MODULE: TGTRLS :=*PRV
 '''
-    # BAR.MODULE uses wildcard vars + target-specific vars
-    assert rules_mk.rules[2].variables == ['TEXT := hardcoded for all mod', 'COMMIT :=*NONE', 'TGTVER :=V7R3']
-    assert rules_mk.rules[2].commands == []
-    assert rules_mk.rules[2].dependencies == ['bar.TABLE']
-    assert rules_mk.rules[2].include_dirs == []
-    assert rules_mk.rules[2].target == 'BAR.MODULE'
-    assert rules_mk.rules[2].source_file == '$(d)/bar.rpgle'
-    assert str(rules_mk.rules[2]) == '''BAR.MODULE_SRC=$(d)/bar.rpgle
-BAR.MODULE_DEP=bar.TABLE
-BAR.MODULE_RECIPE=RPGLE_TO_MODULE_RECIPE
-BAR.MODULE: TEXT := hardcoded for all mod
-BAR.MODULE: COMMIT :=*NONE
-BAR.MODULE: TGTVER :=V7R3
-'''
 
-    assert rules_mk.rules[3].variables == [
-        'TEXT := hardcoded for all mod',
-        'TGTVER :=V7R5',
-        'private TEXT := foo is better',
-        'TGTVER := V7R2'
-    ]
+    assert rules_mk.rules[3].variables == ['TEXT := hardcoded for all mod', 'TGTVER=V7R5',
+                                           'private TEXT := foo is better', 'TGTVER := V7R2']
     assert rules_mk.rules[3].commands == []
     assert rules_mk.rules[3].dependencies == ['$(HEADER).rpgleinc']
     assert rules_mk.rules[3].include_dirs == []
@@ -94,13 +84,17 @@ BAR.MODULE: TGTVER :=V7R3
 FOO.MODULE_DEP=$(HEADER).rpgleinc
 FOO.MODULE_RECIPE=RPGLE_TO_MODULE_RECIPE
 FOO.MODULE: TEXT := hardcoded for all mod
-FOO.MODULE: TGTVER :=V7R5
+FOO.MODULE: TGTVER=V7R5
 FOO.MODULE: private TEXT := foo is better
-FOO.MODULE: TGTVER := V7R2
-'''
+FOO.MODULE: TGTVER := V7R2\n'''
 
-    # Final full string check for rules_mk
-    assert str(rules_mk) == '''MODULEs := AB2001_B.MODULE AB2001.B.MODULE BAR.MODULE FOO.MODULE\n\n
+    assert str(rules_mk) == '''MODULEs := BAR.MODULE AB2001_B.MODULE AB2001.B.MODULE FOO.MODULE\n\n
+BAR.MODULE_SRC=$(d)/bar.rpgle
+BAR.MODULE_DEP=bar.TABLE
+BAR.MODULE_RECIPE=RPGLE_TO_MODULE_RECIPE
+BAR.MODULE: TEXT := hardcoded for all mod
+BAR.MODULE: COMMIT=*NONE
+BAR.MODULE: TGTVER:=V7R3
 AB2001_B.MODULE_SRC=$(d)/AB2001_B.rpgle
 AB2001_B.MODULE_DEP=
 AB2001_B.MODULE_RECIPE=RPGLE_TO_MODULE_RECIPE
@@ -111,17 +105,11 @@ AB2001.B.MODULE_DEP=
 AB2001.B.MODULE_RECIPE=RPGLE_TO_MODULE_RECIPE
 AB2001.B.MODULE: TEXT := hardcoded for all mod
 AB2001.B.MODULE: TGTRLS :=*PRV
-BAR.MODULE_SRC=$(d)/bar.rpgle
-BAR.MODULE_DEP=bar.TABLE
-BAR.MODULE_RECIPE=RPGLE_TO_MODULE_RECIPE
-BAR.MODULE: TEXT := hardcoded for all mod
-BAR.MODULE: COMMIT :=*NONE
-BAR.MODULE: TGTVER :=V7R3
 FOO.MODULE_SRC=$(d)/foo.rpgle
 FOO.MODULE_DEP=$(HEADER).rpgleinc
 FOO.MODULE_RECIPE=RPGLE_TO_MODULE_RECIPE
 FOO.MODULE: TEXT := hardcoded for all mod
-FOO.MODULE: TGTVER :=V7R5
+FOO.MODULE: TGTVER=V7R5
 FOO.MODULE: private TEXT := foo is better
 FOO.MODULE: TGTVER := V7R2
 '''
