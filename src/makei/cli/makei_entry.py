@@ -12,9 +12,6 @@ from makei.build import BuildEnv
 from makei.cvtsrcpf import CvtSrcPf
 from makei.utils import Colors, colored, get_compile_targets_from_filenames
 
-if sys.version_info[:2] != (3, 9):
-    print(f"ERROR: makei requires Python 3.9, but you don't have it installed.")
-    sys.exit(1)
 
 def cli():
     """
