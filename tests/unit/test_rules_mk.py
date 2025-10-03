@@ -366,9 +366,9 @@ def test_from_subfolder():
     rules_mk = RulesMk.from_file(test_dir / "Rules.mk", test_dir)
     expected_targets = {'TRGs': [], 'DTAARAs': [], 'DTAQs': [], 'SQLs': [], 'BNDDs': [],
                         'PFs': [], 'LFs': [], 'DSPFs': [], 'PRTFs': [], 'CMDs': [],
-                        'MODULEs': ['TESTX.MODULE'], 'SRVPGMs': [], 'PGMs': [],
+                        'MODULEs': ['HELLO.MODULE'], 'SRVPGMs': [], 'PGMs': [],
                         'MENUs': [], 'PNLGRPs': [], 'QMQRYs': [], 'WSCSTs': [], 'MSGs': []}
-    assert rules_mk.src_obj_mapping['TEST.SQLRPGLE'] == ['TESTX.MODULE']
+    assert rules_mk.src_obj_mapping['HELLOP.RPGLE'] == ['HELLO.MODULE']
     assert rules_mk.containing_dir == test_dir
     assert rules_mk.subdirs == []
     assert rules_mk.targets == expected_targets
@@ -377,11 +377,11 @@ def test_from_subfolder():
     assert rules_mk.rules[0].commands == []
     assert rules_mk.rules[0].dependencies == []
     assert rules_mk.rules[0].include_dirs == []
-    assert rules_mk.rules[0].target == 'TESTX.MODULE'
-    assert str(rules_mk) == '''MODULEs := TESTX.MODULE
+    assert rules_mk.rules[0].target == 'HELLO.MODULE'
+    assert str(rules_mk) == '''MODULEs := HELLO.MODULE
 
 
-TESTX.MODULE_SRC=$(d)/TEST.SQLRPGLE
-TESTX.MODULE_DEP=
-TESTX.MODULE_RECIPE=SQLRPGLE_TO_MODULE_RECIPE
+HELLO.MODULE_SRC=$(d)/HELLOP.RPGLE
+HELLO.MODULE_DEP=
+HELLO.MODULE_RECIPE=RPGLE_TO_MODULE_RECIPE
 '''
