@@ -1,0 +1,6 @@
+{
+  "description": "Test bob improvements",
+  "curlib": "&CURLIB",
+  "buildCommand": "makei build",
+  "compileCommand": "makei compile -f {filename}"
+}
