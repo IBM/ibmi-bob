@@ -41,7 +41,7 @@ check_path() {
 check_dependencies() {
     # Check if a list of tools are installed and in the system path
     check_path
-    check_tool python3
+    check_tool python3.9
     check_tool bash
     check_tool make
 }
