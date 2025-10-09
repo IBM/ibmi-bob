@@ -220,10 +220,12 @@ def handle_compile(args):
         filenames = [args.file]
     elif args.files:
         filenames = map(os.path.basename, args.files.split(':'))
+        print(filenames,"filenames")
     else:
         filenames = []
     targets = []
     source_names = []
+    print(filenames,"filenames")
     for name in filenames:
         if os.path.isdir(name):
             targets.append(make_dir_target(name))

@@ -6,7 +6,7 @@ ifndef COLOR_TTY
 COLOR_TTY := $(shell [ -t 1 ] && echo true)
 endif
 
-SYS_ENCODING := $(shell  /QOpenSys/pkgs/bin/python3.6  -c "import sys;print(sys.getdefaultencoding())")
+SYS_ENCODING := $(shell  /QOpenSys/pkgs/bin/python3.9  -c "import sys;print(sys.getdefaultencoding())")
 ifndef UTF8_SUPPORT
 	ifneq (,$(findstring utf-8,$(SYS_ENCODING)))
 		UTF8_SUPPORT := true
