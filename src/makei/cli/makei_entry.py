@@ -244,7 +244,7 @@ def handle_compile(args):
     build_env = BuildEnv(targets, args.make_options, get_override_vars(args), trace=args.trace)
 
     if args.trace:
-        print(colored(f"{build_env.generate_make_cmd()}", Colors.BOLD))
+        build_env.dump_resolved_makefile()
     else:
         if build_env.make():
             sys.exit(0)
@@ -265,7 +265,7 @@ def handle_build(args):
         target = "all"
     build_env = BuildEnv([target], args.make_options, get_override_vars(args), trace=args.trace)
     if args.trace:
-        print(colored(f"{build_env.generate_make_cmd()}", Colors.BOLD))
+        build_env.dump_resolved_makefile()
     else:
         if build_env.make():
             sys.exit(0)

@@ -80,6 +80,21 @@ class BuildEnv:
     def __del__(self):
         if not self._trace:
             self.build_vars_path.unlink()
+    
+    def dump_resolved_makefile(self):
+        """Generate a fully resolved Makefile dump without building."""
+        if not self._trace:
+            return
+        
+        resolved_makefile_path = self.trace_dir / "ResolvedMakefile.txt"
+        with resolved_makefile_path.open("w", encoding="utf8") as f:
+
+            def write_line(line_bytes: bytes):
+                line = line_bytes.decode()
+                f.write(line)
+
+            cmd = f"{self.generate_make_cmd()} -r -R -p -q"
+            run_command(cmd, stdout_handler=write_line)
 
     def generate_make_cmd(self):
         """ Returns the make command used to build the project."""
