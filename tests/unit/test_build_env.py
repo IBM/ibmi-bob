@@ -59,7 +59,6 @@ def test_simple_build_env(set_test_directory):
         if build_env:
             build_env._post_make()
 
-# Also need to verify contents of .Rules.mk.build files (and their existences)
 @pytest.mark.parametrize("set_test_directory", ["sample_project1"], indirect=True)
 def test_build_env_with_targets_and_options(set_test_directory):
     try:
