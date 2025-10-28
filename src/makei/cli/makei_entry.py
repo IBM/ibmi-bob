@@ -6,11 +6,12 @@ import argparse
 import os
 import sys
 
+from pathlib import Path
 from makei import __version__
 from makei import init_project
 from makei.build import BuildEnv
 from makei.cvtsrcpf import CvtSrcPf
-from makei.utils import Colors, colored, get_compile_targets_from_filenames
+from makei.utils import Colors, colored
 
 
 def cli():
@@ -219,21 +220,24 @@ def handle_compile(args):
     if args.file:
         filenames = [args.file]
     elif args.files:
-        filenames = map(os.path.basename, args.files.split(':'))
+        # Ensures all paths are relative to the project root
+        filenames = map(lambda f: (str(Path(f).resolve().relative_to(Path.cwd()))), args.files.split(':'))
     else:
         filenames = []
-    targets = []
+    # targets = []
     source_names = []
     for name in filenames:
         if os.path.isdir(name):
-            targets.append(make_dir_target(name))
+            source_names.append(make_dir_target(name))
         else:
             source_names.append(name)
     # print("source:"+' '.join(source_names))
     # print("compile targets:"+' '.join(get_compile_targets_from_filenames(source_names)))
-    targets.extend(get_compile_targets_from_filenames(source_names))
+    # targets.extend(source_names)
+    build_env = BuildEnv(source_names, args.make_options, get_override_vars(args))
+    targets = build_env.targets
     print(colored("targets: " + ' '.join(targets), Colors.OKBLUE))
-    build_env = BuildEnv(targets, args.make_options, get_override_vars(args))
+
     if build_env.make():
         sys.exit(0)
     else:
