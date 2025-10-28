@@ -6,7 +6,7 @@ ifndef COLOR_TTY
 COLOR_TTY := $(shell [ -t 1 ] && echo true)
 endif
 
-SYS_ENCODING := $(shell  /QOpenSys/pkgs/bin/python3.6  -c "import sys;print(sys.getdefaultencoding())")
+SYS_ENCODING := $(shell  /QOpenSys/pkgs/bin/python3.9  -c "import sys;print(sys.getdefaultencoding())")
 ifndef UTF8_SUPPORT
 	ifneq (,$(findstring utf-8,$(SYS_ENCODING)))
 		UTF8_SUPPORT := true
@@ -494,7 +494,7 @@ postUsrlibl="$(postUsrlibl)" \
 IBMiEnvCmd="$(IBMiEnvCmd)" \
 $(eval directory := $(subst /,_,$(patsubst $(SRCPATH)/%,%,$(dir $<)))) \
 $(eval directory := $(if $(filter ._,$(directory)),,$(directory))) \
-$(eval file := $(subst .,_,$(notdir $<))) \
+$(eval file := $(subst .,_,$(notdir $@))) \
 $(eval logFile := $(LOGPATH)/$(directory)$(file).splf)
 endef
 
@@ -611,6 +611,8 @@ fileSIZE = $(strip \
 fileTGTRLS = $(strip \
 	$(if $(filter %.table,$<),$(SQL_TGTRLS), \
 	$(if $(filter %.TABLE,$<),$(SQL_TGTRLS), \
+	$(if $(filter %.pfsql,$<),$(SQL_TGTRLS), \
+	$(if $(filter %.PFSQL,$<),$(SQL_TGTRLS), \
 	$(if $(filter %.view,$<),$(SQL_TGTRLS), \
 	$(if $(filter %.VIEW,$<),$(SQL_TGTRLS), \
 	$(if $(filter %.index,$<),$(SQL_TGTRLS), \
@@ -619,7 +621,7 @@ fileTGTRLS = $(strip \
 	$(if $(filter %.SQLUDT,$<),$(SQL_TGTRLS), \
 	$(if $(filter %.sqlalias,$<),$(SQL_TGTRLS), \
 	$(if $(filter %.SQLALIAS,$<),$(SQL_TGTRLS), \
-	UNKNOWN_FILE_TYPE)))))))))))
+	UNKNOWN_FILE_TYPE)))))))))))))
 
 # Determine default settings for the various source types that can make a module object.
 moduleAUT = $(strip \
@@ -1056,6 +1058,19 @@ define TABLE_TO_FILE_RECIPE =
 	$(FILE_VARIABLES)
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating SQL TABLE $(OBJLIB)/$(basename $(notdir $@)) from Sql statement [$(notdir $<)]")
+	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
+	$(eval mbrtextcmd := CHGOBJD OBJ($(OBJLIB)/$(basename $(notdir $@))) OBJTYPE(*FILE) TEXT('$(TEXT)'))
+	@$(PRESETUP) \
+	$(SETCURLIBTOOBJLIB) \
+	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" "$(PRECMD)" "$(POSTCMD)" "$(notdir $@)" "$<" $(logFile) "" "$(mbrtextcmd)"> $(logFile) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
+endef
+
+# @$(TOOLSPATH)/checkObjectAlreadyExists $@ $(OBJLIB)
+# @$(TOOLSPATH)/checkIfBuilt $@ $(OBJLIB)
+define PFSQL_TO_FILE_RECIPE =
+	$(FILE_VARIABLES)
+	$(eval d = $($@_d))
+	@$(call echo_cmd,"=== Creating SQL PFSQL $(OBJLIB)/$(basename $(notdir $@)) from Sql statement [$(notdir $<)]")
 	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
 	$(eval mbrtextcmd := CHGOBJD OBJ($(OBJLIB)/$(basename $(notdir $@))) OBJTYPE(*FILE) TEXT('$(TEXT)'))
 	@$(PRESETUP) \

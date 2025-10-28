@@ -73,6 +73,7 @@ FILE_TARGETGROUPS_MAPPING = {
     "SYSTRG": {"TRG"},
     "SQLPRC": {"SQL"},
     "TABLE": {"SQL"},
+    "PFSQL": {"SQL"},
     "VIEW": {"SQL"},
     "INDEX": {"SQL"},
     "SQLSEQ": {"SQL"},
@@ -139,8 +140,10 @@ FILE_TARGET_MAPPING = {
     "SYSTRG": "PGM",
     "SQLPRC": "PGM",
     "TABLE": "FILE",
+    "PFSQL": "FILE",
     "VIEW": "FILE",
     "INDEX": "FILE",
+    "SQLALIAS": "FILE",
     "SQLSEQ": "DTAARA",
     "SQLUDF": "SRVPGM",
     "SQLTRG": "PGM",
@@ -169,7 +172,7 @@ C_STYLE_COMMENTS = (
 )
 
 SQL_STYLE_COMMENTS = (
-    {"TABLE", "VIEW", "SQLUDT", "SQLALIAS", "SQLSEQ", "SQLPRC", "SQLTRG", "SQLUDF", "SQL", "INDEX"},
+    {"TABLE", "PFSQL", "VIEW", "SQLUDT", "SQLALIAS", "SQLSEQ", "SQLPRC", "SQLTRG", "SQLUDF", "SQL", "INDEX"},
     {
         "style_type": "SQL",
         "start_comment": "--",

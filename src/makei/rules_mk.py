@@ -65,8 +65,12 @@ class MKRule:
                     ['\t' + cmd + '\n' for cmd in self.commands]) + variable_assignment
         try:
             target_type = self.target.split(".")[-1].upper()
+            source_file= decompose_filename(self.source_file)[2].upper()
             if target_type in ("SQL", "MSGF"):
                 recipe_name = f"{target_type}_RECIPE"
+            elif target_type in ("PGM") and source_file in ("RPGLE","SQLRPGLE"):
+                recipe_name = target_type + '.' + source_file + '_TO_' + self.target.split(".")[
+                    -1].upper() + '_RECIPE'
             else:
                 recipe_name = decompose_filename(self.source_file)[2].upper() + '_TO_' + self.target.split(".")[
                     -1].upper() + '_RECIPE'
@@ -343,7 +347,7 @@ class RulesMk:
         # Updates variables with wildcard values
         for wildcard, var in wildcard_variables.items():
             stripped_wildcard = wildcard.strip("%.").upper()
-            matched_targets = list(filter(lambda target: target.split(".")[1] == stripped_wildcard, targets))
+            matched_targets = [target for target in targets if target.endswith(f".{stripped_wildcard}")]
             targets = list(filter(lambda target: target.split(".")[1] != stripped_wildcard, targets))
 
             for target in matched_targets:

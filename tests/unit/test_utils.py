@@ -1,4 +1,4 @@
-from makei.utils import make_include_dirs_absolute
+from makei.utils import make_include_dirs_absolute,decompose_filename
 
 
 # flake8: noqa: E501
@@ -50,3 +50,10 @@ def test_joblob_not_found():
     parameters = " INCDIR( ''/a/b/dir1'' ''dir2'')"
     expected = " INCDIR( ''/a/b/dir1'' ''dir2'')"
     assert make_include_dirs_absolute(path, parameters) == expected
+
+
+def test_decompose_filename():
+    expected = ('custinfo1', None, 'PFSQL', '')
+    assert decompose_filename("custinfo1.pfsql") == expected
+    expected = ('CUSTINFO1', None, 'PFSQL', '')
+    assert decompose_filename("CUSTINFO1.pfsql") == expected
