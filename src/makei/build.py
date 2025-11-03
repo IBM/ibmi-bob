@@ -1,6 +1,8 @@
 #!/usr/bin/env python3.9
 
 """ The module used to build a project"""
+from datetime import datetime
+import shutil
 import sys
 from pathlib import Path
 from tempfile import mkstemp
@@ -39,7 +41,7 @@ class BuildEnv:
     failed_targets: List[str]
 
     def __init__(self, targets: List[str] = None, make_options: Optional[str] = None,
-                 overrides: Dict[str, Any] = None):
+                 overrides: Dict[str, Any] = None, trace = False):
         overrides = overrides or {}
         self.src_dir = Path.cwd()
         self.targets = targets if targets is not None else ["all"]
@@ -47,7 +49,18 @@ class BuildEnv:
         self.bob_path = Path(
             overrides["bob_path"]) if "bob_path" in overrides else BOB_PATH
         self.bob_makefile = MK_PATH / 'Makefile'
-        self.build_vars_handle, path = mkstemp()
+        self._trace = trace
+        
+        if self._trace:
+            trace_dir = Path.cwd() / ".makei-trace"
+            trace_dir.mkdir(parents=True, exist_ok=True)
+            self.trace_dir = trace_dir / datetime.now().strftime("%Y%m%d_%H%M%S")
+            self.trace_dir.mkdir()
+            path = self.trace_dir / "BUILDVARSMKPATH"
+        else:
+            self.build_vars_handle, path = mkstemp()
+            self.trace_dir = None
+
         self.build_vars_path = Path(path)
         self.iproj_json_path = self.src_dir / "iproj.json"
         self.iproj_json = IProjJson.from_file(self.iproj_json_path)
@@ -65,7 +78,23 @@ class BuildEnv:
         self._create_build_vars()
 
     def __del__(self):
-        self.build_vars_path.unlink()
+        if not self._trace:
+            self.build_vars_path.unlink()
+    
+    def dump_resolved_makefile(self):
+        """Generate a fully resolved Makefile dump without building."""
+        if not self._trace:
+            return
+        
+        resolved_makefile_path = self.trace_dir / "ResolvedMakefile.txt"
+        with resolved_makefile_path.open("w", encoding="utf8") as f:
+
+            def write_line(line_bytes: bytes):
+                line = line_bytes.decode()
+                f.write(line)
+
+            cmd = f"{self.generate_make_cmd()} -r -R -p -q"
+            run_command(cmd, stdout_handler=write_line)
 
     def generate_make_cmd(self):
         """ Returns the make command used to build the project."""
@@ -87,6 +116,14 @@ class BuildEnv:
             rules_mk_build_path = rules_mk_path.parent / ".Rules.mk.build"
             rules_mk_build_path.write_text(str(rules_mk))
             self.tmp_files.append(rules_mk_build_path)
+            # Copy to trace directory
+            if self._trace:
+                # Recreate relative folder structure in trace/rules/
+                relative_dir = rules_mk_path.parent.resolve().relative_to(self.src_dir.resolve())
+                trace_rules_subdir = self.trace_dir / "rules" / relative_dir
+                trace_rules_subdir.mkdir(parents=True, exist_ok=True)
+                shutil.copy(rules_mk_build_path, trace_rules_subdir / rules_mk_build_path.name)
+
 
         subdirs = list(map(lambda x: x.parents[0], rules_mk_paths))
 
