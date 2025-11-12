@@ -78,12 +78,12 @@ AB2001.B.MODULE: TGTRLS :=*PRV
     assert rules_mk.rules[3].variables == ['TEXT := hardcoded for all mod', 'TGTVER=V7R5',
                                            'private TEXT := foo is better', 'TGTVER := V7R2']
     assert rules_mk.rules[3].commands == []
-    assert rules_mk.rules[3].dependencies == ['$(HEADER).rpgleinc']
+    assert rules_mk.rules[3].dependencies == ['some.rpgleinc']
     assert rules_mk.rules[3].include_dirs == []
     assert rules_mk.rules[3].target == 'FOO.MODULE'
     assert rules_mk.rules[3].source_file == '$(d)/foo.rpgle'
     assert str(rules_mk.rules[3]) == '''FOO.MODULE_SRC=$(d)/foo.rpgle
-FOO.MODULE_DEP=$(HEADER).rpgleinc
+FOO.MODULE_DEP=some.rpgleinc
 FOO.MODULE_RECIPE=RPGLE_TO_MODULE_RECIPE
 FOO.MODULE: TEXT := hardcoded for all mod
 FOO.MODULE: TGTVER=V7R5
@@ -108,7 +108,7 @@ AB2001.B.MODULE_RECIPE=RPGLE_TO_MODULE_RECIPE
 AB2001.B.MODULE: TEXT := hardcoded for all mod
 AB2001.B.MODULE: TGTRLS :=*PRV
 FOO.MODULE_SRC=$(d)/foo.rpgle
-FOO.MODULE_DEP=$(HEADER).rpgleinc
+FOO.MODULE_DEP=some.rpgleinc
 FOO.MODULE_RECIPE=RPGLE_TO_MODULE_RECIPE
 FOO.MODULE: TEXT := hardcoded for all mod
 FOO.MODULE: TGTVER=V7R5
