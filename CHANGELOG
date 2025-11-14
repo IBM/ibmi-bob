@@ -1,3 +1,17 @@
+* Fri Nov 14 2025 Edmund Reinhardt <ednmund.reinhardt@ca.ibm.com> - 2.4.33
+- Improvements to docs
+- Support PFSQL as an alternative file extension to TABLE for 
+  `CREATE TABLE` SQL source
+- Fix ValueError exception during migration
+- Now permissively allow building PGMs from RPGLE or SQLRPGLE with the 
+  additional `.PGM` in the source name.  I.e. FOO.PGM can now directly 
+  by build from `FOO.RPGLE` while in the past it had to be `FOO.PGM.RPGLE`
+- add support for SQLALIAS source files to build SQL ALIASes
+- enforces requirement for python 3.9 which avoids the error
+  "No module named 'ibm_db_dbi'" when the wrong python is used
+- now support `-t` prepare build files and output the make command 
+  without executing it; trace data is stored in ./.makei-trace. 
+  To clean up extra files, run the command again with the --trace option",
 * Fri Jun 14 2024 Irfan Sharif <IrfanSharif@ibm.com> - 2.4.30
 - Fix of a correct error return code when compilation fails
 - Fix stripping of TEXT parameter from filenames
