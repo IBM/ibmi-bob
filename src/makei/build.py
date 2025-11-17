@@ -8,7 +8,7 @@ from pathlib import Path
 from tempfile import mkstemp
 from typing import Any, Dict, List, Optional
 
-from makei.const import BOB_PATH, MK_PATH
+from makei.const import TOBI_PATH, MK_PATH
 from makei.ibmi_json import IBMiJson
 from makei.iproj_json import IProjJson
 from makei.rules_mk import RulesMk
@@ -24,8 +24,8 @@ class BuildEnv:
     src_dir: Path
     targets: List[str]
     make_options: Optional[str]
-    bob_path: Path
-    bob_makefile: Path
+    tobi_path: Path
+    tobi_makefile: Path
     build_vars_path: Path
     build_vars_handle: Path
     curlib: str
@@ -46,9 +46,9 @@ class BuildEnv:
         self.src_dir = Path.cwd()
         self.targets = targets if targets is not None else ["all"]
         self.make_options = make_options if make_options else ""
-        self.bob_path = Path(
-            overrides["bob_path"]) if "bob_path" in overrides else BOB_PATH
-        self.bob_makefile = MK_PATH / 'Makefile'
+        self.tobi_path = Path(
+            overrides["tobi_path"]) if "tobi_path" in overrides else TOBI_PATH
+        self.tobi_makefile = MK_PATH / 'Makefile'
         self._trace = trace
         
         if self._trace:
@@ -99,7 +99,7 @@ class BuildEnv:
     def generate_make_cmd(self):
         """ Returns the make command used to build the project."""
         cmd = f'/QOpenSys/pkgs/bin/make -k BUILDVARSMKPATH="{self.build_vars_path}"' + \
-              f' -k BOB="{self.bob_path}" -f "{self.bob_makefile}"'
+              f' -k TOBI_PATH="{self.tobi_path}" -f "{self.tobi_makefile}"'
         if self.make_options:
             cmd = f"{cmd} {self.make_options}"
         cmd = f"{cmd} {' '.join(self.targets)}"

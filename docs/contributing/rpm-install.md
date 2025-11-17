@@ -1,6 +1,6 @@
 ## **Install a prebuilt RPM packages**
 
-1. Bob depends on many open source packages. You need to install the dependencies first before continuing.
+1. TOBi depends on many open source packages. You need to install the dependencies first before continuing.
 
 ```bash
 yum install bash coreutils gawk grep-gnu make-gnu python39 python39-ibm_db sed-gnu
@@ -11,7 +11,7 @@ yum install bash coreutils gawk grep-gnu make-gnu python39 python39-ibm_db sed-g
 To download the latest rpm file on IBM i, run the following
 
 ```bash
-curl -L https://github.com/IBM/ibmi-bob/releases/latest/download/bob.rpm -o bob.ppc64.rpm
+curl -L https://github.com/IBM/ibmi-bob/releases/latest/download/tobi.rpm -o tobi.ppc64.rpm
 ```
 
 
@@ -21,17 +21,17 @@ curl -L https://github.com/IBM/ibmi-bob/releases/latest/download/bob.rpm -o bob.
 3. Install the `.rpm`
 
 ```bash
-# install bob from rpm file
-rpm -i bob.ppc64.rpm
+# install TOBi from rpm file
+rpm -i tobi.ppc64.rpm
 ```
 or upgrade from a previous version
 ```bash
-# upgrade bob from rpm file
-rpm -U bob.ppc64.rpm
+# upgrade TOBi from rpm file
+rpm -U tobi.ppc64.rpm
 ```
 
 
-## Verify Bob is installed correctly
+## Verify TOBi is installed correctly
 
 You may check if bob is installed correctly by invoking `makei` on IBM i. You should see an output similar to this.
 

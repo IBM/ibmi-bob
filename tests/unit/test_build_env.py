@@ -45,8 +45,8 @@ def test_simple_build_env(set_test_directory):
         assert build_env.src_dir == test_dir
         assert build_env.targets == ["all"]
         assert build_env.make_options == ""
-        assert build_env.bob_path == MAKEI_PATH
-        assert build_env.bob_makefile == MAKEI_PATH / "src" / "mk" / "Makefile"
+        assert build_env.tobi_path == MAKEI_PATH
+        assert build_env.tobi_makefile == MAKEI_PATH / "src" / "mk" / "Makefile"
         assert os.path.exists(build_env.build_vars_path) == True
 
         assert build_env.iproj_json_path == test_dir / "iproj.json"

@@ -463,7 +463,6 @@ LIBL = $(OBJLIB)
 # preUsrlibl :=
 # postUsrlibl :=
 TOOLSPATH := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
-TOOLSLIB := BOBTOOLS
 runDate := $(shell date +"%F_%H.%M.%S-%a")
 LOGPATH := $(TOP)/.logs
 LOGFILE := $(LOGPATH)/output.log
