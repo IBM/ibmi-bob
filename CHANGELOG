@@ -34,6 +34,17 @@
 - Fix using source name to CHGOBJD for text description
 - Support referencing variables in compiler parameter overrides
 - Ability to support wildcarding to override the rule to make a certain types of objects (https://ibm.github.io/ibmi-bob/#/prepare-the-project/rules.mk?id=wildcarding)
+* Tue Oct 22 2024 Matthew Wiltzius <matthew.wiltzius@ibm.com> - 2.4.30
+- Use license macro for license
+* Fri Jun 14 2024 Irfan Sharif <IrfanSharif@ibm.com> - 2.4.30
+- Fix of a correct error return code when compilation fails
+- Fix stripping of TEXT parameter from filenames
+- Fix empty joblog attributes
+* Fri Apr 12 2024 Edmund Reinhardt <edmund.reinhard@ca.ibm.com> - 2.4.27
+- Support .CMD for pseudo-source for command objects as well as .CMDSRC
+- By requiring 3.9 versions of python and the db2 interface, avoid
+  mismatched level errors.  Using generic python3 was too generic and
+  allowed mismatches between db2 interface and base python
 * Mon Jan 29 2024 Edmund Reinhardt <edmund.reinhard@ca.ibm.com> - 2.4.26
 - Add support for OPM CL  
 - Support variable replacement in setIBMiEnvCmd in iproj.json

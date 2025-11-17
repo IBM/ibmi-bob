@@ -53,6 +53,7 @@ ln -sf %{_libdir}/bob/bin/crtfrmstmf %{buildroot}%{_bindir}/crtfrmstmf
 
 %files
 %defattr(-, qsys, *none)
+%license LICENSE
 %{_libdir}/bob
 %{_bindir}/makei
 %{_bindir}/crtfrmstmf
