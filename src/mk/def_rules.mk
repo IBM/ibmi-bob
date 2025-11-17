@@ -949,7 +949,8 @@ srvpgmTGTRLS = $(strip \
 	$(if $(filter %.ilesrvpgm,$<),$(SRVPGM_TGTRLS), \
 	$(if $(filter %.SQLUDF,$<),$(SQL_TGTRLS), \
 	$(if $(filter %.sqludf,$<),$(SQL_TGTRLS), \
-	UNKNOWN_FILE_TYPE)))))))
+	$(if $(filter %.SQL,$<),$(SQL_TGTRLS), \
+	UNKNOWN_FILE_TYPE))))))))
 
 #    ____ __  __ ____    ____           _
 #   / ___|  \/  |  _ \  |  _ \ ___  ___(_)_ __   ___  ___
@@ -1492,6 +1493,15 @@ define ILESRVPGM_TO_SRVPGM_RECIPE =
 	$(SCRIPTSPATH)/extractAndLaunch "$(JOBLOGFILE)" "$<" $(OBJLIB) $(basename $(@F)) "$(PRECMD)" "$(POSTCMD)" "$(notdir $@)" "$<" "$(logFile)" > $(logFile) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
 endef
 
+define SQL_TO_SRVPGM_RECIPE =
+    $(SRVPGM_VARIABLES)
+    $(eval d = $($@_d))
+    @$(call echo_cmd,"=== Creating Service program $(OBJLIB)/$(basename $(notdir $@)) from SQL statement [$(notdir $<)]")
+    $(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
+    @$(PRESETUP) \
+	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" "$(PRECMD)" "$(POSTCMD)" "$(notdir $@)" "$<" "$(logFile)" "" "$(mbrtextcmd)"> $(logFile) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
+endef
+
 #    ___ _____ _   _ _____ ____    ____           _
 #   / _ \_   _| | | | ____|  _ \  |  _ \ ___  ___(_)_ __   ___  ___
 #  | | | || | | |_| |  _| | |_) | | |_) / _ \/ __| | '_ \ / _ \/ __|
@@ -1571,7 +1581,7 @@ define SQL_TO_QMQRY_RECIPE =
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating QM query [$(basename $@)]")
 	$(eval crtcmd := $(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID) -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTQMQRY" -p $(CRTQMQRYFLAGS))
-	$(PRESETUP) \
+	@$(PRESETUP) \
 	$(SCRIPTSPATH)/crtfrmstmf --ccsid $(TGTCCSID) -f $< -o $(basename $(@F)) -l $(OBJLIB) -c "CRTQMQRY" -p "$(CRTQMQRYFLAGS)" --save-joblog "$(JOBLOGFILE)" --precmd="$(PRECMD)" --postcmd="$(POSTCMD)" --output="$(logFile)" > $(logFile) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
 endef
 
