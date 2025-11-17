@@ -48,6 +48,6 @@ check_dependencies() {
 check_dependencies
 
 SCRIPT_DIR="$(readlink -f "$0" | xargs dirname)"
-BOB_DIR=$(realpath "${SCRIPT_DIR}/..")
+TOBI_DIR=$(realpath "${SCRIPT_DIR}/..")
 
-PYTHONPATH="${BOB_DIR}/src":${PYTHONPATH} /QOpenSys/pkgs/bin/python3.9 "${BOB_DIR}/src/makei/cli/makei_entry.py" "$@"
+PYTHONPATH="${TOBI_DIR}/src":${PYTHONPATH} /QOpenSys/pkgs/bin/python3.9 "${TOBI_DIR}/src/makei/cli/makei_entry.py" "$@"
