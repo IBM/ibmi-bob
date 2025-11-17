@@ -54,7 +54,7 @@
 * Tue Jan 16 2024 Edmund Reinhardt <edmund.reinhard@ca.ibm.com> - 2.4.25
 - CRTCBLMOD does not support DEFINE() - removed it from flags
 * Tue Jan 16 2024 Edmund Reinhardt <edmund.reinhard@ca.ibm.com> - 2.4.24
-- support importing the member text into %TEXT comments at the top of 
+- support importing the member text into %%TEXT comments at the top of 
   the source stream file using `cvtsrcpf` by 
   Irfan Sharif <IrfanSharif@ibm.com> 
 - support using this member text at the top of the source stream file
@@ -88,7 +88,7 @@
 - logs separated into targetobject.log files and references in joblog.json.
   Updated joblog.json to include properties object, source, object and failed.
 - Changed BNDDIRSRC file extension to BNDDIR.
-- Drop %N which doesn't work on Windows without privileged authority
+- Drop %%N which doesn't work on Windows without privileged authority
 - Add iproj.json so IBMi-BOB is a project
 - Minor document fixes
 * Fri Jul 7 2023 Edmund Reinhardt <edmund.reinhard@ca.ibm.com> - 2.4.16
