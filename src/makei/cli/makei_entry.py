@@ -230,16 +230,15 @@ def read_and_filter_rules_mk(source_names):
     rules_mk_paths = list(Path(".").rglob("Rules.mk"))
     for rules_mk_path in rules_mk_paths:
         with rules_mk_path.open("r") as f:
-            rules_mk_str = f.read()
-        for line in rules_mk_str.splitlines():
-            line = line.strip()
-            if not line or line.startswith("#") or ":" not in line:
-                continue  # skip blank lines, comments, or malformed lines
-            target = line.split(":", 1)[0].strip()
-            if target and "." in target and target.rsplit(".", 1)[1] in FILE_TARGET_MAPPING[ext]:
-                build_targets.append(target)
-            else:
-                print(colored(f"No target mapping extension for '{target}'", Colors.WARNING))
+            for raw_line in f:
+                line = raw_line.strip()
+                if not line or line.startswith("#") or ":" not in line:
+                    continue  # skip blank lines, comments, or malformed lines
+                target = line.split(":", 1)[0].strip()
+                if target and "." in target and target.rsplit(".", 1)[1] in FILE_TARGET_MAPPING[ext]:
+                    build_targets.append(target)
+                else:
+                    print(colored(f"No target mapping extension for '{target}'", Colors.FAIL))
     return build_targets
 
 def handle_compile(args):
