@@ -10,7 +10,9 @@ from makei import __version__
 from makei import init_project
 from makei.build import BuildEnv
 from makei.cvtsrcpf import CvtSrcPf
-from makei.utils import Colors, colored, get_compile_targets_from_filenames
+from makei.utils import Colors, colored, get_compile_targets_from_filenames,decompose_filename
+from pathlib import Path
+from makei.const import FILE_TARGET_MAPPING
 
 
 def cli():
@@ -220,6 +222,27 @@ def handle_info(args):
     print("Not implemented!")
 
 
+def read_and_filter_rules_mk(source_names):
+    """
+    Read the Rules.mk file and return targets that match allowed extensions.
+    """
+    build_targets = []
+    name, _, ext, _ = decompose_filename(source_names[0])
+    rules_mk_paths = list(Path(".").rglob("Rules.mk"))
+    for rules_mk_path in rules_mk_paths:
+        with rules_mk_path.open("r") as f:
+            rules_mk_str = f.read()
+        for line in rules_mk_str.splitlines():
+            line = line.strip()
+            if not line or line.startswith("#") or ":" not in line:
+                continue  # skip blank lines, comments, or malformed lines
+            target = line.split(":", 1)[0].strip()
+            if target and "." in target and target.rsplit(".", 1)[1] in FILE_TARGET_MAPPING[ext]:
+                build_targets.append(target)
+            else:
+                print(colored(f"No target mapping extension for '{target}'", Colors.WARNING))
+    return build_targets
+
 def handle_compile(args):
     """
     Processing the compile command
@@ -240,6 +263,7 @@ def handle_compile(args):
             source_names.append(name)
     # print("source:"+' '.join(source_names))
     # print("compile targets:"+' '.join(get_compile_targets_from_filenames(source_names)))
+<<<<<<< HEAD
     targets.extend(get_compile_targets_from_filenames(source_names))
     print(colored("targets: " + ' '.join(targets), Colors.OKBLUE))
     build_env = BuildEnv(targets, args.make_options, get_override_vars(args), trace=args.log)
@@ -249,8 +273,19 @@ def handle_compile(args):
     else:
         if build_env.make():
             sys.exit(0)
+=======
+    build_targets = read_and_filter_rules_mk(source_names)
+    if build_targets:
+        print(colored("targets: " + ', '.join(build_targets), Colors.OKBLUE))
+        build_env = BuildEnv(build_targets, args.make_options, get_override_vars(args),trace=args.trace)
+        if args.trace:
+            build_env.dump_resolved_makefile()
+>>>>>>> b01d6fa (supported both QMQRY and SRVPGM)
         else:
-            sys.exit(1)
+            if build_env.make():
+                sys.exit(0)
+            else:
+                sys.exit(1)
 
 
 def handle_build(args):
