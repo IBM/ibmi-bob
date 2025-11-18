@@ -242,7 +242,7 @@ def read_and_filter_rules_mk(source_names):
                 if target and "." in target and target.rsplit(".", 1)[1] in FILE_TARGET_MAPPING[ext]:
                     build_targets.append(target)
                 else:
-                    print(colored(f"No target mapping extension for '{target}'", Colors.FAIL))
+                    raise ValueError(f"No target mapping extension for '{target}'")
     return build_targets
 
 def handle_compile(args):
