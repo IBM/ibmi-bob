@@ -42,7 +42,7 @@ makei init [-h] [-f]
 
 ```
 makei compile [-h] (-f <filename> | --files <filepaths>) [-o <options>]
-              [-e <var>=<value>] [--bob-path <path>]
+              [-e <var>=<value>] [--tobi-path <path>]
 ```
 
 #### Options
@@ -63,9 +63,9 @@ makei compile [-h] (-f <filename> | --files <filepaths>) [-o <options>]
 
   override environment variables
 
-- **--bob-path**
+- **--tobi-path**
 
-  path to the bob directory
+  path to the TOBi directory
 
 ---
 
@@ -74,7 +74,7 @@ makei compile [-h] (-f <filename> | --files <filepaths>) [-o <options>]
 ?> build the whole project
 
 ```
-makei build [-h] [-t <target> | -d <subdir>] [-o <options>] [--bob-path <path>]
+makei build [-h] [-t <target> | -d <subdir>] [-o <options>] [--tobi-path <path>]
             [-e <var>=<value>]
 ```
 
@@ -92,9 +92,9 @@ makei build [-h] [-t <target> | -d <subdir>] [-o <options>] [--bob-path <path>]
 
   options to pass to make
 
-- **--bob-path**
+- **--tobi-path**
 
-  path to the bob directory
+  path to the directory where TOBi is installed
 
 - **-e, --env**
 
@@ -111,7 +111,7 @@ makei build [-h] [-t <target> | -d <subdir>] [-o <options>] [--bob-path <path>]
 makei cvtsrcpf [-h] [-c <ccsid>] [-l] [-t] <file> <library>
 ```
 
-Converts all members in a source physical file to properly-named (Bob-compatible), UTF-8 encoded, LF-terminated source files in the current directory in the IFS. Generally speaking, the source member type will become the filename extension.
+Converts all members in a source physical file to properly-named (TOBi-compatible), UTF-8 encoded, LF-terminated source files in the current directory in the IFS. Generally speaking, the source member type will become the filename extension.
 
 For example, RPGLE source member `AB1001` will become IFS source file `AB1001.RPGLE`. Four exceptions exist, however: source member types CMD, MENU, and PNLGRP result in filename extensions .CMDSRC, .MENUSRC, and .PNLGRPSRC, respectively, and source member type C residing in source physical file H results in filename extension .H.
 
@@ -146,7 +146,7 @@ It is likely that the same destination directory will contain converted members 
 
 - **-t, --text**
 
-  The generated source file will include the member text as a comment. Note that besides the EBCDIC CCSID, the member text is the only other piece of metadata associated with a SRC-PF member outside of its contents. Build tools like BOB and Arcad Builder know how to extract this text description and specify it on the appropriate compile command so that the resultant object has the same description.
+  The generated source file will include the member text as a comment. Note that besides the EBCDIC CCSID, the member text is the only other piece of metadata associated with a SRC-PF member outside of its contents. Build tools like TOBi and Arcad Builder know how to extract this text description and specify it on the appropriate compile command so that the resultant object has the same description.
 
 #### Example
 

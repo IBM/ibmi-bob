@@ -1,6 +1,6 @@
 #!/usr/bin/env python3.9
 
-""" The CLI entry for BOB"""
+""" The CLI entry for TOBi"""
 
 import argparse
 import os
@@ -40,7 +40,7 @@ def cli():
 
     args = parser.parse_args()
     if args.version:
-        print(f"Bob version {__version__}")
+        print(f"TOBi version {__version__}")
     elif hasattr(args, 'handle'):
         args.handle(args)
     else:
@@ -74,8 +74,8 @@ def add_build_parser(subparsers: argparse.ArgumentParser):
         metavar='<options>',
     )
     build_parser.add_argument(
-        '--bob-path',
-        help='path to the bob directory',
+        '--tobi-path',
+        help='path to the TOBi directory',
         metavar='<path>',
     )
     build_parser.add_argument(
@@ -119,8 +119,8 @@ def add_compile_parser(subparsers: argparse.ArgumentParser):
         action='append'
     )
     compile_parser.add_argument(
-        '--bob-path',
-        help='path to the bob directory',
+        '--tobi-path',
+        help='path to the TOBi directory',
         metavar='<path>',
     )
     compile_parser.set_defaults(handle=handle_compile)
@@ -288,8 +288,8 @@ def handle_cvtsrcpf(args):
 
 def get_override_vars(args):
     """ Get the override variables from the arguments"""
-    if args.bob_path:
-        return {"bob_path": args.bob_path}
+    if args.tobi_path:
+        return {"tobi_path": args.tobi_path}
     return {}
 
 

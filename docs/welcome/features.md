@@ -14,12 +14,12 @@ Some of the major benefits of using a Better Object Builder / Git / RDi developm
 * One-button builds
 * Open source.  Free to use and free to modify.
 
-Obviously, we think Bob is pretty great.  But, in fairness, there are some challenges to be aware of:
+Obviously, we think TOBi is pretty great.  But, in fairness, there are some challenges to be aware of:
 
 * Learning curve -- Git and Make are amazing but can also be quite complex.  Fortunately, the vast wealth of online information will help you recover from any mistake.
 * Installation -- Installing the IBM i prerequisites used to be daunting but has been reduced to a single rpm command
 * PASE -- Since Git (if installed on the IBM i) and Make run in PASE, some familiarity with a Unix-like shell is helpful.  It may be a little outside your comfort zone, but it is a tremendous skill to have.  We have performed search-and-replace instructions on thousands of source files using Sed and regular expressions in mere seconds, and used Grep to almost instantly discover every source file using a specific physical file.
-* At its current stage in development, changes to service programs and files result in rebuilds of everything using them.  This is to avoid signature violations and level checks.  This will be addressed in a future version of Bob.
+* At its current stage in development, changes to service programs and files result in rebuilds of everything using them.  This is to avoid signature violations and level checks.  This will be addressed in a future version of TOBi.
 
 ## Supported object types
 
