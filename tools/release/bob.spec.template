@@ -53,7 +53,8 @@ ln -sf %{_libdir}/tobi/bin/crtfrmstmf %{buildroot}%{_bindir}/crtfrmstmf
 
 %files
 %defattr(-, qsys, *none)
-%{_libdir}/tobi
+%license LICENSE
+%{_libdir}/bob
 %{_bindir}/makei
 %{_bindir}/crtfrmstmf
 
