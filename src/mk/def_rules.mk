@@ -1618,7 +1618,7 @@ test:
 	echo "PROJECTDIR:		$(PROJECTDIR)";
 
 # Definition of variable ${\n} containing just new-line character
-define \n
+define \\n
 
 
 endef
