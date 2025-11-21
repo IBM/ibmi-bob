@@ -5,7 +5,7 @@
   gmake in order to debug where any issues are
 - Updated all docs to new TOBi name from old BOB name
 - Fixed the "*** empty variable name" error in def_rules.mk.
-* Fri Nov 14 2025 Edmund Reinhardt <ednmund.reinhardt@ca.ibm.com> - 2.4.33
+* Fri Nov 14 2025 Edmund Reinhardt <edmund.reinhardt@ca.ibm.com> - 2.4.33
 - Improvements to docs
 - Support PFSQL as an alternative file extension to TABLE for 
   `CREATE TABLE` SQL source
@@ -17,17 +17,7 @@
 - enforces requirement for python 3.9 which avoids the error
   "No module named 'ibm_db_dbi'" when the wrong python is used
 - now support `-t` prepare build files and output the make command 
-  without executing it; trace data is stored in ./.makei-trace. 
-  To clean up extra files, run the command again with the --trace option",
-* Fri Jun 14 2024 Irfan Sharif <IrfanSharif@ibm.com> - 2.4.30
-- Fix of a correct error return code when compilation fails
-- Fix stripping of TEXT parameter from filenames
-- Fix empty joblog attributes 
-* Fri Apr 12 2024 Edmund Reinhardt <edmund.reinhard@ca.ibm.com> - 2.4.27
-- Support .CMD for pseudo-source for command objects as well as .CMDSRC
-- By requiring 3.9 versions of python and the db2 interface, avoid 
-  mismatched level errors.  Using generic python3 was too generic and
-  allowed mismatches between db2 interface and base python
+  without executing it; trace data is stored in ./.makei-trace.
 * Fri Mar 14 2025 Irfan Sharif <IrfanSharif@ibm.com> - 2.4.32
 - Add TGTRLS parameter missing from some commands
 - Add support for setting DFRWRT and ENHDSP parameter values of CRTDSPF command
@@ -41,7 +31,6 @@
 - Fix using source name to CHGOBJD for text description
 - Support referencing variables in compiler parameter overrides
 - Ability to support wildcarding to override the rule to make a certain types of objects (https://ibm.github.io/ibmi-bob/#/prepare-the-project/rules.mk?id=wildcarding)
-* Tue Oct 22 2024 Matthew Wiltzius <matthew.wiltzius@ibm.com> - 2.4.30
 - Use license macro for license
 * Fri Jun 14 2024 Irfan Sharif <IrfanSharif@ibm.com> - 2.4.30
 - Fix of a correct error return code when compilation fails
@@ -49,7 +38,7 @@
 - Fix empty joblog attributes
 * Fri Apr 12 2024 Edmund Reinhardt <edmund.reinhard@ca.ibm.com> - 2.4.27
 - Support .CMD for pseudo-source for command objects as well as .CMDSRC
-- By requiring 3.9 versions of python and the db2 interface, avoid
+- By requiring 3.9 versions of python and the db2 interface, avoid 
   mismatched level errors.  Using generic python3 was too generic and
   allowed mismatches between db2 interface and base python
 * Mon Jan 29 2024 Edmund Reinhardt <edmund.reinhard@ca.ibm.com> - 2.4.26

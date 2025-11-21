@@ -54,7 +54,7 @@ ln -sf %{_libdir}/tobi/bin/crtfrmstmf %{buildroot}%{_bindir}/crtfrmstmf
 %files
 %defattr(-, qsys, *none)
 %license LICENSE
-%{_libdir}/bob
+%{_libdir}/tobi
 %{_bindir}/makei
 %{_bindir}/crtfrmstmf
 
@@ -62,13 +62,11 @@ ln -sf %{_libdir}/tobi/bin/crtfrmstmf %{buildroot}%{_bindir}/crtfrmstmf
 ${CHANGELOG}
 
 %package -n bob
-Summary: IBM i Better Object Builder, or Bob is now known as The Object Builder for i or TOBi.  
-This is an open source dependency build system for building QSYS objects from stream files.
-
+Summary: IBM i Better Object Builder, or Bob is now known as The Object Builder for i or TOBi.
 Requires: tobi = %{version}-%{release}
 
 %description -n bob
-IBM i Better Object Builder, or Bob is now known as The Object Builder for i or TOBi.  
+IBM i Better Object Builder, or Bob is now known as The Object Builder for i or TOBi.
 This is an open source dependency build system for building QSYS objects from stream files.
 - Speed. TOBi only compiles objects that need recompiling, like from new or 
   changed source code.
