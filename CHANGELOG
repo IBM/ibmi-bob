@@ -1,4 +1,4 @@
-* Fri Nov 14 2025 Edmund Reinhardt <edmund.reinhardt@ca.ibm.com> - 2.5.0
+* Fri Nov 21 2025 Edmund Reinhardt <edmund.reinhardt@ca.ibm.com> - 2.5.0
 - Rename RPM to 'tobi' from 'bob' - `yum install tobi`
 - change to use -l and --log to avoid conflict with --target
   This allows decomposing of make rule generation vs running 
