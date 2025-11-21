@@ -41,7 +41,7 @@ Here's what makes TOBi different.
 
 
 %prep
-%setup -n ibmi-tobi-%{version}
+%setup -n ibmi-bob-%{version}
 
 
 %install
