@@ -27,7 +27,9 @@ def test_wildcard_recipes_variables():
     rules_mk = RulesMk.from_file(test_dir / "wildcard.rules.mk", test_dir)
     expected_targets = {'TRGs': [], 'DTAARAs': [], 'DTAQs': [], 'SQLs': [], 'BNDDs': [],
                         'PFs': [], 'LFs': [], 'DSPFs': [], 'PRTFs': [], 'CMDs': [],
-                        'MODULEs': ['BAR.MODULE', 'AB2001_B.MODULE', 'AB2001.B.MODULE', 'FOO.MODULE'], 'SRVPGMs': [], 'PGMs': [],
+                        'MODULEs': ['BAR.MODULE', 'AB2001_B.MODULE', 'AB2001.B.MODULE',
+                                    'FOO.MODULE'],
+                        'SRVPGMs': [], 'PGMs': [],
                         'MENUs': [], 'PNLGRPs': [], 'QMQRYs': [], 'WSCSTs': [], 'MSGs': []}
     assert rules_mk.containing_dir == test_dir
     assert rules_mk.subdirs == []
@@ -47,7 +49,7 @@ BAR.MODULE: COMMIT=*NONE
 BAR.MODULE: TGTVER:=V7R3
 '''
 
-    assert rules_mk.rules[1].variables == ['TEXT := hardcoded for all mod' , 'TGTRLS :=*PRV']
+    assert rules_mk.rules[1].variables == ['TEXT := hardcoded for all mod', 'TGTRLS :=*PRV']
     assert rules_mk.rules[1].commands == []
     assert rules_mk.rules[1].dependencies == []
     assert rules_mk.rules[1].include_dirs == []
@@ -60,7 +62,7 @@ AB2001_B.MODULE: TEXT := hardcoded for all mod
 AB2001_B.MODULE: TGTRLS :=*PRV
 '''
 
-    assert rules_mk.rules[2].variables == ['TEXT := hardcoded for all mod' , 'TGTRLS :=*PRV']
+    assert rules_mk.rules[2].variables == ['TEXT := hardcoded for all mod', 'TGTRLS :=*PRV']
     assert rules_mk.rules[2].commands == []
     assert rules_mk.rules[2].dependencies == []
     assert rules_mk.rules[2].include_dirs == []
@@ -342,12 +344,15 @@ TMPDETORD.FILE : \n\t@$(call echo_cmd,=== Creating [TMPDETORD.FILE] from custom 
 \t@$(call echo_success_cmd,End of creating TMPDETORD.FILE)
 '''
 
+
 def test_pgm_recipe():
     # Test loading from a valid file
     rules_mk = RulesMk.from_file(data_dir / "pgm.rules.mk", data_dir)
-    expected_targets = {'TRGs': [], 'DTAARAs': [], 'DTAQs': [], 'SQLs': [], 'BNDDs': [], 'PFs': [],
-                        'LFs': [], 'DSPFs': [], 'PRTFs': [], 'CMDs': [], 'MODULEs': ['HELLO.MODULE'], 'SRVPGMs': [],
-                        'PGMs': ['HELLO.PGM','HELLOSQL.PGM','HELLOP.PGM'], 'MENUs': [], 'PNLGRPs': [], 'QMQRYs': [], 'WSCSTs': [], 'MSGs': []}
+    expected_targets = {'TRGs': [], 'DTAARAs': [], 'DTAQs': [], 'SQLs': [], 'BNDDs': [],
+                        'PFs': [], 'LFs': [], 'DSPFs': [], 'PRTFs': [], 'CMDs': [],
+                        'MODULEs': ['HELLO.MODULE'], 'SRVPGMs': [],
+                        'PGMs': ['HELLO.PGM', 'HELLOSQL.PGM', 'HELLOP.PGM'],
+                        'MENUs': [], 'PNLGRPs': [], 'QMQRYs': [], 'WSCSTs': [], 'MSGs': []}
     assert rules_mk.containing_dir == data_dir
     assert rules_mk.subdirs == []
     assert rules_mk.targets == expected_targets

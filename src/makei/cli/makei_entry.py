@@ -29,7 +29,8 @@ def cli():
     add_cvtsrcpf_parser(subparsers)
     parser.add_argument(
         '-l', '--log',
-        help="log build files and output the make command without executing it; trace data is stored in ./.makei-trace.",
+        help="log build files and output the make command without executing it; "
+             "trace data is stored in ./.makei-trace.",
         action='store_true'
     )
     parser.add_argument(

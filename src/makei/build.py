@@ -41,7 +41,7 @@ class BuildEnv:
     failed_targets: List[str]
 
     def __init__(self, targets: List[str] = None, make_options: Optional[str] = None,
-                 overrides: Dict[str, Any] = None, trace = False):
+                 overrides: Dict[str, Any] = None, trace=False):
         overrides = overrides or {}
         self.src_dir = Path.cwd()
         self.targets = targets if targets is not None else ["all"]
@@ -50,7 +50,7 @@ class BuildEnv:
             overrides["tobi_path"]) if "tobi_path" in overrides else TOBI_PATH
         self.tobi_makefile = MK_PATH / 'Makefile'
         self._trace = trace
-        
+
         if self._trace:
             trace_dir = Path.cwd() / ".makei-trace"
             trace_dir.mkdir(parents=True, exist_ok=True)
@@ -80,12 +80,12 @@ class BuildEnv:
     def __del__(self):
         if not self._trace:
             self.build_vars_path.unlink()
-    
+
     def dump_resolved_makefile(self):
         """Generate a fully resolved Makefile dump without building."""
         if not self._trace:
             return
-        
+
         resolved_makefile_path = self.trace_dir / "ResolvedMakefile.txt"
         with resolved_makefile_path.open("w", encoding="utf8") as f:
 
@@ -123,7 +123,6 @@ class BuildEnv:
                 trace_rules_subdir = self.trace_dir / "rules" / relative_dir
                 trace_rules_subdir.mkdir(parents=True, exist_ok=True)
                 shutil.copy(rules_mk_build_path, trace_rules_subdir / rules_mk_build_path.name)
-
 
         subdirs = list(map(lambda x: x.parents[0], rules_mk_paths))
 
