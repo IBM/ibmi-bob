@@ -1,3 +1,10 @@
+* Fri Nov 14 2025 Edmund Reinhardt <edmund.reinhardt@ca.ibm.com> - 2.5.0
+- Rename RPM to 'tobi' from 'bob' - `yum install tobi`
+- change to use -l and --log to avoid conflict with --target
+  This allows decomposing of make rule generation vs running 
+  gmake in order to debug where any issues are
+- Updated all docs to new TOBi name from old BOB name
+- Fixed the "*** empty variable name" error in def_rules.mk.
 * Fri Nov 14 2025 Edmund Reinhardt <ednmund.reinhardt@ca.ibm.com> - 2.4.33
 - Improvements to docs
 - Support PFSQL as an alternative file extension to TABLE for 
