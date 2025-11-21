@@ -67,6 +67,10 @@ makei compile [-h] (-f <filename> | --files <filepaths>) [-o <options>]
 
   path to the TOBi directory
 
+- **-l, --log**
+
+  log tracing information to .trace-makei to diagnose why things are not working as expected
+
 ---
 
 ### build (b)
@@ -100,6 +104,10 @@ makei build [-h] [-t <target> | -d <subdir>] [-o <options>] [--tobi-path <path>]
 
   override environment variables
   
+- **-l, --log**
+
+  log tracing information to .trace-makei to diagnose why things are not working as expected
+
   ---
 
 ### cvtsrcpf

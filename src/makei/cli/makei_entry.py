@@ -28,8 +28,8 @@ def cli():
     add_build_parser(subparsers)
     add_cvtsrcpf_parser(subparsers)
     parser.add_argument(
-        '-t', '--trace',
-        help="prepare build files and output the make command without executing it; trace data is stored in ./.makei-trace. To clean up extra files, run the command again with the --trace option",
+        '-l', '--log',
+        help="log build files and output the make command without executing it; trace data is stored in ./.makei-trace.",
         action='store_true'
     )
     parser.add_argument(
@@ -205,8 +205,8 @@ def handle_init(args):
     """
     Handling the init command
     """
-    if args.trace:
-        print(colored("Warning: --trace has no effect on 'init' command.", Colors.WARNING))
+    if args.log:
+        print(colored("Warning: --log has no effect on 'init' command.", Colors.WARNING))
     init_project.init_project(force=args.force, objlib=args.objlib, tgtCcsid=args.ccsid)
 
 
@@ -214,8 +214,8 @@ def handle_info(args):
     """
     Handling the info command
     """
-    if args.trace:
-        print(colored("Warning: --trace has no effect on 'info' command.", Colors.WARNING))
+    if args.log:
+        print(colored("Warning: --log has no effect on 'info' command.", Colors.WARNING))
     print("Not implemented!")
 
 
@@ -241,9 +241,9 @@ def handle_compile(args):
     # print("compile targets:"+' '.join(get_compile_targets_from_filenames(source_names)))
     targets.extend(get_compile_targets_from_filenames(source_names))
     print(colored("targets: " + ' '.join(targets), Colors.OKBLUE))
-    build_env = BuildEnv(targets, args.make_options, get_override_vars(args), trace=args.trace)
+    build_env = BuildEnv(targets, args.make_options, get_override_vars(args), trace=args.log)
 
-    if args.trace:
+    if args.log:
         build_env.dump_resolved_makefile()
     else:
         if build_env.make():
@@ -263,8 +263,8 @@ def handle_build(args):
         target = make_dir_target(args.subdir)
     else:
         target = "all"
-    build_env = BuildEnv([target], args.make_options, get_override_vars(args), trace=args.trace)
-    if args.trace:
+    build_env = BuildEnv([target], args.make_options, get_override_vars(args), trace=args.log)
+    if args.log:
         build_env.dump_resolved_makefile()
     else:
         if build_env.make():
