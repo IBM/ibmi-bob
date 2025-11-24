@@ -1,6 +1,6 @@
 #!/usr/bin/env python3.9
 
-""" The CLI entry for BOB"""
+""" The CLI entry for TOBi"""
 
 import argparse
 import os
@@ -27,7 +27,12 @@ def cli():
     add_compile_parser(subparsers)
     add_build_parser(subparsers)
     add_cvtsrcpf_parser(subparsers)
-
+    parser.add_argument(
+        '-l', '--log',
+        help="log build files and output the make command without executing it; "
+             "trace data is stored in ./.makei-trace.",
+        action='store_true'
+    )
     parser.add_argument(
         '-v', '--version',
         help="print version information and exit",
@@ -36,7 +41,7 @@ def cli():
 
     args = parser.parse_args()
     if args.version:
-        print(f"Bob version {__version__}")
+        print(f"TOBi version {__version__}")
     elif hasattr(args, 'handle'):
         args.handle(args)
     else:
@@ -70,8 +75,8 @@ def add_build_parser(subparsers: argparse.ArgumentParser):
         metavar='<options>',
     )
     build_parser.add_argument(
-        '--bob-path',
-        help='path to the bob directory',
+        '--tobi-path',
+        help='path to the TOBi directory',
         metavar='<path>',
     )
     build_parser.add_argument(
@@ -115,8 +120,8 @@ def add_compile_parser(subparsers: argparse.ArgumentParser):
         action='append'
     )
     compile_parser.add_argument(
-        '--bob-path',
-        help='path to the bob directory',
+        '--tobi-path',
+        help='path to the TOBi directory',
         metavar='<path>',
     )
     compile_parser.set_defaults(handle=handle_compile)
@@ -201,13 +206,17 @@ def handle_init(args):
     """
     Handling the init command
     """
+    if args.log:
+        print(colored("Warning: --log has no effect on 'init' command.", Colors.WARNING))
     init_project.init_project(force=args.force, objlib=args.objlib, tgtCcsid=args.ccsid)
 
 
-def handle_info(_args):
+def handle_info(args):
     """
     Handling the info command
     """
+    if args.log:
+        print(colored("Warning: --log has no effect on 'info' command.", Colors.WARNING))
     print("Not implemented!")
 
 
@@ -233,11 +242,15 @@ def handle_compile(args):
     # print("compile targets:"+' '.join(get_compile_targets_from_filenames(source_names)))
     targets.extend(get_compile_targets_from_filenames(source_names))
     print(colored("targets: " + ' '.join(targets), Colors.OKBLUE))
-    build_env = BuildEnv(targets, args.make_options, get_override_vars(args))
-    if build_env.make():
-        sys.exit(0)
+    build_env = BuildEnv(targets, args.make_options, get_override_vars(args), trace=args.log)
+
+    if args.log:
+        build_env.dump_resolved_makefile()
     else:
-        sys.exit(1)
+        if build_env.make():
+            sys.exit(0)
+        else:
+            sys.exit(1)
 
 
 def handle_build(args):
@@ -251,11 +264,14 @@ def handle_build(args):
         target = make_dir_target(args.subdir)
     else:
         target = "all"
-    build_env = BuildEnv([target], args.make_options, get_override_vars(args))
-    if build_env.make():
-        sys.exit(0)
+    build_env = BuildEnv([target], args.make_options, get_override_vars(args), trace=args.log)
+    if args.log:
+        build_env.dump_resolved_makefile()
     else:
-        sys.exit(1)
+        if build_env.make():
+            sys.exit(0)
+        else:
+            sys.exit(1)
 
 
 def make_dir_target(filename):
@@ -266,13 +282,15 @@ def handle_cvtsrcpf(args):
     """
     Processing the cvtsrcpf command
     """
+    if args.trace:
+        print(colored("Warning: --trace has no effect on 'cvtsrcpf' command.", Colors.WARNING))
     CvtSrcPf(args.file, args.library, args.tolower, args.ccsid, args.text).run()
 
 
 def get_override_vars(args):
     """ Get the override variables from the arguments"""
-    if args.bob_path:
-        return {"bob_path": args.bob_path}
+    if args.tobi_path:
+        return {"tobi_path": args.tobi_path}
     return {}
 
 

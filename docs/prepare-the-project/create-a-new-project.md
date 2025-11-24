@@ -33,7 +33,7 @@ The following files will be added to the project
 Continue? (yes)
 ```
 
-Simply press enter to confirm the changes and you have created a minimal bob project.
+Simply press enter to confirm the changes and you have created a minimal TOBi project.
 
 ## Manually Setup
 

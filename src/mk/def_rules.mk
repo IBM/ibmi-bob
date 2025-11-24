@@ -6,7 +6,7 @@ ifndef COLOR_TTY
 COLOR_TTY := $(shell [ -t 1 ] && echo true)
 endif
 
-SYS_ENCODING := $(shell  /QOpenSys/pkgs/bin/python3.6  -c "import sys;print(sys.getdefaultencoding())")
+SYS_ENCODING := $(shell  /QOpenSys/pkgs/bin/python3.9  -c "import sys;print(sys.getdefaultencoding())")
 ifndef UTF8_SUPPORT
 	ifneq (,$(findstring utf-8,$(SYS_ENCODING)))
 		UTF8_SUPPORT := true
@@ -463,7 +463,6 @@ LIBL = $(OBJLIB)
 # preUsrlibl :=
 # postUsrlibl :=
 TOOLSPATH := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
-TOOLSLIB := BOBTOOLS
 runDate := $(shell date +"%F_%H.%M.%S-%a")
 LOGPATH := $(TOP)/.logs
 LOGFILE := $(LOGPATH)/output.log
@@ -1619,7 +1618,7 @@ test:
 	echo "PROJECTDIR:		$(PROJECTDIR)";
 
 # Definition of variable ${\n} containing just new-line character
-define \n
+define \\n
 
 
 endef
