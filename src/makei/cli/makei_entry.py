@@ -246,11 +246,17 @@ def handle_compile(args):
     """
     Processing the compile command
     """
+    filenames=[]
     set_environment_vars(args)
     if args.file:
         filenames = [args.file]
     elif args.files:
-        filenames = map(os.path.basename, args.files.split(':'))
+        name=args.files.split(':')
+        for i in name:
+            if os.path.isdir(i):
+                filenames.append(i)
+            else:
+               filenames = map(os.path.basename, args.files.split(':'))
     else:
         filenames = []
     targets = []
@@ -283,7 +289,12 @@ def handle_build(args):
     if args.target:
         target = args.target
     elif args.subdir:
-        target = make_dir_target(args.subdir)
+        name = os.path.basename(args.subdir)
+        filenames = [args.subdir] if os.path.isdir(name) else []
+        if filenames:
+            for i in filenames:
+                target = make_dir_target(i)
+
     else:
         target = "all"
     build_env = BuildEnv([target], args.make_options, get_override_vars(args), trace=args.log)
@@ -297,7 +308,7 @@ def handle_build(args):
 
 
 def make_dir_target(filename):
-    return f"dir_{os.path.basename(filename.strip(os.sep))}"
+    return f"dir_{filename.replace('/','_')}"
 
 
 def handle_cvtsrcpf(args):
