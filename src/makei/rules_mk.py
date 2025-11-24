@@ -65,10 +65,10 @@ class MKRule:
                     ['\t' + cmd + '\n' for cmd in self.commands]) + variable_assignment
         try:
             target_type = self.target.split(".")[-1].upper()
-            source_file= decompose_filename(self.source_file)[2].upper()
+            source_file = decompose_filename(self.source_file)[2].upper()
             if target_type in ("SQL", "MSGF"):
                 recipe_name = f"{target_type}_RECIPE"
-            elif target_type in ("PGM") and source_file in ("RPGLE","SQLRPGLE"):
+            elif target_type in ("PGM") and source_file in ("RPGLE", "SQLRPGLE"):
                 recipe_name = target_type + '.' + source_file + '_TO_' + self.target.split(".")[
                     -1].upper() + '_RECIPE'
             else:
@@ -153,12 +153,13 @@ class RulesMk:
         for rule in rules:
             if rule.source_file is not None:
                 decomposed_src = decompose_filename(rule.source_file)
-                
+
                 tgt_group_list = FILE_TARGETGROUPS_MAPPING[decomposed_src[-2].upper()]
 
                 # If only 1 target mapping exists, use it, otherwise use target's extension
-                tgt_group = next(iter(tgt_group_list)).upper() if len(tgt_group_list) == 1 else rule.target.split('.')[-1].upper()
-                
+                tgt_group = (next(iter(tgt_group_list)).upper() if len(tgt_group_list) == 1
+                             else rule.target.split('.')[-1].upper())
+
                 if tgt_group not in TARGET_GROUPS:
                     print(f"Warning: Target '{rule.target}' is not supported")
                     sys.exit(1)

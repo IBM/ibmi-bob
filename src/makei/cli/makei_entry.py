@@ -1,6 +1,6 @@
 #!/usr/bin/env python3.9
 
-""" The CLI entry for BOB"""
+""" The CLI entry for TOBi"""
 
 import argparse
 import os
@@ -30,8 +30,9 @@ def cli():
     add_build_parser(subparsers)
     add_cvtsrcpf_parser(subparsers)
     parser.add_argument(
-        '-t', '--trace',
-        help="prepare build files and output the make command without executing it; trace data is stored in ./.makei-trace. To clean up extra files, run the command again with the --trace option",
+        '-l', '--log',
+        help="log build files and output the make command without executing it; "
+             "trace data is stored in ./.makei-trace.",
         action='store_true'
     )
     parser.add_argument(
@@ -42,7 +43,7 @@ def cli():
 
     args = parser.parse_args()
     if args.version:
-        print(f"Bob version {__version__}")
+        print(f"TOBi version {__version__}")
     elif hasattr(args, 'handle'):
         args.handle(args)
     else:
@@ -76,8 +77,8 @@ def add_build_parser(subparsers: argparse.ArgumentParser):
         metavar='<options>',
     )
     build_parser.add_argument(
-        '--bob-path',
-        help='path to the bob directory',
+        '--tobi-path',
+        help='path to the TOBi directory',
         metavar='<path>',
     )
     build_parser.add_argument(
@@ -121,8 +122,8 @@ def add_compile_parser(subparsers: argparse.ArgumentParser):
         action='append'
     )
     compile_parser.add_argument(
-        '--bob-path',
-        help='path to the bob directory',
+        '--tobi-path',
+        help='path to the TOBi directory',
         metavar='<path>',
     )
     compile_parser.set_defaults(handle=handle_compile)
@@ -207,8 +208,8 @@ def handle_init(args):
     """
     Handling the init command
     """
-    if args.trace:
-        print(colored("Warning: --trace has no effect on 'init' command.", Colors.WARNING))
+    if args.log:
+        print(colored("Warning: --log has no effect on 'init' command.", Colors.WARNING))
     init_project.init_project(force=args.force, objlib=args.objlib, tgtCcsid=args.ccsid)
 
 
@@ -216,8 +217,8 @@ def handle_info(args):
     """
     Handling the info command
     """
-    if args.trace:
-        print(colored("Warning: --trace has no effect on 'info' command.", Colors.WARNING))
+    if args.log:
+        print(colored("Warning: --log has no effect on 'info' command.", Colors.WARNING))
     print("Not implemented!")
 
 
@@ -285,8 +286,8 @@ def handle_build(args):
         target = make_dir_target(args.subdir)
     else:
         target = "all"
-    build_env = BuildEnv([target], args.make_options, get_override_vars(args), trace=args.trace)
-    if args.trace:
+    build_env = BuildEnv([target], args.make_options, get_override_vars(args), trace=args.log)
+    if args.log:
         build_env.dump_resolved_makefile()
     else:
         if build_env.make():
@@ -310,8 +311,8 @@ def handle_cvtsrcpf(args):
 
 def get_override_vars(args):
     """ Get the override variables from the arguments"""
-    if args.bob_path:
-        return {"bob_path": args.bob_path}
+    if args.tobi_path:
+        return {"tobi_path": args.tobi_path}
     return {}
 
 
