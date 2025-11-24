@@ -23,6 +23,12 @@
 yum install tobi
 ```
 
+If you have installed `bob` previously, you will have to uninstall 
+it before installing `tobi` which is the latest version.  To do so, 
+simply do 
+```bash
+yum erase bob
+```
 
 ## Verify TOBi is installed correctly
 
