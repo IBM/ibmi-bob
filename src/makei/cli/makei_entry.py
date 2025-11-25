@@ -13,9 +13,12 @@ from makei.cvtsrcpf import CvtSrcPf
 from makei.utils import Colors, colored, get_compile_targets_from_filenames,decompose_filename
 from pathlib import Path
 from makei.const import FILE_TARGET_MAPPING
+<<<<<<< HEAD
 from makei.utils import Colors, colored, get_compile_targets_from_filenames,decompose_filename
 from pathlib import Path
 from makei.const import FILE_TARGET_MAPPING
+=======
+>>>>>>> 42493cdff351ad865d3daa07cc5a62e212402176
 
 
 def cli():
