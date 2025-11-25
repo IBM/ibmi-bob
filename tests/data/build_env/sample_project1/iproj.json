@@ -1,5 +1,5 @@
 {
-  "description": "Test bob improvements",
+  "description": "Test TOBi improvements",
   "objlib": "OBJLIB",
   "curlib": "CURLIB",
   "includePath": ["prototypes", "headers"],
