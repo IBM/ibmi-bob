@@ -115,7 +115,7 @@ def test_ibmijson_from_file_inherits_from_parent(temp_directory):
     assert ibmi_json.build["objlib"] == "PARENTLIB"  # From parent
 
 
-def test_ibmijson_from_file_with_variable_substitution(temp_directory):
+def test_ibmijson_from_file_with_variable_substitution(temp_directory, monkeypatch):
     """Test IBMiJson.from_file with variable substitution in objlib"""
     ibmi_json_path = temp_directory / ".ibmi.json"
     test_data = {
@@ -128,6 +128,9 @@ def test_ibmijson_from_file_with_variable_substitution(temp_directory):
     with ibmi_json_path.open('w') as f:
         json.dump(test_data, f)
     
+    # Set environment variable to avoid sys.exit(1)
+    monkeypatch.setenv("OBJLIB", "TESTLIB")
+    
     parent = IBMiJson.from_values("37", "PARENTLIB")
     
     # Load from file - parse_all_variables should be called
@@ -135,6 +138,7 @@ def test_ibmijson_from_file_with_variable_substitution(temp_directory):
     
     # The objlib should be processed by parse_all_variables
     assert "objlib" in ibmi_json.build
+    assert ibmi_json.build["objlib"] == "TESTLIB"
 
 
 def test_ibmijson_dict_with_custom_values():
@@ -238,7 +242,7 @@ def test_ibmijson_copy_independence():
     copy.build["tgt_ccsid"] = "1208"
     copy.build["objlib"] = "OTHERLIB"
     
-    # Original should be unchanged
+    # Original should be unchanged (now that copy() does deep copy)
     assert original.build["tgt_ccsid"] == "37"
     assert original.build["objlib"] == "MYLIB"
 

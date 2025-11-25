@@ -1,0 +1,310 @@
+# IBM i Remote Testing Guide
+
+## Problem Overview
+
+The tests for `test_crtfrmstmf.py`, `test_cvtsrcpf.py`, and `test_ibm_job.py` fail on non-IBM i systems (macOS, Linux, Windows) because they depend on `ibm_db_dbi`, which is only available on IBM i systems.
+
+```
+ModuleNotFoundError: No module named 'ibm_db_dbi'
+```
+
+## Solution Strategies
+
+### Strategy 1: Mock IBM i Dependencies (Local Development) ⭐ RECOMMENDED
+
+**Purpose**: Run tests locally on your development machine (macOS/Linux/Windows) by mocking IBM i-specific modules.
+
+**How it works**:
+- Create a `conftest.py` file that mocks `ibm_db_dbi` before tests run
+- Tests run with mocked database connections
+- Fast feedback during development
+- No IBM i system required
+
+**Implementation**:
+
+1. **Create `tests/unit/conftest.py`** (already provided in this project)
+2. **Run tests locally**:
+   ```bash
+   cd ibmi-bob
+   pytest tests/unit/test_crtfrmstmf.py tests/unit/test_cvtsrcpf.py tests/unit/test_ibm_job.py -v
+   ```
+
+**Pros**:
+- ✅ Fast local development
+- ✅ No IBM i system needed
+- ✅ Works on any OS
+- ✅ Good for unit testing logic
+
+**Cons**:
+- ❌ Doesn't test actual IBM i integration
+- ❌ Mock behavior may differ from real system
+
+---
+
+### Strategy 2: Remote Testing on IBM i System (Integration Testing)
+
+**Purpose**: Run tests on actual IBM i system to verify real integration.
+
+**How it works**:
+- SSH into IBM i system
+- Run tests directly on IBM i
+- Tests use real `ibm_db_dbi` module
+- Validates actual system behavior
+
+**Prerequisites**:
+1. Access to IBM i system (SSH credentials)
+2. Python 3.9+ installed on IBM i
+3. pytest installed on IBM i
+4. Project code deployed to IBM i
+
+**Implementation Steps**:
+
+#### Step 1: Setup IBM i Environment
+
+```bash
+# SSH into IBM i system
+ssh user@your-ibmi-system.com
+
+# Install Python packages (if not already installed)
+pip3 install pytest pytest-cov
+
+# Clone or copy your project to IBM i
+cd /home/youruser
+git clone https://github.com/your-org/ibmi-bob.git
+cd ibmi-bob
+```
+
+#### Step 2: Run Tests on IBM i
+
+```bash
+# Run specific tests
+pytest tests/unit/test_crtfrmstmf.py tests/unit/test_cvtsrcpf.py tests/unit/test_ibm_job.py -v
+
+# Run all tests
+pytest tests/unit/ -v
+
+# Run with coverage
+pytest tests/unit/ --cov=src/makei --cov-report=html
+```
+
+**Pros**:
+- ✅ Tests real IBM i integration
+- ✅ Validates actual database operations
+- ✅ Catches platform-specific issues
+
+**Cons**:
+- ❌ Requires IBM i system access
+- ❌ Slower feedback loop
+- ❌ May require VPN/network access
+
+---
+
+### Strategy 3: Hybrid Approach (Best Practice) 🏆
+
+**Purpose**: Combine local mocking with remote integration testing.
+
+**How it works**:
+1. **Local Development**: Use mocks for fast iteration
+2. **CI/CD Pipeline**: Run integration tests on IBM i
+3. **Pre-release**: Full test suite on IBM i
+
+**Implementation**:
+
+#### Local Development Workflow:
+```bash
+# Run unit tests locally with mocks
+pytest tests/unit/ -v -m "not integration"
+
+# Quick feedback on logic changes
+pytest tests/unit/test_ibm_job.py -v
+```
+
+#### CI/CD Pipeline (GitHub Actions Example):
+
+```yaml
+# .github/workflows/test.yml
+name: Tests
+
+on: [push, pull_request]
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      - run: pip install -r tests/requirements.txt
+      - run: pytest tests/unit/ -v -m "not integration"
+
+  integration-tests:
+    runs-on: self-hosted  # IBM i runner
+    steps:
+      - uses: actions/checkout@v3
+      - run: pytest tests/unit/ -v -m integration
+```
+
+---
+
+### Strategy 4: Docker Container with IBM i Emulation (Advanced)
+
+**Purpose**: Create reproducible test environment.
+
+**Note**: This is complex and may not fully replicate IBM i behavior.
+
+**Implementation**:
+```dockerfile
+# Dockerfile
+FROM python:3.9
+RUN pip install pytest pytest-mock
+# Install mock ibm_db_dbi
+COPY tests/mocks/ibm_db_dbi.py /usr/local/lib/python3.9/site-packages/
+```
+
+---
+
+## Recommended Setup for Your Project
+
+### Phase 1: Local Development (Immediate)
+
+1. **Use the provided `conftest.py`** to mock IBM i dependencies
+2. **Mark integration tests** with pytest markers:
+   ```python
+   import pytest
+   
+   @pytest.mark.integration
+   def test_real_ibmi_connection():
+       # This test requires real IBM i
+       pass
+   ```
+
+3. **Run local tests**:
+   ```bash
+   # Run all tests except integration
+   pytest tests/unit/ -v -m "not integration"
+   
+   # Run only integration tests (will fail locally)
+   pytest tests/unit/ -v -m integration
+   ```
+
+### Phase 2: Remote Testing Setup (When Available)
+
+1. **Setup IBM i test environment**:
+   - Create dedicated test library (e.g., `BOBTEST`)
+   - Setup test user with appropriate permissions
+   - Install Python and pytest
+
+2. **Create remote test script**:
+   ```bash
+   #!/bin/bash
+   # run_remote_tests.sh
+   
+   IBM_HOST="your-ibmi-system.com"
+   IBM_USER="testuser"
+   
+   # Copy code to IBM i
+   rsync -avz --exclude='.git' . ${IBM_USER}@${IBM_HOST}:/home/${IBM_USER}/ibmi-bob/
+   
+   # Run tests remotely
+   ssh ${IBM_USER}@${IBM_HOST} "cd /home/${IBM_USER}/ibmi-bob && pytest tests/unit/ -v"
+   ```
+
+3. **Run remote tests**:
+   ```bash
+   chmod +x run_remote_tests.sh
+   ./run_remote_tests.sh
+   ```
+
+### Phase 3: CI/CD Integration (Production)
+
+1. **Setup GitHub Actions with self-hosted runner on IBM i**
+2. **Configure automated testing on every commit**
+3. **Generate coverage reports**
+
+---
+
+## Test Markers Reference
+
+Add these markers to your tests:
+
+```python
+# tests/unit/test_ibm_job.py
+
+import pytest
+
+@pytest.mark.unit
+def test_ibmjob_initialization():
+    """Unit test - runs with mocks"""
+    pass
+
+@pytest.mark.integration
+def test_ibmjob_real_connection():
+    """Integration test - requires IBM i"""
+    pass
+
+@pytest.mark.slow
+def test_large_dataset_processing():
+    """Slow test - run separately"""
+    pass
+```
+
+Run specific markers:
+```bash
+# Run only unit tests
+pytest -m unit
+
+# Run only integration tests
+pytest -m integration
+
+# Skip slow tests
+pytest -m "not slow"
+```
+
+---
+
+## Troubleshooting
+
+### Issue: Tests still fail with mocked ibm_db_dbi
+
+**Solution**: Ensure `conftest.py` is in the correct location:
+```
+tests/
+  unit/
+    conftest.py  ← Must be here
+    test_ibm_job.py
+    test_crtfrmstmf.py
+```
+
+### Issue: SSH connection to IBM i fails
+
+**Solution**: Check network/VPN and SSH keys:
+```bash
+# Test SSH connection
+ssh -v user@ibmi-system.com
+
+# Setup SSH keys
+ssh-copy-id user@ibmi-system.com
+```
+
+### Issue: Python not found on IBM i
+
+**Solution**: Install Python via yum:
+```bash
+# On IBM i
+yum install python39
+yum install python39-pip
+```
+
+---
+
+## Summary
+
+| Strategy | Use Case | Pros | Cons |
+|----------|----------|------|------|
+| **Mock Dependencies** | Daily development | Fast, no IBM i needed | Not real integration |
+| **Remote Testing** | Pre-release validation | Real system testing | Slower, needs access |
+| **Hybrid** | Production workflow | Best of both worlds | More complex setup |
+| **Docker** | Reproducible env | Consistent testing | Complex, limited IBM i support |
+
+**Recommendation**: Start with Strategy 1 (mocking) for development, then add Strategy 2 (remote testing) for release validation.

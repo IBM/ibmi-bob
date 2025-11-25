@@ -86,16 +86,16 @@ def test_file_target_mapping():
     """Test FILE_TARGET_MAPPING dictionary"""
     assert isinstance(FILE_TARGET_MAPPING, dict)
     
-    # Test some common mappings
-    assert FILE_TARGET_MAPPING["PGM.RPGLE"] == "PGM"
-    assert FILE_TARGET_MAPPING["PGM.SQLRPGLE"] == "PGM"
-    assert FILE_TARGET_MAPPING["RPGLE"] == "MODULE"
-    assert FILE_TARGET_MAPPING["SQLRPGLE"] == "MODULE"
-    assert FILE_TARGET_MAPPING["CMD"] == "CMD"
-    assert FILE_TARGET_MAPPING["PF"] == "FILE"
-    assert FILE_TARGET_MAPPING["DSPF"] == "FILE"
-    assert FILE_TARGET_MAPPING["MODULE"] == "PGM"
-    assert FILE_TARGET_MAPPING["BND"] == "SRVPGM"
+    # Test some common mappings - FILE_TARGET_MAPPING returns sets
+    assert FILE_TARGET_MAPPING["PGM.RPGLE"] == {"PGM"}
+    assert FILE_TARGET_MAPPING["PGM.SQLRPGLE"] == {"PGM"}
+    assert FILE_TARGET_MAPPING["RPGLE"] == {"MODULE"}
+    assert FILE_TARGET_MAPPING["SQLRPGLE"] == {"MODULE"}
+    assert FILE_TARGET_MAPPING["CMD"] == {"CMD"}
+    assert FILE_TARGET_MAPPING["PF"] == {"FILE"}
+    assert FILE_TARGET_MAPPING["DSPF"] == {"FILE"}
+    assert FILE_TARGET_MAPPING["MODULE"] == {"PGM"}
+    assert FILE_TARGET_MAPPING["BND"] == {"SRVPGM"}
 
 
 def test_file_max_ext_length():
@@ -222,11 +222,13 @@ def test_file_extensions_coverage():
 def test_mapping_consistency():
     """Test consistency between different mapping dictionaries"""
     # Every key in FILE_TARGET_MAPPING should map to a value in TARGET_TARGETGROUPS_MAPPING
-    for file_ext, target in FILE_TARGET_MAPPING.items():
-        if target in TARGET_TARGETGROUPS_MAPPING:
-            # Verify the target group exists
-            target_group = TARGET_TARGETGROUPS_MAPPING[target]
-            assert target_group in TARGET_GROUPS, f"{target_group} not in TARGET_GROUPS"
+    for file_ext, targets in FILE_TARGET_MAPPING.items():
+        # FILE_TARGET_MAPPING values are sets, so iterate through them
+        for target in targets:
+            if target in TARGET_TARGETGROUPS_MAPPING:
+                # Verify the target group exists
+                target_group = TARGET_TARGETGROUPS_MAPPING[target]
+                assert target_group in TARGET_GROUPS, f"{target_group} not in TARGET_GROUPS"
 
 
 def test_comment_style_column_ranges():
