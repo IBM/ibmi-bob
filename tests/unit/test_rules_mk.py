@@ -411,3 +411,97 @@ HELLOP.PGM_SRC=HELLO.PGM.RPGLE
 HELLOP.PGM_DEP=
 HELLOP.PGM_RECIPE=PGM.RPGLE_TO_PGM_RECIPE
 '''
+
+
+def test_relativepath_subfolder1():
+    # Test loading from a valid file
+    test_dir = DATA_PATH / "build_env"/ "sample_project2" / "QRPGLESRC"
+    rules_mk = RulesMk.from_file(test_dir / "Rules.mk", test_dir)
+    expected_targets = {'TRGs': [], 'DTAARAs': [], 'DTAQs': [], 'SQLs': [], 'BNDDs': [],
+                        'PFs': [], 'LFs': [], 'DSPFs': [], 'PRTFs': [], 'CMDs': [],
+                        'MODULEs': [], 'SRVPGMs': [], 'PGMs': ['HELLO.PGM'],
+                        'MENUs': [], 'PNLGRPs': [], 'QMQRYs': [], 'WSCSTs': [], 'MSGs': []}
+    # assert rules_mk.src_obj_mapping['HELLO.RPGLE'] == ['HELLO.PGM']
+    assert rules_mk.containing_dir == test_dir
+    assert rules_mk.subdirs == []
+    assert rules_mk.targets == expected_targets
+
+    assert rules_mk.rules[0].variables == []
+    assert rules_mk.rules[0].commands == []
+    assert rules_mk.rules[0].dependencies == []
+    assert rules_mk.rules[0].include_dirs == []
+    assert rules_mk.rules[0].target == 'HELLO.PGM'
+    print(rules_mk,"dd")
+    assert str(rules_mk) == '''PGMs := HELLO.PGM
+
+
+HELLO.PGM_SRC=$(d)/hello.rpgle
+HELLO.PGM_DEP=
+HELLO.PGM_RECIPE=PGM.RPGLE_TO_PGM_RECIPE
+'''
+
+def test_relativepath_subfolder2():
+    # Test loading from a valid file
+
+    test_dir = DATA_PATH / "build_env"/ "sample_project2" / "QTEMP"
+    rules_mk = RulesMk.from_file(test_dir / "Rules.mk", test_dir)
+    expected_targets = {'TRGs': [], 'DTAARAs': [], 'DTAQs': [], 'SQLs': [], 'BNDDs': [],
+                        'PFs': [], 'LFs': [], 'DSPFs': [], 'PRTFs': [], 'CMDs': [],
+                        'MODULEs': [], 'SRVPGMs': [], 'PGMs': [],
+                        'MENUs': [], 'PNLGRPs': [], 'QMQRYs': [], 'WSCSTs': [], 'MSGs': []}
+    assert rules_mk.containing_dir == test_dir
+    assert rules_mk.subdirs == ['QRPGLESRC']
+    assert rules_mk.targets == expected_targets
+    print(rules_mk,"dd")
+    assert str(rules_mk) == '''SUBDIRS := QRPGLESRC
+
+
+
+'''
+
+def test_relativepath_subfolder3():
+    # Test loading from a valid file
+
+    test_dir = DATA_PATH / "build_env"/ "sample_project2" / "QTEMP" / "QRPGLESRC"
+    rules_mk = RulesMk.from_file(test_dir / "Rules.mk", test_dir)
+    expected_targets = {'TRGs': [], 'DTAARAs': [], 'DTAQs': [], 'SQLs': [], 'BNDDs': [],
+                        'PFs': [], 'LFs': [], 'DSPFs': [], 'PRTFs': [], 'CMDs': [],
+                        'MODULEs': ["HELLO2.MODULE"], 'SRVPGMs': [], 'PGMs': [],
+                        'MENUs': [], 'PNLGRPs': [], 'QMQRYs': [], 'WSCSTs': [], 'MSGs': []}
+    # assert rules_mk.src_obj_mapping['HELLO.RPGLE'] == ['HELLO.PGM']
+    assert rules_mk.containing_dir == test_dir
+    assert rules_mk.subdirs == []
+    assert rules_mk.targets == expected_targets
+
+    assert rules_mk.rules[0].variables == []
+    assert rules_mk.rules[0].commands == []
+    assert rules_mk.rules[0].dependencies == []
+    assert rules_mk.rules[0].include_dirs == []
+    assert rules_mk.rules[0].target == 'HELLO2.MODULE'
+    print(rules_mk,"dd")
+    assert str(rules_mk) == '''MODULEs := HELLO2.MODULE
+
+
+HELLO2.MODULE_SRC=$(d)/hello2.rpgle
+HELLO2.MODULE_DEP=
+HELLO2.MODULE_RECIPE=RPGLE_TO_MODULE_RECIPE
+'''
+
+def test_relativepath_rules():
+    # Test loading from a valid file
+
+    test_dir = DATA_PATH / "build_env"/ "sample_project2"
+    rules_mk = RulesMk.from_file(test_dir / "Rules.mk", test_dir)
+    expected_targets = {'TRGs': [], 'DTAARAs': [], 'DTAQs': [], 'SQLs': [], 'BNDDs': [],
+                        'PFs': [], 'LFs': [], 'DSPFs': [], 'PRTFs': [], 'CMDs': [],
+                        'MODULEs': [], 'SRVPGMs': [], 'PGMs': [],
+                        'MENUs': [], 'PNLGRPs': [], 'QMQRYs': [], 'WSCSTs': [], 'MSGs': []}
+    print(rules_mk.containing_dir,"dd")
+    assert rules_mk.containing_dir == test_dir
+    assert rules_mk.subdirs == ['QTEMP/QRPGLESRC','QRPGLESRC',]
+    assert rules_mk.targets == expected_targets
+    assert str(rules_mk) == '''SUBDIRS := QTEMP/QRPGLESRC QRPGLESRC
+
+
+
+'''
