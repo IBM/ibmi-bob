@@ -431,7 +431,6 @@ def test_relativepath_subfolder1():
     assert rules_mk.rules[0].dependencies == []
     assert rules_mk.rules[0].include_dirs == []
     assert rules_mk.rules[0].target == 'HELLO.PGM'
-    print(rules_mk,"dd")
     assert str(rules_mk) == '''PGMs := HELLO.PGM
 
 
@@ -452,7 +451,6 @@ def test_relativepath_subfolder2():
     assert rules_mk.containing_dir == test_dir
     assert rules_mk.subdirs == ['QRPGLESRC']
     assert rules_mk.targets == expected_targets
-    print(rules_mk,"dd")
     assert str(rules_mk) == '''SUBDIRS := QRPGLESRC
 
 
@@ -478,7 +476,6 @@ def test_relativepath_subfolder3():
     assert rules_mk.rules[0].dependencies == []
     assert rules_mk.rules[0].include_dirs == []
     assert rules_mk.rules[0].target == 'HELLO2.MODULE'
-    print(rules_mk,"dd")
     assert str(rules_mk) == '''MODULEs := HELLO2.MODULE
 
 
@@ -496,7 +493,6 @@ def test_relativepath_rules():
                         'PFs': [], 'LFs': [], 'DSPFs': [], 'PRTFs': [], 'CMDs': [],
                         'MODULEs': [], 'SRVPGMs': [], 'PGMs': [],
                         'MENUs': [], 'PNLGRPs': [], 'QMQRYs': [], 'WSCSTs': [], 'MSGs': []}
-    print(rules_mk.containing_dir,"dd")
     assert rules_mk.containing_dir == test_dir
     assert rules_mk.subdirs == ['QTEMP/QRPGLESRC','QRPGLESRC',]
     assert rules_mk.targets == expected_targets
