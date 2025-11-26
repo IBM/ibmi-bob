@@ -434,7 +434,7 @@ def test_relativepath_subfolder1():
     assert str(rules_mk) == '''PGMs := HELLO.PGM
 
 
-HELLO.PGM_SRC=$(d)/hello.rpgle
+HELLO.PGM_SRC=hello.rpgle
 HELLO.PGM_DEP=
 HELLO.PGM_RECIPE=PGM.RPGLE_TO_PGM_RECIPE
 '''
@@ -479,7 +479,7 @@ def test_relativepath_subfolder3():
     assert str(rules_mk) == '''MODULEs := HELLO2.MODULE
 
 
-HELLO2.MODULE_SRC=$(d)/hello2.rpgle
+HELLO2.MODULE_SRC=hello2.rpgle
 HELLO2.MODULE_DEP=
 HELLO2.MODULE_RECIPE=RPGLE_TO_MODULE_RECIPE
 '''
