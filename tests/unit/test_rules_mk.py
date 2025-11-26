@@ -412,6 +412,7 @@ HELLOP.PGM_DEP=
 HELLOP.PGM_RECIPE=PGM.RPGLE_TO_PGM_RECIPE
 '''
 
+
 def test_sql_recipe():
     # Test loading from a valid file
     rules_mk = RulesMk.from_file(data_dir / "sql.rules.mk", data_dir)
