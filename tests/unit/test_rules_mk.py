@@ -411,3 +411,43 @@ HELLOP.PGM_SRC=HELLO.PGM.RPGLE
 HELLOP.PGM_DEP=
 HELLOP.PGM_RECIPE=PGM.RPGLE_TO_PGM_RECIPE
 '''
+
+def test_sql_recipe():
+    # Test loading from a valid file
+    rules_mk = RulesMk.from_file(data_dir / "sql.rules.mk", data_dir)
+    expected_targets = {'TRGs': [], 'DTAARAs': [], 'DTAQs': [], 'SQLs': [], 'BNDDs': [],
+                        'PFs': [], 'LFs': [], 'DSPFs': [], 'PRTFs': [], 'CMDs': [],
+                        'MODULEs': [], 'SRVPGMs': ['VALUSE.SRVPGM'],
+                        'PGMs': [],
+                        'MENUs': [], 'PNLGRPs': [], 'QMQRYs': ['VALUSE.QMQRY'], 'WSCSTs': [], 'MSGs': []}
+    assert rules_mk.containing_dir == data_dir
+    assert rules_mk.targets == expected_targets
+    assert rules_mk.rules[0].variables == []
+    assert rules_mk.rules[0].commands == []
+    assert rules_mk.rules[0].dependencies == []
+    assert rules_mk.rules[0].include_dirs == []
+    assert rules_mk.rules[0].target == 'VALUSE.SRVPGM'
+    assert rules_mk.rules[0].source_file == 'VALUSE.SQL'
+    assert str(rules_mk.rules[0]) == '''VALUSE.SRVPGM_SRC=VALUSE.SQL
+VALUSE.SRVPGM_DEP=
+VALUSE.SRVPGM_RECIPE=SQL_TO_SRVPGM_RECIPE\n'''
+
+    assert rules_mk.rules[1].variables == []
+    assert rules_mk.rules[1].commands == []
+    assert rules_mk.rules[1].dependencies == []
+    assert rules_mk.rules[1].include_dirs == []
+    assert rules_mk.rules[1].target == 'VALUSE.QMQRY'
+    assert rules_mk.rules[1].source_file == 'VALUSE.SQL'
+    assert str(rules_mk.rules[1]) == '''VALUSE.QMQRY_SRC=VALUSE.SQL
+VALUSE.QMQRY_DEP=
+VALUSE.QMQRY_RECIPE=SQL_TO_QMQRY_RECIPE\n'''
+
+    assert str(rules_mk) == '''SRVPGMs := VALUSE.SRVPGM
+QMQRYs := VALUSE.QMQRY\n\n
+VALUSE.SRVPGM_SRC=VALUSE.SQL
+VALUSE.SRVPGM_DEP=
+VALUSE.SRVPGM_RECIPE=SQL_TO_SRVPGM_RECIPE
+VALUSE.QMQRY_SRC=VALUSE.SQL
+VALUSE.QMQRY_DEP=
+VALUSE.QMQRY_RECIPE=SQL_TO_QMQRY_RECIPE
+'''
