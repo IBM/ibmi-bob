@@ -64,7 +64,7 @@ FILE_TARGETGROUPS_MAPPING = {
     "ILEPGM": {"PGM"},
     "PNLGRPSRC": {"PNLGRP"},
     "PNLGRP": {"PNLGRP"},
-    "SQL": {"QMQRY"},
+    "SQL": {"QMQRY","SRVPGM"},
     "BND": {"SRVPGM"},
     "ILESRVPGM": {"SRVPGM"},
     "BNDDIR": {"BNDD"},
