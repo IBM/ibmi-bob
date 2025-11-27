@@ -78,12 +78,12 @@ AB2001.B.MODULE: TGTRLS :=*PRV
     assert rules_mk.rules[3].variables == ['TEXT := hardcoded for all mod', 'TGTVER=V7R5',
                                            'private TEXT := foo is better', 'TGTVER := V7R2']
     assert rules_mk.rules[3].commands == []
-    assert rules_mk.rules[3].dependencies == ['$(HEADER).rpgleinc']
+    assert rules_mk.rules[3].dependencies == ['some.rpgleinc']
     assert rules_mk.rules[3].include_dirs == []
     assert rules_mk.rules[3].target == 'FOO.MODULE'
     assert rules_mk.rules[3].source_file == '$(d)/foo.rpgle'
     assert str(rules_mk.rules[3]) == '''FOO.MODULE_SRC=$(d)/foo.rpgle
-FOO.MODULE_DEP=$(HEADER).rpgleinc
+FOO.MODULE_DEP=some.rpgleinc
 FOO.MODULE_RECIPE=RPGLE_TO_MODULE_RECIPE
 FOO.MODULE: TEXT := hardcoded for all mod
 FOO.MODULE: TGTVER=V7R5
@@ -108,7 +108,7 @@ AB2001.B.MODULE_RECIPE=RPGLE_TO_MODULE_RECIPE
 AB2001.B.MODULE: TEXT := hardcoded for all mod
 AB2001.B.MODULE: TGTRLS :=*PRV
 FOO.MODULE_SRC=$(d)/foo.rpgle
-FOO.MODULE_DEP=$(HEADER).rpgleinc
+FOO.MODULE_DEP=some.rpgleinc
 FOO.MODULE_RECIPE=RPGLE_TO_MODULE_RECIPE
 FOO.MODULE: TEXT := hardcoded for all mod
 FOO.MODULE: TGTVER=V7R5
@@ -410,4 +410,135 @@ HELLOSQL.PGM_RECIPE=PGM.SQLRPGLE_TO_PGM_RECIPE
 HELLOP.PGM_SRC=HELLO.PGM.RPGLE
 HELLOP.PGM_DEP=
 HELLOP.PGM_RECIPE=PGM.RPGLE_TO_PGM_RECIPE
+'''
+
+
+def test_relativepath_subfolder1():
+    # Test loading from a valid file
+    test_dir = DATA_PATH / "build_env"/ "sample_project2" / "QRPGLESRC"
+    rules_mk = RulesMk.from_file(test_dir / "Rules.mk", test_dir)
+    expected_targets = {'TRGs': [], 'DTAARAs': [], 'DTAQs': [], 'SQLs': [], 'BNDDs': [],
+                        'PFs': [], 'LFs': [], 'DSPFs': [], 'PRTFs': [], 'CMDs': [],
+                        'MODULEs': [], 'SRVPGMs': [], 'PGMs': ['HELLO.PGM'],
+                        'MENUs': [], 'PNLGRPs': [], 'QMQRYs': [], 'WSCSTs': [], 'MSGs': []}
+    # assert rules_mk.src_obj_mapping['HELLO.RPGLE'] == ['HELLO.PGM']
+    assert rules_mk.containing_dir == test_dir
+    assert rules_mk.subdirs == []
+    assert rules_mk.targets == expected_targets
+
+    assert rules_mk.rules[0].variables == []
+    assert rules_mk.rules[0].commands == []
+    assert rules_mk.rules[0].dependencies == []
+    assert rules_mk.rules[0].include_dirs == []
+    assert rules_mk.rules[0].target == 'HELLO.PGM'
+    assert str(rules_mk) == '''PGMs := HELLO.PGM
+
+
+HELLO.PGM_SRC=hello.rpgle
+HELLO.PGM_DEP=
+HELLO.PGM_RECIPE=PGM.RPGLE_TO_PGM_RECIPE
+'''
+
+def test_relativepath_subfolder2():
+    # Test loading from a valid file
+
+    test_dir = DATA_PATH / "build_env"/ "sample_project2" / "QTEMP"
+    rules_mk = RulesMk.from_file(test_dir / "Rules.mk", test_dir)
+    expected_targets = {'TRGs': [], 'DTAARAs': [], 'DTAQs': [], 'SQLs': [], 'BNDDs': [],
+                        'PFs': [], 'LFs': [], 'DSPFs': [], 'PRTFs': [], 'CMDs': [],
+                        'MODULEs': [], 'SRVPGMs': [], 'PGMs': [],
+                        'MENUs': [], 'PNLGRPs': [], 'QMQRYs': [], 'WSCSTs': [], 'MSGs': []}
+    assert rules_mk.containing_dir == test_dir
+    assert rules_mk.subdirs == ['QRPGLESRC']
+    assert rules_mk.targets == expected_targets
+    assert str(rules_mk) == '''SUBDIRS := QRPGLESRC
+
+
+
+'''
+
+def test_relativepath_subfolder3():
+    # Test loading from a valid file
+
+    test_dir = DATA_PATH / "build_env"/ "sample_project2" / "QTEMP" / "QRPGLESRC"
+    rules_mk = RulesMk.from_file(test_dir / "Rules.mk", test_dir)
+    expected_targets = {'TRGs': [], 'DTAARAs': [], 'DTAQs': [], 'SQLs': [], 'BNDDs': [],
+                        'PFs': [], 'LFs': [], 'DSPFs': [], 'PRTFs': [], 'CMDs': [],
+                        'MODULEs': ["HELLO2.MODULE"], 'SRVPGMs': [], 'PGMs': [],
+                        'MENUs': [], 'PNLGRPs': [], 'QMQRYs': [], 'WSCSTs': [], 'MSGs': []}
+    # assert rules_mk.src_obj_mapping['HELLO.RPGLE'] == ['HELLO.PGM']
+    assert rules_mk.containing_dir == test_dir
+    assert rules_mk.subdirs == []
+    assert rules_mk.targets == expected_targets
+
+    assert rules_mk.rules[0].variables == []
+    assert rules_mk.rules[0].commands == []
+    assert rules_mk.rules[0].dependencies == []
+    assert rules_mk.rules[0].include_dirs == []
+    assert rules_mk.rules[0].target == 'HELLO2.MODULE'
+    assert str(rules_mk) == '''MODULEs := HELLO2.MODULE
+
+
+HELLO2.MODULE_SRC=hello2.rpgle
+HELLO2.MODULE_DEP=
+HELLO2.MODULE_RECIPE=RPGLE_TO_MODULE_RECIPE
+'''
+
+def test_relativepath_rules():
+    # Test loading from a valid file
+
+    test_dir = DATA_PATH / "build_env"/ "sample_project2"
+    rules_mk = RulesMk.from_file(test_dir / "Rules.mk", test_dir)
+    expected_targets = {'TRGs': [], 'DTAARAs': [], 'DTAQs': [], 'SQLs': [], 'BNDDs': [],
+                        'PFs': [], 'LFs': [], 'DSPFs': [], 'PRTFs': [], 'CMDs': [],
+                        'MODULEs': [], 'SRVPGMs': [], 'PGMs': [],
+                        'MENUs': [], 'PNLGRPs': [], 'QMQRYs': [], 'WSCSTs': [], 'MSGs': []}
+    assert rules_mk.containing_dir == test_dir
+    assert rules_mk.subdirs == ['QTEMP/QRPGLESRC','QRPGLESRC',]
+    assert rules_mk.targets == expected_targets
+    assert str(rules_mk) == '''SUBDIRS := QTEMP/QRPGLESRC QRPGLESRC
+
+
+
+'''
+
+
+def test_sql_recipe():
+    # Test loading from a valid file
+    rules_mk = RulesMk.from_file(data_dir / "sql.rules.mk", data_dir)
+    expected_targets = {'TRGs': [], 'DTAARAs': [], 'DTAQs': [], 'SQLs': [], 'BNDDs': [],
+                        'PFs': [], 'LFs': [], 'DSPFs': [], 'PRTFs': [], 'CMDs': [],
+                        'MODULEs': [], 'SRVPGMs': ['VALUSE.SRVPGM'],
+                        'PGMs': [],
+                        'MENUs': [], 'PNLGRPs': [], 'QMQRYs': ['VALUSE.QMQRY'], 'WSCSTs': [], 'MSGs': []}
+    assert rules_mk.containing_dir == data_dir
+    assert rules_mk.targets == expected_targets
+    assert rules_mk.rules[0].variables == []
+    assert rules_mk.rules[0].commands == []
+    assert rules_mk.rules[0].dependencies == []
+    assert rules_mk.rules[0].include_dirs == []
+    assert rules_mk.rules[0].target == 'VALUSE.SRVPGM'
+    assert rules_mk.rules[0].source_file == 'VALUSE.SQL'
+    assert str(rules_mk.rules[0]) == '''VALUSE.SRVPGM_SRC=VALUSE.SQL
+VALUSE.SRVPGM_DEP=
+VALUSE.SRVPGM_RECIPE=SQL_TO_SRVPGM_RECIPE\n'''
+
+    assert rules_mk.rules[1].variables == []
+    assert rules_mk.rules[1].commands == []
+    assert rules_mk.rules[1].dependencies == []
+    assert rules_mk.rules[1].include_dirs == []
+    assert rules_mk.rules[1].target == 'VALUSE.QMQRY'
+    assert rules_mk.rules[1].source_file == 'VALUSE.SQL'
+    assert str(rules_mk.rules[1]) == '''VALUSE.QMQRY_SRC=VALUSE.SQL
+VALUSE.QMQRY_DEP=
+VALUSE.QMQRY_RECIPE=SQL_TO_QMQRY_RECIPE\n'''
+
+    assert str(rules_mk) == '''SRVPGMs := VALUSE.SRVPGM
+QMQRYs := VALUSE.QMQRY\n\n
+VALUSE.SRVPGM_SRC=VALUSE.SQL
+VALUSE.SRVPGM_DEP=
+VALUSE.SRVPGM_RECIPE=SQL_TO_SRVPGM_RECIPE
+VALUSE.QMQRY_SRC=VALUSE.SQL
+VALUSE.QMQRY_DEP=
+VALUSE.QMQRY_RECIPE=SQL_TO_QMQRY_RECIPE
 '''
