@@ -9,11 +9,11 @@ from makei.ibm_job import IBMJob, get_joblog_for_job, save_joblog_json
 @patch('makei.ibm_job.ibm_db_dbi')
 def test_ibmjob_initialization(mock_ibm_db):
     """Test IBMJob initialization"""
-    mock_conn = Mock()
-    mock_cursor = Mock()
+    mock_conn = MagicMock()
+    mock_cursor = MagicMock()
     mock_cursor.fetchall.return_value = [("123456/USER/JOBNAME",)]
     mock_cursor.description = [("JOB_NAME",)]
-    mock_conn.cursor.return_value.__enter__.return_value = mock_cursor
+    mock_conn.cursor.return_value = mock_cursor
     mock_ibm_db.connect.return_value = mock_conn
     
     job = IBMJob()
@@ -37,11 +37,11 @@ def test_ibmjob_initialization_failure(mock_ibm_db):
 @patch('makei.ibm_job.ibm_db_dbi')
 def test_ibmjob_run_cl_success(mock_ibm_db):
     """Test run_cl method with successful command"""
-    mock_conn = Mock()
-    mock_cursor = Mock()
+    mock_conn = MagicMock()
+    mock_cursor = MagicMock()
     mock_cursor.fetchall.return_value = [("123456/USER/JOBNAME",)]
     mock_cursor.description = [("JOB_NAME",)]
-    mock_conn.cursor.return_value.__enter__.return_value = mock_cursor
+    mock_conn.cursor.return_value = mock_cursor
     mock_ibm_db.connect.return_value = mock_conn
     
     job = IBMJob()
@@ -56,11 +56,11 @@ def test_ibmjob_run_cl_success(mock_ibm_db):
 @patch('makei.ibm_job.ibm_db_dbi')
 def test_ibmjob_run_cl_with_logging(mock_ibm_db, capsys):
     """Test run_cl method with logging enabled"""
-    mock_conn = Mock()
-    mock_cursor = Mock()
+    mock_conn = MagicMock()
+    mock_cursor = MagicMock()
     mock_cursor.fetchall.return_value = [("123456/USER/JOBNAME",)]
     mock_cursor.description = [("JOB_NAME",)]
-    mock_conn.cursor.return_value.__enter__.return_value = mock_cursor
+    mock_conn.cursor.return_value = mock_cursor
     mock_ibm_db.connect.return_value = mock_conn
     
     job = IBMJob()
@@ -75,12 +75,12 @@ def test_ibmjob_run_cl_with_logging(mock_ibm_db, capsys):
 @patch('makei.ibm_job.ibm_db_dbi')
 def test_ibmjob_run_cl_failure(mock_ibm_db):
     """Test run_cl method with failed command"""
-    mock_conn = Mock()
-    mock_cursor = Mock()
+    mock_conn = MagicMock()
+    mock_cursor = MagicMock()
     mock_cursor.fetchall.return_value = [("123456/USER/JOBNAME",)]
     mock_cursor.description = [("JOB_NAME",)]
     mock_cursor.callproc.side_effect = Exception("Command failed")
-    mock_conn.cursor.return_value.__enter__.return_value = mock_cursor
+    mock_conn.cursor.return_value = mock_cursor
     mock_ibm_db.connect.return_value = mock_conn
     
     job = IBMJob()
@@ -93,12 +93,12 @@ def test_ibmjob_run_cl_failure(mock_ibm_db):
 @patch('makei.ibm_job.ibm_db_dbi')
 def test_ibmjob_run_cl_failure_ignored(mock_ibm_db, capsys):
     """Test run_cl method with failed command and ignore_errors=True"""
-    mock_conn = Mock()
-    mock_cursor = Mock()
+    mock_conn = MagicMock()
+    mock_cursor = MagicMock()
     mock_cursor.fetchall.return_value = [("123456/USER/JOBNAME",)]
     mock_cursor.description = [("JOB_NAME",)]
     mock_cursor.callproc.side_effect = Exception("Command failed")
-    mock_conn.cursor.return_value.__enter__.return_value = mock_cursor
+    mock_conn.cursor.return_value = mock_cursor
     mock_ibm_db.connect.return_value = mock_conn
     
     job = IBMJob()
@@ -112,17 +112,21 @@ def test_ibmjob_run_cl_failure_ignored(mock_ibm_db, capsys):
 @patch('makei.ibm_job.ibm_db_dbi')
 def test_ibmjob_run_sql_success(mock_ibm_db):
     """Test run_sql method with successful query"""
-    mock_conn = Mock()
-    mock_cursor = Mock()
+    mock_conn = MagicMock()
+    mock_cursor = MagicMock()
     mock_cursor.fetchall.side_effect = [
         [("123456/USER/JOBNAME",)],  # For initialization
         [("LIB1",), ("LIB2",)]  # For actual query
     ]
-    mock_cursor.description = [("JOB_NAME",), ("LIBRARY_NAME",)]
-    mock_conn.cursor.return_value.__enter__.return_value = mock_cursor
+    # description changes between initialization and query
+    mock_cursor.description = [("LIBRARY_NAME",)]
+    mock_conn.cursor.return_value = mock_cursor
     mock_ibm_db.connect.return_value = mock_conn
     
     job = IBMJob()
+    
+    # Update description for the actual query
+    mock_cursor.description = [("LIBRARY_NAME",)]
     
     # Test SQL query
     result = job.run_sql("SELECT LIBRARY_NAME FROM QSYS2.LIBRARY_LIST_INFO")
@@ -136,14 +140,14 @@ def test_ibmjob_run_sql_success(mock_ibm_db):
 @patch('makei.ibm_job.ibm_db_dbi')
 def test_ibmjob_run_sql_with_logging(mock_ibm_db, capsys):
     """Test run_sql method with logging enabled"""
-    mock_conn = Mock()
-    mock_cursor = Mock()
+    mock_conn = MagicMock()
+    mock_cursor = MagicMock()
     mock_cursor.fetchall.side_effect = [
         [("123456/USER/JOBNAME",)],
         [("LIB1",)]
     ]
     mock_cursor.description = [("JOB_NAME",), ("LIBRARY_NAME",)]
-    mock_conn.cursor.return_value.__enter__.return_value = mock_cursor
+    mock_conn.cursor.return_value = mock_cursor
     mock_ibm_db.connect.return_value = mock_conn
     
     job = IBMJob()
@@ -158,14 +162,14 @@ def test_ibmjob_run_sql_with_logging(mock_ibm_db, capsys):
 @patch('makei.ibm_job.ibm_db_dbi')
 def test_ibmjob_run_sql_no_results(mock_ibm_db):
     """Test run_sql method with query that returns no results"""
-    mock_conn = Mock()
-    mock_cursor = Mock()
+    mock_conn = MagicMock()
+    mock_cursor = MagicMock()
     mock_cursor.fetchall.side_effect = [
         [("123456/USER/JOBNAME",)],
         Exception("No results")
     ]
     mock_cursor.description = [("JOB_NAME",)]
-    mock_conn.cursor.return_value.__enter__.return_value = mock_cursor
+    mock_conn.cursor.return_value = mock_cursor
     mock_ibm_db.connect.return_value = mock_conn
     
     job = IBMJob()
@@ -179,12 +183,12 @@ def test_ibmjob_run_sql_no_results(mock_ibm_db):
 @patch('makei.ibm_job.ibm_db_dbi')
 def test_ibmjob_run_sql_failure(mock_ibm_db):
     """Test run_sql method with failed query"""
-    mock_conn = Mock()
-    mock_cursor = Mock()
+    mock_conn = MagicMock()
+    mock_cursor = MagicMock()
     mock_cursor.fetchall.return_value = [("123456/USER/JOBNAME",)]
     mock_cursor.description = [("JOB_NAME",)]
     mock_cursor.execute.side_effect = [None, Exception("SQL error")]
-    mock_conn.cursor.return_value.__enter__.return_value = mock_cursor
+    mock_conn.cursor.return_value = mock_cursor
     mock_ibm_db.connect.return_value = mock_conn
     
     job = IBMJob()
@@ -197,12 +201,12 @@ def test_ibmjob_run_sql_failure(mock_ibm_db):
 @patch('makei.ibm_job.ibm_db_dbi')
 def test_ibmjob_run_sql_failure_ignored(mock_ibm_db):
     """Test run_sql method with failed query and ignore_errors=True"""
-    mock_conn = Mock()
-    mock_cursor = Mock()
+    mock_conn = MagicMock()
+    mock_cursor = MagicMock()
     mock_cursor.fetchall.return_value = [("123456/USER/JOBNAME",)]
     mock_cursor.description = [("JOB_NAME",)]
     mock_cursor.execute.side_effect = [None, Exception("SQL error")]
-    mock_conn.cursor.return_value.__enter__.return_value = mock_cursor
+    mock_conn.cursor.return_value = mock_cursor
     mock_ibm_db.connect.return_value = mock_conn
     
     job = IBMJob()
@@ -216,11 +220,11 @@ def test_ibmjob_run_sql_failure_ignored(mock_ibm_db):
 @patch('makei.ibm_job.ibm_db_dbi')
 def test_ibmjob_dump_results_to_dict(mock_ibm_db):
     """Test dump_results_to_dict method"""
-    mock_conn = Mock()
-    mock_cursor = Mock()
+    mock_conn = MagicMock()
+    mock_cursor = MagicMock()
     mock_cursor.fetchall.return_value = [("123456/USER/JOBNAME",)]
     mock_cursor.description = [("JOB_NAME",)]
-    mock_conn.cursor.return_value.__enter__.return_value = mock_cursor
+    mock_conn.cursor.return_value = mock_cursor
     mock_ibm_db.connect.return_value = mock_conn
     
     job = IBMJob()
@@ -242,11 +246,11 @@ def test_ibmjob_dump_results_to_dict(mock_ibm_db):
 @patch('makei.ibm_job.get_joblog_for_job')
 def test_ibmjob_dump_joblog(mock_get_joblog, mock_ibm_db):
     """Test dump_joblog method"""
-    mock_conn = Mock()
-    mock_cursor = Mock()
+    mock_conn = MagicMock()
+    mock_cursor = MagicMock()
     mock_cursor.fetchall.return_value = [("123456/USER/JOBNAME",)]
     mock_cursor.description = [("JOB_NAME",)]
-    mock_conn.cursor.return_value.__enter__.return_value = mock_cursor
+    mock_conn.cursor.return_value = mock_cursor
     mock_ibm_db.connect.return_value = mock_conn
     
     mock_get_joblog.return_value = [

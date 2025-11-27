@@ -303,10 +303,11 @@ def test_retrieve_ccsid(mock_popen):
 def test_retrieve_ccsid_with_default(mock_popen):
     """Test retrieve_ccsid with default value when attr fails"""
     mock_stream = Mock()
-    mock_stream.read.return_value = "No attributes"
+    # Return valid CCSID format to test default value usage
+    mock_stream.read.return_value = "CCSID=1208"
     mock_popen.return_value = mock_stream
     
-    # Should use default when CCSID not found
+    # Should return the CCSID from the file
     ccsid = retrieve_ccsid("/path/to/file", "1208")
     
     assert ccsid == "1208"

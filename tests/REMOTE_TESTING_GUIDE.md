@@ -10,7 +10,23 @@ ModuleNotFoundError: No module named 'ibm_db_dbi'
 
 ## Solution Strategies
 
-### Strategy 1: Mock IBM i Dependencies (Local Development) ⭐ RECOMMENDED
+### Strategy 1: Remote Testing on IBM i System (Integration Testing)
+
+**Purpose**: Run tests on actual IBM i system to verify real integration.
+
+**How it works**:
+- SSH into IBM i system
+- Run tests directly on IBM i
+- Tests use real `ibm_db_dbi` module
+- Validates actual system behavior
+
+**Prerequisites**:
+1. Access to IBM i system (SSH credentials)
+2. Python 3.9+ installed on IBM i
+3. pytest installed on IBM i
+4. Project code deployed to IBM i
+
+### Strategy 2: Mock IBM i Dependencies (Local Development)
 
 **Purpose**: Run tests locally on your development machine (macOS/Linux/Windows) by mocking IBM i-specific modules.
 
@@ -28,34 +44,7 @@ ModuleNotFoundError: No module named 'ibm_db_dbi'
    cd ibmi-bob
    pytest tests/unit/test_crtfrmstmf.py tests/unit/test_cvtsrcpf.py tests/unit/test_ibm_job.py -v
    ```
-
-**Pros**:
-- ✅ Fast local development
-- ✅ No IBM i system needed
-- ✅ Works on any OS
-- ✅ Good for unit testing logic
-
-**Cons**:
-- ❌ Doesn't test actual IBM i integration
-- ❌ Mock behavior may differ from real system
-
 ---
-
-### Strategy 2: Remote Testing on IBM i System (Integration Testing)
-
-**Purpose**: Run tests on actual IBM i system to verify real integration.
-
-**How it works**:
-- SSH into IBM i system
-- Run tests directly on IBM i
-- Tests use real `ibm_db_dbi` module
-- Validates actual system behavior
-
-**Prerequisites**:
-1. Access to IBM i system (SSH credentials)
-2. Python 3.9+ installed on IBM i
-3. pytest installed on IBM i
-4. Project code deployed to IBM i
 
 **Implementation Steps**:
 
@@ -85,81 +74,6 @@ pytest tests/unit/ -v
 
 # Run with coverage
 pytest tests/unit/ --cov=src/makei --cov-report=html
-```
-
-**Pros**:
-- ✅ Tests real IBM i integration
-- ✅ Validates actual database operations
-- ✅ Catches platform-specific issues
-
-**Cons**:
-- ❌ Requires IBM i system access
-- ❌ Slower feedback loop
-- ❌ May require VPN/network access
-
----
-
-### Strategy 3: Hybrid Approach (Best Practice) 🏆
-
-**Purpose**: Combine local mocking with remote integration testing.
-
-**How it works**:
-1. **Local Development**: Use mocks for fast iteration
-2. **CI/CD Pipeline**: Run integration tests on IBM i
-3. **Pre-release**: Full test suite on IBM i
-
-**Implementation**:
-
-#### Local Development Workflow:
-```bash
-# Run unit tests locally with mocks
-pytest tests/unit/ -v -m "not integration"
-
-# Quick feedback on logic changes
-pytest tests/unit/test_ibm_job.py -v
-```
-
-#### CI/CD Pipeline (GitHub Actions Example):
-
-```yaml
-# .github/workflows/test.yml
-name: Tests
-
-on: [push, pull_request]
-
-jobs:
-  unit-tests:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
-        with:
-          python-version: '3.9'
-      - run: pip install -r tests/requirements.txt
-      - run: pytest tests/unit/ -v -m "not integration"
-
-  integration-tests:
-    runs-on: self-hosted  # IBM i runner
-    steps:
-      - uses: actions/checkout@v3
-      - run: pytest tests/unit/ -v -m integration
-```
-
----
-
-### Strategy 4: Docker Container with IBM i Emulation (Advanced)
-
-**Purpose**: Create reproducible test environment.
-
-**Note**: This is complex and may not fully replicate IBM i behavior.
-
-**Implementation**:
-```dockerfile
-# Dockerfile
-FROM python:3.9
-RUN pip install pytest pytest-mock
-# Install mock ibm_db_dbi
-COPY tests/mocks/ibm_db_dbi.py /usr/local/lib/python3.9/site-packages/
 ```
 
 ---
@@ -295,16 +209,3 @@ ssh-copy-id user@ibmi-system.com
 yum install python39
 yum install python39-pip
 ```
-
----
-
-## Summary
-
-| Strategy | Use Case | Pros | Cons |
-|----------|----------|------|------|
-| **Mock Dependencies** | Daily development | Fast, no IBM i needed | Not real integration |
-| **Remote Testing** | Pre-release validation | Real system testing | Slower, needs access |
-| **Hybrid** | Production workflow | Best of both worlds | More complex setup |
-| **Docker** | Reproducible env | Consistent testing | Complex, limited IBM i support |
-
-**Recommendation**: Start with Strategy 1 (mocking) for development, then add Strategy 2 (remote testing) for release validation.
