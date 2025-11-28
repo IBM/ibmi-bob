@@ -26,7 +26,6 @@ while read -r line; do
     linetmp=$(echo "$line" | sed 's/\+\S*$//')
     cmd="${cmd} ${linetmp}"
     continue
-
   fi
 
   cmd+=$line
