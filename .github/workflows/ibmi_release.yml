@@ -60,10 +60,10 @@ jobs:
         if: always()
         run: $ssh_command "rm -fr $remote_build_dir"
       - name: Rename RPM before attaching
-        run: mv ${{ steps.find_rpm.outputs.RPM_FILE_PATH }} bob.rpm
+        run: mv ${{ steps.find_rpm.outputs.RPM_FILE_PATH }} tobi.rpm
       - name: Create the tag and release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ github.ref }}
           name: Release ${{ steps.get_version.outputs.VERSION }}
-          files: bob.rpm
+          files: tobi.rpm
