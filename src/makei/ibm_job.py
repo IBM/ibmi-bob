@@ -43,7 +43,9 @@ class IBMJob():
                 if not ignore_errors:
                     print(f"[FAILED]  {cmd}")
                     raise
-                return False
+                    return False
+                else:
+                    return True
 
     def run_sql(self, sql, ignore_errors=False, log: bool = False):
         with closing(self.conn.cursor()) as cursor:
