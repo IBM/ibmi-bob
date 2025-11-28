@@ -1,17 +1,18 @@
 #!/usr/bin/env python3.9
 
-""" The CLI entry for BOB"""
+""" The CLI entry for TOBi"""
 
 import argparse
 import os
 import sys
 
-from pathlib import Path
 from makei import __version__
 from makei import init_project
 from makei.build import BuildEnv
 from makei.cvtsrcpf import CvtSrcPf
-from makei.utils import Colors, colored
+from makei.utils import Colors, colored, get_compile_targets_from_filenames,decompose_filename
+from pathlib import Path
+from makei.const import FILE_TARGET_MAPPING
 
 
 def cli():
@@ -28,7 +29,12 @@ def cli():
     add_compile_parser(subparsers)
     add_build_parser(subparsers)
     add_cvtsrcpf_parser(subparsers)
-
+    parser.add_argument(
+        '-l', '--log',
+        help="log build files and output the make command without executing it; "
+             "trace data is stored in ./.makei-trace.",
+        action='store_true'
+    )
     parser.add_argument(
         '-v', '--version',
         help="print version information and exit",
@@ -37,7 +43,7 @@ def cli():
 
     args = parser.parse_args()
     if args.version:
-        print(f"Bob version {__version__}")
+        print(f"TOBi version {__version__}")
     elif hasattr(args, 'handle'):
         args.handle(args)
     else:
@@ -71,8 +77,8 @@ def add_build_parser(subparsers: argparse.ArgumentParser):
         metavar='<options>',
     )
     build_parser.add_argument(
-        '--bob-path',
-        help='path to the bob directory',
+        '--tobi-path',
+        help='path to the TOBi directory',
         metavar='<path>',
     )
     build_parser.add_argument(
@@ -116,8 +122,8 @@ def add_compile_parser(subparsers: argparse.ArgumentParser):
         action='append'
     )
     compile_parser.add_argument(
-        '--bob-path',
-        help='path to the bob directory',
+        '--tobi-path',
+        help='path to the TOBi directory',
         metavar='<path>',
     )
     compile_parser.set_defaults(handle=handle_compile)
@@ -202,20 +208,45 @@ def handle_init(args):
     """
     Handling the init command
     """
+    if args.log:
+        print(colored("Warning: --log has no effect on 'init' command.", Colors.WARNING))
     init_project.init_project(force=args.force, objlib=args.objlib, tgtCcsid=args.ccsid)
 
 
-def handle_info(_args):
+def handle_info(args):
     """
     Handling the info command
     """
+    if args.log:
+        print(colored("Warning: --log has no effect on 'info' command.", Colors.WARNING))
     print("Not implemented!")
 
+
+def read_and_filter_rules_mk(source_names):
+    """
+    Read the Rules.mk file and return targets that match allowed extensions.
+    """
+    build_targets = []
+    name, _, ext, _ = decompose_filename(source_names[0])
+    rules_mk_paths = list(Path(".").rglob("Rules.mk"))
+    for rules_mk_path in rules_mk_paths:
+        with rules_mk_path.open("r") as f:
+            for raw_line in f:
+                line = raw_line.strip()
+                if not line or line.startswith("#") or ":" not in line:
+                    continue  # skip blank lines, comments, or malformed lines
+                target = line.split(":", 1)[0].strip()
+                if target and "." in target and target.rsplit(".", 1)[1] in FILE_TARGET_MAPPING[ext]:
+                    build_targets.append(target)
+                else:
+                    raise ValueError(f"No target mapping extension for '{target}'")
+    return build_targets
 
 def handle_compile(args):
     """
     Processing the compile command
     """
+    filenames=[]
     set_environment_vars(args)
     if args.file:
         filenames = [args.file]
@@ -224,24 +255,26 @@ def handle_compile(args):
         filenames = map(lambda f: (str(Path(f).resolve().relative_to(Path.cwd()))), args.files.split(':'))
     else:
         filenames = []
-    # targets = []
+    targets = []
     source_names = []
     for name in filenames:
         if os.path.isdir(name):
-            source_names.append(make_dir_target(name))
+            targets.append(make_dir_target(name))
         else:
             source_names.append(name)
+            targets = read_and_filter_rules_mk(source_names)
     # print("source:"+' '.join(source_names))
     # print("compile targets:"+' '.join(get_compile_targets_from_filenames(source_names)))
     # targets.extend(source_names)
-    build_env = BuildEnv(source_names, args.make_options, get_override_vars(args))
-    targets = build_env.targets
-    print(colored("targets: " + ' '.join(targets), Colors.OKBLUE))
-
-    if build_env.make():
-        sys.exit(0)
+    print(colored("targets: " + ', '.join(targets), Colors.OKBLUE))
+    build_env = BuildEnv(targets, args.make_options, get_override_vars(args))
+    if args.log:
+        build_env.dump_resolved_makefile()
     else:
-        sys.exit(1)
+        if build_env.make():
+            sys.exit(0)
+        else:
+            sys.exit(1)
 
 
 def handle_build(args):
@@ -252,31 +285,41 @@ def handle_build(args):
     if args.target:
         target = args.target
     elif args.subdir:
-        target = make_dir_target(args.subdir)
+        name = os.path.basename(args.subdir)
+        filenames = [args.subdir] if os.path.isdir(name) else []
+        if filenames:
+            for i in filenames:
+                target = make_dir_target(i)
+
     else:
         target = "all"
-    build_env = BuildEnv([target], args.make_options, get_override_vars(args))
-    if build_env.make():
-        sys.exit(0)
+    build_env = BuildEnv([target], args.make_options, get_override_vars(args), trace=args.log)
+    if args.log:
+        build_env.dump_resolved_makefile()
     else:
-        sys.exit(1)
+        if build_env.make():
+            sys.exit(0)
+        else:
+            sys.exit(1)
 
 
 def make_dir_target(filename):
-    return f"dir_{os.path.basename(filename.strip(os.sep))}"
+    return f"dir_{filename.replace('/','_')}"
 
 
 def handle_cvtsrcpf(args):
     """
     Processing the cvtsrcpf command
     """
+    if args.trace:
+        print(colored("Warning: --trace has no effect on 'cvtsrcpf' command.", Colors.WARNING))
     CvtSrcPf(args.file, args.library, args.tolower, args.ccsid, args.text).run()
 
 
 def get_override_vars(args):
     """ Get the override variables from the arguments"""
-    if args.bob_path:
-        return {"bob_path": args.bob_path}
+    if args.tobi_path:
+        return {"tobi_path": args.tobi_path}
     return {}
 
 

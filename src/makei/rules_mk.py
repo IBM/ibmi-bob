@@ -65,10 +65,10 @@ class MKRule:
                     ['\t' + cmd + '\n' for cmd in self.commands]) + variable_assignment
         try:
             target_type = self.target.split(".")[-1].upper()
-            source_file= decompose_filename(self.source_file)[2].upper()
+            source_file = decompose_filename(self.source_file)[2].upper()
             if target_type in ("SQL", "MSGF"):
                 recipe_name = f"{target_type}_RECIPE"
-            elif target_type in ("PGM") and source_file in ("RPGLE","SQLRPGLE"):
+            elif target_type in ("PGM") and source_file in ("RPGLE", "SQLRPGLE"):
                 recipe_name = target_type + '.' + source_file + '_TO_' + self.target.split(".")[
                     -1].upper() + '_RECIPE'
             else:
@@ -331,6 +331,11 @@ class RulesMk:
 
         # Create all the rules for the wildcard rule declaration
         for target_ext, source_ext, dependencies in wildcard_targets:
+            # Expand any variables in the dependencies
+            expanded_deps = dependencies
+            for var_name, var_value in rules_mk_variables.items():
+                expanded_deps = expanded_deps.replace(f"$({var_name})", var_value)
+            #target specific variable assignmnet(expansion)
             for filename in os.listdir(dir_path):
                 recipe_str = ''
                 filename_split = filename.split('.', 1)
@@ -339,7 +344,7 @@ class RulesMk:
                     target_object = (filename_split[0] + "." + target_ext).upper()
                     if target_object not in targets:
                         recipe_str = (
-                            target_object + ": " + filename_split[0] + "." + source_ext + " " + dependencies
+                            target_object + ": " + filename_split[0] + "." + source_ext + " " + expanded_deps
                         ).strip() + '\n'
                         rules.append(MKRule.from_str(recipe_str, containing_dir, include_dirs))
                         targets.append(target_object)

@@ -2,11 +2,11 @@
 
 > [!NOTE]
 >
-> This page documents how to create a `Rules.mk`, which is a text file that tells Bob how your project structured and what the objects are.
+> This page documents how to create a `Rules.mk`, which is a text file that tells TOBi how your project structured and what the objects are.
 
 ## Overview
 
-Better Object Builder uses GNU Make to determine what code needs to be compiled. Make takes as input a _makefile_, which tells it what objects should be compiled, what source code they need, and what other objects they are dependent on. In Bob, we will reuse a common Makefile in the Bob directory which reads the `Rules.mk` files dynamically in the project.
+Better Object Builder uses GNU Make to determine what code needs to be compiled. Make takes as input a _makefile_, which tells it what objects should be compiled, what source code they need, and what other objects they are dependent on. In TOBi, we will reuse a common Makefile in the TOBi directory which reads the `Rules.mk` files dynamically in the project.
 
 By itself, Make has no concept of ILE objects, and doesn't know how to compile an RPG module or bind together a service program.  Better Object Builder provides that functionality in the makefile `mk/def_rules.mk`,  which contains all the special instructions for building various types of IBM i objects. That way, when your `Rules.mk` says "build module XY1001 from source file XY1001.RPGLE", Make will know how to do that.
 
@@ -23,7 +23,7 @@ The `Rules.mk` consists of two sections:
 
 > [!TIP]
 >
-> You are about to create a `Rules.mk` to describe the objects Bob should build.  If a project directory doesn't yet exist, [create one](prepare-the-project/create-a-new-project) now.
+> You are about to create a `Rules.mk` to describe the objects TOBi should build.  If a project directory doesn't yet exist, [create one](prepare-the-project/create-a-new-project) now.
 
 Create a new `Rules.mk` in your project directory.  Open it in any text editor.
 
@@ -37,11 +37,11 @@ For example:
 SUBDIRS = functionsVAT QDDSSRC QDTASRC QPNLSRC QCLSRC QMSGSRC QRPGSRC QRPGLESRC QCBLSRC QSRVSRC QILESRVSRC QBNDSRC QILESRC QCMDSRC QSQLSRC
 ```
 
-This line at the project root directory will tell Bob to build all the subdirectories under the [bob-recursive-example](https://github.com/edmundreinhardt/bob-recursive-example).
+This line at the project root directory will tell TOBi to build all the subdirectories under the [bob-recursive-example](https://github.com/edmundreinhardt/bob-recursive-example).
 
 ### Rules section
 
-The rules section specifies dependency information and custom compile settings. This is where Bob is told which source files and other objects are needed to build each object, and is where object-specific compile settings are overridden.
+The rules section specifies dependency information and custom compile settings. This is where TOBi is told which source files and other objects are needed to build each object, and is where object-specific compile settings are overridden.
 
 To create a rule, first write the object name, followed by a colon and a space.  Then write the name of the object's source file :
 
@@ -53,7 +53,7 @@ The example above is physical file `VATDEF.FILE`.  It is compiled from source co
 
 > [!WARNING]
 >
-> Note previous versions of BOB required a `$(d)/` prefix on the source file, but this is no longer required and can be removed.  There also was an _object list_ section which broke down the list of target objects by type ( `TRGs` `DTAs` `SQLs` `BNDDs` `PFs` `LFs` `DSPFs` `PRTFs` `CMDs` `SQLs` `MODULEs` `SRVPGMs` `PGMs` `MENUs` `PNLGRPs` `QMQRYs` `WSCSTs` `MSGs`).  This is also unnecessary as of BOB 2.4 since these are now automatically discovered.
+> Note previous versions of TOBi required a `$(d)/` prefix on the source file, but this is no longer required and can be removed.  There also was an _object list_ section which broke down the list of target objects by type ( `TRGs` `DTAs` `SQLs` `BNDDs` `PFs` `LFs` `DSPFs` `PRTFs` `CMDs` `SQLs` `MODULEs` `SRVPGMs` `PGMs` `MENUs` `PNLGRPs` `QMQRYs` `WSCSTs` `MSGs`).  This is also unnecessary as of TOBi 2.4 since these are now automatically discovered.
 
 If the object depends on other objects (referenced files or called programs) or source files (includes), add them to the end, separated by spaces:
 
@@ -66,13 +66,13 @@ In summary, for the rules section, simply specify each object, followed by its s
 
 > [!TIP]
 >
-> In order to determine if an object is out-of-date and needs to be built, BOB looks within the library list (using VPATH for gmake gurus).  This library list consists of the current library list for your user profile that is updated via the iproj.json at the root of the project.  See [iproj.json documentation](iproj-json.md) for details.
+> In order to determine if an object is out-of-date and needs to be built, TOBi looks within the library list (using VPATH for gmake gurus).  This library list consists of the current library list for your user profile that is updated via the iproj.json at the root of the project.  See [iproj.json documentation](iproj-json.md) for details.
 
 ---
 
 #### Overriding compile settings
 
-The generic bob makefile establishes what are hopefully sensible defaults for compile settings.  All of your projects will reference the same `def_rules.mk` file, so you can change its defaults to those shared among your projects (for example, TGTRLS is by default set to `V6R1M0`).
+The generic TOBi makefile establishes what are hopefully sensible defaults for compile settings.  All of your projects will reference the same `def_rules.mk` file, so you can change its defaults to those shared among your projects (for example, TGTRLS is by default set to `V6R1M0`).
 
 On the other hand, let's say you have an object that needs to be specially compiled at `V7R1M0`.  This directive is implemented by use of [target-specific variables](https://www.gnu.org/software/make/manual/make.html#Target_002dspecific), which is added as a separate line in the object's rule:
 
@@ -117,12 +117,12 @@ The current list of overrideable compile attributes is:
 
 #### Switches and options
 
-Bob's functionality and behavior can be adjusted by setting the values of certain options in the makefile.  Syntactically, setting an option is identical to overriding a compile attribute (as detailed above); the format is _`object_name: private option := value`_.
+TOBi's functionality and behavior can be adjusted by setting the values of certain options in the makefile.  Syntactically, setting an option is identical to overriding a compile attribute (as detailed above); the format is _`object_name: private option := value`_.
 
 Following are the available makefile options.
 
 ##### CREATE_TYPEDEF
-Setting `CREATE_TYPEDEF` to `YES` for a *FILE object (LF, PF, PRTF) results in a separate include-ready source file being generated that contains a typedef structure for the file object's record formats.  This feature is useful for C code that can no longer rely on `#pragma mapinc`, which doesn't work with IFS source code.  The generated file is named after the original source file, but with `.H` appended (source file `JB001.PF` results in include file `JB001.PF.H`)  Under the covers, the GENCSRC command is called.  Note that in the resulting struct, Bob changes `int` to `long int` to work with the SQL C compiler.
+Setting `CREATE_TYPEDEF` to `YES` for a *FILE object (LF, PF, PRTF) results in a separate include-ready source file being generated that contains a typedef structure for the file object's record formats.  This feature is useful for C code that can no longer rely on `#pragma mapinc`, which doesn't work with IFS source code.  The generated file is named after the original source file, but with `.H` appended (source file `JB001.PF` results in include file `JB001.PF.H`)  Under the covers, the GENCSRC command is called.  Note that in the resulting struct, TOBi changes `int` to `long int` to work with the SQL C compiler.
 
 _Example:_
 
@@ -182,7 +182,7 @@ MOD_TGTRLS = V7R3M0
 
 The above two examples are equivalent. Note the use of wildcards for overriding compile settings for objects of the same type.
 
-When you include wildcarding in your Rules.mk, BOB will locate your source files in the directory of your Rules.mk and create the respective objects.
+When you include wildcarding in your Rules.mk, TOBi will locate your source files in the directory of your Rules.mk and create the respective objects.
 
 ### Overriding with Wildcards
 
@@ -204,4 +204,4 @@ EMP.MODULE: EMP.RPGLE A.TABLE
 
 ## Further reading
 
-To learn more about makefile syntax, see the official [GNU Make documentation](https://www.gnu.org/software/make/manual/make.html).  Just remember that every object referenced in a Bob makefile must have an IFS file suffix (`.PGM`, `.FILE`, etc.) and be written in upper case.
+To learn more about makefile syntax, see the official [GNU Make documentation](https://www.gnu.org/software/make/manual/make.html).  Just remember that every object referenced in a TOBi makefile must have an IFS file suffix (`.PGM`, `.FILE`, etc.) and be written in upper case.

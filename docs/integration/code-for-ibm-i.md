@@ -24,7 +24,7 @@
 
 ## Developing on the local machine with ibmi-bob
 
-You may use Bob as the deploy backend for Code for IBM i by providing a customized `.vscode/actions.json` inside your workspace. [Read more on how to create the actions](https://halcyon-tech.github.io/vscode-ibmi/#/?id=workspaces-amp-deployment)
+You may use TOBi as the deploy backend for Code for IBM i by providing a customized `.vscode/actions.json` inside your workspace. [Read more on how to create the actions](https://halcyon-tech.github.io/vscode-ibmi/#/?id=workspaces-amp-deployment)
 
 1. Make sure `ibmi-bob` is installed on the remote IBM i
 2. Clone the project repository to your local machine and open it up in VS Code
