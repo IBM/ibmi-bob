@@ -163,8 +163,8 @@ class RulesMk:
                 tgt_group_list = FILE_TARGETGROUPS_MAPPING[decomposed_src[-2].upper()]
 
                 # If only 1 target mapping exists, use it, otherwise use target's extension
-                tgt_group = next(iter(tgt_group_list)).upper() if len(tgt_group_list) == 1 \
-                    else rule.target.split('.')[-1].upper()
+                tgt_group = (next(iter(tgt_group_list)).upper() if len(tgt_group_list) == 1
+                             else rule.target.split('.')[-1].upper())
                 if tgt_group not in TARGET_GROUPS:
                     print(f"Warning: Target '{rule.target}' is not supported")
                     sys.exit(1)
