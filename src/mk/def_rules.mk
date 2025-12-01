@@ -1063,7 +1063,7 @@ define TABLE_TO_FILE_RECIPE =
 	$(eval mbrtextcmd := CHGOBJD OBJ($(OBJLIB)/$(basename $(notdir $@))) OBJTYPE(*FILE) TEXT('$(subst ','',$(TEXT))'))
 	@$(PRESETUP) \
 	$(SETCURLIBTOOBJLIB) \
-	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" "$(PRECMD)" "$(POSTCMD)" "$(notdir $@)" "$<" $(logFile) "" "$(mbrtextcmd)"> $(logFile) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
+	$(SCRIPTSPATH)/extractPseudoSQLAndLaunch "$(JOBLOGFILE)" "$(crtcmd)" "$(PRECMD)" "$(POSTCMD)" "$(notdir $@)" "$<" $(logFile) "$(mbrtextcmd)" "$(VPATH)" "$(tempFile)"> $(logFile) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
 endef
 
 # @$(TOOLSPATH)/checkObjectAlreadyExists $@ $(OBJLIB)
@@ -1072,7 +1072,8 @@ define PFSQL_TO_FILE_RECIPE =
 	$(FILE_VARIABLES)
 	$(eval d = $($@_d))
 	@$(call echo_cmd,"=== Creating SQL PFSQL $(OBJLIB)/$(basename $(notdir $@)) from Sql statement [$(notdir $<)]")
-	$(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
+	$(eval tempFile := $(shell mktemp))
+	$(eval crtcmd := RUNSQLSTM srcstmf('$(tempFile)') $(RUNSQLFLAGS))
 	$(eval mbrtextcmd := CHGOBJD OBJ($(OBJLIB)/$(basename $(notdir $@))) OBJTYPE(*FILE) TEXT('$(subst ','',$(TEXT))'))
 	@$(PRESETUP) \
 	$(SETCURLIBTOOBJLIB) \
