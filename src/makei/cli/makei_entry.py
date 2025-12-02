@@ -228,18 +228,21 @@ def read_and_filter_rules_mk(source_names):
     """
     build_targets = []
     name, _, ext, _ = decompose_filename(source_names[0])
-    rules_mk_paths = list(Path(".").rglob("Rules.mk"))
-    for rules_mk_path in rules_mk_paths:
-        with rules_mk_path.open("r") as f:
-            for raw_line in f:
-                line = raw_line.strip()
-                if not line or line.startswith("#") or ":" not in line:
-                    continue  # skip blank lines, comments, or malformed lines
-                target = line.split(":", 1)[0].strip()
-                if target and "." in target and target.rsplit(".", 1)[1] in FILE_TARGET_MAPPING[ext]:
-                    build_targets.append(target)
-                else:
-                    raise ValueError(f"No target mapping extension for '{target}'")
+    source_path = Path(source_names[0])
+    rules_mk_path = source_path.parent / "Rules.mk"
+    if not rules_mk_path.exists():
+        raise FileNotFoundError(f"No Rules.mk found at {rules_mk_path}")
+    # for rules_mk_path in rules_mk_paths:
+    with rules_mk_path.open("r") as f:
+        for raw_line in f:
+            line = raw_line.strip()
+            if not line or line.startswith("#") or ":" not in line:
+                continue  # skip blank lines, comments, or malformed lines
+            target = line.split(":", 1)[0].strip()
+            if target and "." in target and target.rsplit(".", 1)[1] in FILE_TARGET_MAPPING[ext]:
+                build_targets.append(target)
+            else:
+                raise ValueError(f"No target mapping extension for '{target}'")
     return build_targets
 
 def handle_compile(args):
@@ -265,10 +268,9 @@ def handle_compile(args):
             targets = read_and_filter_rules_mk(source_names)
     # print("source:"+' '.join(source_names))
     # print("compile targets:"+' '.join(get_compile_targets_from_filenames(source_names)))
-    # targets.extend(source_names)
     print(colored("targets: " + ', '.join(targets), Colors.OKBLUE))
-    build_env = BuildEnv(targets, args.make_options, get_override_vars(args),trace=args.log)
-    if args.log:
+    build_env = BuildEnv(targets, args.make_options, get_override_vars(args),trace=args.trace)
+    if args.trace:
         build_env.dump_resolved_makefile()
     else:
         if build_env.make():

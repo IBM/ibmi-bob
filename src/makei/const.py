@@ -117,7 +117,7 @@ FILE_TARGET_MAPPING = {
     "MENU": {"MENU"},
     "C": {"MODULE"},
     "CPP": {"MODULE"},
-    "RPGLE": {"MODULE"},
+    "RPGLE": {"MODULE","PGM"},
     "CLLE": {"MODULE"},
     "CBLLE": {"MODULE"},
     "SQLC": {"MODULE"},
