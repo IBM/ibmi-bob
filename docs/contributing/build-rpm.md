@@ -22,15 +22,15 @@ mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
 ### 3. Build TOBi RPM
 
 * Create a new draft version named `v{r.v.m}` where `{r.v.m}` is the new version number
-* make sure you update bob.spec to the new release level
+* make sure you update `tobi.spec` to the new release level
 * publish the release so the curl command below will find it
 * Execute the following commands
 
 ```bash
 export TOBI_VERSION=r.v.m 
 cd ~/rpmbuild
-curl "https://raw.githubusercontent.com/IBM/ibmi-bob/v${TOBI_VERSION}/bob.spec" -o SPECS/bob.spec
-rpmbuild -ba SPECS/bob.SPEC
+curl "https://raw.githubusercontent.com/IBM/ibmi-bob/v${TOBI_VERSION}/tobi.spec" -o SPECS/tobi.spec
+rpmbuild -ba SPECS/tobi.SPEC
 ```
 
 * The rpm is now created under `~/rpmbuild/RPMS/PPC64` directory.
