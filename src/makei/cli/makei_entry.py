@@ -228,8 +228,7 @@ def read_and_filter_rules_mk(source_names):
     """
     build_targets = []
     name, _, ext, _ = decompose_filename(source_names[0])
-    source_path = Path(source_names[0])
-    rules_mk_path = source_path.parent / "Rules.mk"
+    rules_mk_path = Path(source_names[0]).parent / "Rules.mk"
     if not rules_mk_path.exists():
         raise FileNotFoundError(f"No Rules.mk found at {rules_mk_path}")
     # for rules_mk_path in rules_mk_paths:
