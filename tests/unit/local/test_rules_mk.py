@@ -415,7 +415,7 @@ HELLOP.PGM_RECIPE=PGM.RPGLE_TO_PGM_RECIPE
 
 def test_relativepath_subfolder1():
     # Test loading from a valid file
-    test_dir = DATA_PATH / "build_env"/ "sample_project2" / "QRPGLESRC"
+    test_dir = DATA_PATH / "build_env" / "sample_project2" / "QRPGLESRC"
     rules_mk = RulesMk.from_file(test_dir / "Rules.mk", test_dir)
     expected_targets = {'TRGs': [], 'DTAARAs': [], 'DTAQs': [], 'SQLs': [], 'BNDDs': [],
                         'PFs': [], 'LFs': [], 'DSPFs': [], 'PRTFs': [], 'CMDs': [],
@@ -439,10 +439,11 @@ HELLO.PGM_DEP=
 HELLO.PGM_RECIPE=PGM.RPGLE_TO_PGM_RECIPE
 '''
 
+
 def test_relativepath_subfolder2():
     # Test loading from a valid file
 
-    test_dir = DATA_PATH / "build_env"/ "sample_project2" / "QTEMP"
+    test_dir = DATA_PATH / "build_env" / "sample_project2" / "QTEMP"
     rules_mk = RulesMk.from_file(test_dir / "Rules.mk", test_dir)
     expected_targets = {'TRGs': [], 'DTAARAs': [], 'DTAQs': [], 'SQLs': [], 'BNDDs': [],
                         'PFs': [], 'LFs': [], 'DSPFs': [], 'PRTFs': [], 'CMDs': [],
@@ -457,10 +458,11 @@ def test_relativepath_subfolder2():
 
 '''
 
+
 def test_relativepath_subfolder3():
     # Test loading from a valid file
 
-    test_dir = DATA_PATH / "build_env"/ "sample_project2" / "QTEMP" / "QRPGLESRC"
+    test_dir = DATA_PATH / "build_env" / "sample_project2" / "QTEMP" / "QRPGLESRC"
     rules_mk = RulesMk.from_file(test_dir / "Rules.mk", test_dir)
     expected_targets = {'TRGs': [], 'DTAARAs': [], 'DTAQs': [], 'SQLs': [], 'BNDDs': [],
                         'PFs': [], 'LFs': [], 'DSPFs': [], 'PRTFs': [], 'CMDs': [],
@@ -484,17 +486,18 @@ HELLO2.MODULE_DEP=
 HELLO2.MODULE_RECIPE=RPGLE_TO_MODULE_RECIPE
 '''
 
+
 def test_relativepath_rules():
     # Test loading from a valid file
 
-    test_dir = DATA_PATH / "build_env"/ "sample_project2"
+    test_dir = DATA_PATH / "build_env" / "sample_project2"
     rules_mk = RulesMk.from_file(test_dir / "Rules.mk", test_dir)
     expected_targets = {'TRGs': [], 'DTAARAs': [], 'DTAQs': [], 'SQLs': [], 'BNDDs': [],
                         'PFs': [], 'LFs': [], 'DSPFs': [], 'PRTFs': [], 'CMDs': [],
                         'MODULEs': [], 'SRVPGMs': [], 'PGMs': [],
                         'MENUs': [], 'PNLGRPs': [], 'QMQRYs': [], 'WSCSTs': [], 'MSGs': []}
     assert rules_mk.containing_dir == test_dir
-    assert rules_mk.subdirs == ['QTEMP/QRPGLESRC','QRPGLESRC',]
+    assert rules_mk.subdirs == ['QTEMP/QRPGLESRC', 'QRPGLESRC',]
     assert rules_mk.targets == expected_targets
     assert str(rules_mk) == '''SUBDIRS := QTEMP/QRPGLESRC QRPGLESRC
 

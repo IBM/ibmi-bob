@@ -102,9 +102,11 @@ def get_joblog_for_job(job_id: str) -> List[Dict[str, Any]]:
     joblog_dict = query_job.dump_results_to_dict(results)
     return joblog_dict
 
+
 def default_filter_func(record: Dict[str, Any]) -> bool:
     _ = record
     return True
+
 
 def save_joblog_json(cmd: str, cmd_time: str, jobid: str, build_object: str, source: str, output: str,
                      failed: bool, joblog_json: Optional[str],
