@@ -10,7 +10,7 @@ from makei import __version__
 from makei import init_project
 from makei.build import BuildEnv
 from makei.cvtsrcpf import CvtSrcPf
-from makei.utils import Colors, colored, get_compile_targets_from_filenames,decompose_filename
+from makei.utils import Colors, colored, decompose_filename
 from pathlib import Path
 from makei.const import FILE_TARGET_MAPPING
 
@@ -242,21 +242,22 @@ def read_and_filter_rules_mk(source_names):
                     raise ValueError(f"No target mapping extension for '{target}'")
     return build_targets
 
+
 def handle_compile(args):
     """
     Processing the compile command
     """
-    filenames=[]
+    filenames = []
     set_environment_vars(args)
     if args.file:
         filenames = [args.file]
     elif args.files:
-        name=args.files.split(':')
+        name = args.files.split(':')
         for i in name:
             if os.path.isdir(i):
                 filenames.append(i)
             else:
-               filenames = map(os.path.basename, args.files.split(':'))
+                filenames = map(os.path.basename, args.files.split(':'))
     else:
         filenames = []
     targets = []
@@ -271,7 +272,7 @@ def handle_compile(args):
     build_targets = read_and_filter_rules_mk(source_names)
     if build_targets:
         print(colored("targets: " + ', '.join(build_targets), Colors.OKBLUE))
-        build_env = BuildEnv(build_targets, args.make_options, get_override_vars(args),trace=args.trace)
+        build_env = BuildEnv(build_targets, args.make_options, get_override_vars(args), trace=args.trace)
         if args.trace:
             build_env.dump_resolved_makefile()
         else:
@@ -308,7 +309,7 @@ def handle_build(args):
 
 
 def make_dir_target(filename):
-    return f"dir_{filename.replace('/','_')}"
+    return f"dir_{filename.replace('/', '_')}"
 
 
 def handle_cvtsrcpf(args):
