@@ -1,4 +1,4 @@
-# Testing BOB
+# Testing TOBi
 
 ## Doctest 
 makei/utils.py can be tested via doctest

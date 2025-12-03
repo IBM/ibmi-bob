@@ -228,6 +228,8 @@ def decompose_filename(filename: str) -> Tuple[str, Optional[str], str, str]:
     ('verifysql', None, 'SQLCBLLE', '')
     >>> decompose_filename("anbenei1.index")
     ('anbenei1', None, 'INDEX', '')
+    >>> decompose_filename("custinfo1.pfsql")
+    ('custinfo1', None, 'PFSQL', '')
     """
     if not filename:
         raise ValueError()
@@ -276,7 +278,19 @@ def get_target_from_filename(filename: str) -> str:
     """Returns the target from the filename
     """
     name, _, ext, _ = decompose_filename(filename)
-    return f'{name.upper()}.{FILE_TARGET_MAPPING[ext]}'
+    targets = FILE_TARGET_MAPPING[ext]
+    # FILE_TARGET_MAPPING returns a set, pick the first target
+    # For sets with multiple targets, we pick based on priority (PGM > MODULE)
+    if isinstance(targets, set):
+        if 'PGM' in targets:
+            target = 'PGM'
+        elif 'MODULE' in targets:
+            target = 'MODULE'
+        else:
+            target = next(iter(targets))  # Pick first element
+    else:
+        target = targets
+    return f'{name.upper()}.{target}'
 
 
 def get_compile_targets_from_filenames(filenames: List[str]) -> List[str]:
