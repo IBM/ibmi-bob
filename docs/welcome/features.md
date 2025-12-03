@@ -1,6 +1,6 @@
-# Better Object Builder features
+# The Object Builder features
 
-Some of the major benefits of using a Better Object Builder / Git / RDi development environment are:
+Some of the major benefits of using a The Object Builder / Git / RDi development environment are:
 
 * Consistent, repeatable software builds
 * At-a-glance version history
