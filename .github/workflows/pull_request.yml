@@ -46,7 +46,7 @@ jobs:
               lib: CURLIB,
               directory: qrpglesrc,
               file: mypgm.pgm.rpgle,
-              firstBuild: "0 failed 7 succeed 7 total",
+              firstBuild: "0 failed 15 succeed 15 total",
               secondBuild: "0 failed 1 succeed 1 total",
               firstCompile: "0 failed 1 succeed 1 total",
               secondCompile: "0 failed 1 succeed 1 total"
@@ -76,19 +76,19 @@ jobs:
             --rcwd "../${{ matrix.project.name }}" \
             --cmd "echo Full build..." \
             --cmd "../ibmi_bob/bin/makei b -e ${{ matrix.project.lib }}=$(so -bl ${GITHUB_HEAD_REF}_${{ matrix.project.name }}) | tee firstBuild.log" \
-            --cmd "grep '${{ matrix.project.firstBuild }}' firstBuild.log || { echo 'First build failed!'; exit 1; }" \
+            --cmd "grep '${{ matrix.project.firstBuild }}' firstBuild.log || { echo 'First build of ${{ matrix.project.firstBuild }} failed!'; exit 1; }" \
             --cmd "echo Touch one file and full build..." \
             --cmd "touch ${{ matrix.project.directory }}/${{ matrix.project.file }}" \
             --cmd "../ibmi_bob/bin/makei b -e ${{ matrix.project.lib }}=$(so -bl ${GITHUB_HEAD_REF}_${{ matrix.project.name }}) | tee secondBuild.log" \
-            --cmd "grep '${{ matrix.project.secondBuild }}' secondBuild.log || { echo 'Second build failed!'; exit 1; }" \
+            --cmd "grep '${{ matrix.project.secondBuild }}' secondBuild.log || { echo 'Second build of ${{ matrix.project.secondBuild }} failed!'; exit 1; }" \
             --cmd "echo Touch one file and compile it..." \
             --cmd "touch ${{ matrix.project.directory }}/${{ matrix.project.file }}" \
             --cmd "../ibmi_bob/bin/makei c -f ${{ matrix.project.directory }}/${{ matrix.project.file }} -e ${{ matrix.project.lib }}=$(so -bl ${GITHUB_HEAD_REF}_${{ matrix.project.name }}) | tee firstCompile.log" \
-            --cmd "grep '${{ matrix.project.firstCompile }}' firstCompile.log || { echo 'First compile failed!'; exit 1; }" \
+            --cmd "grep '${{ matrix.project.firstCompile }}' firstCompile.log || { echo 'First compile of ${{ matrix.project.firstCompile }} failed!'; exit 1; }" \
             --cmd "echo Touch one file and compile directory..." \
             --cmd "touch ${{ matrix.project.directory }}/${{ matrix.project.file }}" \
             --cmd "../ibmi_bob/bin/makei c -f ${{ matrix.project.directory }} -e ${{ matrix.project.lib }}=$(so -bl ${GITHUB_HEAD_REF}_${{ matrix.project.name }}) | tee secondCompile.log" \
-            --cmd "grep '${{ matrix.project.secondCompile }}' secondCompile.log || { echo 'Second compile failed!'; exit 1; }" \
+            --cmd "grep '${{ matrix.project.secondCompile }}' secondCompile.log || { echo 'Second compile of ${{ matrix.project.secondCompile }} failed!'; exit 1; }" \
             --cmd "echo Clean up..." \
             --ignore --cl "DLTLIB $(so -bl ${GITHUB_HEAD_REF}_${{ matrix.project.name }})" \
             --rcwd "../../../github_ci/" \
