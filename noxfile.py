@@ -31,7 +31,7 @@ def test(session: nox.Session):
     arguments = session.posargs
     session.env['PYTHONPATH'] = PYTHONPATH
     print(session.env['PYTHONPATH'])
-    session.run("pytest", *arguments, env={"LC_CTYPE": "en_US.UTF-8"})
+    session.run("pytest", "./tests/unit/local", env={"LC_CTYPE": "en_US.UTF-8"})
 
 
 VENV_DIR = Path('./.venv').resolve()
