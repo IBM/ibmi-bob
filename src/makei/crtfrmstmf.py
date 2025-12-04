@@ -155,11 +155,11 @@ class CrtFrmStmf():
 
         if "preUsrlibl" in self.env_settings and self.env_settings["preUsrlibl"]:
             for libl in reversed(self.env_settings["preUsrlibl"].split()):
-                self.job.run_cl(f"ADDLIBLE LIB({libl}) POSITION(*FIRST)", log=True)
+                self.job.run_cl(f"ADDLIBLE LIB({libl}) POSITION(*FIRST)", ignore_errors=True, log=True)
 
         if "postUsrlibl" in self.env_settings and self.env_settings["postUsrlibl"]:
             for libl in self.env_settings["postUsrlibl"].split():
-                self.job.run_cl(f"ADDLIBLE LIB({libl}) POSITION(*LAST)", log=True)
+                self.job.run_cl(f"ADDLIBLE LIB({libl}) POSITION(*LAST)", ignore_errors=True, log=True)
 
         if "IBMiEnvCmd" in self.env_settings and self.env_settings["IBMiEnvCmd"]:
             for cmd in self.env_settings["IBMiEnvCmd"].split("\\n"):
