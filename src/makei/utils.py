@@ -273,26 +273,6 @@ def is_source_file(filename: str) -> bool:
     except ValueError:
         return False
 
-
-def get_target_from_filename(filename: str) -> str:
-    """Returns the target from the filename
-    """
-    name, _, ext, _ = decompose_filename(filename)
-    targets = FILE_TARGET_MAPPING[ext]
-    # FILE_TARGET_MAPPING returns a set, pick the first target
-    # For sets with multiple targets, we pick based on priority (PGM > MODULE)
-    if isinstance(targets, set):
-        if 'PGM' in targets:
-            target = 'PGM'
-        elif 'MODULE' in targets:
-            target = 'MODULE'
-        else:
-            target = next(iter(targets))  # Pick first element
-    else:
-        target = targets
-    return f'{name.upper()}.{target}'
-
-
 def format_datetime(d: datetime) -> str:
     # 2022-03-25-09.33.34.064676
     return d.strftime("%Y-%m-%d-%H.%M.%S.%f")
