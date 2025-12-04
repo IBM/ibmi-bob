@@ -2,7 +2,7 @@ Name: tobi
 Version: ${VERSION}
 Release: 0
 License: Apache-2.0
-Summary: Better Object Builder for IBM i
+Summary: The Object Builder for IBM i
 Url: https://github.com/IBM/ibmi-bob/
 
 BuildRequires: make-gnu
