@@ -1,10 +1,15 @@
+- support arbitrary long source names even in compile by looking up 
+  the mapping to target be derived from the Rules.mk files
+- allow multiple targets with same source name in different directories
+  even if the immediate parent directory is the same
+- allow `.rpgle` and `.sqlrpgle` to build into `PGM` objects
 * Fri Nov 21 2025 Edmund Reinhardt <edmund.reinhardt@ca.ibm.com> - 3.0.0
 - Rename RPM to 'tobi' from 'bob' - `yum install tobi`
 - change to use -l and --log to avoid conflict with --target
   This allows decomposing of make rule generation vs running 
   gmake in order to debug where any issues are
 - Updated all docs to new TOBi name from old BOB name
-- Fixed the "*** empty variable name" error in def_rules.mk.
+- Fixed the "*** empty variable name" error iar def_rules.mk.
 * Fri Nov 14 2025 Edmund Reinhardt <edmund.reinhardt@ca.ibm.com> - 2.4.33
 - Improvements to docs
 - Support PFSQL as an alternative file extension to TABLE for 
