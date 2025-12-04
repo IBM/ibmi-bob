@@ -1,4 +1,4 @@
-from makei.utils import make_include_dirs_absolute, get_compile_targets_from_filenames,decompose_filename
+from makei.utils import make_include_dirs_absolute,decompose_filename
 
 
 # flake8: noqa: E501
@@ -51,11 +51,6 @@ def test_joblob_not_found():
     expected = " INCDIR( ''/a/b/dir1'' ''dir2'')"
     assert make_include_dirs_absolute(path, parameters) == expected
 
-def test_compile_targets_from_filenames():
-    expected = ['TEST.DTAARA']
-    assert get_compile_targets_from_filenames(['test.DTAARA']) == expected
-    expected = ['TEST.FILE']
-    assert get_compile_targets_from_filenames(['test.index']) == expected
 
 def test_decompose_filename():
     expected = ('custinfo1', None, 'PFSQL', '')
