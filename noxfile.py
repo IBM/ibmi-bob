@@ -143,7 +143,7 @@ def publish(session: nox.Session) -> None:
     current_version, _ = _get_version(session)
 
     changelog_file = Path("CHANGELOG").resolve()
-    spec_file = Path("bob.spec").resolve()
+    spec_file = Path("tobi.spec").resolve()
 
     session.log(f"Generating the spec file for v{current_version}")
 

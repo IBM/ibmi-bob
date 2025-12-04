@@ -40,7 +40,7 @@ jobs:
       - name: Create rpmbuild directory
         run: |
           mkdir -p rpmbuild/{BUILD,RPMS,SOURCES,SPECS,BUILDROOT}
-          cp bob.spec rpmbuild/SPECS
+          cp tobi.spec rpmbuild/SPECS
       - name: Populate build sandbox
         run: $rsync_command
       - name: Get short SHA ID
@@ -50,7 +50,7 @@ jobs:
       - name: Perform remote RPM build
         id: remote_build
         run: |
-          $ssh_command "cd $remote_build_dir && PATH=/QOpenSys/pkgs/bin:/QOpenSys/usr/bin:/usr/bin time /QOpenSys/pkgs/bin/rpmbuild -ba --define '_topdir $remote_build_dir/rpmbuild' rpmbuild/SPECS/bob.spec"
+          $ssh_command "cd $remote_build_dir && PATH=/QOpenSys/pkgs/bin:/QOpenSys/usr/bin:/usr/bin time /QOpenSys/pkgs/bin/rpmbuild -ba --define '_topdir $remote_build_dir/rpmbuild' rpmbuild/SPECS/tobi.spec"
       - name: Find RPM file
         id: find_rpm
         run: |
