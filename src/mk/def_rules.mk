@@ -948,7 +948,7 @@ srvpgmTGTRLS = $(strip \
 	$(if $(filter %.ilesrvpgm,$<),$(SRVPGM_TGTRLS), \
 	$(if $(filter %.SQLUDF,$<),$(SQL_TGTRLS), \
 	$(if $(filter %.sqludf,$<),$(SQL_TGTRLS), \
-	$(if $(filter %.SQL,$<),$(SQL_TGTRLS), \
+	$(if $(filter %.SQLVAR,$<),$(SQL_TGTRLS), \
 	UNKNOWN_FILE_TYPE))))))))
 
 #    ____ __  __ ____    ____           _
@@ -1502,10 +1502,10 @@ define ILESRVPGM_TO_SRVPGM_RECIPE =
 	$(SCRIPTSPATH)/extractAndLaunch "$(JOBLOGFILE)" "$<" $(OBJLIB) $(basename $(@F)) "$(PRECMD)" "$(POSTCMD)" "$(notdir $@)" "$<" "$(logFile)" > $(logFile) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
 endef
 
-define SQL_TO_SRVPGM_RECIPE =
+define SQLVAR_TO_SRVPGM_RECIPE =
     $(SRVPGM_VARIABLES)
     $(eval d = $($@_d))
-    @$(call echo_cmd,"=== Creating Service program $(OBJLIB)/$(basename $(notdir $@)) from SQL statement [$(notdir $<)]")
+    @$(call echo_cmd,"=== Creating SQL Global Variable [$(notdir $<)]")
     $(eval crtcmd := RUNSQLSTM srcstmf('$<') $(RUNSQLFLAGS))
     @$(PRESETUP) \
 	$(SCRIPTSPATH)/launch "$(JOBLOGFILE)" "$(crtcmd)" "$(PRECMD)" "$(POSTCMD)" "$(notdir $@)" "$<" "$(logFile)" "" "$(mbrtextcmd)"> $(logFile) 2>&1 && $(call logSuccess,$@) || $(call logFail,$@)
