@@ -613,14 +613,14 @@ def test_relativepath_subfolder3():
 
     assert rules_mk.rules[0].variables == []
     assert rules_mk.rules[0].commands == []
-    assert rules_mk.rules[0].dependencies == []
+    assert rules_mk.rules[0].dependencies == ['hello.pgm']
     assert rules_mk.rules[0].include_dirs == []
     assert rules_mk.rules[0].target == 'HELLO2.MODULE'
     assert str(rules_mk) == '''MODULEs := HELLO2.MODULE
 
 
 HELLO2.MODULE_SRC=hello2.rpgle
-HELLO2.MODULE_DEP=
+HELLO2.MODULE_DEP=hello.pgm
 HELLO2.MODULE_RECIPE=RPGLE_TO_MODULE_RECIPE
 '''
 
