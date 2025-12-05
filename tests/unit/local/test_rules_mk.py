@@ -658,10 +658,10 @@ def test_sql_recipe():
     assert rules_mk.rules[0].dependencies == []
     assert rules_mk.rules[0].include_dirs == []
     assert rules_mk.rules[0].target == 'VALUSE.SRVPGM'
-    assert rules_mk.rules[0].source_file == 'VALUSE.SQL'
-    assert str(rules_mk.rules[0]) == '''VALUSE.SRVPGM_SRC=VALUSE.SQL
+    assert rules_mk.rules[0].source_file == 'VALUSE.SQLVAR'
+    assert str(rules_mk.rules[0]) == '''VALUSE.SRVPGM_SRC=VALUSE.SQLVAR
 VALUSE.SRVPGM_DEP=
-VALUSE.SRVPGM_RECIPE=SQL_TO_SRVPGM_RECIPE\n'''
+VALUSE.SRVPGM_RECIPE=SQLVAR_TO_SRVPGM_RECIPE\n'''
 
     assert rules_mk.rules[1].variables == []
     assert rules_mk.rules[1].commands == []
@@ -675,9 +675,9 @@ VALUSE.QMQRY_RECIPE=SQL_TO_QMQRY_RECIPE\n'''
 
     assert str(rules_mk) == '''SRVPGMs := VALUSE.SRVPGM
 QMQRYs := VALUSE.QMQRY\n\n
-VALUSE.SRVPGM_SRC=VALUSE.SQL
+VALUSE.SRVPGM_SRC=VALUSE.SQLVAR
 VALUSE.SRVPGM_DEP=
-VALUSE.SRVPGM_RECIPE=SQL_TO_SRVPGM_RECIPE
+VALUSE.SRVPGM_RECIPE=SQLVAR_TO_SRVPGM_RECIPE
 VALUSE.QMQRY_SRC=VALUSE.SQL
 VALUSE.QMQRY_DEP=
 VALUSE.QMQRY_RECIPE=SQL_TO_QMQRY_RECIPE
