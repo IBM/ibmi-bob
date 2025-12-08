@@ -1,3 +1,4 @@
+- Added support for global variables via sqlvar extension.
 - support arbitrary long source names even in compile by looking up 
   the mapping to target be derived from the Rules.mk files
 - allow multiple targets with same source name in different directories
@@ -230,4 +231,3 @@ with lowercase fie names.
 - Add include path and user libraries to VPATH
 - Include more joblog information
 - Set Bash 5.1-2 as the minimum
-- Added support for global variables via sqlvar extension.
