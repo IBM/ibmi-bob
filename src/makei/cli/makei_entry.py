@@ -231,7 +231,6 @@ def read_and_filter_rules_mk(source_names):
     rules_mk_path = Path(source_names[0]).parent / "Rules.mk"
     if not rules_mk_path.exists():
         raise FileNotFoundError(f"No Rules.mk found at {rules_mk_path}")
-    # for rules_mk_path in rules_mk_paths:
     with rules_mk_path.open("r") as f:
         for raw_line in f:
             line = raw_line.strip()
@@ -265,11 +264,9 @@ def handle_compile(args):
         else:
             source_names.append(name)
             targets = read_and_filter_rules_mk(source_names)
-    # print("source:"+' '.join(source_names))
-    # print("compile targets:"+' '.join(get_compile_targets_from_filenames(source_names)))
     print(colored("targets: " + ', '.join(targets), Colors.OKBLUE))
-    build_env = BuildEnv(targets, args.make_options, get_override_vars(args),trace=args.trace)
-    if args.trace:
+    build_env = BuildEnv(targets, args.make_options, get_override_vars(args),trace=args.log)
+    if args.log:
         build_env.dump_resolved_makefile()
     else:
         if build_env.make():
