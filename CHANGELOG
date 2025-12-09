@@ -1,4 +1,4 @@
-- Added support for global variables via sqlvar extension.
+- Added a new recipe to support files with the .sqlvar extension.
 - support arbitrary long source names even in compile by looking up 
   the mapping to target be derived from the Rules.mk files
 - allow multiple targets with same source name in different directories
