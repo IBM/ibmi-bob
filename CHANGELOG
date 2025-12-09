@@ -1,4 +1,4 @@
-- Added support for retrieving `rules.mk` from a user-specified directory via CLI.
+- Added support to read target names from the `rules.mk` file for the `makei c` command.
 - support arbitrary long source names even in compile by looking up 
   the mapping to target be derived from the Rules.mk files
 - allow multiple targets with same source name in different directories
