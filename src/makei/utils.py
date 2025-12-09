@@ -12,7 +12,7 @@ from enum import Enum
 from pathlib import Path
 from shutil import move, copymode
 from tempfile import mkstemp, gettempdir
-from typing import Callable, List, Optional, Tuple, Union
+from typing import Callable, Optional, Tuple, Union
 
 from makei.const import FILE_MAX_EXT_LENGTH, FILE_TARGET_MAPPING, COMMENT_STYLES
 
@@ -272,49 +272,6 @@ def is_source_file(filename: str) -> bool:
         return ext in FILE_TARGET_MAPPING
     except ValueError:
         return False
-
-
-def get_target_from_filename(filename: str) -> str:
-    """Returns the target from the filename
-    """
-    name, _, ext, _ = decompose_filename(filename)
-    targets = FILE_TARGET_MAPPING[ext]
-    # FILE_TARGET_MAPPING returns a set, pick the first target
-    # For sets with multiple targets, we pick based on priority (PGM > MODULE)
-    if isinstance(targets, set):
-        if 'PGM' in targets:
-            target = 'PGM'
-        elif 'MODULE' in targets:
-            target = 'MODULE'
-        else:
-            target = next(iter(targets))  # Pick first element
-    else:
-        target = targets
-    return f'{name.upper()}.{target}'
-
-
-def get_compile_targets_from_filenames(filenames: List[str]) -> List[str]:
-    """ Returns the possible target name for the given filename
-
-    >>> get_compile_targets_from_filenames(["test.PGM.RPGLE"])
-    ['TEST.PGM']
-    >>> get_compile_targets_from_filenames(["test.pgm.rpgle"])
-    ['TEST.PGM']
-    >>> get_compile_targets_from_filenames(["test.RPGLE"])
-    ['TEST.MODULE']
-    >>> get_compile_targets_from_filenames(["vat300.rpgle"])
-    ['VAT300.MODULE']
-    >>> get_compile_targets_from_filenames(["functionsVAT/VAT300.RPGLE", "test.RPGLE"])
-    ['VAT300.MODULE', 'TEST.MODULE']
-    >>> get_compile_targets_from_filenames(["ART200-Work_with_article.PGM.SQLRPGLE", "SGSMSGF.MSGF"])
-    ['ART200.PGM', 'SGSMSGF.MSGF']
-    >>> get_compile_targets_from_filenames(["SAMPLE.BNDDIR"])
-    ['SAMPLE.BNDDIR']
-    """
-    result = []
-    for filename in filenames:
-        result.append(get_target_from_filename(filename))
-    return result
 
 
 def format_datetime(d: datetime) -> str:

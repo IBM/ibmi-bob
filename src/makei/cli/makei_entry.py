@@ -252,12 +252,8 @@ def handle_compile(args):
     if args.file:
         filenames = [args.file]
     elif args.files:
-        name = args.files.split(':')
-        for i in name:
-            if os.path.isdir(i):
-                filenames.append(i)
-            else:
-                filenames = map(os.path.basename, args.files.split(':'))
+        # Ensures all paths are relative to the project root
+        filenames = map(lambda f: (str(Path(f).resolve().relative_to(Path.cwd()))), args.files.split(':'))
     else:
         filenames = []
     targets = []
@@ -267,19 +263,19 @@ def handle_compile(args):
             targets.append(make_dir_target(name))
         else:
             source_names.append(name)
+            targets = read_and_filter_rules_mk(source_names)
     # print("source:"+' '.join(source_names))
     # print("compile targets:"+' '.join(get_compile_targets_from_filenames(source_names)))
-    build_targets = read_and_filter_rules_mk(source_names)
-    if build_targets:
-        print(colored("targets: " + ', '.join(build_targets), Colors.OKBLUE))
-        build_env = BuildEnv(build_targets, args.make_options, get_override_vars(args), trace=args.trace)
-        if args.trace:
-            build_env.dump_resolved_makefile()
+    # targets.extend(source_names)
+    print(colored("targets: " + ', '.join(targets), Colors.OKBLUE))
+    build_env = BuildEnv(targets, args.make_options, get_override_vars(args), trace=args.log)
+    if args.log:
+        build_env.dump_resolved_makefile()
+    else:
+        if build_env.make():
+            sys.exit(0)
         else:
-            if build_env.make():
-                sys.exit(0)
-            else:
-                sys.exit(1)
+            sys.exit(1)
 
 
 def handle_build(args):

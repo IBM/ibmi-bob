@@ -12,10 +12,14 @@
 > Make sure you have installed the IBM i package repositories `ibmi-repos`.
 >
 > If not, run `yum install ibmi-repos` before installing `tobi`.
-> if `ibmi-repos` is present but the `tobi` package is not found in it then do the follwoing in order to update the repository.
+> if `ibmi-repos` is present but the `tobi` package is not found in it then do the following in order to update the repository.
 > ```bash
 > yum upgrade yum ibmi-repos
 > yum upgrade ibmi-repos
+> ```
+> if that does not work clean up the metadata with
+> ```bash
+> yum clean metadata
 > ```
 
 ```bash

@@ -1,4 +1,4 @@
-# Convert source code for use with Better Object Builder
+# Convert source code for use with The Object Builder
 
 TOBi expects source code to reside on a PC/Mac as standard text files.  This enables it to be version controlled with Git and edited with standard PC code editors.  If your source code currently resides on an IBM i in source physical files, use the following information to get your code ready for use with TOBi.
 
