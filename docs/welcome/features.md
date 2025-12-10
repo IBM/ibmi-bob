@@ -113,6 +113,7 @@ The set of SQL commands to create the object is stored in a file with the given 
 | TRIGGER   | *PGM        | .SQLTRG         | CREATE OR REPLACE TRIGGER   |
 | ALIAS     | *FILE       | .SQLALIAS       | CREATE OR REPLACE ALIAS     |
 | SEQUENCE  | *DTAARA     | .SQLSEQ         | CREATE OR REPLACE SEQUENCE  |
+| VARIABLE  | *SRVPGM     | .SQLVAR         | CREATE OR REPLACE VARIABLE  |
 
 Generic SQL statements with file extension .SQL are executed using RUNSQLSTM
 
