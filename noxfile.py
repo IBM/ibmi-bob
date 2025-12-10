@@ -28,7 +28,6 @@ def test(session: nox.Session):
     session.install("-r", REQUIREMENTS["tests"])
 
     # Parallelize tests as much as possible, by default.
-    arguments = session.posargs
     session.env['PYTHONPATH'] = PYTHONPATH
     print(session.env['PYTHONPATH'])
     session.run("pytest", "./tests/unit/local", env={"LC_CTYPE": "en_US.UTF-8"})

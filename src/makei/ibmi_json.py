@@ -36,11 +36,9 @@ class IBMiJson:
                     version = data["version"]
                 else:
                     version = None
-                
                 # Initialize with parent values
                 tgt_ccsid = parent_ibm_i_json.build["tgt_ccsid"]
                 objlib = parent_ibm_i_json.build["objlib"]
-                
                 if "build" in data:
                     build = data["build"]
                     if "tgtCcsid" in build:

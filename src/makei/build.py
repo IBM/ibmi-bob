@@ -60,6 +60,7 @@ class BuildEnv:
             path = self.trace_dir / "BUILDVARSMKPATH"
         else:
             self.build_vars_handle, path = mkstemp()
+            os.close(self.build_vars_handle)
             self.trace_dir = None
 
         self.build_vars_path = Path(path)
