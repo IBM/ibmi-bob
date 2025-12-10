@@ -623,7 +623,6 @@ WORLD.PGM_RECIPE=PGM.RPGLE_TO_PGM_RECIPE\n"""
     )
 
 
-
 def test_src_obj_mapping_from_root_folder():
     # Test loading from a valid file
     test_dir = DATA_PATH / "build_env" / "sample_project1"
@@ -672,7 +671,6 @@ HELLO.MODULE_RECIPE=RPGLE_TO_MODULE_RECIPE
     )
 
 
-
 def test_src_obj_mapping_from_subfolder():
     # Test loading from a valid file
     test_dir = DATA_PATH / "build_env" / "sample_project1" / "innerdir1"
@@ -717,7 +715,6 @@ TESTX.MODULE_DEP=
 TESTX.MODULE_RECIPE=SQLRPGLE_TO_MODULE_RECIPE
 """
     )
-
 
 
 def test_src_obj_mapping_from_subfolder1():
@@ -767,7 +764,6 @@ TEST2.PGM_DEP=
 TEST2.PGM_RECIPE=PGM.SQLRPGLE_TO_PGM_RECIPE
 """
     )
-
 
 
 def test_pgm_recipe():
@@ -914,7 +910,6 @@ HELLO.PGM_RECIPE=PGM.RPGLE_TO_PGM_RECIPE
     )
 
 
-
 def test_relativepath_subfolder2():
     # Test loading from a valid file
 
@@ -951,7 +946,6 @@ def test_relativepath_subfolder2():
 
 """
     )
-
 
 
 def test_relativepath_subfolder3():
@@ -999,7 +993,6 @@ HELLO2.MODULE_DEP=
 HELLO2.MODULE_RECIPE=RPGLE_TO_MODULE_RECIPE
 """
     )
-
 
 
 def test_relativepath_rules():
@@ -1072,11 +1065,14 @@ def test_sql_recipe():
     assert rules_mk.rules[0].commands == []
     assert rules_mk.rules[0].dependencies == []
     assert rules_mk.rules[0].include_dirs == []
-    assert rules_mk.rules[0].target == 'VALUSE.SRVPGM'
-    assert rules_mk.rules[0].source_file == 'VALUSE.SQLVAR'
-    assert str(rules_mk.rules[0]) == '''VALUSE.SRVPGM_SRC=VALUSE.SQLVAR
+    assert rules_mk.rules[0].target == "VALUSE.SRVPGM"
+    assert rules_mk.rules[0].source_file == "VALUSE.SQLVAR"
+    assert (
+        str(rules_mk.rules[0])
+        == """VALUSE.SRVPGM_SRC=VALUSE.SQLVAR
 VALUSE.SRVPGM_DEP=
-VALUSE.SRVPGM_RECIPE=SQLVAR_TO_SRVPGM_RECIPE\n'''
+VALUSE.SRVPGM_RECIPE=SQLVAR_TO_SRVPGM_RECIPE\n"""
+    )
 
     assert rules_mk.rules[1].variables == []
     assert rules_mk.rules[1].commands == []
