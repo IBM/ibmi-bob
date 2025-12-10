@@ -18,7 +18,7 @@ from makei.const import (
     SQL_STYLE_COMMENTS,
     COBOL_STYLE_COMMENTS,
     PNL_STYLE_COMMENTS,
-    COMMENT_STYLES
+    COMMENT_STYLES,
 )
 
 
@@ -103,7 +103,7 @@ def test_file_max_ext_length():
     assert FILE_MAX_EXT_LENGTH > 0
 
     # Verify it's the max length of dot-separated parts
-    max_len = max(len(ext.split('.')) for ext in FILE_TARGET_MAPPING.keys())
+    max_len = max(len(ext.split(".")) for ext in FILE_TARGET_MAPPING.keys())
     assert FILE_MAX_EXT_LENGTH == max_len
 
 
@@ -211,11 +211,23 @@ def test_comment_styles():
 
 def test_file_extensions_coverage():
     """Test that common file extensions are covered in mappings"""
-    common_extensions = ["RPGLE", "SQLRPGLE", "CLLE", "C", "CPP", "CMD", "PF", "LF", "DSPF"]
+    common_extensions = [
+        "RPGLE",
+        "SQLRPGLE",
+        "CLLE",
+        "C",
+        "CPP",
+        "CMD",
+        "PF",
+        "LF",
+        "DSPF",
+    ]
 
     for ext in common_extensions:
         assert ext in FILE_TARGET_MAPPING, f"{ext} not in FILE_TARGET_MAPPING"
-        assert ext in FILE_TARGETGROUPS_MAPPING, f"{ext} not in FILE_TARGETGROUPS_MAPPING"
+        assert (
+            ext in FILE_TARGETGROUPS_MAPPING
+        ), f"{ext} not in FILE_TARGETGROUPS_MAPPING"
 
 
 def test_mapping_consistency():
@@ -227,7 +239,9 @@ def test_mapping_consistency():
             if target in TARGET_TARGETGROUPS_MAPPING:
                 # Verify the target group exists
                 target_group = TARGET_TARGETGROUPS_MAPPING[target]
-                assert target_group in TARGET_GROUPS, f"{target_group} not in TARGET_GROUPS"
+                assert (
+                    target_group in TARGET_GROUPS
+                ), f"{target_group} not in TARGET_GROUPS"
 
 
 def test_comment_style_column_ranges():

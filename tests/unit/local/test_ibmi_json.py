@@ -15,10 +15,7 @@ def temp_directory():
 
 def test_ibmijson_initialization():
     """Test IBMiJson initialization"""
-    ibmi_json = IBMiJson(
-        version="0.0.1",
-        build={"tgt_ccsid": "37", "objlib": "MYLIB"}
-    )
+    ibmi_json = IBMiJson(version="0.0.1", build={"tgt_ccsid": "37", "objlib": "MYLIB"})
 
     assert ibmi_json.version == "0.0.1"
     assert ibmi_json.build["tgt_ccsid"] == "37"
@@ -27,11 +24,7 @@ def test_ibmijson_initialization():
 
 def test_ibmijson_from_values():
     """Test IBMiJson.from_values class method"""
-    ibmi_json = IBMiJson.from_values(
-        tgt_ccsid="37",
-        objlib="TESTLIB",
-        version="1.0.0"
-    )
+    ibmi_json = IBMiJson.from_values(tgt_ccsid="37", objlib="TESTLIB", version="1.0.0")
 
     assert ibmi_json.version == "1.0.0"
     assert ibmi_json.build["tgt_ccsid"] == "37"
@@ -40,10 +33,7 @@ def test_ibmijson_from_values():
 
 def test_ibmijson_from_values_without_version():
     """Test IBMiJson.from_values without version"""
-    ibmi_json = IBMiJson.from_values(
-        tgt_ccsid="37",
-        objlib="TESTLIB"
-    )
+    ibmi_json = IBMiJson.from_values(tgt_ccsid="37", objlib="TESTLIB")
 
     assert ibmi_json.version is None
     assert ibmi_json.build["tgt_ccsid"] == "37"
@@ -54,15 +44,9 @@ def test_ibmijson_from_file_existing(temp_directory):
     """Test IBMiJson.from_file with existing file"""
     # Create a test .ibmi.json file
     ibmi_json_path = temp_directory / ".ibmi.json"
-    test_data = {
-        "version": "0.0.1",
-        "build": {
-            "tgtCcsid": "37",
-            "objlib": "MYLIB"
-        }
-    }
+    test_data = {"version": "0.0.1", "build": {"tgtCcsid": "37", "objlib": "MYLIB"}}
 
-    with ibmi_json_path.open('w') as f:
+    with ibmi_json_path.open("w") as f:
         json.dump(test_data, f)
 
     # Create parent IBMiJson
@@ -95,14 +79,9 @@ def test_ibmijson_from_file_inherits_from_parent(temp_directory):
     """Test IBMiJson.from_file inherits missing values from parent"""
     # Create a test .ibmi.json file with only tgtCcsid
     ibmi_json_path = temp_directory / ".ibmi.json"
-    test_data = {
-        "version": "0.0.1",
-        "build": {
-            "tgtCcsid": "37"
-        }
-    }
+    test_data = {"version": "0.0.1", "build": {"tgtCcsid": "37"}}
 
-    with ibmi_json_path.open('w') as f:
+    with ibmi_json_path.open("w") as f:
         json.dump(test_data, f)
 
     # Create parent with objlib
@@ -118,14 +97,9 @@ def test_ibmijson_from_file_inherits_from_parent(temp_directory):
 def test_ibmijson_from_file_with_variable_substitution(temp_directory, monkeypatch):
     """Test IBMiJson.from_file with variable substitution in objlib"""
     ibmi_json_path = temp_directory / ".ibmi.json"
-    test_data = {
-        "version": "0.0.1",
-        "build": {
-            "objlib": "&OBJLIB"
-        }
-    }
+    test_data = {"version": "0.0.1", "build": {"objlib": "&OBJLIB"}}
 
-    with ibmi_json_path.open('w') as f:
+    with ibmi_json_path.open("w") as f:
         json.dump(test_data, f)
 
     # Set environment variable to avoid sys.exit(1)
@@ -143,10 +117,7 @@ def test_ibmijson_from_file_with_variable_substitution(temp_directory, monkeypat
 
 def test_ibmijson_dict_with_custom_values():
     """Test __dict__ method with custom values"""
-    ibmi_json = IBMiJson(
-        version="1.0.0",
-        build={"tgt_ccsid": "37", "objlib": "MYLIB"}
-    )
+    ibmi_json = IBMiJson(version="1.0.0", build={"tgt_ccsid": "37", "objlib": "MYLIB"})
 
     result = ibmi_json.__dict__()
 
@@ -160,7 +131,7 @@ def test_ibmijson_dict_with_default_values():
     """Test __dict__ method with default values"""
     ibmi_json = IBMiJson(
         version="1.0.0",
-        build={"tgt_ccsid": DEFAULT_TGT_CCSID, "objlib": DEFAULT_OBJLIB}
+        build={"tgt_ccsid": DEFAULT_TGT_CCSID, "objlib": DEFAULT_OBJLIB},
     )
 
     result = ibmi_json.__dict__()
@@ -171,10 +142,7 @@ def test_ibmijson_dict_with_default_values():
 
 def test_ibmijson_dict_with_empty_values():
     """Test __dict__ method with empty values"""
-    ibmi_json = IBMiJson(
-        version="1.0.0",
-        build={"tgt_ccsid": "", "objlib": ""}
-    )
+    ibmi_json = IBMiJson(version="1.0.0", build={"tgt_ccsid": "", "objlib": ""})
 
     result = ibmi_json.__dict__()
 
@@ -184,10 +152,7 @@ def test_ibmijson_dict_with_empty_values():
 
 def test_ibmijson_dict_with_none_values():
     """Test __dict__ method with None values"""
-    ibmi_json = IBMiJson(
-        version="1.0.0",
-        build={"tgt_ccsid": None, "objlib": None}
-    )
+    ibmi_json = IBMiJson(version="1.0.0", build={"tgt_ccsid": None, "objlib": None})
 
     result = ibmi_json.__dict__()
 
@@ -198,8 +163,7 @@ def test_ibmijson_dict_with_none_values():
 def test_ibmijson_dict_with_mixed_values():
     """Test __dict__ method with mix of default and custom values"""
     ibmi_json = IBMiJson(
-        version="1.0.0",
-        build={"tgt_ccsid": "37", "objlib": DEFAULT_OBJLIB}
+        version="1.0.0", build={"tgt_ccsid": "37", "objlib": DEFAULT_OBJLIB}
     )
 
     result = ibmi_json.__dict__()
@@ -213,10 +177,7 @@ def test_ibmijson_dict_with_mixed_values():
 
 def test_ibmijson_copy():
     """Test copy method"""
-    original = IBMiJson(
-        version="1.0.0",
-        build={"tgt_ccsid": "37", "objlib": "MYLIB"}
-    )
+    original = IBMiJson(version="1.0.0", build={"tgt_ccsid": "37", "objlib": "MYLIB"})
 
     copy = original.copy()
 
@@ -231,10 +192,7 @@ def test_ibmijson_copy():
 
 def test_ibmijson_copy_independence():
     """Test that copy is independent of original"""
-    original = IBMiJson(
-        version="1.0.0",
-        build={"tgt_ccsid": "37", "objlib": "MYLIB"}
-    )
+    original = IBMiJson(version="1.0.0", build={"tgt_ccsid": "37", "objlib": "MYLIB"})
 
     copy = original.copy()
 
@@ -249,10 +207,7 @@ def test_ibmijson_copy_independence():
 
 def test_ibmijson_save(temp_directory):
     """Test save method"""
-    ibmi_json = IBMiJson(
-        version="1.0.0",
-        build={"tgt_ccsid": "37", "objlib": "MYLIB"}
-    )
+    ibmi_json = IBMiJson(version="1.0.0", build={"tgt_ccsid": "37", "objlib": "MYLIB"})
 
     save_path = temp_directory / ".ibmi.json"
     ibmi_json.save(str(save_path))
@@ -261,7 +216,7 @@ def test_ibmijson_save(temp_directory):
     assert save_path.exists()
 
     # Verify content
-    with save_path.open('r') as f:
+    with save_path.open("r") as f:
         data = json.load(f)
 
     assert data["version"] == "1.0.0"
@@ -271,10 +226,7 @@ def test_ibmijson_save(temp_directory):
 
 def test_ibmijson_save_creates_file(temp_directory):
     """Test save method creates file if it doesn't exist"""
-    ibmi_json = IBMiJson(
-        version="1.0.0",
-        build={"tgt_ccsid": "37", "objlib": "MYLIB"}
-    )
+    ibmi_json = IBMiJson(version="1.0.0", build={"tgt_ccsid": "37", "objlib": "MYLIB"})
 
     save_path = temp_directory / "new_file.json"
 
@@ -293,18 +245,15 @@ def test_ibmijson_save_overwrites_existing(temp_directory):
 
     # Create initial file
     initial_data = {"version": "0.0.1", "build": {}}
-    with save_path.open('w') as f:
+    with save_path.open("w") as f:
         json.dump(initial_data, f)
 
     # Save new data
-    ibmi_json = IBMiJson(
-        version="1.0.0",
-        build={"tgt_ccsid": "37", "objlib": "MYLIB"}
-    )
+    ibmi_json = IBMiJson(version="1.0.0", build={"tgt_ccsid": "37", "objlib": "MYLIB"})
     ibmi_json.save(str(save_path))
 
     # Verify file was overwritten
-    with save_path.open('r') as f:
+    with save_path.open("r") as f:
         data = json.load(f)
 
     assert data["version"] == "1.0.0"
@@ -314,10 +263,7 @@ def test_ibmijson_save_overwrites_existing(temp_directory):
 def test_ibmijson_roundtrip(temp_directory):
     """Test saving and loading IBMiJson"""
     # Create and save
-    original = IBMiJson(
-        version="1.0.0",
-        build={"tgt_ccsid": "37", "objlib": "MYLIB"}
-    )
+    original = IBMiJson(version="1.0.0", build={"tgt_ccsid": "37", "objlib": "MYLIB"})
 
     save_path = temp_directory / ".ibmi.json"
     original.save(str(save_path))
@@ -335,14 +281,9 @@ def test_ibmijson_roundtrip(temp_directory):
 def test_ibmijson_from_file_without_version(temp_directory):
     """Test IBMiJson.from_file with file missing version"""
     ibmi_json_path = temp_directory / ".ibmi.json"
-    test_data = {
-        "build": {
-            "tgtCcsid": "37",
-            "objlib": "MYLIB"
-        }
-    }
+    test_data = {"build": {"tgtCcsid": "37", "objlib": "MYLIB"}}
 
-    with ibmi_json_path.open('w') as f:
+    with ibmi_json_path.open("w") as f:
         json.dump(test_data, f)
 
     parent = IBMiJson.from_values("1208", "PARENTLIB")
@@ -356,11 +297,9 @@ def test_ibmijson_from_file_without_version(temp_directory):
 def test_ibmijson_from_file_without_build(temp_directory):
     """Test IBMiJson.from_file with file missing build section"""
     ibmi_json_path = temp_directory / ".ibmi.json"
-    test_data = {
-        "version": "1.0.0"
-    }
+    test_data = {"version": "1.0.0"}
 
-    with ibmi_json_path.open('w') as f:
+    with ibmi_json_path.open("w") as f:
         json.dump(test_data, f)
 
     parent = IBMiJson.from_values("37", "PARENTLIB", "0.0.1")

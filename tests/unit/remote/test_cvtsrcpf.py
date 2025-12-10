@@ -12,7 +12,7 @@ def temp_directory():
         yield Path(tmpdir)
 
 
-@patch('makei.cvtsrcpf.IBMJob')
+@patch("makei.cvtsrcpf.IBMJob")
 def test_cvtsrcpf_initialization(mock_ibm_job, temp_directory):
     """Test CvtSrcPf initialization"""
     mock_job_instance = Mock()
@@ -24,7 +24,7 @@ def test_cvtsrcpf_initialization(mock_ibm_job, temp_directory):
         tolower=True,
         default_ccsid="37",
         text=False,
-        save_path=temp_directory
+        save_path=temp_directory,
     )
 
     assert cvt.srcfile == "QRPGLESRC"
@@ -36,7 +36,7 @@ def test_cvtsrcpf_initialization(mock_ibm_job, temp_directory):
     assert cvt.ibmi_json_path == temp_directory / ".ibmi.json"
 
 
-@patch('makei.cvtsrcpf.IBMJob')
+@patch("makei.cvtsrcpf.IBMJob")
 def test_cvtsrcpf_initialization_with_invalid_ccsid(mock_ibm_job, temp_directory):
     """Test CvtSrcPf initialization with invalid CCSID"""
     mock_job_instance = Mock()
@@ -47,14 +47,14 @@ def test_cvtsrcpf_initialization_with_invalid_ccsid(mock_ibm_job, temp_directory
         lib="MYLIB",
         tolower=False,
         default_ccsid="INVALID",
-        save_path=temp_directory
+        save_path=temp_directory,
     )
 
     # Invalid CCSID should result in None
     assert cvt.default_ccsid is None
 
 
-@patch('makei.cvtsrcpf.IBMJob')
+@patch("makei.cvtsrcpf.IBMJob")
 def test_cvtsrcpf_get_src_mbr_name(mock_ibm_job, temp_directory):
     """Test _get_src_mbr_name method"""
     mock_job_instance = Mock()
@@ -68,7 +68,7 @@ def test_cvtsrcpf_get_src_mbr_name(mock_ibm_job, temp_directory):
     assert name == "TESTPGM"
 
 
-@patch('makei.cvtsrcpf.IBMJob')
+@patch("makei.cvtsrcpf.IBMJob")
 def test_cvtsrcpf_get_src_mbr_ext(mock_ibm_job, temp_directory):
     """Test _get_src_mbr_ext method"""
     mock_job_instance = Mock()
@@ -87,7 +87,7 @@ def test_cvtsrcpf_get_src_mbr_ext(mock_ibm_job, temp_directory):
     assert ext2 == ".pf"
 
 
-@patch('makei.cvtsrcpf.IBMJob')
+@patch("makei.cvtsrcpf.IBMJob")
 def test_cvtsrcpf_get_dst_mbr_name(mock_ibm_job, temp_directory):
     """Test _get_dst_mbr_name method"""
     mock_job_instance = Mock()
@@ -104,7 +104,7 @@ def test_cvtsrcpf_get_dst_mbr_name(mock_ibm_job, temp_directory):
     assert name2 == "testpgm.rpgle"
 
 
-@patch('makei.cvtsrcpf.IBMJob')
+@patch("makei.cvtsrcpf.IBMJob")
 def test_cvtsrcpf_get_dst_mbr_path(mock_ibm_job, temp_directory):
     """Test _get_dst_mbr_path method"""
     mock_job_instance = Mock()
@@ -118,7 +118,7 @@ def test_cvtsrcpf_get_dst_mbr_path(mock_ibm_job, temp_directory):
     assert path == temp_directory / "testpgm.rpgle"
 
 
-@patch('makei.cvtsrcpf.IBMJob')
+@patch("makei.cvtsrcpf.IBMJob")
 def test_cvtsrcpf_get_dst_mbr_path_with_duplicates(mock_ibm_job, temp_directory):
     """Test _get_dst_mbr_path method with duplicate files"""
     mock_job_instance = Mock()
@@ -136,22 +136,26 @@ def test_cvtsrcpf_get_dst_mbr_path_with_duplicates(mock_ibm_job, temp_directory)
     assert path == temp_directory / "testpgm_1.rpgle"
 
 
-@patch('makei.cvtsrcpf.IBMJob')
+@patch("makei.cvtsrcpf.IBMJob")
 def test_cvtsrcpf_default_ccsid(mock_ibm_job, temp_directory):
     """Test _default_ccsid method"""
     mock_job_instance = Mock()
     mock_ibm_job.return_value = mock_job_instance
 
     # Test with default_ccsid set
-    cvt1 = CvtSrcPf("QRPGLESRC", "MYLIB", False, default_ccsid="37", save_path=temp_directory)
+    cvt1 = CvtSrcPf(
+        "QRPGLESRC", "MYLIB", False, default_ccsid="37", save_path=temp_directory
+    )
     assert cvt1._default_ccsid() == "37"
 
     # Test with default_ccsid None
-    cvt2 = CvtSrcPf("QRPGLESRC", "MYLIB", False, default_ccsid=None, save_path=temp_directory)
+    cvt2 = CvtSrcPf(
+        "QRPGLESRC", "MYLIB", False, default_ccsid=None, save_path=temp_directory
+    )
     assert cvt2._default_ccsid() == "*JOB"
 
 
-@patch('makei.cvtsrcpf.IBMJob')
+@patch("makei.cvtsrcpf.IBMJob")
 def test_cvtsrcpf_get_src_mbrs(mock_ibm_job, temp_directory):
     """Test _get_src_mbrs method"""
     mock_job_instance = Mock()
@@ -159,12 +163,8 @@ def test_cvtsrcpf_get_src_mbrs(mock_ibm_job, temp_directory):
 
     # Mock SQL results
     mock_job_instance.run_sql.return_value = (
-        [
-            ("TESTPGM1", "RPGLE"),
-            ("TESTPGM2", "SQLRPGLE"),
-            ("TESTCMD", "CMD")
-        ],
-        ["SYSTEM_TABLE_MEMBER", "SOURCE_TYPE"]
+        [("TESTPGM1", "RPGLE"), ("TESTPGM2", "SQLRPGLE"), ("TESTCMD", "CMD")],
+        ["SYSTEM_TABLE_MEMBER", "SOURCE_TYPE"],
     )
 
     cvt = CvtSrcPf("QRPGLESRC", "MYLIB", False, save_path=temp_directory)
@@ -176,7 +176,7 @@ def test_cvtsrcpf_get_src_mbrs(mock_ibm_job, temp_directory):
     assert ("TESTCMD", "CMD") in members
 
 
-@patch('makei.cvtsrcpf.IBMJob')
+@patch("makei.cvtsrcpf.IBMJob")
 def test_cvtsrcpf_get_src_mbrs_with_none_type(mock_ibm_job, temp_directory):
     """Test _get_src_mbrs method with None source type"""
     mock_job_instance = Mock()
@@ -184,11 +184,8 @@ def test_cvtsrcpf_get_src_mbrs_with_none_type(mock_ibm_job, temp_directory):
 
     # Mock SQL results with None type
     mock_job_instance.run_sql.return_value = (
-        [
-            ("TESTPGM", "RPGLE"),
-            ("NOEXT", None)
-        ],
-        ["SYSTEM_TABLE_MEMBER", "SOURCE_TYPE"]
+        [("TESTPGM", "RPGLE"), ("NOEXT", None)],
+        ["SYSTEM_TABLE_MEMBER", "SOURCE_TYPE"],
     )
 
     cvt = CvtSrcPf("QRPGLESRC", "MYLIB", False, save_path=temp_directory)
@@ -199,7 +196,7 @@ def test_cvtsrcpf_get_src_mbrs_with_none_type(mock_ibm_job, temp_directory):
     assert ("NOEXT", "") in members
 
 
-@patch('makei.cvtsrcpf.IBMJob')
+@patch("makei.cvtsrcpf.IBMJob")
 def test_cvtsrcpf_cvr_src_mbr(mock_ibm_job, temp_directory):
     """Test _cvr_src_mbr method"""
     mock_job_instance = Mock()
@@ -217,7 +214,7 @@ def test_cvtsrcpf_cvr_src_mbr(mock_ibm_job, temp_directory):
     mock_job_instance.run_cl.assert_called_once()
 
 
-@patch('makei.cvtsrcpf.IBMJob')
+@patch("makei.cvtsrcpf.IBMJob")
 def test_cvtsrcpf_get_member_text(mock_ibm_job, temp_directory):
     """Test _get_member_text method"""
     mock_job_instance = Mock()
@@ -226,7 +223,7 @@ def test_cvtsrcpf_get_member_text(mock_ibm_job, temp_directory):
     # Mock SQL results
     mock_job_instance.run_sql.return_value = (
         [("Test program description",)],
-        ["TEXT_DESCRIPTION"]
+        ["TEXT_DESCRIPTION"],
     )
 
     cvt = CvtSrcPf("QRPGLESRC", "MYLIB", False, save_path=temp_directory)
@@ -237,8 +234,8 @@ def test_cvtsrcpf_get_member_text(mock_ibm_job, temp_directory):
     assert result[0][0][0] == "Test program description"
 
 
-@patch('makei.cvtsrcpf.IBMJob')
-@patch('makei.cvtsrcpf.get_style_dict')
+@patch("makei.cvtsrcpf.IBMJob")
+@patch("makei.cvtsrcpf.get_style_dict")
 def test_cvtsrcpf_insert_line(mock_get_style, mock_ibm_job, temp_directory):
     """Test insert_line method"""
     mock_job_instance = Mock()
@@ -251,15 +248,7 @@ def test_cvtsrcpf_insert_line(mock_get_style, mock_ibm_job, temp_directory):
     test_file.write_text("Line 1\nLine 2\nLine 3\n")
 
     # Insert a line
-    result = cvt.insert_line(
-        test_file,
-        "Test Comment",
-        "*",
-        "*",
-        0,
-        7,
-        72
-    )
+    result = cvt.insert_line(test_file, "Test Comment", "*", "*", 0, 7, 72)
 
     assert result is True
 
@@ -268,7 +257,7 @@ def test_cvtsrcpf_insert_line(mock_get_style, mock_ibm_job, temp_directory):
     assert "Test Comment" in content
 
 
-@patch('makei.cvtsrcpf.IBMJob')
+@patch("makei.cvtsrcpf.IBMJob")
 def test_cvtsrcpf_insert_line_invalid_columns(mock_ibm_job, temp_directory):
     """Test insert_line with invalid column range"""
     mock_job_instance = Mock()
@@ -285,7 +274,7 @@ def test_cvtsrcpf_insert_line_invalid_columns(mock_ibm_job, temp_directory):
     assert result is False
 
 
-@patch('os.popen')
+@patch("os.popen")
 def test_retrieve_ccsid(mock_popen):
     """Test retrieve_ccsid function"""
     mock_stream = Mock()
@@ -295,10 +284,10 @@ def test_retrieve_ccsid(mock_popen):
     ccsid = retrieve_ccsid("/path/to/file", "1208")
 
     assert ccsid == "37"
-    mock_popen.assert_called_once_with('/QOpenSys/usr/bin/attr /path/to/file')
+    mock_popen.assert_called_once_with("/QOpenSys/usr/bin/attr /path/to/file")
 
 
-@patch('os.popen')
+@patch("os.popen")
 def test_retrieve_ccsid_with_default(mock_popen):
     """Test retrieve_ccsid with default value when attr fails"""
     mock_stream = Mock()
@@ -312,10 +301,12 @@ def test_retrieve_ccsid_with_default(mock_popen):
     assert ccsid == "1208"
 
 
-@patch('makei.cvtsrcpf.IBMJob')
-@patch('makei.cvtsrcpf.check_keyword_in_file')
-@patch('makei.cvtsrcpf.get_style_dict')
-def test_cvtsrcpf_import_member_text(mock_get_style, mock_check_keyword, mock_ibm_job, temp_directory):
+@patch("makei.cvtsrcpf.IBMJob")
+@patch("makei.cvtsrcpf.check_keyword_in_file")
+@patch("makei.cvtsrcpf.get_style_dict")
+def test_cvtsrcpf_import_member_text(
+    mock_get_style, mock_check_keyword, mock_ibm_job, temp_directory
+):
     """Test import_member_text method"""
     mock_job_instance = Mock()
     mock_ibm_job.return_value = mock_job_instance
@@ -329,7 +320,7 @@ def test_cvtsrcpf_import_member_text(mock_get_style, mock_check_keyword, mock_ib
         "end_comment": "*",
         "start_column": 7,
         "end_column": 72,
-        "write_on_line": 0
+        "write_on_line": 0,
     }
 
     cvt = CvtSrcPf("QRPGLESRC", "MYLIB", False, save_path=temp_directory)
@@ -344,11 +335,12 @@ def test_cvtsrcpf_import_member_text(mock_get_style, mock_check_keyword, mock_ib
     assert result == 3
 
 
-@patch('makei.cvtsrcpf.IBMJob')
-@patch('makei.cvtsrcpf.check_keyword_in_file')
-@patch('makei.cvtsrcpf.get_style_dict')
-def test_cvtsrcpf_import_member_text_existing_metadata(mock_get_style, mock_check_keyword,
-                                                       mock_ibm_job, temp_directory):
+@patch("makei.cvtsrcpf.IBMJob")
+@patch("makei.cvtsrcpf.check_keyword_in_file")
+@patch("makei.cvtsrcpf.get_style_dict")
+def test_cvtsrcpf_import_member_text_existing_metadata(
+    mock_get_style, mock_check_keyword, mock_ibm_job, temp_directory
+):
     """Test import_member_text with existing metadata"""
     mock_job_instance = Mock()
     mock_ibm_job.return_value = mock_job_instance
@@ -367,9 +359,11 @@ def test_cvtsrcpf_import_member_text_existing_metadata(mock_get_style, mock_chec
     assert result is False
 
 
-@patch('makei.cvtsrcpf.IBMJob')
-@patch('makei.cvtsrcpf.get_style_dict')
-def test_cvtsrcpf_import_member_text_no_style(mock_get_style, mock_ibm_job, temp_directory):
+@patch("makei.cvtsrcpf.IBMJob")
+@patch("makei.cvtsrcpf.get_style_dict")
+def test_cvtsrcpf_import_member_text_no_style(
+    mock_get_style, mock_ibm_job, temp_directory
+):
     """Test import_member_text when no style dict is found"""
     mock_job_instance = Mock()
     mock_ibm_job.return_value = mock_job_instance
