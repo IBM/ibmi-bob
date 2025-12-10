@@ -335,7 +335,7 @@ class RulesMk:
             expanded_deps = dependencies
             for var_name, var_value in rules_mk_variables.items():
                 expanded_deps = expanded_deps.replace(f"$({var_name})", var_value)
-            #target specific variable assignmnet(expansion)
+            # target specific variable assignmnet(expansion)
             for filename in os.listdir(dir_path):
                 recipe_str = ''
                 filename_split = filename.split('.', 1)
