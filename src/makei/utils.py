@@ -273,6 +273,7 @@ def is_source_file(filename: str) -> bool:
     except ValueError:
         return False
 
+
 def format_datetime(d: datetime) -> str:
     # 2022-03-25-09.33.34.064676
     return d.strftime("%Y-%m-%d-%H.%M.%S.%f")
