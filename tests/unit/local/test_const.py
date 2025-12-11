@@ -88,8 +88,8 @@ def test_file_target_mapping():
     # Test some common mappings - FILE_TARGET_MAPPING returns sets
     assert FILE_TARGET_MAPPING["PGM.RPGLE"] == {"PGM"}
     assert FILE_TARGET_MAPPING["PGM.SQLRPGLE"] == {"PGM"}
-    assert FILE_TARGET_MAPPING["RPGLE"] == {"MODULE"}
-    assert FILE_TARGET_MAPPING["SQLRPGLE"] == {"MODULE"}
+    assert FILE_TARGET_MAPPING["RPGLE"] == {"MODULE", "PGM"}
+    assert FILE_TARGET_MAPPING["SQLRPGLE"] == {"MODULE", "PGM"}
     assert FILE_TARGET_MAPPING["CMD"] == {"CMD"}
     assert FILE_TARGET_MAPPING["PF"] == {"FILE"}
     assert FILE_TARGET_MAPPING["DSPF"] == {"FILE"}
