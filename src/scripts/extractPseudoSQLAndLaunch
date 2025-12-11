@@ -24,12 +24,12 @@ do
 done
 
 while read -r line; do
-  if [[ $line == *"{"* ]]; then
+  if [[ "$line" == *"{"* ]]; then
     if [[ "$objectExists" = "false" ]]; then
       shouldProcess="false"
     fi 
     continue
-  elif [[ $line == *"}"* ]]; then
+  elif [[ "$line" == *"}"* ]]; then
     if [[ "$objectExists" = "false" ]]; then
       shouldProcess="true"
       continue
@@ -39,7 +39,7 @@ while read -r line; do
   fi
 
   if [[ "$shouldProcess" = "true" ]]; then
-      echo $line >> $temp_file
+      echo "$line" >> $temp_file
   fi
 done < <(grep "" $source)
 
