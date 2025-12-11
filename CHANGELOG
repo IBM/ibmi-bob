@@ -1,3 +1,4 @@
+- Added support to read target names from the `rules.mk` file for the `makei c` command.
 - Added a new recipe to support files with the .sqlvar extension.
 - support arbitrary long source names even in compile by looking up 
   the mapping to target be derived from the Rules.mk files
