@@ -310,7 +310,7 @@ def handle_cvtsrcpf(args):
     """
     Processing the cvtsrcpf command
     """
-    if args.trace:
+    if args.log:
         print(colored("Warning: --trace has no effect on 'cvtsrcpf' command.", Colors.WARNING))
     CvtSrcPf(args.file, args.library, args.tolower, args.ccsid, args.text).run()
 
