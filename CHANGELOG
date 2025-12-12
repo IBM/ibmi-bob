@@ -1,8 +1,13 @@
+- Added support to read target names from the `rules.mk` file for the `makei c` command.
+- Added a new recipe to support files with the .sqlvar extension.
 - support arbitrary long source names even in compile by looking up 
   the mapping to target be derived from the Rules.mk files
 - allow multiple targets with same source name in different directories
   even if the immediate parent directory is the same
 - allow `.rpgle` and `.sqlrpgle` to build into `PGM` objects
+- rename `bob.spec` into `tobi.spec` for RPM spec file
+- improve installation instructions to `yum clean metadata` if 
+  there is trouble
 * Fri Nov 21 2025 Edmund Reinhardt <edmund.reinhardt@ca.ibm.com> - 3.0.0
 - Rename RPM to 'tobi' from 'bob' - `yum install tobi`
 - change to use -l and --log to avoid conflict with --target

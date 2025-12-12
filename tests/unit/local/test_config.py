@@ -11,12 +11,12 @@ def temp_config_file():
     config_data = {
         "setting1": "value1",
         "setting2": "value2",
-        "nested": {
-            "key": "nested_value"
-        }
+        "nested": {"key": "nested_value"},
     }
 
-    with NamedTemporaryFile(mode='w', suffix='.json', delete=False, encoding='utf-8') as f:
+    with NamedTemporaryFile(
+        mode="w", suffix=".json", delete=False, encoding="utf-8"
+    ) as f:
         json.dump(config_data, f)
         temp_path = f.name
 
@@ -61,10 +61,7 @@ def test_config_update_config(temp_config_file):
     config = Config(temp_config_file)
 
     # Update with new values
-    new_config = {
-        "setting1": "updated_value1",
-        "new_setting": "new_value"
-    }
+    new_config = {"setting1": "updated_value1", "new_setting": "new_value"}
     config.update_config(new_config)
 
     # Verify updates
@@ -82,7 +79,7 @@ def test_config_save_config(temp_config_file):
     config.update_config({"test_key": "test_value"})
 
     # Read file directly to verify save
-    with open(temp_config_file, 'r', encoding='utf-8') as f:
+    with open(temp_config_file, "r", encoding="utf-8") as f:
         saved_data = json.load(f)
 
     assert saved_data["test_key"] == "test_value"
@@ -90,7 +87,9 @@ def test_config_save_config(temp_config_file):
 
 def test_config_with_empty_file():
     """Test Config with an empty JSON file"""
-    with NamedTemporaryFile(mode='w', suffix='.json', delete=False, encoding='utf-8') as f:
+    with NamedTemporaryFile(
+        mode="w", suffix=".json", delete=False, encoding="utf-8"
+    ) as f:
         json.dump({}, f)
         temp_path = f.name
 

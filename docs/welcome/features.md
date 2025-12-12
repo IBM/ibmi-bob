@@ -85,6 +85,17 @@ Note:
 
 * this provides a second way of creating programs and service programs using the .ILEPGM and .ILESRVPGM file types.  This gives a high degree of customization in that you can specify any and all parameters on the command and even additional commands.  But it is more work than the simple dependency line needed when building from binder source.
 
+### Placeholders in Pseudo Source Files (&O and &N)
+
+* **&O (Object Library Placeholder)**:
+This placeholder is used to represent the library where an object resides.
+
+Example Usage: If a command in a pseudo source file is CRTPGM PGM(&O/MYPGM), and the script is invoked with MYLIB as the object library, the command executed will become CRTPGM PGM(MYLIB/MYPGM).
+
+* **&N (Object Name Placeholder)**:
+This placeholder is used to represent the name of the object.
+
+Example Usage: If a command in a pseudo source file is DSPPGM PGM(&O/&N), and the script is invoked with MYLIB as the object library and MYPGM as the object name, the command executed will become DSPPGM PGM(MYLIB/MYPGM).
 
 ## Support SQL pseudo-source
 
@@ -102,6 +113,7 @@ The set of SQL commands to create the object is stored in a file with the given 
 | TRIGGER   | *PGM        | .SQLTRG         | CREATE OR REPLACE TRIGGER   |
 | ALIAS     | *FILE       | .SQLALIAS       | CREATE OR REPLACE ALIAS     |
 | SEQUENCE  | *DTAARA     | .SQLSEQ         | CREATE OR REPLACE SEQUENCE  |
+| VARIABLE  | *SRVPGM     | .SQLVAR         | CREATE OR REPLACE VARIABLE  |
 
 Generic SQL statements with file extension .SQL are executed using RUNSQLSTM
 

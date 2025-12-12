@@ -10,7 +10,7 @@ from makei.init_project import (
     create_file,
     update_json_field,
     retrieve_json_val,
-    init_project
+    init_project,
 )
 
 
@@ -35,27 +35,27 @@ def test_yes_function():
     assert yes("anything") is False
 
 
-@patch('builtins.input', return_value='test_value')
+@patch("builtins.input", return_value="test_value")
 def test_prompt_with_input(mock_input):
     """Test prompt function with user input"""
-    result = prompt('Enter value', 'default')
+    result = prompt("Enter value", "default")
 
-    assert result == 'test_value'
-    mock_input.assert_called_once_with('Enter value: (default) ')
+    assert result == "test_value"
+    mock_input.assert_called_once_with("Enter value: (default) ")
 
 
-@patch('builtins.input', return_value='')
+@patch("builtins.input", return_value="")
 def test_prompt_with_default(mock_input):
     """Test prompt function using default value"""
-    result = prompt('Enter value', 'default_value')
+    result = prompt("Enter value", "default_value")
 
-    assert result == 'default_value'
+    assert result == "default_value"
 
 
-@patch('builtins.input', return_value='')
+@patch("builtins.input", return_value="")
 def test_prompt_without_default(mock_input):
     """Test prompt function without default value"""
-    result = prompt('Enter value', None)
+    result = prompt("Enter value", None)
 
     assert result is None
 
@@ -81,7 +81,7 @@ def test_create_file_none_content(temp_directory):
     assert not file_path.exists()
 
 
-@patch('builtins.input', return_value='yes')
+@patch("builtins.input", return_value="yes")
 def test_create_file_overwrite_existing(mock_input, temp_directory):
     """Test create_file overwrites existing file when confirmed"""
     file_path = temp_directory / "test.txt"
@@ -92,7 +92,7 @@ def test_create_file_overwrite_existing(mock_input, temp_directory):
     assert file_path.read_text() == "New content"
 
 
-@patch('builtins.input', return_value='no')
+@patch("builtins.input", return_value="no")
 def test_create_file_no_overwrite(mock_input, temp_directory):
     """Test create_file doesn't overwrite when declined"""
     file_path = temp_directory / "test.txt"
@@ -120,12 +120,12 @@ def test_update_json_field_single_key(temp_directory):
     json_path = temp_directory / "test.json"
     initial_data = {"key1": "value1", "key2": "value2"}
 
-    with json_path.open('w') as f:
+    with json_path.open("w") as f:
         json.dump(initial_data, f)
 
     update_json_field(str(json_path), "key1", "updated_value")
 
-    with json_path.open('r') as f:
+    with json_path.open("r") as f:
         data = json.load(f)
 
     assert data["key1"] == "updated_value"
@@ -135,19 +135,14 @@ def test_update_json_field_single_key(temp_directory):
 def test_update_json_field_nested_key(temp_directory):
     """Test update_json_field with nested keys"""
     json_path = temp_directory / "test.json"
-    initial_data = {
-        "key1": "value1",
-        "nested": {
-            "subkey": "old_value"
-        }
-    }
+    initial_data = {"key1": "value1", "nested": {"subkey": "old_value"}}
 
-    with json_path.open('w') as f:
+    with json_path.open("w") as f:
         json.dump(initial_data, f)
 
     update_json_field(str(json_path), "nested", "new_value", "subkey")
 
-    with json_path.open('r') as f:
+    with json_path.open("r") as f:
         data = json.load(f)
 
     assert data["nested"]["subkey"] == "new_value"
@@ -158,7 +153,7 @@ def test_retrieve_json_val_single_key(temp_directory):
     json_path = temp_directory / "test.json"
     test_data = {"key1": "value1", "key2": "value2"}
 
-    with json_path.open('w') as f:
+    with json_path.open("w") as f:
         json.dump(test_data, f)
 
     result = retrieve_json_val(str(json_path), "key1")
@@ -169,13 +164,9 @@ def test_retrieve_json_val_single_key(temp_directory):
 def test_retrieve_json_val_nested_key(temp_directory):
     """Test retrieve_json_val with nested keys"""
     json_path = temp_directory / "test.json"
-    test_data = {
-        "nested": {
-            "subkey": "nested_value"
-        }
-    }
+    test_data = {"nested": {"subkey": "nested_value"}}
 
-    with json_path.open('w') as f:
+    with json_path.open("w") as f:
         json.dump(test_data, f)
 
     result = retrieve_json_val(str(json_path), "nested", "subkey")
@@ -188,7 +179,7 @@ def test_retrieve_json_val_missing_key(temp_directory):
     json_path = temp_directory / "test.json"
     test_data = {"key1": "value1"}
 
-    with json_path.open('w') as f:
+    with json_path.open("w") as f:
         json.dump(test_data, f)
 
     result = retrieve_json_val(str(json_path), "missing_key")
@@ -196,95 +187,95 @@ def test_retrieve_json_val_missing_key(temp_directory):
     assert result is None
 
 
-@patch('builtins.input')
+@patch("builtins.input")
 def test_projspec_initialization(mock_input):
     """Test ProjSpec initialization"""
     # Mock user inputs
     mock_input.side_effect = [
-        'My Project',  # description
-        'https://github.com/user/repo',  # repository
-        '/usr/include',  # include_path
-        'MYLIB',  # objlib
-        '37',  # tgt_ccsid
-        'MYLIB',  # curlib
-        'LIB1, LIB2',  # pre_usr_libl
-        'LIB3',  # post_usr_libl
-        'CHGJOB CCSID(37)',  # set_ibm_i_env_cmd
-        'MIT'  # license
+        "My Project",  # description
+        "https://github.com/user/repo",  # repository
+        "/usr/include",  # include_path
+        "MYLIB",  # objlib
+        "37",  # tgt_ccsid
+        "MYLIB",  # curlib
+        "LIB1, LIB2",  # pre_usr_libl
+        "LIB3",  # post_usr_libl
+        "CHGJOB CCSID(37)",  # set_ibm_i_env_cmd
+        "MIT",  # license
     ]
 
     proj_spec = ProjSpec(None, None)
 
-    assert proj_spec.description == 'My Project'
-    assert proj_spec.repository == 'https://github.com/user/repo'
-    assert proj_spec.include_path == ['/usr/include']
-    assert proj_spec.objlib == 'MYLIB'
-    assert proj_spec.tgt_ccsid == '37'
-    assert proj_spec.curlib == 'MYLIB'
-    assert proj_spec.pre_usr_libl == ['LIB1', 'LIB2']
-    assert proj_spec.post_usr_libl == ['LIB3']
-    assert proj_spec.set_ibm_i_env_cmd == ['CHGJOB CCSID(37)']
-    assert proj_spec.license == 'MIT'
+    assert proj_spec.description == "My Project"
+    assert proj_spec.repository == "https://github.com/user/repo"
+    assert proj_spec.include_path == ["/usr/include"]
+    assert proj_spec.objlib == "MYLIB"
+    assert proj_spec.tgt_ccsid == "37"
+    assert proj_spec.curlib == "MYLIB"
+    assert proj_spec.pre_usr_libl == ["LIB1", "LIB2"]
+    assert proj_spec.post_usr_libl == ["LIB3"]
+    assert proj_spec.set_ibm_i_env_cmd == ["CHGJOB CCSID(37)"]
+    assert proj_spec.license == "MIT"
 
 
-@patch('builtins.input')
+@patch("builtins.input")
 def test_projspec_with_provided_objlib_and_ccsid(mock_input):
     """Test ProjSpec with objlib and tgt_ccsid provided"""
     mock_input.side_effect = [
-        'My Project',  # description
-        '',  # repository (empty)
-        '',  # include_path (empty)
-        'MYLIB',  # curlib
-        '',  # pre_usr_libl (empty)
-        '',  # post_usr_libl (empty)
-        '',  # set_ibm_i_env_cmd (empty)
-        ''  # license (empty)
+        "My Project",  # description
+        "",  # repository (empty)
+        "",  # include_path (empty)
+        "MYLIB",  # curlib
+        "",  # pre_usr_libl (empty)
+        "",  # post_usr_libl (empty)
+        "",  # set_ibm_i_env_cmd (empty)
+        "",  # license (empty)
     ]
 
-    proj_spec = ProjSpec(objlib='PROVIDEDLIB', tgt_ccsid='1208')
+    proj_spec = ProjSpec(objlib="PROVIDEDLIB", tgt_ccsid="1208")
 
-    assert proj_spec.objlib == 'PROVIDEDLIB'
-    assert proj_spec.tgt_ccsid == '1208'
+    assert proj_spec.objlib == "PROVIDEDLIB"
+    assert proj_spec.tgt_ccsid == "1208"
 
 
-@patch('builtins.input')
+@patch("builtins.input")
 def test_projspec_input_str_to_list(mock_input):
     """Test ProjSpec _input_str_to_list method"""
     mock_input.side_effect = [
-        'Test',  # description
-        '',  # repository
-        'path1, path2, path3',  # include_path
-        'LIB',  # objlib
-        '37',  # tgt_ccsid
-        'LIB',  # curlib
-        'LIB1,  LIB2  , LIB3',  # pre_usr_libl with spaces
-        '',  # post_usr_libl
-        '',  # set_ibm_i_env_cmd
-        ''  # license
+        "Test",  # description
+        "",  # repository
+        "path1, path2, path3",  # include_path
+        "LIB",  # objlib
+        "37",  # tgt_ccsid
+        "LIB",  # curlib
+        "LIB1,  LIB2  , LIB3",  # pre_usr_libl with spaces
+        "",  # post_usr_libl
+        "",  # set_ibm_i_env_cmd
+        "",  # license
     ]
 
     proj_spec = ProjSpec(None, None)
 
     # Should handle comma-separated values with spaces
-    assert proj_spec.include_path == ['path1', 'path2', 'path3']
-    assert proj_spec.pre_usr_libl == ['LIB1', 'LIB2', 'LIB3']
+    assert proj_spec.include_path == ["path1", "path2", "path3"]
+    assert proj_spec.pre_usr_libl == ["LIB1", "LIB2", "LIB3"]
     assert proj_spec.post_usr_libl == []
 
 
-@patch('builtins.input')
+@patch("builtins.input")
 def test_projspec_generate_iproj_json(mock_input):
     """Test ProjSpec generate_iproj_json method"""
     mock_input.side_effect = [
-        'Test Project',
-        'https://github.com/test/repo',
-        '/usr/include',
-        'TESTLIB',
-        '37',
-        'TESTLIB',
-        'LIB1',
-        'LIB2',
-        'CHGJOB CCSID(37)',
-        'MIT'
+        "Test Project",
+        "https://github.com/test/repo",
+        "/usr/include",
+        "TESTLIB",
+        "37",
+        "TESTLIB",
+        "LIB1",
+        "LIB2",
+        "CHGJOB CCSID(37)",
+        "MIT",
     ]
 
     proj_spec = ProjSpec(None, None)
@@ -301,21 +292,10 @@ def test_projspec_generate_iproj_json(mock_input):
     assert iproj_data["tgtCcsid"] == "37"
 
 
-@patch('builtins.input')
+@patch("builtins.input")
 def test_projspec_generate_ibmi_json(mock_input):
     """Test ProjSpec generate_ibmi_json method"""
-    mock_input.side_effect = [
-        'Test',
-        '',
-        '',
-        'LIB',
-        '37',
-        'LIB',
-        '',
-        '',
-        '',
-        ''
-    ]
+    mock_input.side_effect = ["Test", "", "", "LIB", "37", "LIB", "", "", "", ""]
 
     proj_spec = ProjSpec(None, None)
     ibmi_json_str = proj_spec.generate_ibmi_json()
@@ -337,10 +317,10 @@ def test_projspec_generate_ibmi_json_static():
     assert ibmi_data["build"]["tgtCcsid"] == "37"
 
 
-@patch('builtins.input')
+@patch("builtins.input")
 def test_projspec_generate_rules_mk(mock_input):
     """Test ProjSpec generate_rules_mk method"""
-    mock_input.side_effect = ['Test', '', '', 'LIB', '37', 'LIB', '', '', '', '']
+    mock_input.side_effect = ["Test", "", "", "LIB", "37", "LIB", "", "", "", ""]
 
     proj_spec = ProjSpec(None, None)
     rules_mk = proj_spec.generate_rules_mk()
@@ -349,24 +329,24 @@ def test_projspec_generate_rules_mk(mock_input):
     assert "https://ibm.github.io/ibmi-bob" in rules_mk
 
 
-@patch('builtins.input', side_effect=['yes'])
-@patch('makei.init_project.create_file')
+@patch("builtins.input", side_effect=["yes"])
+@patch("makei.init_project.create_file")
 def test_init_project_new(mock_create_file, mock_input, temp_directory):
     """Test init_project creating new project"""
-    with patch('pathlib.Path.cwd', return_value=temp_directory):
-        with patch('builtins.input') as mock_proj_input:
+    with patch("pathlib.Path.cwd", return_value=temp_directory):
+        with patch("builtins.input") as mock_proj_input:
             mock_proj_input.side_effect = [
-                'Test Project',
-                '',
-                '',
-                'TESTLIB',
-                '37',
-                'TESTLIB',
-                '',
-                '',
-                '',
-                '',
-                'yes'  # Confirm creation
+                "Test Project",
+                "",
+                "",
+                "TESTLIB",
+                "37",
+                "TESTLIB",
+                "",
+                "",
+                "",
+                "",
+                "yes",  # Confirm creation
             ]
 
             init_project(force=False, objlib=None, tgtCcsid=None)
@@ -375,52 +355,52 @@ def test_init_project_new(mock_create_file, mock_input, temp_directory):
             assert mock_create_file.call_count == 3
 
 
-@patch('makei.init_project.update_json_field')
+@patch("makei.init_project.update_json_field")
 def test_init_project_update_objlib(mock_update, temp_directory):
     """Test init_project updating objlib in existing project"""
-    with patch('pathlib.Path.cwd', return_value=temp_directory):
+    with patch("pathlib.Path.cwd", return_value=temp_directory):
         # Create existing iproj.json
-        iproj_path = temp_directory / 'iproj.json'
+        iproj_path = temp_directory / "iproj.json"
         iproj_path.write_text('{"version": "1.0.0", "objlib": "OLDLIB"}')
 
-        init_project(force=False, objlib='NEWLIB', tgtCcsid=None)
+        init_project(force=False, objlib="NEWLIB", tgtCcsid=None)
 
         # Verify update_json_field was called
         mock_update.assert_called()
 
 
-@patch('makei.init_project.update_json_field')
-@patch('makei.init_project.create_file')
+@patch("makei.init_project.update_json_field")
+@patch("makei.init_project.create_file")
 def test_init_project_update_tgtccsid(mock_create, mock_update, temp_directory):
     """Test init_project updating tgtCcsid in existing project"""
-    with patch('pathlib.Path.cwd', return_value=temp_directory):
+    with patch("pathlib.Path.cwd", return_value=temp_directory):
         # Create existing iproj.json
-        iproj_path = temp_directory / 'iproj.json'
+        iproj_path = temp_directory / "iproj.json"
         iproj_path.write_text('{"version": "1.0.0", "tgtCcsid": "37"}')
 
-        init_project(force=False, objlib=None, tgtCcsid='1208')
+        init_project(force=False, objlib=None, tgtCcsid="1208")
 
         # Verify update was called
         assert mock_update.called or mock_create.called
 
 
-@patch('builtins.input', return_value='no')
+@patch("builtins.input", return_value="no")
 def test_init_project_cancelled(mock_input, temp_directory):
     """Test init_project when user cancels"""
-    with patch('pathlib.Path.cwd', return_value=temp_directory):
-        with patch('builtins.input') as mock_proj_input:
+    with patch("pathlib.Path.cwd", return_value=temp_directory):
+        with patch("builtins.input") as mock_proj_input:
             mock_proj_input.side_effect = [
-                'Test',
-                '',
-                '',
-                'LIB',
-                '37',
-                'LIB',
-                '',
-                '',
-                '',
-                '',
-                'no'  # Cancel
+                "Test",
+                "",
+                "",
+                "LIB",
+                "37",
+                "LIB",
+                "",
+                "",
+                "",
+                "",
+                "no",  # Cancel
             ]
 
             with pytest.raises(SystemExit):
@@ -430,9 +410,9 @@ def test_init_project_cancelled(mock_input, temp_directory):
 def test_projspec_get_repository_with_git_config(temp_directory):
     """Test ProjSpec _get_repository with git config"""
     # Create a mock .git/config file
-    git_dir = temp_directory / '.git'
+    git_dir = temp_directory / ".git"
     git_dir.mkdir()
-    config_file = git_dir / 'config'
+    config_file = git_dir / "config"
     config_content = """[core]
     repositoryformatversion = 0
 [remote "origin"]
@@ -441,44 +421,44 @@ def test_projspec_get_repository_with_git_config(temp_directory):
 """
     config_file.write_text(config_content)
 
-    with patch('pathlib.Path.cwd', return_value=temp_directory):
-        with patch('builtins.input') as mock_input:
+    with patch("pathlib.Path.cwd", return_value=temp_directory):
+        with patch("builtins.input") as mock_input:
             mock_input.side_effect = [
-                'Test',
-                '',  # Will use git config
-                '',
-                'LIB',
-                '37',
-                'LIB',
-                '',
-                '',
-                '',
-                ''
+                "Test",
+                "",  # Will use git config
+                "",
+                "LIB",
+                "37",
+                "LIB",
+                "",
+                "",
+                "",
+                "",
             ]
 
             proj_spec = ProjSpec(None, None)
 
             # Should convert git@ URL to https://
-            assert proj_spec.repository == 'https://github.com/user/repo.git'
+            assert proj_spec.repository == "https://github.com/user/repo.git"
 
 
 def test_projspec_get_repository_without_git(temp_directory):
     """Test ProjSpec _get_repository without git config"""
-    with patch('pathlib.Path.cwd', return_value=temp_directory):
-        with patch('builtins.input') as mock_input:
+    with patch("pathlib.Path.cwd", return_value=temp_directory):
+        with patch("builtins.input") as mock_input:
             mock_input.side_effect = [
-                'Test',
-                '',  # No git config, should return empty
-                '',
-                'LIB',
-                '37',
-                'LIB',
-                '',
-                '',
-                '',
-                ''
+                "Test",
+                "",  # No git config, should return empty
+                "",
+                "LIB",
+                "37",
+                "LIB",
+                "",
+                "",
+                "",
+                "",
             ]
 
             proj_spec = ProjSpec(None, None)
 
-            assert proj_spec.repository == ''
+            assert proj_spec.repository == ""

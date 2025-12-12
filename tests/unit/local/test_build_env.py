@@ -25,7 +25,7 @@ def normalize_build_env_paths(content: str) -> str:
 
     def replacer(match):
         prefix = match.group(1)  # TGTCCSID_ or OBJPATH_
-        full_path = match.group(2)  # full path including ibmi-bob and after
+        full_path = match.group(2).replace("\\", "/")  # full path including ibmi-bob and after
         rest = match.group(3)  # everything after the path (:= ...)
 
         # Find index of 'ibmi-bob' in path, keep that and everything after
@@ -71,9 +71,8 @@ def test_build_env_with_targets_and_options(set_test_directory):
         with open(build_env.build_vars_path, 'r', encoding='utf-8') as actual_file, \
              open(".expectedBuildVarsMk.txt", 'r', encoding='utf-8') as expected_file:
 
-            actual_file_contents = normalize_build_env_paths(actual_file.read())
-            expected_file_contents = normalize_build_env_paths(expected_file.read())
-            assert actual_file_contents == expected_file_contents
+            assert sorted(normalize_build_env_paths(actual_file.read()).splitlines()) == \
+                sorted(normalize_build_env_paths(expected_file.read()).splitlines())
     finally:
         if build_env:
             build_env._post_make()

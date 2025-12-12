@@ -6,24 +6,26 @@ from makei.crtfrmstmf import (
     check_object_exists,
     get_physical_dependencies,
     delete_objects,
-    filter_joblogs
+    filter_joblogs,
 )
 
 
 def test_command_map():
     """Test COMMAND_MAP contains expected mappings"""
     assert isinstance(COMMAND_MAP, dict)
-    assert COMMAND_MAP['CRTCMD'] == 'CMD'
-    assert COMMAND_MAP['CRTBNDCL'] == 'PGM'
-    assert COMMAND_MAP['CRTPF'] == 'FILE'
-    assert COMMAND_MAP['CRTSRVPGM'] == 'SRVPGM'
-    assert COMMAND_MAP['CRTRPGPGM'] == 'PGM'
+    assert COMMAND_MAP["CRTCMD"] == "CMD"
+    assert COMMAND_MAP["CRTBNDCL"] == "PGM"
+    assert COMMAND_MAP["CRTPF"] == "FILE"
+    assert COMMAND_MAP["CRTSRVPGM"] == "SRVPGM"
+    assert COMMAND_MAP["CRTRPGPGM"] == "PGM"
 
 
-@patch('makei.crtfrmstmf.IBMJob')
-@patch('makei.crtfrmstmf.retrieve_ccsid')
-@patch('makei.crtfrmstmf.check_object_exists')
-def test_crtfrmstmf_initialization(mock_check_exists, mock_retrieve_ccsid, mock_ibm_job):
+@patch("makei.crtfrmstmf.IBMJob")
+@patch("makei.crtfrmstmf.retrieve_ccsid")
+@patch("makei.crtfrmstmf.check_object_exists")
+def test_crtfrmstmf_initialization(
+    mock_check_exists, mock_retrieve_ccsid, mock_ibm_job
+):
     """Test CrtFrmStmf initialization"""
     mock_check_exists.return_value = False
     mock_retrieve_ccsid.return_value = "37"
@@ -35,7 +37,7 @@ def test_crtfrmstmf_initialization(mock_check_exists, mock_retrieve_ccsid, mock_
         obj="TESTOBJ",
         lib="TESTLIB",
         cmd="CRTRPGPGM",
-        rcdlen=112
+        rcdlen=112,
     )
 
     assert crt.srcstmf == "/path/to/source.rpgle"
@@ -47,10 +49,12 @@ def test_crtfrmstmf_initialization(mock_check_exists, mock_retrieve_ccsid, mock_
     assert crt.back_up_obj_list == []
 
 
-@patch('makei.crtfrmstmf.IBMJob')
-@patch('makei.crtfrmstmf.retrieve_ccsid')
-@patch('makei.crtfrmstmf.check_object_exists')
-def test_crtfrmstmf_with_tgt_ccsid(mock_check_exists, mock_retrieve_ccsid, mock_ibm_job):
+@patch("makei.crtfrmstmf.IBMJob")
+@patch("makei.crtfrmstmf.retrieve_ccsid")
+@patch("makei.crtfrmstmf.check_object_exists")
+def test_crtfrmstmf_with_tgt_ccsid(
+    mock_check_exists, mock_retrieve_ccsid, mock_ibm_job
+):
     """Test CrtFrmStmf with explicit target CCSID"""
     mock_check_exists.return_value = False
     mock_job_instance = Mock()
@@ -62,7 +66,7 @@ def test_crtfrmstmf_with_tgt_ccsid(mock_check_exists, mock_retrieve_ccsid, mock_
         lib="TESTLIB",
         cmd="CRTRPGPGM",
         rcdlen=112,
-        tgt_ccsid="37"
+        tgt_ccsid="37",
     )
 
     assert crt.ccsid_c == "37"
@@ -70,10 +74,12 @@ def test_crtfrmstmf_with_tgt_ccsid(mock_check_exists, mock_retrieve_ccsid, mock_
     mock_retrieve_ccsid.assert_not_called()
 
 
-@patch('makei.crtfrmstmf.IBMJob')
-@patch('makei.crtfrmstmf.retrieve_ccsid')
-@patch('makei.crtfrmstmf.check_object_exists')
-def test_crtfrmstmf_with_parameters(mock_check_exists, mock_retrieve_ccsid, mock_ibm_job):
+@patch("makei.crtfrmstmf.IBMJob")
+@patch("makei.crtfrmstmf.retrieve_ccsid")
+@patch("makei.crtfrmstmf.check_object_exists")
+def test_crtfrmstmf_with_parameters(
+    mock_check_exists, mock_retrieve_ccsid, mock_ibm_job
+):
     """Test CrtFrmStmf with compile parameters"""
     mock_check_exists.return_value = False
     mock_retrieve_ccsid.return_value = "37"
@@ -87,30 +93,35 @@ def test_crtfrmstmf_with_parameters(mock_check_exists, mock_retrieve_ccsid, mock
         lib="TESTLIB",
         cmd="CRTRPGPGM",
         rcdlen=112,
-        parameters=parameters
+        parameters=parameters,
     )
 
     assert crt.parameters == parameters
 
 
-@patch('makei.crtfrmstmf.IBMJob')
-@patch('makei.crtfrmstmf.retrieve_ccsid')
-@patch('makei.crtfrmstmf.check_object_exists')
-@patch('makei.crtfrmstmf.get_physical_dependencies')
-def test_crtfrmstmf_with_existing_pf(mock_get_deps, mock_check_exists, mock_retrieve_ccsid, mock_ibm_job):
+@patch("makei.crtfrmstmf.IBMJob")
+@patch("makei.crtfrmstmf.retrieve_ccsid")
+@patch("makei.crtfrmstmf.check_object_exists")
+@patch("makei.crtfrmstmf.get_physical_dependencies")
+def test_crtfrmstmf_with_existing_pf(
+    mock_get_deps, mock_check_exists, mock_retrieve_ccsid, mock_ibm_job
+):
     """Test CrtFrmStmf with existing physical file"""
     mock_check_exists.return_value = True
     mock_retrieve_ccsid.return_value = "37"
     mock_job_instance = Mock()
     mock_ibm_job.return_value = mock_job_instance
-    mock_get_deps.return_value = [("TESTOBJ", "TESTLIB", "FILE"), ("LOGFILE", "TESTLIB", "FILE")]
+    mock_get_deps.return_value = [
+        ("TESTOBJ", "TESTLIB", "FILE"),
+        ("LOGFILE", "TESTLIB", "FILE"),
+    ]
 
     crt = CrtFrmStmf(
         srcstmf="/path/to/source.pf",
         obj="TESTOBJ",
         lib="TESTLIB",
         cmd="CRTPF",
-        rcdlen=112
+        rcdlen=112,
     )
 
     # For PF, should get dependencies
@@ -118,9 +129,9 @@ def test_crtfrmstmf_with_existing_pf(mock_get_deps, mock_check_exists, mock_retr
     mock_get_deps.assert_called_once()
 
 
-@patch('makei.crtfrmstmf.IBMJob')
-@patch('makei.crtfrmstmf.retrieve_ccsid')
-@patch('makei.crtfrmstmf.check_object_exists')
+@patch("makei.crtfrmstmf.IBMJob")
+@patch("makei.crtfrmstmf.retrieve_ccsid")
+@patch("makei.crtfrmstmf.check_object_exists")
 def test_crtfrmstmf_setup_env(mock_check_exists, mock_retrieve_ccsid, mock_ibm_job):
     """Test setup_env method"""
     mock_check_exists.return_value = False
@@ -132,7 +143,7 @@ def test_crtfrmstmf_setup_env(mock_check_exists, mock_retrieve_ccsid, mock_ibm_j
         "curlib": "MYLIB",
         "preUsrlibl": "LIB1 LIB2",
         "postUsrlibl": "LIB3 LIB4",
-        "IBMiEnvCmd": "CHGJOB CCSID(37)\\nADDLIBLE QGPL"
+        "IBMiEnvCmd": "CHGJOB CCSID(37)\\nADDLIBLE QGPL",
     }
 
     crt = CrtFrmStmf(
@@ -141,7 +152,7 @@ def test_crtfrmstmf_setup_env(mock_check_exists, mock_retrieve_ccsid, mock_ibm_j
         lib="TESTLIB",
         cmd="CRTRPGPGM",
         rcdlen=112,
-        env_settings=env_settings
+        env_settings=env_settings,
     )
 
     crt.setup_env()
@@ -156,7 +167,7 @@ def test_crtfrmstmf_setup_env(mock_check_exists, mock_retrieve_ccsid, mock_ibm_j
     assert any("ADDLIBLE" in str(call) for call in calls)
 
 
-@patch('os.popen')
+@patch("os.popen")
 def test_retrieve_ccsid(mock_popen):
     """Test retrieve_ccsid function"""
     mock_stream = Mock()
@@ -166,12 +177,12 @@ def test_retrieve_ccsid(mock_popen):
     ccsid = retrieve_ccsid("/path/to/file")
 
     assert ccsid == "37"
-    mock_popen.assert_called_once_with('/QOpenSys/usr/bin/attr /path/to/file')
+    mock_popen.assert_called_once_with("/QOpenSys/usr/bin/attr /path/to/file")
 
 
 def test_check_object_exists():
     """Test check_object_exists function"""
-    with patch('pathlib.Path.exists') as mock_exists:
+    with patch("pathlib.Path.exists") as mock_exists:
         mock_exists.return_value = True
         result = check_object_exists("TESTOBJ", "TESTLIB", "PGM")
         assert result is True
@@ -181,7 +192,7 @@ def test_check_object_exists():
         assert result is False
 
 
-@patch('makei.crtfrmstmf.IBMJob')
+@patch("makei.crtfrmstmf.IBMJob")
 def test_get_physical_dependencies(mock_ibm_job):
     """Test get_physical_dependencies function"""
     mock_job_instance = Mock()
@@ -190,10 +201,10 @@ def test_get_physical_dependencies(mock_ibm_job):
     # Mock the SQL results
     mock_job_instance.run_sql.return_value = (
         [("LOGFILE", "TESTLIB"), ("DETFILE", "TESTLIB")],
-        ["WHREFI", "WHRELI"]
+        ["WHREFI", "WHRELI"],
     )
 
-    with patch('pathlib.Path.exists', return_value=True):
+    with patch("pathlib.Path.exists", return_value=True):
         deps = get_physical_dependencies("TESTPF", "TESTLIB", True, mock_job_instance)
 
         assert len(deps) == 3  # 2 dependencies + self
@@ -202,7 +213,7 @@ def test_get_physical_dependencies(mock_ibm_job):
         assert ("DETFILE", "TESTLIB", "FILE") in deps
 
 
-@patch('makei.crtfrmstmf.IBMJob')
+@patch("makei.crtfrmstmf.IBMJob")
 def test_get_physical_dependencies_without_self(mock_ibm_job):
     """Test get_physical_dependencies without including self"""
     mock_job_instance = Mock()
@@ -210,10 +221,10 @@ def test_get_physical_dependencies_without_self(mock_ibm_job):
 
     mock_job_instance.run_sql.return_value = (
         [("LOGFILE", "TESTLIB")],
-        ["WHREFI", "WHRELI"]
+        ["WHREFI", "WHRELI"],
     )
 
-    with patch('pathlib.Path.exists', return_value=True):
+    with patch("pathlib.Path.exists", return_value=True):
         deps = get_physical_dependencies("TESTPF", "TESTLIB", False, mock_job_instance)
 
         assert len(deps) == 1
@@ -221,16 +232,13 @@ def test_get_physical_dependencies_without_self(mock_ibm_job):
         assert ("LOGFILE", "TESTLIB", "FILE") in deps
 
 
-@patch('shutil.rmtree')
-@patch('pathlib.Path.exists')
+@patch("shutil.rmtree")
+@patch("pathlib.Path.exists")
 def test_delete_objects(mock_exists, mock_rmtree):
     """Test delete_objects function"""
     mock_exists.return_value = True
 
-    obj_list = [
-        ("OBJ1", "LIB1", "PGM"),
-        ("OBJ2", "LIB1", "FILE")
-    ]
+    obj_list = [("OBJ1", "LIB1", "PGM"), ("OBJ2", "LIB1", "FILE")]
 
     delete_objects(obj_list, verbose=False)
 
@@ -273,22 +281,21 @@ def test_filter_joblogs_with_text_patterns():
     # Should filter job change errors
     record = {
         "MESSAGE_ID": "CPF1234",
-        "MESSAGE_TEXT": "Job changed successfully; however errors occurred."
+        "MESSAGE_TEXT": "Job changed successfully; however errors occurred.",
     }
     assert filter_joblogs(record) is False
 
     # Should keep normal messages
-    record2 = {
-        "MESSAGE_ID": "RNF7031",
-        "MESSAGE_TEXT": "Variable TEST not defined"
-    }
+    record2 = {"MESSAGE_ID": "RNF7031", "MESSAGE_TEXT": "Variable TEST not defined"}
     assert filter_joblogs(record2) is True
 
 
-@patch('makei.crtfrmstmf.IBMJob')
-@patch('makei.crtfrmstmf.retrieve_ccsid')
-@patch('makei.crtfrmstmf.check_object_exists')
-def test_crtfrmstmf_with_precmd_postcmd(mock_check_exists, mock_retrieve_ccsid, mock_ibm_job):
+@patch("makei.crtfrmstmf.IBMJob")
+@patch("makei.crtfrmstmf.retrieve_ccsid")
+@patch("makei.crtfrmstmf.check_object_exists")
+def test_crtfrmstmf_with_precmd_postcmd(
+    mock_check_exists, mock_retrieve_ccsid, mock_ibm_job
+):
     """Test CrtFrmStmf with pre and post commands"""
     mock_check_exists.return_value = False
     mock_retrieve_ccsid.return_value = "37"
@@ -302,17 +309,22 @@ def test_crtfrmstmf_with_precmd_postcmd(mock_check_exists, mock_retrieve_ccsid, 
         cmd="CRTRPGPGM",
         rcdlen=112,
         precmd="CHGJOB CCSID(37)",
-        postcmd="GRTOBJAUT OBJ(TESTLIB/TESTOBJ) OBJTYPE(*PGM) USER(*PUBLIC) AUT(*USE)"
+        postcmd="GRTOBJAUT OBJ(TESTLIB/TESTOBJ) OBJTYPE(*PGM) USER(*PUBLIC) AUT(*USE)",
     )
 
     assert crt.precmd == "CHGJOB CCSID(37)"
-    assert crt.postcmd == "GRTOBJAUT OBJ(TESTLIB/TESTOBJ) OBJTYPE(*PGM) USER(*PUBLIC) AUT(*USE)"
+    assert (
+        crt.postcmd
+        == "GRTOBJAUT OBJ(TESTLIB/TESTOBJ) OBJTYPE(*PGM) USER(*PUBLIC) AUT(*USE)"
+    )
 
 
-@patch('makei.crtfrmstmf.IBMJob')
-@patch('makei.crtfrmstmf.retrieve_ccsid')
-@patch('makei.crtfrmstmf.check_object_exists')
-def test_crtfrmstmf_obj_type_mapping(mock_check_exists, mock_retrieve_ccsid, mock_ibm_job):
+@patch("makei.crtfrmstmf.IBMJob")
+@patch("makei.crtfrmstmf.retrieve_ccsid")
+@patch("makei.crtfrmstmf.check_object_exists")
+def test_crtfrmstmf_obj_type_mapping(
+    mock_check_exists, mock_retrieve_ccsid, mock_ibm_job
+):
     """Test that obj_type is correctly mapped from command"""
     mock_check_exists.return_value = False
     mock_retrieve_ccsid.return_value = "37"
@@ -330,10 +342,6 @@ def test_crtfrmstmf_obj_type_mapping(mock_check_exists, mock_retrieve_ccsid, moc
 
     for cmd, expected_type in test_cases:
         crt = CrtFrmStmf(
-            srcstmf="/path/to/source",
-            obj="TESTOBJ",
-            lib="TESTLIB",
-            cmd=cmd,
-            rcdlen=112
+            srcstmf="/path/to/source", obj="TESTOBJ", lib="TESTLIB", cmd=cmd, rcdlen=112
         )
         assert crt.obj_type == expected_type, f"Failed for {cmd}"
