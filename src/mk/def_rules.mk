@@ -273,7 +273,6 @@ CPPMOD_AUT := $(AUT)
 CPPMOD_DBGVIEW := $(DBGVIEW)
 CPPMOD_DBGENCKEY := $(DBGENCKEY)
 CPPMOD_USRPRF := $(USRPRF)
-CMOD_DEFINE := $(DEFINE)
 CPPMOD_OPTIMIZE := $(OPTIMIZE)
 CPPMOD_OPTION := $(OPTION)
 CPPMOD_INCDIR := $(INCDIR)
@@ -305,6 +304,7 @@ CMOD_STGMDL := *INHERIT
 CMOD_SYSIFCOPT := *IFS64IO
 CMOD_TERASPACE := *YES *NOTSIFC
 CMOD_TGTRLS := $(TGTRLS)
+CMOD_USRPRF := $(USRPRF)
 
 CRTPGM_OPTION := $(OPTION)
 ifeq ($(COMPATIBILITYMODE), true)
@@ -384,6 +384,8 @@ CBLMOD_INCDIR := $(INCDIR)
 CBLMOD_OPTIMIZE := $(OPTIMIZE)
 CBLMOD_OPTION := $(OPTION)
 CBLMOD_TGTRLS := $(TGTRLS)
+CBLMOD_USRPRF := $(USRPRF)
+
 
 SQLCIMOD_DBGVIEW := *SOURCE
 SQLCIMOD_DBGENCKEY := $(CMOD_DBGENCKEY)
@@ -438,6 +440,7 @@ SQLCBLIPGM_OBJTYPE := *PGM
 SQLCBLIPGM_OPTION := $(OPTION)
 
 SQL_TGTRLS := $(TGTRLS)
+SQL_USRPRF := $(USRPRF)
 
 
 SRVPGM_ACTGRP := *CALLER
@@ -880,6 +883,20 @@ moduleTGTRLS = $(strip \
 	$(if $(filter %.SQLCBLLE,$<),$(CBLMOD_TGTRLS), \
 	$(if $(filter %.sqlcblle,$<),$(CBLMOD_TGTRLS), \
 	UNKNOWN_FILE_TYPE)))))))))))))))))))
+moduleUSRPRF = $(strip \
+	$(if $(filter %.C,$<),$(CMOD_USRPRF), \
+	$(if $(filter %.c,$<),$(CMOD_USRPRF), \
+	$(if $(filter %.CPP,$<),$(CPPMOD_USRPRF), \
+	$(if $(filter %.cpp,$<),$(CPPMOD_USRPRF), \
+	$(if $(filter %.SQLC,$<),$(CMOD_USRPRF), \
+	$(if $(filter %.sqlc,$<),$(CMOD_USRPRF), \
+	$(if $(filter %.SQLRPGLE,$<),$(SQLRPGIMOD_USRPRF), \
+	$(if $(filter %.sqlrpgle,$<),$(SQLRPGIMOD_USRPRF), \
+	$(if $(filter %.SQLCBLLE,$<),$(CBLMOD_USRPRF), \
+	$(if $(filter %.sqlcblle,$<),$(CBLMOD_USRPRF), \
+	$(if $(filter %.SQLCPP,$<),$(CPPMOD_USRPRF), \
+	$(if $(filter %.sqlcpp,$<),$(CPPMOD_USRPRF), \
+	UNKNOWN_FILE_TYPE)))))))))))))
 
 # Determine default settings for the various source types that can make a program object.
 programACTGRP = $(strip \
@@ -1064,7 +1081,8 @@ srvpgmTGTRLS = $(strip \
 	$(if $(filter %.SQLUDF,$<),$(SQL_TGTRLS), \
 	$(if $(filter %.sqludf,$<),$(SQL_TGTRLS), \
 	$(if $(filter %.SQLVAR,$<),$(SQL_TGTRLS), \
-	UNKNOWN_FILE_TYPE))))))))
+	$(if $(filter %.sqlvar,$<),$(SQL_TGTRLS), \
+	UNKNOWN_FILE_TYPE)))))))))
 
 #    ____ __  __ ____    ____           _
 #   / ___|  \/  |  _ \  |  _ \ ___  ___(_)_ __   ___  ___
@@ -1315,7 +1333,8 @@ define MODULE_VARIABLES
 	$(eval STGMDL = $(moduleSTGMDL))\
 	$(eval SYSIFCOPT = $(moduleSYSIFCOPT))\
 	$(eval TERASPACE = $(moduleTERASPACE))\
-	$(eval TGTRLS = $(moduleTGTRLS))
+	$(eval TGTRLS = $(moduleTGTRLS))\
+	$(eval USRPRF = $(moduleUSRPRF))
 endef
 
 define C_TO_MODULE_RECIPE =
