@@ -1065,11 +1065,14 @@ def test_sql_recipe():
     assert rules_mk.rules[0].commands == []
     assert rules_mk.rules[0].dependencies == []
     assert rules_mk.rules[0].include_dirs == []
-    assert rules_mk.rules[0].target == 'VALUSE.SRVPGM'
-    assert rules_mk.rules[0].source_file == 'VALUSE.SQLVAR'
-    assert str(rules_mk.rules[0]) == '''VALUSE.SRVPGM_SRC=VALUSE.SQLVAR
+    assert rules_mk.rules[0].target == "VALUSE.SRVPGM"
+    assert rules_mk.rules[0].source_file == "VALUSE.SQLVAR"
+    assert (
+        str(rules_mk.rules[0])
+        == """VALUSE.SRVPGM_SRC=VALUSE.SQLVAR
 VALUSE.SRVPGM_DEP=
-VALUSE.SRVPGM_RECIPE=SQLVAR_TO_SRVPGM_RECIPE\n'''
+VALUSE.SRVPGM_RECIPE=SQLVAR_TO_SRVPGM_RECIPE\n"""
+    )
 
     assert rules_mk.rules[1].variables == []
     assert rules_mk.rules[1].commands == []
