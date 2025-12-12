@@ -229,21 +229,16 @@ def read_and_filter_rules_mk(source_names):
     Uses the new src_obj_mapping to correctly handle multi-target sources.
     """
     build_targets = []
-    
     for source_name in source_names:
         source_path = Path(source_name)
         rules_mk_path = source_path.parent / "Rules.mk"
-        
         if not rules_mk_path.exists():
             raise FileNotFoundError(f"No Rules.mk found at {rules_mk_path}")
-        
         # Parse the Rules.mk to get the source-to-object mapping
         rules_mk = RulesMk.from_file(rules_mk_path, str(rules_mk_path.parent))
-        
         # Get the source file name and extension
         name, _, ext, _ = decompose_filename(source_name)
         source_key = f"{name.upper()}.{ext.upper()}"
-        
         # Look up the target(s) for this source file
         if source_key in rules_mk.src_obj_mapping:
             targets = rules_mk.src_obj_mapping[source_key]
@@ -264,10 +259,8 @@ def read_and_filter_rules_mk(source_names):
                             if target_ext in FILE_TARGET_MAPPING.get(ext, set()):
                                 build_targets.append(target)
                                 break
-    
     if not build_targets:
         raise ValueError(f"No targets found for source files: {', '.join(source_names)}")
-    
     return build_targets
 
 
