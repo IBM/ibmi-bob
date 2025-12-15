@@ -95,6 +95,8 @@ def test_file_target_mapping():
     assert FILE_TARGET_MAPPING["DSPF"] == {"FILE"}
     assert FILE_TARGET_MAPPING["MODULE"] == {"PGM"}
     assert FILE_TARGET_MAPPING["BND"] == {"SRVPGM"}
+    assert FILE_TARGET_MAPPING["SYSTRG"] == {"TRG"}
+
 
 
 def test_file_max_ext_length():
@@ -221,6 +223,7 @@ def test_file_extensions_coverage():
         "PF",
         "LF",
         "DSPF",
+        "SYSTRG"
     ]
 
     for ext in common_extensions:

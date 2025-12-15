@@ -1,3 +1,5 @@
+- Added support for building SYSTRG sources as TRG objects instead of PGM objects 
+  for `makei c` command.
 - Added support to read target names from the `rules.mk` file for the `makei c` command.
 - Added a new recipe to support files with the .sqlvar extension.
 - support arbitrary long source names even in compile by looking up 
