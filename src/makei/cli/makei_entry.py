@@ -13,7 +13,6 @@ from makei.cvtsrcpf import CvtSrcPf
 from makei.utils import Colors, colored, decompose_filename
 from pathlib import Path
 from makei.const import FILE_TARGET_MAPPING
-from makei.rules_mk import RulesMk
 
 
 def cli():
@@ -225,42 +224,23 @@ def handle_info(args):
 
 def read_and_filter_rules_mk(source_names):
     """
-    Read the Rules.mk file and return targets that match the source files.
-    Uses the new src_obj_mapping to correctly handle multi-target sources.
+    Read the Rules.mk file and return targets that match allowed extensions.
     """
     build_targets = []
-    for source_name in source_names:
-        source_path = Path(source_name)
-        rules_mk_path = source_path.parent / "Rules.mk"
-        if not rules_mk_path.exists():
-            raise FileNotFoundError(f"No Rules.mk found at {rules_mk_path}")
-        # Parse the Rules.mk to get the source-to-object mapping
-        rules_mk = RulesMk.from_file(rules_mk_path, str(rules_mk_path.parent))
-        # Get the source file name and extension
-        name, _, ext, _ = decompose_filename(source_name)
-        source_key = f"{name.upper()}.{ext.upper()}"
-        # Look up the target(s) for this source file
-        if source_key in rules_mk.src_obj_mapping:
-            targets = rules_mk.src_obj_mapping[source_key]
-            build_targets.extend(targets)
-        else:
-            # Fallback: try to find targets by reading Rules.mk directly
-            with rules_mk_path.open("r") as f:
-                for raw_line in f:
-                    line = raw_line.strip()
-                    if not line or line.startswith("#") or ":" not in line:
-                        continue
-                    target = line.split(":", 1)[0].strip()
-                    # Check if this line references our source file
-                    if source_path.name.lower() in line.lower():
-                        if target and "." in target:
-                            target_ext = target.rsplit(".", 1)[1]
-                            # Verify the target extension is valid for this source type
-                            if target_ext in FILE_TARGET_MAPPING.get(ext, set()):
-                                build_targets.append(target)
-                                break
-    if not build_targets:
-        raise ValueError(f"No targets found for source files: {', '.join(source_names)}")
+    name, _, ext, _ = decompose_filename(source_names[0])
+    rules_mk_path = Path(source_names[0]).parent / "Rules.mk"
+    if not rules_mk_path.exists():
+        raise FileNotFoundError(f"No Rules.mk found at {rules_mk_path}")
+    with rules_mk_path.open("r") as f:
+        for raw_line in f:
+            line = raw_line.strip()
+            if not line or line.startswith("#") or ":" not in line:
+                continue  # skip blank lines, comments, or malformed lines
+            target = line.split(":", 1)[0].strip()
+            if target and "." in target and target.rsplit(".", 1)[1] in FILE_TARGET_MAPPING[ext]:
+                build_targets.append(target)
+            else:
+                raise ValueError(f"No target mapping extension for '{target}'")
     return build_targets
 
 
