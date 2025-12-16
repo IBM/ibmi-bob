@@ -227,6 +227,7 @@ def read_and_filter_rules_mk(source_names):
     Read the Rules.mk file and return targets that match allowed extensions.
     """
     build_targets = []
+    source_path = Path(source_names[0])
     name, _, ext, _ = decompose_filename(source_names[0])
     rules_mk_path = Path(source_names[0]).parent / "Rules.mk"
     if not rules_mk_path.exists():
@@ -236,11 +237,12 @@ def read_and_filter_rules_mk(source_names):
             line = raw_line.strip()
             if not line or line.startswith("#") or ":" not in line:
                 continue  # skip blank lines, comments, or malformed lines
-            target = line.split(":", 1)[0].strip()
-            if target and "." in target and target.rsplit(".", 1)[1] in FILE_TARGET_MAPPING[ext]:
+            target, deps = map(str.strip, line.split(":", 1))
+            dep_list = deps.split()
+            if source_path.name in dep_list:
                 build_targets.append(target)
-            else:
-                raise ValueError(f"No target mapping extension for '{target}'")
+    if not build_targets:
+        raise ValueError(f"No target found in Rules.mk for source file '{source_path.name}'")
     return build_targets
 
 
