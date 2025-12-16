@@ -12,7 +12,6 @@ from makei.build import BuildEnv
 from makei.cvtsrcpf import CvtSrcPf
 from makei.utils import Colors, colored, decompose_filename
 from pathlib import Path
-from makei.const import FILE_TARGET_MAPPING
 
 
 def cli():
