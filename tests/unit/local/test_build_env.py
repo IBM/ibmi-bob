@@ -28,9 +28,14 @@ def normalize_build_env_paths(content: str) -> str:
         full_path = match.group(2).replace("\\", "/")  # full path including ibmi-bob and after
         rest = match.group(3)  # everything after the path (:= ...)
 
-        # Find index of 'ibmi-bob' in path, keep that and everything after
-        ibmi_index = full_path.find('ibmi-bob')
-        normalized_path = '{ROOT_PATH}/' + full_path[ibmi_index:]
+        # Find LAST index of 'ibmi-bob' in path to handle duplicate directory names
+        # (e.g., /home/runner/work/ibmi-bob/ibmi-bob/tests/...)
+        ibmi_index = full_path.rfind('ibmi-bob')
+        if ibmi_index == -1:
+            # Fallback if 'ibmi-bob' not found
+            normalized_path = full_path
+        else:
+            normalized_path = '{ROOT_PATH}/' + full_path[ibmi_index:]
 
         return f"{prefix}{normalized_path}{rest}"
 
