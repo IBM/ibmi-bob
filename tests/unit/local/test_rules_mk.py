@@ -1100,6 +1100,7 @@ VALUSE.QMQRY_RECIPE=SQL_TO_QMQRY_RECIPE
 """
     )
 
+
 def test_trg_recipe():
     # Test loading from a valid file
     rules_mk = RulesMk.from_file(data_dir / "trg.rules.mk", data_dir)
@@ -1123,14 +1124,13 @@ def test_trg_recipe():
         "WSCSTs": [],
         "MSGs": [],
     }
-    
     assert rules_mk.src_obj_mapping["ORD700A.SYSTRG"] == ["ORD700A.TRG"]
     assert rules_mk.src_obj_mapping["MYPF1.PF"] == ["MYPF1.FILE"]
     assert rules_mk.src_obj_mapping["TRGPGM.PGM.RPGLE"] == ["TRGPGM.PGM"]
     assert rules_mk.containing_dir == data_dir
     assert rules_mk.subdirs == []
     assert rules_mk.targets == expected_targets
-    
+
     # Test MYPF1.FILE rule
     assert rules_mk.rules[0].variables == []
     assert rules_mk.rules[0].commands == []
@@ -1143,9 +1143,7 @@ def test_trg_recipe():
         == """MYPF1.FILE_SRC=mypf1.pf
 MYPF1.FILE_DEP=
 MYPF1.FILE_RECIPE=PF_TO_FILE_RECIPE
-"""
-    )
-    
+""")
     # Test TRGPGM.PGM rule
     assert rules_mk.rules[1].variables == []
     assert rules_mk.rules[1].commands == []
@@ -1158,9 +1156,7 @@ MYPF1.FILE_RECIPE=PF_TO_FILE_RECIPE
         == """TRGPGM.PGM_SRC=trgpgm.pgm.rpgle
 TRGPGM.PGM_DEP=
 TRGPGM.PGM_RECIPE=PGM.RPGLE_TO_PGM_RECIPE
-"""
-    )
-    
+""")
     # Test ORD700A.TRG rule
     assert rules_mk.rules[2].variables == []
     assert rules_mk.rules[2].commands == []
@@ -1193,5 +1189,4 @@ TRGPGM.PGM_RECIPE=PGM.RPGLE_TO_PGM_RECIPE
 ORD700A.TRG_SRC=ORD700A.SYSTRG
 ORD700A.TRG_DEP=TRGPGM.PGM MYPF1.FILE
 ORD700A.TRG_RECIPE=SYSTRG_TO_TRG_RECIPE
-"""
-    )
+""")

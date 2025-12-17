@@ -98,7 +98,6 @@ def test_file_target_mapping():
     assert FILE_TARGET_MAPPING["SYSTRG"] == {"TRG"}
 
 
-
 def test_file_max_ext_length():
     """Test FILE_MAX_EXT_LENGTH is calculated correctly"""
     assert isinstance(FILE_MAX_EXT_LENGTH, int)
