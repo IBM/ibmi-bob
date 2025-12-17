@@ -1065,11 +1065,14 @@ def test_sql_recipe():
     assert rules_mk.rules[0].commands == []
     assert rules_mk.rules[0].dependencies == []
     assert rules_mk.rules[0].include_dirs == []
-    assert rules_mk.rules[0].target == 'VALUSE.SRVPGM'
-    assert rules_mk.rules[0].source_file == 'VALUSE.SQLVAR'
-    assert str(rules_mk.rules[0]) == '''VALUSE.SRVPGM_SRC=VALUSE.SQLVAR
+    assert rules_mk.rules[0].target == "VALUSE.SRVPGM"
+    assert rules_mk.rules[0].source_file == "VALUSE.SQLVAR"
+    assert (
+        str(rules_mk.rules[0])
+        == """VALUSE.SRVPGM_SRC=VALUSE.SQLVAR
 VALUSE.SRVPGM_DEP=
-VALUSE.SRVPGM_RECIPE=SQLVAR_TO_SRVPGM_RECIPE\n'''
+VALUSE.SRVPGM_RECIPE=SQLVAR_TO_SRVPGM_RECIPE\n"""
+    )
 
     assert rules_mk.rules[1].variables == []
     assert rules_mk.rules[1].commands == []
@@ -1094,5 +1097,101 @@ VALUSE.SRVPGM_RECIPE=SQLVAR_TO_SRVPGM_RECIPE
 VALUSE.QMQRY_SRC=VALUSE.SQL
 VALUSE.QMQRY_DEP=
 VALUSE.QMQRY_RECIPE=SQL_TO_QMQRY_RECIPE
+"""
+    )
+
+def test_trg_recipe():
+    # Test loading from a valid file
+    rules_mk = RulesMk.from_file(data_dir / "trg.rules.mk", data_dir)
+    expected_targets = {
+        "TRGs": ["ORD700A.TRG"],
+        "DTAARAs": [],
+        "DTAQs": [],
+        "SQLs": [],
+        "BNDDs": [],
+        "PFs": ["MYPF1.FILE"],
+        "LFs": [],
+        "DSPFs": [],
+        "PRTFs": [],
+        "CMDs": [],
+        "MODULEs": [],
+        "SRVPGMs": [],
+        "PGMs": ["TRGPGM.PGM"],
+        "MENUs": [],
+        "PNLGRPs": [],
+        "QMQRYs": [],
+        "WSCSTs": [],
+        "MSGs": [],
+    }
+    
+    assert rules_mk.src_obj_mapping["ORD700A.SYSTRG"] == ["ORD700A.TRG"]
+    assert rules_mk.src_obj_mapping["MYPF1.PF"] == ["MYPF1.FILE"]
+    assert rules_mk.src_obj_mapping["TRGPGM.PGM.RPGLE"] == ["TRGPGM.PGM"]
+    assert rules_mk.containing_dir == data_dir
+    assert rules_mk.subdirs == []
+    assert rules_mk.targets == expected_targets
+    
+    # Test MYPF1.FILE rule
+    assert rules_mk.rules[0].variables == []
+    assert rules_mk.rules[0].commands == []
+    assert rules_mk.rules[0].dependencies == []
+    assert rules_mk.rules[0].include_dirs == []
+    assert rules_mk.rules[0].target == "MYPF1.FILE"
+    assert rules_mk.rules[0].source_file == "mypf1.pf"
+    assert (
+        str(rules_mk.rules[0])
+        == """MYPF1.FILE_SRC=mypf1.pf
+MYPF1.FILE_DEP=
+MYPF1.FILE_RECIPE=PF_TO_FILE_RECIPE
+"""
+    )
+    
+    # Test TRGPGM.PGM rule
+    assert rules_mk.rules[1].variables == []
+    assert rules_mk.rules[1].commands == []
+    assert rules_mk.rules[1].dependencies == []
+    assert rules_mk.rules[1].include_dirs == []
+    assert rules_mk.rules[1].target == "TRGPGM.PGM"
+    assert rules_mk.rules[1].source_file == "trgpgm.pgm.rpgle"
+    assert (
+        str(rules_mk.rules[1])
+        == """TRGPGM.PGM_SRC=trgpgm.pgm.rpgle
+TRGPGM.PGM_DEP=
+TRGPGM.PGM_RECIPE=PGM.RPGLE_TO_PGM_RECIPE
+"""
+    )
+    
+    # Test ORD700A.TRG rule
+    assert rules_mk.rules[2].variables == []
+    assert rules_mk.rules[2].commands == []
+    assert rules_mk.rules[2].dependencies == ["TRGPGM.PGM", "MYPF1.FILE"]
+    assert rules_mk.rules[2].include_dirs == []
+    assert rules_mk.rules[2].target == "ORD700A.TRG"
+    assert rules_mk.rules[2].source_file == "ORD700A.SYSTRG"
+    assert (
+        str(rules_mk.rules[2])
+        == """ORD700A.TRG_SRC=ORD700A.SYSTRG
+ORD700A.TRG_DEP=TRGPGM.PGM MYPF1.FILE
+ORD700A.TRG_RECIPE=SYSTRG_TO_TRG_RECIPE
+"""
+    )
+
+    # Test full RulesMk string output
+    assert (
+        str(rules_mk)
+        == """TRGs := ORD700A.TRG
+PFs := MYPF1.FILE
+PGMs := TRGPGM.PGM
+
+
+MYPF1.FILE_SRC=mypf1.pf
+MYPF1.FILE_DEP=
+MYPF1.FILE_RECIPE=PF_TO_FILE_RECIPE
+TRGPGM.PGM_SRC=trgpgm.pgm.rpgle
+TRGPGM.PGM_DEP=
+TRGPGM.PGM_RECIPE=PGM.RPGLE_TO_PGM_RECIPE
+ORD700A.TRG_SRC=ORD700A.SYSTRG
+ORD700A.TRG_DEP=TRGPGM.PGM MYPF1.FILE
+ORD700A.TRG_RECIPE=SYSTRG_TO_TRG_RECIPE
 """
     )
