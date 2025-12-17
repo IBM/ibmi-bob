@@ -33,7 +33,7 @@ jobs:
         project:
           - { 
               name: bob-recursive-example,
-              branch: integration-test
+              branch: integration-test,
               lib: lib1,
               directory: functionsVAT,
               file: vat300.rpgle,
