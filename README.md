@@ -22,7 +22,7 @@
 
 # The Object Builder for i (TOBi)
 
-The Object Buiderl for i or _TOBi_ was known as Better Object Builder, or _Bob_ until 2025 when we hit a name collision with the very popular IBM Project Bob.  TOBi is a free and open source build system for the IBM i platform that is used to build native "QSYS" objects.  It was originally developed by [S4i Systems](http://www.s4isystems.com/), a leader in Electronic Document Management, to build their own software. In 2021, IBM began to make major investments in making TOBi span multiple directories and handle pseudo-source and a buildable project definition. TOBi is now hosted in IBM's public gihub and is under active development. It is released under the [Apache 2.0](https://github.com/IBM/ibmi-bob/pull/LICENSE) license to the open source community so that others can contribute and benefit.
+The Object Builder for i or _TOBi_ was known as Better Object Builder, or _Bob_ until 2025 when we hit a name collision with the very popular IBM Project Bob.  TOBi is a free and open source build system for the IBM i platform that is used to build native "QSYS" objects.  It was originally developed by [S4i Systems](http://www.s4isystems.com/), a leader in Electronic Document Management, to build their own software. In 2021, IBM began to make major investments in making TOBi span multiple directories and handle pseudo-source and a buildable project definition. TOBi is now hosted in IBM's public gihub and is under active development. It is released under the [Apache 2.0](https://github.com/IBM/ibmi-bob/pull/LICENSE) license to the open source community so that others can contribute and benefit.
 
 # Why Object Builder for i?
 
