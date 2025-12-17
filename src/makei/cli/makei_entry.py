@@ -237,8 +237,8 @@ def read_and_filter_rules_mk(source_names):
             if not line or line.startswith("#") or ":" not in line:
                 continue  # skip blank lines, comments, or malformed lines
             target, deps = map(str.strip, line.split(":", 1))
-            dep_list = deps.split()
-            if source_path.name in dep_list:
+            dep_list = [dep.upper() for dep in deps.split()]
+            if source_path.name.upper() in dep_list:
                 build_targets.append(target)
     if not build_targets:
         raise ValueError(f"No target found in Rules.mk for source file '{source_path.name}'")
@@ -265,7 +265,8 @@ def handle_compile(args):
             targets.append(make_dir_target(name))
         else:
             source_names.append(name)
-            targets = read_and_filter_rules_mk(source_names)
+            targets_from_rule = read_and_filter_rules_mk(source_names)
+            targets.extend([t.upper() for t in targets_from_rule])
     print(colored("targets: " + ', '.join(targets), Colors.OKBLUE))
     build_env = BuildEnv(targets, args.make_options, get_override_vars(args), trace=args.log)
     if args.log:
