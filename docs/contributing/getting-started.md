@@ -6,8 +6,8 @@ We are glad you are interested in contributing to TOBi. This document will help 
 To work on TOBi, you need to get the source code. You can do this by cloning the repository:
 
 ```bash
-git clone git@github.com:IBM/ibmi-bob.git
-cd ibmi-bob
+git clone git@github.com:IBM/ibmi-tobi.git
+cd ibmi-tobi
 ```
 
 ## Set up the develop environment
@@ -49,7 +49,7 @@ the version number, create a new tag, and push the tag to the remote repository.
 6. Optionally update the release with the description of the changes from the CHANGELOG
 7. Install RPM on an IBM i machine  [ Install RPM ](contributing/rpm-install)
 8. [Test TOBi](contributing/testing) on that IBM i.
-9. Use `nox -s publish` to create the spec file and create a new pull request to the spec file repository.
+9. Use [publish github action](https://github.com/IBM/ibmi-tobi/actions/workflows/publish_rpm.yml) to generate the `tobi.spec` and create a pull request on [rpm-specs repo](https://github.ibm.com/ibmi-oss/rpm-specs/).  Once the reviewer merges the `yum install tobi` will work.
 
 ## Versioning
 The version number is defined in the `src/makei/__init__.py` file and is handled by `bump2version` package.

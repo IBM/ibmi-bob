@@ -1,3 +1,5 @@
+- Added support for building SYSTRG sources as TRG objects instead of PGM objects 
+  for `makei c` command.
 * Tue Dec 16 2025 Het Patel <het.patel@ibm.com> - 3.1.0
 - Added support to read target names from the `rules.mk` file for the `makei c` command.
 - Added a new recipe to support files with the .sqlvar extension.
@@ -46,7 +48,7 @@
 - Document `-l` and `-t` options for cvtsrcpf
 - Fix using source name to CHGOBJD for text description
 - Support referencing variables in compiler parameter overrides
-- Ability to support wildcarding to override the rule to make a certain types of objects (https://ibm.github.io/ibmi-bob/#/prepare-the-project/rules.mk?id=wildcarding)
+- Ability to support wildcarding to override the rule to make a certain types of objects (https://ibm.github.io/ibmi-tobi/#/prepare-the-project/rules.mk?id=wildcarding)
 - Use license macro for license
 * Fri Jun 14 2024 Irfan Sharif <IrfanSharif@ibm.com> - 2.4.30
 - Fix of a correct error return code when compilation fails
@@ -106,7 +108,7 @@
 * Fri Jul 7 2023 Edmund Reinhardt <edmund.reinhard@ca.ibm.com> - 2.4.16
 - `makei cvtsrcpf -l` now supports optionally generating stream files
 with lowercase fie names.
-- Fixes https://github.com/IBM/ibmi-bob/issues/236 DTAARA now supported
+- Fixes https://github.com/IBM/ibmi-tobi/issues/236 DTAARA now supported
 * Fri Jun 30 2023 Edmund Reinhardt <edmund.reinhard@ca.ibm.com> - 2.4.15
 - `makei cvtsrcpf` now supports library and source physical file names
   specified in lower case.
@@ -120,23 +122,23 @@ with lowercase fie names.
   CL command, that CL command will be executed before or after the
   compile command.  Typically this is done using a
   'MYTARGET.PGM: private precmd = MYCUSTOMCL' rule in the Rules.mk
-  This implements https://github.com/IBM/ibmi-bob/issues/208
+  This implements https://github.com/IBM/ibmi-tobi/issues/208
 - The overriding of OBJLIB and TGTCCSID using .ibmi.json in
   a subdirectory needed to be restored. Fixed through
-  https://github.com/IBM/ibmi-bob/pull/229
+  https://github.com/IBM/ibmi-tobi/pull/229
 * Thu Apr 27 2023 Edmund Reinhardt <edmund.reinhard@ca.ibm.com> - 2.4.12
 - Support rules with no dependencies, which is useful for custom recipes.
-  Addresses https://github.com/IBM/ibmi-bob/issues/223
+  Addresses https://github.com/IBM/ibmi-tobi/issues/223
 - Support the splitting of lines using escaped newlines as described by
   https://www.gnu.org/software/make/manual/make.html#Splitting-Lines
 * Mon Apr 17 2023 Edmund Reinhardt <edmund.reinhard@ca.ibm.com> - 2.4.11
 - Fix SAVOBJ/RSTOBJ command for crtfrmstmf - failed when deleting files that
-  depend on a PF. https://github.com/IBM/ibmi-bob/issues/215 and 
-  https://github.com/IBM/ibmi-bob/issues/207
+  depend on a PF. https://github.com/IBM/ibmi-tobi/issues/215 and 
+  https://github.com/IBM/ibmi-tobi/issues/207
 - Fix that only last private compile parameter override processed from Rules.mk 
-  took effect.  Documented under https://github.com/IBM/ibmi-bob/issues/201.
+  took effect.  Documented under https://github.com/IBM/ibmi-tobi/issues/201.
 - Support multiple variable assignment operators, fixing 
-  https://github.com/IBM/ibmi-bob/issues/194
+  https://github.com/IBM/ibmi-tobi/issues/194
 * Mon Mar 6 2023 Edmund Reinhardt <edmund.reinhard@ca.ibm.com> - 2.4.10
 - Support CRTSQLCPPI and additional parameters for CMOD 
 - Support CVTCCSID and TGTCCSID for CCSID support of C and CPP
@@ -154,7 +156,7 @@ with lowercase fie names.
   job and lose the joblog.json info
 * Tue Jan 17 2023 Edmund Reinhardt <edmund.reinhard@ca.ibm.com> - 2.4.7
 - Improve project structure and automate release process.  See the documentation
-  at https://ibm.github.io/ibmi-bob/#/contributing/getting-started for how to 
+  at https://ibm.github.io/ibmi-tobi/#/contributing/getting-started for how to 
   setup development and run linter and tests and also release using `nox`.  
   Github actions are configured to be triggered when a tag of the vn.n.n-n is 
   pushed to master to publish to the yum repository.
@@ -201,7 +203,7 @@ with lowercase fie names.
 * Mon May 09 2022 Tongkun Zhang <tongkun.zhang@ibm.com> - 2.3.7
 - Fix UTF-8 handling
 * Mon May 09 2022 Tongkun Zhang <tongkun.zhang@ibm.com> - 2.3.6
-- New documentation site is available at https://ibm.github.io/ibmi-bob/
+- New documentation site is available at https://ibm.github.io/ibmi-tobi/
 - Do not generate .ibmi.json when invoking makei cvtsrcpf to avoid
   misleading as to when target CCSID is required
 - Fix the encoding issue(#86) on machines without Utf-8 support

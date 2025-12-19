@@ -326,7 +326,7 @@ def test_projspec_generate_rules_mk(mock_input):
     rules_mk = proj_spec.generate_rules_mk()
 
     assert "SUBDIRS :=" in rules_mk
-    assert "https://ibm.github.io/ibmi-bob" in rules_mk
+    assert "https://ibm.github.io/ibmi-tobi" in rules_mk
 
 
 @patch("builtins.input", side_effect=["yes"])

@@ -20,19 +20,19 @@ def set_test_directory(request):
 
 def normalize_build_env_paths(content: str) -> str:
     # This pattern finds lines starting with TGTCCSID_ or OBJPATH_,
-    # then a path that includes 'ibmi-bob', and replaces
-    # the absolute part before 'ibmi-bob' with '{ROOT_PATH}'.
+    # then a path that includes 'ibmi-tobi', and replaces
+    # the absolute part before 'ibmi-tobi' with '{ROOT_PATH}'.
 
     def replacer(match):
         prefix = match.group(1)  # TGTCCSID_ or OBJPATH_
-        full_path = match.group(2).replace("\\", "/")  # full path including ibmi-bob and after
+        full_path = match.group(2).replace("\\", "/")  # full path including ibmi-tobi and after
         rest = match.group(3)  # everything after the path (:= ...)
 
-        # Find LAST index of 'ibmi-bob' in path to handle duplicate directory names
-        # (e.g., /home/runner/work/ibmi-bob/ibmi-bob/tests/...)
-        ibmi_index = full_path.rfind('ibmi-bob')
+        # Find LAST index of 'ibmi-tobi' in path to handle duplicate directory names
+        # (e.g., /home/runner/work/ibmi-tobi/ibmi-tobi/tests/...)
+        ibmi_index = full_path.rfind('ibmi-tobi')
         if ibmi_index == -1:
-            # Fallback if 'ibmi-bob' not found
+            # Fallback if 'ibmi-tobi' not found
             normalized_path = full_path
         else:
             normalized_path = '{ROOT_PATH}/' + full_path[ibmi_index:]

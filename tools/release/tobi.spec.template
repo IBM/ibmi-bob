@@ -52,7 +52,7 @@ This is a compatibility package to redirect to get TOBi installed for anyone loo
 for Bob.
 
 %prep
-%setup -n ibmi-bob-%{version}
+%setup -n ibmi-tobi-%{version}
 
 
 %install

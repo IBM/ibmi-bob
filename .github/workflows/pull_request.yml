@@ -33,16 +33,18 @@ jobs:
         project:
           - { 
               name: bob-recursive-example,
+              branch: integration-test,
               lib: lib1,
               directory: functionsVAT,
               file: vat300.rpgle,
-              firstBuild: "0 failed 126 succeed 126 total",
+              firstBuild: "0 failed 127 succeed 127 total",
               secondBuild: "0 failed 5 succeed 5 total",
               firstCompile: "0 failed 1 succeed 1 total",
               secondCompile: "0 failed 2 succeed 2 total"
             }
           - { 
               name: ibmi-company_system,
+              branch: main,
               lib: CURLIB,
               directory: qrpglesrc,
               file: mypgm.pgm.rpgle,
@@ -52,7 +54,7 @@ jobs:
               secondCompile: "0 failed 1 succeed 1 total"
           }
     steps:
-      - name: Checkout ibmi-bob
+      - name: Checkout ibmi-tobi
         uses: actions/checkout@v4
       - name: Set up Node.js 20.x
         uses: actions/setup-node@v3
@@ -75,6 +77,7 @@ jobs:
             --cmd "rm -rf ../${{ matrix.project.name }}" \
             --cmd "git clone https://github.com/IBM/${{ matrix.project.name }}.git ../${{ matrix.project.name }}" \
             --rcwd "../${{ matrix.project.name }}" \
+            --cmd "git switch ${{ matrix.project.branch }}" \
             --cmd "echo Full build..." \
             --cmd "../ibmi_bob/bin/makei b -e ${{ matrix.project.lib }}=$(so -bl ${GITHUB_HEAD_REF}_${{ matrix.project.name }}) | tee firstBuild.log" \
             --cmd "grep '${{ matrix.project.firstBuild }}' firstBuild.log || { echo 'First build of ${{ matrix.project.firstBuild }} failed!'; exit 1; }" \

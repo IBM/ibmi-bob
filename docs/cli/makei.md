@@ -123,7 +123,7 @@ Converts all members in a source physical file to properly-named (TOBi-compatibl
 
 For example, RPGLE source member `AB1001` will become IFS source file `AB1001.RPGLE`. Four exceptions exist, however: source member types CMD, MENU, and PNLGRP result in filename extensions .CMDSRC, .MENUSRC, and .PNLGRPSRC, respectively, and source member type C residing in source physical file H results in filename extension .H.
 
-All source files will be encoded in UTF-8. If the source physical file was created successfully, a `.ibmi.json` file with the CCSID value from the SRC-PF will be created in the same directory. Note that it will not override an existing `.ibmi.json` file. [Link to discussions](https://github.com/IBM/ibmi-bob/pull/115#issuecomment-1194661949)
+All source files will be encoded in UTF-8. If the source physical file was created successfully, a `.ibmi.json` file with the CCSID value from the SRC-PF will be created in the same directory. Note that it will not override an existing `.ibmi.json` file. [Link to discussions](https://github.com/IBM/ibmi-tobi/pull/115#issuecomment-1194661949)
 
 If the SRC-PF is 65535, then the value of the `ccsid` parameter of the cvtsrcpf command will be used.
 
