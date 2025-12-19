@@ -4,7 +4,7 @@
     "examples": [
         [
             {
-                "cmd": "CRTBNDRPG srcstmf('/home/tongkun/bob-recursive-example/QRPGLESRC/ORD700.PGM.RPGLE') PGM(TONGKUN/ORD700) DBGVIEW(*ALL) TGTCCSID(*JOB) OPTION(*EVENTF) TEXT('') INCDIR(QPROTOSRC)",
+                "cmd": "CRTBNDRPG srcstmf('/home/tongkun/tobi-example/QRPGLESRC/ORD700.PGM.RPGLE') PGM(TONGKUN/ORD700) DBGVIEW(*ALL) TGTCCSID(*JOB) OPTION(*EVENTF) TEXT('') INCDIR(QPROTOSRC)",
                 "cmd_time": "2022-04-18-07.38.48.176801000",
                 "msgs": [
                     {
@@ -35,7 +35,7 @@
         "examples": [
             [
                 {
-                    "cmd": "CRTBNDRPG srcstmf('/home/tongkun/bob-recursive-example/QRPGLESRC/ORD700.PGM.RPGLE') PGM(TONGKUN/ORD700) DBGVIEW(*ALL) TGTCCSID(*JOB) OPTION(*EVENTF) TEXT('') INCDIR(QPROTOSRC)",
+                    "cmd": "CRTBNDRPG srcstmf('/home/tongkun/tobi-example/QRPGLESRC/ORD700.PGM.RPGLE') PGM(TONGKUN/ORD700) DBGVIEW(*ALL) TGTCCSID(*JOB) OPTION(*EVENTF) TEXT('') INCDIR(QPROTOSRC)",
                     "cmd_time": "2022-04-18-07.38.48.176801000",
                     "msgs": [
                         {
@@ -67,7 +67,7 @@
         "properties": {
             "cmd": {
                "examples": [
-                   "CRTBNDRPG srcstmf('/home/tongkun/bob-recursive-example/QRPGLESRC/ORD700.PGM.RPGLE') PGM(TONGKUN/ORD700) DBGVIEW(*ALL) TGTCCSID(*JOB) OPTION(*EVENTF) TEXT('') INCDIR(QPROTOSRC)"
+                   "CRTBNDRPG srcstmf('/home/tongkun/tobi-example/QRPGLESRC/ORD700.PGM.RPGLE') PGM(TONGKUN/ORD700) DBGVIEW(*ALL) TGTCCSID(*JOB) OPTION(*EVENTF) TEXT('') INCDIR(QPROTOSRC)"
                 ],
                 "title": "Command",
                 "type": "string"

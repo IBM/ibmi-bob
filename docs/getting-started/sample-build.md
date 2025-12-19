@@ -1,6 +1,6 @@
 # Build the sample project
 
-Now that everything is installed and configured, let's build a [sample project](https://github.com/ibm/bob-recursive-example).
+Now that everything is installed and configured, let's build a [sample project](https://github.com/ibm/tobi-example).
 
 ## Perform a build
 
@@ -20,8 +20,8 @@ Now that everything is installed and configured, let's build a [sample project](
 1. **Get the source from a sample git project**
 
    ```shell
-   git clone https://github.com/ibm/bob-recursive-example
-   cd bob-recursive-example
+   git clone https://github.com/ibm/tobi-example
+   cd tobi-example
    ```
 
    If you didn't have git, simply do a `yum install git` to get it.
@@ -50,7 +50,7 @@ Now that everything is installed and configured, let's build a [sample project](
    Set variable <lib1> to 'TOBITEST'
    > make -k BUILDVARSMKPATH="/tmp/tmpigspspcr" -k TOBI_PATH="/home/tongkun/git/ibmi-tobi" -f "/home/tongkun/git/ibmi-tobi/mk/Makefile" all
    === Creating RPG module [XML001.RPGLE]
-   crtrpgmod module(TOBITEST/XML001) srcstmf('/home/tongkun/git/bob-recursive-example/QRPGLESRC/XML001.RPGLE') AUT() DBGVIEW(*ALL) OPTION(*EVENTF) OUTPUT(*PRINT) TEXT('') TGTCCSID(297) TGTRLS()
+   crtrpgmod module(TOBITEST/XML001) srcstmf('/home/tongkun/git/tobi-example/QRPGLESRC/XML001.RPGLE') AUT() DBGVIEW(*ALL) OPTION(*EVENTF) OUTPUT(*PRINT) TEXT('') TGTCCSID(297) TGTRLS()
    ✓ XML001.MODULE was created successfully!
    ...
    ...

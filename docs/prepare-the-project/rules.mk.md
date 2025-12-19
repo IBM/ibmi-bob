@@ -37,7 +37,7 @@ For example:
 SUBDIRS = functionsVAT QDDSSRC QDTASRC QPNLSRC QCLSRC QMSGSRC QRPGSRC QRPGLESRC QCBLSRC QSRVSRC QILESRVSRC QBNDSRC QILESRC QCMDSRC QSQLSRC
 ```
 
-This line at the project root directory will tell TOBi to build all the subdirectories under the [bob-recursive-example](https://github.com/edmundreinhardt/bob-recursive-example).
+This line at the project root directory will tell TOBi to build all the subdirectories under the [tobi-example](https://github.com/edmundreinhardt/tobi-example).
 
 ### Rules section
 
