@@ -138,7 +138,7 @@ FILE_TARGET_MAPPING = {
     "BNDDIR": {"BNDDIR"},
     "DTAARA": {"DTAARA"},
     "DTAQ": {"DTAQ"},
-    "SYSTRG": {"PGM"},
+    "SYSTRG": {"TRG"},
     "SQLPRC": {"PGM"},
     "TABLE": {"FILE"},
     "PFSQL": {"FILE"},
