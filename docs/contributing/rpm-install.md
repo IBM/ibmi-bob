@@ -6,16 +6,16 @@
 yum install bash coreutils gawk grep-gnu make-gnu python39 python39-ibm_db sed-gnu
 ```
 
-2. You may always grab the latest binary from the [releases](https://github.com/ibm/ibmi-bob/releases) page.
+2. You may always grab the latest binary from the [releases](https://github.com/ibm/ibmi-tobi/releases) page.
 
 To download the latest rpm file on IBM i, run the following
 
 ```bash
-curl -L https://github.com/IBM/ibmi-bob/releases/latest/download/tobi.rpm -o tobi.ppc64.rpm
+curl -L https://github.com/IBM/ibmi-tobi/releases/latest/download/tobi.rpm -o tobi.ppc64.rpm
 ```
 
 
-* If you want to test an older release, you can grab the URL from the [latest release on GitHub](https://github.com/ibm/ibmi-bob/releases).
+* If you want to test an older release, you can grab the URL from the [latest release on GitHub](https://github.com/ibm/ibmi-tobi/releases).
     * right click on the `.rpm` file and copy the link URL.
 
 3. Install the `.rpm`

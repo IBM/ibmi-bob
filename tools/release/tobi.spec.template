@@ -3,7 +3,7 @@ Version: ${VERSION}
 Release: 0
 License: Apache-2.0
 Summary: The Object Builder for IBM i
-Url: https://github.com/IBM/ibmi-bob/
+Url: https://github.com/IBM/ibmi-tobi/
 
 BuildRequires: make-gnu
 BuildRequires: tar-gnu
@@ -21,7 +21,7 @@ Requires: python39-ibm_db >= 2.0.5.12
 Obsoletes: bob < 3.0.0
 Conflicts: bob < 3.0.0
 
-Source0: https://github.com/IBM/ibmi-bob/archive/refs/tags/v%{version}.tar.gz
+Source0: https://github.com/IBM/ibmi-tobi/archive/refs/tags/v%{version}.tar.gz
 
 %description
 The Object Builder for i or TOBi is an open source dependency build system for 
@@ -52,7 +52,7 @@ This is a compatibility package to redirect to get TOBi installed for anyone loo
 for Bob.
 
 %prep
-%setup -n ibmi-bob-%{version}
+%setup -n ibmi-tobi-%{version}
 
 
 %install

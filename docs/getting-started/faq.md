@@ -2,7 +2,7 @@
 
 Below you'll find answers to the most commonly asked questions.
 If you don't find the answer you are looking for.
-Check out the [support](Support.md) page and [submit an issue](https://github.com/IBM/ibmi-bob/issues).
+Check out the [support](Support.md) page and [submit an issue](https://github.com/IBM/ibmi-tobi/issues).
 
 + I just extracted my source from source control and I am pointing to a library with object that are already built.  I only want to rebuild objects from source that I change after the extract? +
 

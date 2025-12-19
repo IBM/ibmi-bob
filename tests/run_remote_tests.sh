@@ -12,7 +12,7 @@
 # Options:
 #   -h, --host HOST       IBM i hostname or IP address
 #   -u, --user USER       IBM i username
-#   -p, --path PATH       Remote path on IBM i (default: ~/ibmi-bob)
+#   -p, --path PATH       Remote path on IBM i (default: ~/ibmi-tobi)
 #   -t, --tests TESTS     Specific tests to run (default: all)
 #   -v, --verbose         Verbose output
 #   --sync-only           Only sync code, don't run tests
@@ -36,7 +36,7 @@ set -e  # Exit on error
 # Default values
 IBM_HOST=""
 IBM_USER=""
-REMOTE_PATH="~/ibmi-bob"
+REMOTE_PATH="~/ibmi-tobi"
 TESTS="tests/unit/"
 VERBOSE=""
 SYNC_ONLY=false

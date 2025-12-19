@@ -54,7 +54,7 @@ jobs:
               secondCompile: "0 failed 1 succeed 1 total"
           }
     steps:
-      - name: Checkout ibmi-bob
+      - name: Checkout ibmi-tobi
         uses: actions/checkout@v4
       - name: Set up Node.js 20.x
         uses: actions/setup-node@v3

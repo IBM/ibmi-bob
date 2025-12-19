@@ -41,7 +41,7 @@ ModuleNotFoundError: No module named 'ibm_db_dbi'
 1. **Create `tests/unit/conftest.py`** (already provided in this project)
 2. **Run tests locally**:
    ```bash
-   cd ibmi-bob
+   cd ibmi-tobi
    pytest tests/unit/test_crtfrmstmf.py tests/unit/test_cvtsrcpf.py tests/unit/test_ibm_job.py -v
    ```
 ---
@@ -59,8 +59,8 @@ pip3 install pytest pytest-cov
 
 # Clone or copy your project to IBM i
 cd /home/youruser
-git clone https://github.com/your-org/ibmi-bob.git
-cd ibmi-bob
+git clone https://github.com/your-org/ibmi-tobi.git
+cd ibmi-tobi
 ```
 
 #### Step 2: Run Tests on IBM i
@@ -118,10 +118,10 @@ pytest tests/unit/ --cov=src/makei --cov-report=html
    IBM_USER="testuser"
    
    # Copy code to IBM i
-   rsync -avz --exclude='.git' . ${IBM_USER}@${IBM_HOST}:/home/${IBM_USER}/ibmi-bob/
+   rsync -avz --exclude='.git' . ${IBM_USER}@${IBM_HOST}:/home/${IBM_USER}/ibmi-tobi/
    
    # Run tests remotely
-   ssh ${IBM_USER}@${IBM_HOST} "cd /home/${IBM_USER}/ibmi-bob && pytest tests/unit/ -v"
+   ssh ${IBM_USER}@${IBM_HOST} "cd /home/${IBM_USER}/ibmi-tobi && pytest tests/unit/ -v"
    ```
 
 3. **Run remote tests**:
