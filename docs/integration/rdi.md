@@ -93,7 +93,7 @@ Click `New`, populate the fields, then click `OK`.  Repeat this process for all 
 
 | Variable Name      | Value                                                        | Description                                                  |
 | :----------------- | :----------------------------------------------------------- | :----------------------------------------------------------- |
-| `TOBi_bash`         | The location of your bash executable. <br /> Mac: `/bin/bash` <br /> Windows: `c:\cygwin64\bin\bash.exe` | Location of the Bash shell on this system.                   |
+| `tobi_bash`         | The location of your bash executable. <br /> Mac: `/bin/bash` <br /> Windows: `c:\cygwin64\bin\bash.exe` | Location of the Bash shell on this system.                   |
 | `tobi_client_tools` | The location of the tobi/Client-tools directory, such as: <br /> Mac: `/Users/your_name/Develop/Source/tobi/Client-tools` <br /> Windows: `/cygdrive/c/Users/your_name/Develop/Source/tobi/Client-tools` | Location of the TOBi client tools scripts, from a Bash context. |
 
 When everything has been entered, it should look similar to this: 
