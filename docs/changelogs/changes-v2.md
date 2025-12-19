@@ -36,7 +36,7 @@ Since Bob v2, we don't create the `Makefile` anymore and we can define a project
 
 - `.ibmi.json`: in this file, we allow developer to override configurations such as target CCSID and object library for the containing directory and its subdirectories.  [More on the directory level metadata .ibmi.json](prepare-the-project/ibmi-json.md) 
 
-A sample project for Bob v2 can be found at [edmundreinhardt/bob-recursive-example](https://github.com/edmundreinhardt/bob-recursive-example).
+A sample project for Bob v2 can be found at [edmundreinhardt/tobi-example](https://github.com/edmundreinhardt/tobi-example).
 
 ### Logs
 

@@ -417,8 +417,8 @@ class RulesMk:
 
 
 if __name__ == "__main__":
-    # print(RulesMk.from_file(Path("/Users/tongkun/git/bob-recursive-example/QDDSSRC/Rules.mk")))
-    # print(str(RulesMk.from_file(Path("/Users/tongkun/git/bob-recursive-example/functionsVAT/Rules.mk"))))
+    # print(RulesMk.from_file(Path("/Users/tongkun/git/tobi-example/QDDSSRC/Rules.mk")))
+    # print(str(RulesMk.from_file(Path("/Users/tongkun/git/tobi-example/functionsVAT/Rules.mk"))))
     import doctest
 
     doctest.testmod()

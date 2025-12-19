@@ -4,7 +4,7 @@
 makei/utils.py can be tested via doctest
 Requires PYTHONPATH being set to the ibmi-tobi project root so that the 'makei' module is recognized. 
 ```
-export PYTHONPATH=<bob project root>/src
+export PYTHONPATH=<tobi project root>/src
 python makei/utils.py -v
 ```
 
@@ -12,7 +12,7 @@ python makei/utils.py -v
 makei/tests contains tests that can be run through VS Code Test Explorer extension
 
 ## Running makei
-1. Use the https://github.com/edmundreinhardt/bob-recursive-example and do a `makei b -e <yourlib>` into an empty directory
+1. Use the https://github.com/edmundreinhardt/tobi-example and do a `makei b -e <yourlib>` into an empty directory
 2. Use the https://github.com/worksofliam/company_system and do a `makei b -e <yourlib>` into an empty directory
 ( tests with an empty iproj.json includePath)
 

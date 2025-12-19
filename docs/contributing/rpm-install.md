@@ -33,7 +33,7 @@ rpm -U tobi.ppc64.rpm
 
 ## Verify TOBi is installed correctly
 
-You may check if bob is installed correctly by invoking `makei` on IBM i. You should see an output similar to this.
+You may check if tobi is installed correctly by invoking `makei` on IBM i. You should see an output similar to this.
 
 ```
 $ makei
