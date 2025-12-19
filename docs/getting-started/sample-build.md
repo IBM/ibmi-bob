@@ -48,7 +48,7 @@ Now that everything is installed and configured, let's build a [sample project](
   ```
    $ makei b -e lib1=TOBITEST
    Set variable <lib1> to 'TOBITEST'
-   > make -k BUILDVARSMKPATH="/tmp/tmpigspspcr" -k TOBI_PATH="/home/tongkun/git/ibmi-bob" -f "/home/tongkun/git/ibmi-bob/mk/Makefile" all
+   > make -k BUILDVARSMKPATH="/tmp/tmpigspspcr" -k TOBI_PATH="/home/tongkun/git/ibmi-tobi" -f "/home/tongkun/git/ibmi-tobi/mk/Makefile" all
    === Creating RPG module [XML001.RPGLE]
    crtrpgmod module(TOBITEST/XML001) srcstmf('/home/tongkun/git/bob-recursive-example/QRPGLESRC/XML001.RPGLE') AUT() DBGVIEW(*ALL) OPTION(*EVENTF) OUTPUT(*PRINT) TEXT('') TGTCCSID(297) TGTRLS()
    ✓ XML001.MODULE was created successfully!

@@ -49,18 +49,18 @@ RSA private/public key authentication is used by the scripts to connect to the I
 
 ## Install Bob client scripts
 
-The Bob project (git@github.com:IBM/ibmi-bob) contains a `Client-tools` directory that contains scripts for running on a PC or Mac.  Copy the `Client-tools` directory to somewhere on your computer (e.g., `C:\Users\your_name\Develop\Bob\Client-tools` [PC] or `~/Develop/Bob/Client-tools` [Mac]).  The easiest way to do this is simply to use Git to clone the Bob project to that location on your PC, either with a GUI Git client or by command line:
+The Bob project (git@github.com:IBM/ibmi-tobi) contains a `Client-tools` directory that contains scripts for running on a PC or Mac.  Copy the `Client-tools` directory to somewhere on your computer (e.g., `C:\Users\your_name\Develop\Bob\Client-tools` [PC] or `~/Develop/Bob/Client-tools` [Mac]).  The easiest way to do this is simply to use Git to clone the Bob project to that location on your PC, either with a GUI Git client or by command line:
 
 _Windows (via Cygwin64 Terminal):_
 ```shell
 $ cd /cygdrive/c/Users/username/Develop
-$ git clone git@github.com:IBM/ibmi-bob.git
+$ git clone git@github.com:IBM/ibmi-tobi.git
 ```
 
 _macOS (via Terminal.app):_
 ```shell
 $ cd ~/Develop
-$ git clone git@github.com:IBM/ibmi-bob.git
+$ git clone git@github.com:IBM/ibmi-tobi.git
 ```
 
 ## Import the external tools definitions into RDi

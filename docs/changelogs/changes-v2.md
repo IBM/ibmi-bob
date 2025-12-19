@@ -1,6 +1,6 @@
 ## Changes in Bob v2
 
-Bob v2 now known as The Object Builder for i (TOBi) ([IBM/ibmi-bob](https://github.com/IBM/ibmi-bob)) improves many aspects over original Bob developed by S4i ([s4isystems/Bob](https://github.com/s4isystems/Bob)).
+Bob v2 now known as The Object Builder for i (TOBi) ([IBM/ibmi-tobi](https://github.com/IBM/ibmi-tobi)) improves many aspects over original Bob developed by S4i ([s4isystems/Bob](https://github.com/s4isystems/Bob)).
 
 If you previously used Bob v1, the following changes should be noted.
 

@@ -29,7 +29,7 @@ mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
 ```bash
 export TOBI_VERSION=r.v.m 
 cd ~/rpmbuild
-curl "https://raw.githubusercontent.com/IBM/ibmi-bob/v${TOBI_VERSION}/tobi.spec" -o SPECS/tobi.spec
+curl "https://raw.githubusercontent.com/IBM/ibmi-tobi/v${TOBI_VERSION}/tobi.spec" -o SPECS/tobi.spec
 rpmbuild -ba SPECS/tobi.SPEC
 ```
 
