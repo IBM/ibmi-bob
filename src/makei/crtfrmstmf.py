@@ -327,11 +327,11 @@ def cli():
     srcstmf_absolute_path = str(Path(args.stream_file.strip()).resolve())
     env_settings = {}
     if "curlib" in os.environ:
-        env_settings["curlib"] = os.environ["curlib"]
+        env_settings["curlib"] = sanitize_lib_envvar(os.environ["curlib"])
     if "preUsrlibl" in os.environ:
-        env_settings["preUsrlibl"] = os.environ["preUsrlibl"]
+        env_settings["preUsrlibl"] = sanitize_lib_envvar(os.environ["preUsrlibl"])
     if "postUsrlibl" in os.environ:
-        env_settings["postUsrlibl"] = os.environ["postUsrlibl"]
+        env_settings["postUsrlibl"] = sanitize_lib_envvar(os.environ["postUsrlibl"])
     if "IBMiEnvCmd" in os.environ:
         env_settings["IBMiEnvCmd"] = os.environ["IBMiEnvCmd"]
 
@@ -356,6 +356,19 @@ def _get_attr(srcstmf: str):
         [key, value] = attr.split("=")
         attrs[key] = value
     return attrs
+
+
+# Library names that include the hash symbol need to be
+# escaped otherwise make will treat characters after the
+# hash as a comment.
+#
+# This escaping is performed in `build.py`.
+#
+# Here we are replacing the escaped characters with the
+# non-escaped hash character, reversing the escaping
+# needed by make.
+def sanitize_lib_envvar(lib_or_libl: str):
+    return lib_or_libl.replace("\\#", "#")
 
 
 def retrieve_ccsid(srcstmf: str) -> str:
