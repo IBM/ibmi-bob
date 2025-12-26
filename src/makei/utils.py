@@ -119,6 +119,7 @@ def objlib_to_path(lib, object_name=None) -> str:
         return f"/QSYS.LIB/{object_name}"
     if object_name is not None:
         return f"/QSYS.LIB/{lib}.LIB/{object_name}"
+    lib = lib.replace("#", "\\#")
     return f"/QSYS.LIB/{lib}.LIB"
 
 
